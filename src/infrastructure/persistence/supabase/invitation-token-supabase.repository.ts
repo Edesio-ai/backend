@@ -12,12 +12,12 @@ export class SupabaseInvitationTokenRepository
         const { data, error } = await this.supabaseAdmin
             .from('invitation_tokens')
             .select(`
-                id,
+                  id,
                 invited_email,
-                chatbots_alloues,
+                assigned_chatbots,
                 expires_at,
                 used_at,
-                etablissements!inner ( nom )
+                establishment:establishment!invitation_tokens_establishment_id_fkey ( name )
             `)
             .eq('token', token)
             .single();
@@ -38,11 +38,12 @@ export class SupabaseInvitationTokenRepository
 
         const maskedEmail = this.maskEmail(data.invited_email);
 
+
         return {
-            valid: true,
+            isValid: true,
             maskedEmail: maskedEmail,
-            etablissementNom: data.etablissements.nom,
-            chatbotsAlloues: data.chatbots_alloues,
+            establishmentName: data.establishment.name,
+            assignedChatbots: data.assignedChatbots,
         };
     }
 

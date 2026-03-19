@@ -1,6 +1,6 @@
 export type InvitationTokenPreview = {
-    valid: true;
+    isValid: true;
     maskedEmail: string;
-    etablissementNom: string;
-    chatbotsAlloues: number;
+    establishmentName: string;
+    assignedChatbots: number;
 };

@@ -48,19 +48,19 @@ class Fixtures {
   public readonly token = 'token-123';
 
   public readonly preview: InvitationTokenPreview = {
-    valid: true,
+    isValid: true,
     maskedEmail: 'j**n@acme.com',
-    etablissementNom: 'Edesio Academy',
-    chatbotsAlloues: 2,
+    establishmentName: 'Edesio Academy',
+    assignedChatbots: 2,
   };
 
   private readonly validData = {
     id: 'id-1',
     invited_email: 'john@acme.com',
-    chatbots_alloues: 2,
+    assignedChatbots: 2,
     expires_at: new Date(Date.now() + 60_000).toISOString(),
     used_at: null,
-    etablissements: { nom: 'Edesio Academy' },
+    establishment: { name: 'Edesio Academy' },
   };
 
   private readonly singleMock = jest.fn();
