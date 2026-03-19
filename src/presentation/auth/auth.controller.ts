@@ -1,12 +1,16 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from '../../application/auth/auth.use-case';
+import { Controller, Get, Param } from '@nestjs/common';
 
-@Controller()
+import { GetInvitationPreviewUseCase } from '../../application/auth/get-invitation-preview.use-case';
+import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
+import { GetInvitationPreviewParamsDto } from './dto/get-invitation-preview.dto';
+
+@Controller('auth')
 export class AuthController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly getInvitationPreviewUseCase: GetInvitationPreviewUseCase) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('invitation-preview/:token')
+  async getInvitationPreview(@Param() params: GetInvitationPreviewParamsDto): Promise<InvitationTokenPreview> {
+    const invitationTokenPreview = await this.getInvitationPreviewUseCase.execute(params.token);
+    return invitationTokenPreview;
   }
 }
