@@ -2,13 +2,17 @@ import { Module } from '@nestjs/common';
 
 import { AuthController } from './auth.controller';
 import {GetInvitationPreviewUseCase } from '../../application/auth/get-invitation-preview.use-case';
-import { InvitationTokenSupabaseModule } from '../../infrastructure/persistence/supabase/invitation-token-supabase.module';
+import { authPersistenceModule } from '../../infrastructure/persistence/supabase/auth-persistence.module';
+import { SignUpTeacherUseCase } from '../../application/auth/sign-up-teacher.use-case';
 
 
 @Module({
-  imports: [InvitationTokenSupabaseModule],
+  imports: [authPersistenceModule],
   controllers: [AuthController],
-  providers: [GetInvitationPreviewUseCase],
+  providers: [
+    GetInvitationPreviewUseCase,
+    SignUpTeacherUseCase
+  ],
 })
 
 export class AuthModule {}
