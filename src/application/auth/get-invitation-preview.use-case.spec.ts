@@ -1,7 +1,7 @@
-import { BadRequestException } from '@nestjs/common';
 import { GetInvitationPreviewUseCase } from './get-invitation-preview.use-case';
-import { InvitationTokenRepository } from 'src/interfaces/persistence/invitation-token.repository';
-import { InvitationTokenPreview } from 'src/domain/auth/invitation.type';
+import { AuthRepository } from '../../interfaces/persistence/auth.repository';
+import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
+import { InvitationTokenNotFoundError } from '../../domain/auth/errors';
 
 describe('GetInvitationPreviewUseCase', () => {
     let fixtures: Fixtures;
@@ -10,7 +10,7 @@ describe('GetInvitationPreviewUseCase', () => {
         fixtures = new Fixtures();
     });
 
-    it('should throw BadRequestException when token is empty', async () => {
+    it('should throw InvitationTokenNotFoundError when token is empty', async () => {
         const promise = fixtures.whenExecuteWith('');
 
         await fixtures.thenThrowBadRequest(promise);
@@ -35,7 +35,7 @@ describe('GetInvitationPreviewUseCase', () => {
 });
 
 class Fixtures {
-    public readonly invitationTokenRepository: jest.Mocked<InvitationTokenRepository>;
+    public readonly authRepository: jest.Mocked<AuthRepository>;
     public readonly getInvitationPreviewUseCase: GetInvitationPreviewUseCase;
 
     public readonly token = 'token-123';
@@ -43,17 +43,19 @@ class Fixtures {
     public readonly repositoryError: Error;
 
     constructor() {
-        this.invitationTokenRepository = {
+        this.authRepository = {
             getInvitationPreview: jest.fn(),
+            valideInvitationToken: jest.fn(),
+            createTeacher: jest.fn(),
         };
 
-        this.getInvitationPreviewUseCase = new GetInvitationPreviewUseCase(this.invitationTokenRepository);
+        this.getInvitationPreviewUseCase = new GetInvitationPreviewUseCase(this.authRepository);
 
         this.preview = {
-            valid: true,
+            isValid: true,
             maskedEmail: 'j***@mail.com',
-            etablissementNom: 'Mon Etablissement',
-            chatbotsAlloues: 2,
+            establishmentName: 'Mon Etablissement',
+            assignedChatbots: 2,
         };
 
         this.repositoryError = new Error('DB down');
@@ -64,15 +66,15 @@ class Fixtures {
     }
 
     whenRepositoryReturnsPreview() {
-        this.invitationTokenRepository.getInvitationPreview.mockResolvedValue(this.preview);
+        this.authRepository.getInvitationPreview.mockResolvedValue(this.preview);
     }
 
     whenRepositoryThrowsError() {
-        this.invitationTokenRepository.getInvitationPreview.mockRejectedValue(this.repositoryError);
+        this.authRepository.getInvitationPreview.mockRejectedValue(this.repositoryError);
     }
 
     async thenThrowBadRequest(promise: Promise<unknown>) {
-        await expect(promise).rejects.toBeInstanceOf(BadRequestException);
+        await expect(promise).rejects.toBeInstanceOf(InvitationTokenNotFoundError);
     }
 
     async thenThrowRepositoryError(promise: Promise<unknown>) {
@@ -80,12 +82,12 @@ class Fixtures {
     }
 
     thenRepositoryCalledWith(token: string) {
-        expect(this.invitationTokenRepository.getInvitationPreview).toHaveBeenCalledWith(token);
-        expect(this.invitationTokenRepository.getInvitationPreview).toHaveBeenCalledTimes(1);
+        expect(this.authRepository.getInvitationPreview).toHaveBeenCalledWith(token);
+        expect(this.authRepository.getInvitationPreview).toHaveBeenCalledTimes(1);
     }
 
     thenRepositoryNotCalled() {
-        expect(this.invitationTokenRepository.getInvitationPreview).not.toHaveBeenCalled();
+        expect(this.authRepository.getInvitationPreview).not.toHaveBeenCalled();
     }
 
     thenReturnExpectedPreview(result: InvitationTokenPreview) {
