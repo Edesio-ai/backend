@@ -56,3 +56,9 @@ export class TokenUpdateError extends AuthError {
     readonly httpStatus = 500;
     constructor(message?: string) { super(message || 'Token update error'); }
 }
+
+export class UserLoginError extends AuthError {
+    readonly code = 'USER_LOGIN_ERROR';
+    readonly httpStatus = 401;
+    constructor(message?: string) { super(message || 'User login error'); }
+}

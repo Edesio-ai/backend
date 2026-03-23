@@ -12,15 +12,29 @@ import {
     UserCreationError,
     UserCreationFailedError,
     TeacherProfileCreationError,
-    TokenUpdateError
+    TokenUpdateError,
+    UserLoginError
 } from "../../../domain/auth/errors";
-import { User, Teacher } from "../../../domain/auth/sign-up.type";
-import { UserMetadata } from "../../../domain/auth/sign-up.type";
+import { User, Teacher, Session } from "../../../domain/auth/auth.type";
+import { UserMetadata } from "../../../domain/auth/auth.type";
 
 @Injectable()
 export class AuthSupabaseRepository
     implements AuthRepository {
     constructor(@Inject(SUPABASE_ADMIN) private readonly supabaseAdmin: any) { }
+
+    public async loginUser(email: string, password: string): Promise<Session> {
+        const { data, error } = await this.supabaseAdmin.auth.signInWithPassword({
+            email: email.toLowerCase().trim(),
+            password,
+        });
+
+        if (error) {
+            throw new UserLoginError(error.message);
+        }
+
+        return data;
+    }
 
     public async getInvitationPreview(token: string): Promise<InvitationTokenPreview> {
         const { data, error } = await this.supabaseAdmin

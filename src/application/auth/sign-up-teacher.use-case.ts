@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 
-import { UserMetadata } from "../../domain/auth/sign-up.type";
-import { SignUpTeacherBody } from "../../domain/auth/sign-up.type";
+import { UserMetadata } from "../../domain/auth/auth.type";
+import { SignUpTeacherBody } from "../../domain/auth/auth.type";
 import { AUTH_REPOSITORY, type AuthRepository } from "../../interfaces/persistence/auth.repository";
 import { InvitationToken } from "../../domain/auth/invitation.type";
 import { EMAIL_PROVIDER, type EmailProviderInterface } from "../../interfaces/mailer/email.provider";

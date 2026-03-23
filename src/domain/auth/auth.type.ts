@@ -6,6 +6,27 @@ export type SignUpTeacherBody = {
     lastname: string;
 }
 
+export type Session = {
+    user: UserSession;
+    session: AuthSession;
+}
+
+export type AuthSession = {
+    access_token: string;
+    token_type: string;
+    expires_in: number;
+    expires_at: string;
+    refresh_token: string;
+    user: UserSession;
+    weak_password: boolean | null;
+}
+export type UserSession = User & {
+    confirmed_at: string;
+    last_sign_in_at: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export type User = {
     id: string;
     aud: string;
@@ -66,4 +87,9 @@ export type RegisterBody = {
     lastname: string;
     acceptTerms: boolean;
     establishment?: string;
+}
+
+export type LoginBody = {
+    email: string;
+    password: string;
 }
