@@ -1,0 +1,10 @@
+export type WelcomeEmailRole = "teacher" | "student" | "establishment" | "standalone";
+
+export type WelcomeEmailTemplateData = {
+  name: string;
+  roleLabel: string;
+  dashboardPath: string;
+  quickStartItems: string[];
+  appUrl: string;
+  logoUrl: string;
+};

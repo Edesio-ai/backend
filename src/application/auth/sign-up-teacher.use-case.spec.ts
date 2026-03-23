@@ -2,6 +2,7 @@ import { SignUpTeacherUseCase } from './sign-up-teacher.use-case';
 import { AuthRepository } from '../../interfaces/persistence/auth.repository';
 import { InvitationToken } from '../../domain/auth/invitation.type';
 import { SignUpTeacherBody } from '../../domain/auth/sign-up.type';
+import { EmailProviderInterface } from '../../interfaces/mailer/email.provider';
 
 describe('SignUpTeacherUseCase', () => {
     let fixtures: Fixtures;
@@ -12,18 +13,20 @@ describe('SignUpTeacherUseCase', () => {
 
     it('should validate invitation token then create teacher when body is valid', async () => {
         fixtures.whenValideInvitationTokenReturnsInvitation();
-        fixtures.whenCreateTeacherResolves();
+        fixtures.whenCreateUserResolves();
+        fixtures.whenSendWelcomeEmailResolves();
 
         await fixtures.whenExecuteWith(fixtures.body);
 
         fixtures.thenValideInvitationTokenCalledWith(fixtures.body.token, fixtures.body.email);
-        fixtures.thenCreateTeacherCalledWith(
+        fixtures.thenCreateUserCalledWith(
             fixtures.body.email,
             fixtures.body.password,
             fixtures.body.firstname,
             fixtures.body.lastname,
             fixtures.invitationToken,
         );
+        fixtures.thenSendWelcomeEmailCalledWith(fixtures.body.email, fixtures.body.firstname, 'teacher');
     });
 
     it('should propagate error when valideInvitationToken fails', async () => {
@@ -32,36 +35,55 @@ describe('SignUpTeacherUseCase', () => {
         const promise = fixtures.whenExecuteWith(fixtures.body);
 
         await fixtures.thenThrowRepositoryError(promise);
-        fixtures.thenCreateTeacherNotCalled();
+        fixtures.thenCreateUserNotCalled();
+        fixtures.thenSendWelcomeEmailNotCalled();
     });
 
-    it('should propagate error when createTeacher fails', async () => {
+    it('should propagate error when createUser fails', async () => {
         fixtures.whenValideInvitationTokenReturnsInvitation();
-        fixtures.whenCreateTeacherThrowsError();
+        fixtures.whenCreateUserThrowsError();
 
         const promise = fixtures.whenExecuteWith(fixtures.body);
 
         await fixtures.thenThrowRepositoryError(promise);
+        fixtures.thenValideInvitationTokenCalledWith(fixtures.body.token, fixtures.body.email);
+        fixtures.thenSendWelcomeEmailNotCalled();
+    });
+
+    it('should propagate error when sendWelcomeEmail fails', async () => {
+        fixtures.whenValideInvitationTokenReturnsInvitation();
+        fixtures.whenCreateUserResolves();
+        fixtures.whenSendWelcomeEmailThrowsError();
+
+        const promise = fixtures.whenExecuteWith(fixtures.body);
+
+        await fixtures.thenThrowEmailProviderError(promise);
         fixtures.thenValideInvitationTokenCalledWith(fixtures.body.token, fixtures.body.email);
     });
 });
 
 class Fixtures {
     public readonly authRepository: jest.Mocked<AuthRepository>;
+    public readonly emailProvider: jest.Mocked<EmailProviderInterface>;
     public readonly signUpTeacherUseCase: SignUpTeacherUseCase;
 
     public readonly body: SignUpTeacherBody;
     public readonly invitationToken: InvitationToken;
     public readonly repositoryError: Error;
+    public readonly emailProviderError: Error;
 
     constructor() {
         this.authRepository = {
             getInvitationPreview: jest.fn(),
             valideInvitationToken: jest.fn(),
-            createTeacher: jest.fn(),
+            createUser: jest.fn(),
         };
 
-        this.signUpTeacherUseCase = new SignUpTeacherUseCase(this.authRepository);
+        this.emailProvider = {
+            sendWelcomeEmail: jest.fn(),
+        };
+
+        this.signUpTeacherUseCase = new SignUpTeacherUseCase(this.authRepository, this.emailProvider);
 
         this.body = {
             token: 'invitation-token-abc',
@@ -84,6 +106,7 @@ class Fixtures {
         };
 
         this.repositoryError = new Error('DB down');
+        this.emailProviderError = new Error('Email provider down');
     }
 
     whenExecuteWith(body: SignUpTeacherBody) {
@@ -98,16 +121,28 @@ class Fixtures {
         this.authRepository.valideInvitationToken.mockRejectedValue(this.repositoryError);
     }
 
-    whenCreateTeacherResolves() {
-        this.authRepository.createTeacher.mockResolvedValue(undefined);
+    whenCreateUserResolves() {
+        this.authRepository.createUser.mockResolvedValue(undefined);
     }
 
-    whenCreateTeacherThrowsError() {
-        this.authRepository.createTeacher.mockRejectedValue(this.repositoryError);
+    whenCreateUserThrowsError() {
+        this.authRepository.createUser.mockRejectedValue(this.repositoryError);
+    }
+
+    whenSendWelcomeEmailResolves() {
+        this.emailProvider.sendWelcomeEmail.mockResolvedValue(undefined);
+    }
+
+    whenSendWelcomeEmailThrowsError() {
+        this.emailProvider.sendWelcomeEmail.mockRejectedValue(this.emailProviderError);
     }
 
     async thenThrowRepositoryError(promise: Promise<unknown>) {
         await expect(promise).rejects.toBe(this.repositoryError);
+    }
+
+    async thenThrowEmailProviderError(promise: Promise<unknown>) {
+        await expect(promise).rejects.toBe(this.emailProviderError);
     }
 
     thenValideInvitationTokenCalledWith(token: string, email: string) {
@@ -115,24 +150,36 @@ class Fixtures {
         expect(this.authRepository.valideInvitationToken).toHaveBeenCalledTimes(1);
     }
 
-    thenCreateTeacherCalledWith(
+    thenCreateUserCalledWith(
         email: string,
         password: string,
         firstname: string,
         lastname: string,
         invitationToken: InvitationToken,
     ) {
-        expect(this.authRepository.createTeacher).toHaveBeenCalledWith(
+        expect(this.authRepository.createUser).toHaveBeenCalledWith(
             email,
             password,
-            firstname,
-            lastname,
+            {
+                role: 'teacher',
+                firstname,
+                lastname,
+            },
             invitationToken,
         );
-        expect(this.authRepository.createTeacher).toHaveBeenCalledTimes(1);
+        expect(this.authRepository.createUser).toHaveBeenCalledTimes(1);
     }
 
-    thenCreateTeacherNotCalled() {
-        expect(this.authRepository.createTeacher).not.toHaveBeenCalled();
+    thenCreateUserNotCalled() {
+        expect(this.authRepository.createUser).not.toHaveBeenCalled();
+    }
+
+    thenSendWelcomeEmailCalledWith(email: string, name: string, role: string) {
+        expect(this.emailProvider.sendWelcomeEmail).toHaveBeenCalledWith(email, name, role);
+        expect(this.emailProvider.sendWelcomeEmail).toHaveBeenCalledTimes(1);
+    }
+
+    thenSendWelcomeEmailNotCalled() {
+        expect(this.emailProvider.sendWelcomeEmail).not.toHaveBeenCalled();
     }
 }

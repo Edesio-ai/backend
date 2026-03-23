@@ -27,22 +27,22 @@ export class InvitationTokenEmailMismatchError extends AuthError {
     constructor(message?: string) { super(message || 'Invitation email mismatch with the email provided'); }
 }
 
-export class TeacherAlreadyExistsError extends AuthError {
+export class UserAlereadyExistsError extends AuthError {
     readonly code = 'TEACHER_ALREADY_EXISTS';
     readonly httpStatus = 400;
-    constructor(message?: string) { super(message || 'Teacher already exists'); }
+    constructor(message?: string) { super(message || 'User already exists'); }
 }
 
-export class TeacherCreationError extends AuthError {
-    readonly code = 'TEACHER_CREATION_ERROR';
+export class UserCreationError extends AuthError {
+    readonly code = 'USER_CREATION_ERROR';
     readonly httpStatus = 400;
-    constructor(message?: string) { super(message || 'Teacher creation error'); }
+    constructor(message?: string) { super(message || 'User creation error'); }
 }
 
-export class TeacherCreationFailedError extends AuthError {
-    readonly code = 'TEACHER_CREATION_FAILED';
+export class UserCreationFailedError extends AuthError {
+    readonly code = 'USER_CREATION_FAILED';
     readonly httpStatus = 500;
-    constructor(message?: string) { super(message || 'Teacher creation failed'); }
+    constructor(message?: string) { super(message || 'User creation failed'); }
 }
 
 export class TeacherProfileCreationError extends AuthError {

@@ -5,9 +5,9 @@ import {
   InvitationTokenEmailMismatchError,
   InvitationTokenExpiredError,
   InvitationTokenNotFoundError,
-  TeacherAlreadyExistsError,
-  TeacherCreationError,
-  TeacherCreationFailedError,
+  UserAlereadyExistsError,
+  UserCreationError,
+  UserCreationFailedError,
   TeacherProfileCreationError,
   TokenUpdateError,
 } from '../../../domain/auth/errors';
@@ -103,17 +103,17 @@ describe('AuthSupabaseRepository', () => {
     });
   });
 
-  describe('createTeacher', () => {
-    let fixtures: CreateTeacherFixtures;
+  describe('createUser', () => {
+    let fixtures: CreateUserFixtures;
 
     beforeEach(() => {
-      fixtures = new CreateTeacherFixtures();
+      fixtures = new CreateUserFixtures();
     });
 
     it('should create auth user, teacher profile and mark invitation token as used', async () => {
       fixtures.whenFullSuccessPath();
 
-      await fixtures.whenCreateTeacher();
+      await fixtures.whenCreateUser();
 
       expect(fixtures.createUserMock).toHaveBeenCalledTimes(1);
       expect(fixtures.teachersInsertMock).toHaveBeenCalledTimes(1);
@@ -124,27 +124,27 @@ describe('AuthSupabaseRepository', () => {
       expect(fixtures.tokensIsMock).toHaveBeenCalledWith('used_at', null);
     });
 
-    it('should throw TeacherAlreadyExistsError when user is already registered', async () => {
+    it('should throw UserAlereadyExistsError when user is already registered', async () => {
       fixtures.whenCreateUserReturnsAlreadyRegistered();
 
-      const promise = fixtures.whenCreateTeacher();
+      const promise = fixtures.whenCreateUser();
 
       await fixtures.thenThrowTeacherAlreadyExists(promise);
       expect(fixtures.teachersInsertMock).not.toHaveBeenCalled();
     });
 
-    it('should throw TeacherCreationError on other admin createUser errors', async () => {
+    it('should throw UserCreationError on other admin createAuthUser errors', async () => {
       fixtures.whenCreateUserReturnsGenericError();
 
-      const promise = fixtures.whenCreateTeacher();
+      const promise = fixtures.whenCreateUser();
 
-      await fixtures.thenThrowTeacherCreationError(promise);
+      await fixtures.thenThrowUserCreationError(promise);
     });
 
-    it('should throw TeacherCreationFailedError when admin response has no user', async () => {
+    it('should throw UserCreationFailedError when admin response has no user', async () => {
       fixtures.whenCreateUserReturnsNoUser();
 
-      const promise = fixtures.whenCreateTeacher();
+      const promise = fixtures.whenCreateUser();
 
       await fixtures.thenThrowTeacherCreationFailed(promise);
     });
@@ -152,7 +152,7 @@ describe('AuthSupabaseRepository', () => {
     it('should throw TeacherProfileCreationError and delete auth user when teacher insert fails', async () => {
       fixtures.whenCreateUserSucceedsButTeacherInsertFails();
 
-      const promise = fixtures.whenCreateTeacher();
+      const promise = fixtures.whenCreateUser();
 
       await fixtures.thenThrowTeacherProfileCreationError(promise);
       expect(fixtures.deleteUserMock).toHaveBeenCalledWith('user-uuid-1');
@@ -161,7 +161,7 @@ describe('AuthSupabaseRepository', () => {
     it('should throw TokenUpdateError when updating invitation token fails', async () => {
       fixtures.whenCreateUserAndTeacherInsertSucceedButTokenUpdateFails();
 
-      const promise = fixtures.whenCreateTeacher();
+      const promise = fixtures.whenCreateUser();
 
       await fixtures.thenThrowTokenUpdateError(promise);
     });
@@ -182,6 +182,7 @@ class GetInvitationPreviewFixtures {
     id: 'id-1',
     invited_email: 'john@acme.com',
     assigned_chatbots: 2,
+    assignedChatbots: 2,
     expires_at: new Date(Date.now() + 60_000).toISOString(),
     used_at: null,
     establishment: { name: 'Edesio Academy' },
@@ -351,7 +352,7 @@ class ValideInvitationTokenFixtures {
   }
 }
 
-class CreateTeacherFixtures {
+class CreateUserFixtures {
   public readonly invitationToken: InvitationToken = {
     id: 'inv-token-id-1',
     establishment_id: 'est-1',
@@ -418,7 +419,7 @@ class CreateTeacherFixtures {
           user_metadata: { firstname: 'Jean', lastname: 'Dupont', role: 'teacher' },
         },
       },
-      adminError: null,
+      error: null,
     });
     this.teachersSingleMock.mockResolvedValue({ data: this.teacherRow, error: null });
     this.tokensIsMock.mockResolvedValue({ error: null });
@@ -427,21 +428,21 @@ class CreateTeacherFixtures {
   whenCreateUserReturnsAlreadyRegistered() {
     this.createUserMock.mockResolvedValue({
       data: null,
-      adminError: { message: 'User already registered' },
+      error: { message: 'User already registered' },
     });
   }
 
   whenCreateUserReturnsGenericError() {
     this.createUserMock.mockResolvedValue({
       data: null,
-      adminError: { message: 'Network error' },
+      error: { message: 'Network error' },
     });
   }
 
   whenCreateUserReturnsNoUser() {
     this.createUserMock.mockResolvedValue({
       data: { user: null },
-      adminError: null,
+      error: null,
     });
   }
 
@@ -454,7 +455,7 @@ class CreateTeacherFixtures {
           user_metadata: { firstname: 'Jean', lastname: 'Dupont', role: 'teacher' },
         },
       },
-      adminError: null,
+      error: null,
     });
     this.teachersSingleMock.mockResolvedValue({
       data: null,
@@ -472,26 +473,31 @@ class CreateTeacherFixtures {
           user_metadata: { firstname: 'Jean', lastname: 'Dupont', role: 'teacher' },
         },
       },
-      adminError: null,
+      error: null,
     });
     this.teachersSingleMock.mockResolvedValue({ data: this.teacherRow, error: null });
     this.tokensIsMock.mockResolvedValue({ error: { message: 'update failed' } });
   }
 
-  whenCreateTeacher() {
-    return this.sut.createTeacher('teacher@school.com', 'secret', 'Jean', 'Dupont', this.invitationToken);
+  whenCreateUser() {
+    return this.sut.createUser(
+      'teacher@school.com',
+      'secret',
+      { firstname: 'Jean', lastname: 'Dupont', role: 'teacher' },
+      this.invitationToken,
+    );
   }
 
   async thenThrowTeacherAlreadyExists(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(TeacherAlreadyExistsError);
+    await expect(promise).rejects.toBeInstanceOf(UserAlereadyExistsError);
   }
 
-  async thenThrowTeacherCreationError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(TeacherCreationError);
+  async thenThrowUserCreationError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(UserCreationError);
   }
 
   async thenThrowTeacherCreationFailed(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(TeacherCreationFailedError);
+    await expect(promise).rejects.toBeInstanceOf(UserCreationFailedError);
   }
 
   async thenThrowTeacherProfileCreationError(promise: Promise<unknown>) {

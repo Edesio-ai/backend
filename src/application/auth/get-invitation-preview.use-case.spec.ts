@@ -46,7 +46,7 @@ class Fixtures {
         this.authRepository = {
             getInvitationPreview: jest.fn(),
             valideInvitationToken: jest.fn(),
-            createTeacher: jest.fn(),
+            createUser: jest.fn(),
         };
 
         this.getInvitationPreviewUseCase = new GetInvitationPreviewUseCase(this.authRepository);
