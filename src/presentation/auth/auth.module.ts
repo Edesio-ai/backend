@@ -5,7 +5,8 @@ import { GetInvitationPreviewUseCase } from '../../application/auth/get-invitati
 import { authPersistenceModule } from '../../infrastructure/persistence/supabase/auth-persistence.module';
 import { SignUpTeacherUseCase } from '../../application/auth/sign-up-teacher.use-case';
 import { RegisterUseCase } from '../../application/auth/register.use-case';
-import { MailerModule } from 'src/infrastructure/mailer/mailer.module';
+import { MailerModule } from '../../infrastructure/mailer/mailer.module';
+import { LoginUseCase } from '../../application/auth/login.use-case';
 
 
 @Module({
@@ -17,7 +18,8 @@ import { MailerModule } from 'src/infrastructure/mailer/mailer.module';
   providers: [
     GetInvitationPreviewUseCase,
     SignUpTeacherUseCase,
-    RegisterUseCase
+    RegisterUseCase,
+    LoginUseCase
   ],
 })
 

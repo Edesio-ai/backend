@@ -21,15 +21,23 @@ export class ResendEmailProvider implements EmailProviderInterface {
         });
         const html = renderWelcomeEmailHtml(templateData);
 
-        const { data, error } = await this.resend.emails.send({
-            from: 'Edesio <noreply@edesio.ai>',
-            to: [email],
-            subject: `Bienvenue sur Edesio, ${name} !`,
-            html,
-        });
+        try {
+            const { error } = await this.resend.emails.send({
+                from: 'Edesio <noreply@edesio.ai>',
+                to: [email],
+                subject: `Bienvenue sur Edesio, ${name} !`,
+                html,
+            });
 
-        if (error) {
-            throw new EmailSendingError(error.message);
+            if (error) {
+                throw new EmailSendingError(error.message);
+            }
+        } catch (err) {
+            if (err instanceof EmailSendingError) {
+                throw err;
+            }
+            const message = err instanceof Error ? err.message : String(err);
+            throw new EmailSendingError(message);
         }
     }
 }

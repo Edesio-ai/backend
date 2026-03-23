@@ -1,7 +1,7 @@
 import { SignUpTeacherUseCase } from './sign-up-teacher.use-case';
 import { AuthRepository } from '../../interfaces/persistence/auth.repository';
 import { InvitationToken } from '../../domain/auth/invitation.type';
-import { SignUpTeacherBody } from '../../domain/auth/sign-up.type';
+import { SignUpTeacherBody } from '../../domain/auth/auth.type';
 import { EmailProviderInterface } from '../../interfaces/mailer/email.provider';
 
 describe('SignUpTeacherUseCase', () => {
@@ -77,6 +77,7 @@ class Fixtures {
             getInvitationPreview: jest.fn(),
             valideInvitationToken: jest.fn(),
             createUser: jest.fn(),
+            loginUser: jest.fn(),
         };
 
         this.emailProvider = {

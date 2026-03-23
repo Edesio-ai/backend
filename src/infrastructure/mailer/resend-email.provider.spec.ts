@@ -24,7 +24,7 @@ describe('ResendEmailProvider', () => {
         await fixtures.thenThrowEmailSendingError(promise);
     });
 
-    it('should throw EmailSendingError when resend throws', async () => {
+    it('should throw EmailSendingError when resend.emails.send rejects', async () => {
         fixtures.whenResendSendThrows();
 
         const promise = fixtures.whenSendWelcomeEmail('teacher');

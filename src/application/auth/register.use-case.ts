@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 
 import { AUTH_REPOSITORY, type AuthRepository } from "../../interfaces/persistence/auth.repository";
-import { RegisterBody, UserMetadata } from "../../domain/auth/sign-up.type";
+import { RegisterBody, UserMetadata } from "../../domain/auth/auth.type";
 import { EMAIL_PROVIDER, type EmailProviderInterface } from "../../interfaces/mailer/email.provider";
 
 

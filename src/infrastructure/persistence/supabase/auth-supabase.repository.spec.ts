@@ -10,7 +10,9 @@ import {
   UserCreationFailedError,
   TeacherProfileCreationError,
   TokenUpdateError,
+  UserLoginError,
 } from '../../../domain/auth/errors';
+import { Session } from '../../../domain/auth/auth.type';
 
 describe('AuthSupabaseRepository', () => {
   describe('getInvitationPreview', () => {
@@ -100,6 +102,32 @@ describe('AuthSupabaseRepository', () => {
       const promise = fixtures.whenValideInvitationToken('other@school.com');
 
       await fixtures.thenThrowEmailMismatch(promise);
+    });
+  });
+
+  describe('loginUser', () => {
+    let fixtures: LoginUserFixtures;
+
+    beforeEach(() => {
+      fixtures = new LoginUserFixtures();
+    });
+
+    it('should return session payload when signInWithPassword succeeds', async () => {
+      fixtures.whenSignInWithPasswordSucceeds();
+
+      const result = await fixtures.whenLoginUser();
+
+      fixtures.thenSignInWithPasswordCalledWithNormalizedEmail();
+      expect(result).toEqual(fixtures.sessionPayload);
+    });
+
+    it('should throw UserLoginError when signInWithPassword returns error', async () => {
+      fixtures.whenSignInWithPasswordFails();
+
+      const promise = fixtures.whenLoginUser();
+
+      await fixtures.thenThrowUserLoginError(promise);
+      fixtures.thenSignInWithPasswordCalledWithNormalizedEmail();
     });
   });
 
@@ -349,6 +377,88 @@ class ValideInvitationTokenFixtures {
 
   async thenThrowEmailMismatch(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(InvitationTokenEmailMismatchError);
+  }
+}
+
+class LoginUserFixtures {
+  public readonly emailInput = '  User@School.com  ';
+  public readonly emailNormalized = 'user@school.com';
+  public readonly password = 'secret123';
+
+  public readonly signInWithPasswordMock = jest.fn();
+  public readonly sut: AuthSupabaseRepository;
+
+  public readonly sessionPayload: Session;
+
+  constructor() {
+    const supabaseAdminMock = {
+      auth: {
+        signInWithPassword: this.signInWithPasswordMock,
+      },
+    };
+
+    this.sut = new AuthSupabaseRepository(supabaseAdminMock as any);
+
+    const authSession = {
+      access_token: 'at',
+      token_type: 'bearer',
+      expires_in: 3600,
+      expires_at: '2026-12-31T23:59:59.000Z',
+      refresh_token: 'rt',
+      user: {} as Session['user'],
+      weak_password: null as boolean | null,
+    };
+
+    this.sessionPayload = {
+      user: {
+        id: 'u1',
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: this.emailNormalized,
+        email_confirmed_at: '',
+        phone: '',
+        app_metadata: { provider: 'email', providers: ['email'] },
+        user_metadata: {},
+        identities: [],
+        created_at: '',
+        updated_at: '',
+        is_anonymous: false,
+        confirmed_at: '',
+        last_sign_in_at: '',
+      } as Session['user'],
+      session: authSession as Session['session'],
+    };
+  }
+
+  whenLoginUser() {
+    return this.sut.loginUser(this.emailInput, this.password);
+  }
+
+  whenSignInWithPasswordSucceeds() {
+    this.signInWithPasswordMock.mockResolvedValue({
+      data: this.sessionPayload,
+      error: null,
+    });
+  }
+
+  whenSignInWithPasswordFails() {
+    this.signInWithPasswordMock.mockResolvedValue({
+      data: null,
+      error: { message: 'Invalid login credentials' },
+    });
+  }
+
+  thenSignInWithPasswordCalledWithNormalizedEmail() {
+    expect(this.signInWithPasswordMock).toHaveBeenCalledWith({
+      email: this.emailNormalized,
+      password: this.password,
+    });
+    expect(this.signInWithPasswordMock).toHaveBeenCalledTimes(1);
+  }
+
+  async thenThrowUserLoginError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(UserLoginError);
+    await expect(promise).rejects.toThrow('Invalid login credentials');
   }
 }
 
