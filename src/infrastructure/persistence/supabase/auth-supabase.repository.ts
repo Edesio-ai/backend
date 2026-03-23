@@ -3,18 +3,19 @@ import { Inject, Injectable } from "@nestjs/common";
 import { AuthRepository } from "../../../interfaces/persistence/auth.repository";
 import { SUPABASE_ADMIN } from "./supabase.module";
 import { InvitationToken, InvitationTokenPreview } from "../../../domain/auth/invitation.type";
-import { 
+import {
     InvitationTokenAlreadyUsedError,
     InvitationTokenEmailMismatchError,
     InvitationTokenExpiredError,
-    InvitationTokenNotFoundError, 
-    TeacherAlreadyExistsError,
-    TeacherCreationError,
-    TeacherCreationFailedError,
+    InvitationTokenNotFoundError,
+    UserAlereadyExistsError,
+    UserCreationError,
+    UserCreationFailedError,
     TeacherProfileCreationError,
     TokenUpdateError
 } from "../../../domain/auth/errors";
-import { AdminUser, Teacher } from "../../../domain/auth/sign-up.type";
+import { User, Teacher } from "../../../domain/auth/sign-up.type";
+import { UserMetadata } from "../../../domain/auth/sign-up.type";
 
 @Injectable()
 export class AuthSupabaseRepository
@@ -87,41 +88,43 @@ export class AuthSupabaseRepository
         return data;
     }
 
-    public async createTeacher(email: string, password: string, firstname: string, lastname: string, invitationToken: InvitationToken): Promise<void> {
-        const { data: adminData, adminError } = await this.supabaseAdmin.auth.admin.createUser({
+    public async createUser(email: string, password: string, metadata: UserMetadata, invitationToken?: InvitationToken): Promise<void> {
+        const authUser = await this.createAuthUser(email, password, metadata);
+        if(invitationToken) {
+            const teacher = await this.createTeacherWithInvitationTokenProfile(authUser, invitationToken);
+            await this.updateTokenUsedAt(invitationToken.id, teacher.id);
+        }
+    }
+
+    private async createAuthUser(email: string, password: string, metadata: UserMetadata): Promise<User> {
+        const { data, error } = await this.supabaseAdmin.auth.admin.createUser({
             email: email.toLowerCase().trim(),
             password,
             email_confirm: true,
-            user_metadata: {
-                role: "teacher",
-                firstname,
-                lastname,
-            },
+            user_metadata: metadata,
         });
 
-        if (adminError) {
-            if (adminError.message.includes("already registered")) {
-                throw new TeacherAlreadyExistsError();
+        if (error) {
+            if (error.message.includes("already registered")) {
+                throw new UserAlereadyExistsError();
             }
-            throw new TeacherCreationError(adminError.message);
+            throw new UserCreationError(error.message);
         }
 
-        if (!adminData.user) {
-            throw new TeacherCreationFailedError();
+        if (!data.user) {
+            throw new UserCreationFailedError();
         }
-
-        const teacher = await this.createTeacherProfile(adminData, invitationToken);
-        await this.updateTokenUsedAt(invitationToken.id, teacher.id);
+        return data.user;
     }
 
-    private async createTeacherProfile(adminData: AdminUser, invitationToken: InvitationToken): Promise<Teacher> {
-        const { firstname, lastname } = adminData.user.user_metadata;
-        const email = adminData.user.email;
+    private async createTeacherWithInvitationTokenProfile(adminData: User, invitationToken: InvitationToken): Promise<Teacher> {
+        const { firstname, lastname } = adminData.user_metadata;
+        const email = adminData.email;
 
         const { data, error } = await this.supabaseAdmin
             .from("teachers")
             .insert({
-                supabase_user_id: adminData.user.id,
+                supabase_user_id: adminData.id,
                 name: `${firstname} ${lastname}`,
                 email: email.toLowerCase().trim(),
                 establishment_id: invitationToken.establishment_id,
@@ -129,9 +132,9 @@ export class AuthSupabaseRepository
             })
             .select()
             .single();
-            
+
         if (error) {
-            await this.supabaseAdmin.auth.admin.deleteUser(adminData.user.id);
+            await this.supabaseAdmin.auth.admin.deleteUser(adminData.id);
             throw new TeacherProfileCreationError(error.message);
         }
 
@@ -140,17 +143,17 @@ export class AuthSupabaseRepository
 
     private async updateTokenUsedAt(tokenId: string, teacherId: string): Promise<void> {
         const { error } = await this.supabaseAdmin
-        .from("invitation_tokens")
-        .update({ 
-          used_at: new Date().toISOString(),
-          used_by: teacherId 
-        })
-        .eq("id", tokenId)
-        .is("used_at", null);
+            .from("invitation_tokens")
+            .update({
+                used_at: new Date().toISOString(),
+                used_by: teacherId
+            })
+            .eq("id", tokenId)
+            .is("used_at", null);
 
-      if (error) {
-        throw new TokenUpdateError(error.message);
-      }
+        if (error) {
+            throw new TokenUpdateError(error.message);
+        }
     }
 
     private maskEmail(email: string): string {

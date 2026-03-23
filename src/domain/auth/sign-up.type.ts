@@ -6,21 +6,19 @@ export type SignUpTeacherBody = {
     lastname: string;
 }
 
-export type AdminUser = {
-    user: {
-        id: string;
-        aud: string;
-        role: string;
-        email: string;
-        email_confirmed_at: string;
-        phone: string;
-        app_metadata: AppMetadata;
-        user_metadata: UserMetadata;
-        identities: Identity[];
-        created_at: string;
-        updated_at: string;
-        is_anonymous: boolean;
-    }
+export type User = {
+    id: string;
+    aud: string;
+    role: string;
+    email: string;
+    email_confirmed_at: string;
+    phone: string;
+    app_metadata: AppMetadata;
+    user_metadata: UserMetadata;
+    identities: Identity[];
+    created_at: string;
+    updated_at: string;
+    is_anonymous: boolean;
 }
 
 type AppMetadata = {
@@ -28,11 +26,8 @@ type AppMetadata = {
     providers: string[];
 }
 
-type UserMetadata = {
-    email_verified: boolean;
-    firstname: string;
-    lastname: string;
-    role: string;
+export type UserMetadata = {
+    [key: string]: any
 }
 
 type Identity = {
@@ -61,4 +56,14 @@ export type Teacher = {
     created_at: string;
     establishment_id: string;
     available_chatbots: number;
+}
+
+export type RegisterBody = {
+    role: 'teacher' | 'establishment' | 'student' | 'standalone';
+    email: string;
+    password: string;
+    firstname: string;
+    lastname: string;
+    acceptTerms: boolean;
+    establishment?: string;
 }
