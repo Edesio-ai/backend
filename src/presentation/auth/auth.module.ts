@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 
-import { AuthController } from './auth.controller';
 import { GetInvitationPreviewUseCase } from '../../application/auth/get-invitation-preview.use-case';
-import { authPersistenceModule } from '../../infrastructure/persistence/supabase/auth-persistence.module';
 import { SignUpTeacherUseCase } from '../../application/auth/sign-up-teacher.use-case';
 import { RegisterUseCase } from '../../application/auth/register.use-case';
 import { MailerModule } from '../../infrastructure/mailer/mailer.module';
 import { LoginUseCase } from '../../application/auth/login.use-case';
+import { SendInvitationUseCase } from '../../application/auth/send-invitation.use-case';
+import { authPersistenceModule } from '../../infrastructure/persistence/supabase/auth-persistence.module';
+import { AuthController } from './auth.controller';
 
 
 @Module({
@@ -19,7 +20,8 @@ import { LoginUseCase } from '../../application/auth/login.use-case';
     GetInvitationPreviewUseCase,
     SignUpTeacherUseCase,
     RegisterUseCase,
-    LoginUseCase
+    LoginUseCase,
+    SendInvitationUseCase
   ],
 })
 

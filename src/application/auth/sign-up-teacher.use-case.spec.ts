@@ -78,10 +78,12 @@ class Fixtures {
             valideInvitationToken: jest.fn(),
             createUser: jest.fn(),
             loginUser: jest.fn(),
+            validateToken: jest.fn(),
         };
 
         this.emailProvider = {
             sendWelcomeEmail: jest.fn(),
+            sendProfesseurInvitation: jest.fn(),
         };
 
         this.signUpTeacherUseCase = new SignUpTeacherUseCase(this.authRepository, this.emailProvider);

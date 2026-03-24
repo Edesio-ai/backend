@@ -13,7 +13,8 @@ import {
     UserCreationFailedError,
     TeacherProfileCreationError,
     TokenUpdateError,
-    UserLoginError
+    UserLoginError,
+    TokenUserNotFoundError
 } from "../../../domain/auth/errors";
 import { User, Teacher, Session } from "../../../domain/auth/auth.type";
 import { UserMetadata } from "../../../domain/auth/auth.type";
@@ -22,6 +23,14 @@ import { UserMetadata } from "../../../domain/auth/auth.type";
 export class AuthSupabaseRepository
     implements AuthRepository {
     constructor(@Inject(SUPABASE_ADMIN) private readonly supabaseAdmin: any) { }
+
+    public async validateToken(token: string): Promise<User> {
+        const { data, error } = await this.supabaseAdmin.auth.getUser(token);
+        if (error) {
+            throw new TokenUserNotFoundError(error.message);
+        }
+        return data.user;
+    }
 
     public async loginUser(email: string, password: string): Promise<Session> {
         const { data, error } = await this.supabaseAdmin.auth.signInWithPassword({
@@ -70,7 +79,7 @@ export class AuthSupabaseRepository
             isValid: true,
             maskedEmail: maskedEmail,
             establishmentName: data.establishment.name,
-            assignedChatbots: data.assignedChatbots,
+            assignedChatbots: data.assigned_chatbots,
         };
     }
 
