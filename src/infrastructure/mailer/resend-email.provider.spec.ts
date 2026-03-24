@@ -13,7 +13,7 @@ describe('ResendEmailProvider', () => {
 
         await fixtures.whenSendWelcomeEmail('teacher');
 
-        fixtures.thenResendCalledWithExpectedPayload();
+        fixtures.thenResendCalledWithWelcomePayload();
     });
 
     it('should throw EmailSendingError when resend returns error', async () => {
@@ -31,6 +31,30 @@ describe('ResendEmailProvider', () => {
 
         await fixtures.thenThrowEmailSendingError(promise);
     });
+
+    it('should send professeur invitation email with rendered template', async () => {
+        fixtures.whenResendSendResolvesWithoutError();
+
+        await fixtures.whenSendProfesseurInvitation();
+
+        fixtures.thenResendCalledWithInvitationPayload();
+    });
+
+    it('should throw EmailSendingError when invitation send returns error', async () => {
+        fixtures.whenResendSendResolvesWithError();
+
+        const promise = fixtures.whenSendProfesseurInvitation();
+
+        await fixtures.thenThrowEmailSendingError(promise);
+    });
+
+    it('should throw EmailSendingError when invitation send rejects', async () => {
+        fixtures.whenResendSendThrows();
+
+        const promise = fixtures.whenSendProfesseurInvitation();
+
+        await fixtures.thenThrowEmailSendingError(promise);
+    });
 });
 
 class Fixtures {
@@ -38,6 +62,8 @@ class Fixtures {
     public readonly provider: ResendEmailProvider;
     public readonly email = 'teacher@school.com';
     public readonly name = 'Jean';
+    public readonly invitationToken = 'inv-token-123';
+    public readonly availableChatbots = 3;
     public readonly resendErrorMessage = 'resend failure';
 
     constructor() {
@@ -52,6 +78,15 @@ class Fixtures {
 
     whenSendWelcomeEmail(role: string) {
         return this.provider.sendWelcomeEmail(this.email, this.name, role);
+    }
+
+    whenSendProfesseurInvitation() {
+        return this.provider.sendProfesseurInvitation(
+            this.email,
+            this.name,
+            this.invitationToken,
+            this.availableChatbots,
+        );
     }
 
     whenResendSendResolvesWithoutError() {
@@ -72,7 +107,7 @@ class Fixtures {
         this.sendMock.mockRejectedValue(new Error(this.resendErrorMessage));
     }
 
-    thenResendCalledWithExpectedPayload() {
+    thenResendCalledWithWelcomePayload() {
         expect(this.sendMock).toHaveBeenCalledTimes(1);
         expect(this.sendMock).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -86,6 +121,22 @@ class Fixtures {
         expect(payload.html).toContain(`Bienvenue ${this.name} !`);
         expect(payload.html).toContain('Acceder a mon espace');
         expect(payload.html).toContain('/teacher');
+    }
+
+    thenResendCalledWithInvitationPayload() {
+        expect(this.sendMock).toHaveBeenCalledTimes(1);
+        expect(this.sendMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                from: 'Edesio <noreply@edesio.ai>',
+                to: [this.email],
+                subject: `${this.name} vous invite a rejoindre Edesio`,
+            }),
+        );
+
+        const payload = this.sendMock.mock.calls[0][0];
+        expect(payload.html).toContain('Vous etes invite(e) !');
+        expect(payload.html).toContain(this.invitationToken);
+        expect(payload.html).toContain('Creer mon compte professeur');
     }
 
     async thenThrowEmailSendingError(promise: Promise<unknown>) {

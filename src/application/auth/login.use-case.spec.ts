@@ -42,6 +42,7 @@ class Fixtures {
             valideInvitationToken: jest.fn(),
             createUser: jest.fn(),
             loginUser: jest.fn(),
+            validateToken: jest.fn(),
         };
 
         this.loginUseCase = new LoginUseCase(this.authRepository);
