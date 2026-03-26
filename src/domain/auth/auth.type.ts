@@ -80,7 +80,7 @@ export type Teacher = {
 }
 
 export type RegisterBody = {
-    role: 'teacher' | 'establishment' | 'student' | 'standalone';
+    role: Role;
     email: string;
     password: string;
     firstname: string;
@@ -93,3 +93,10 @@ export type LoginBody = {
     email: string;
     password: string;
 }
+
+export type GetUserSessionResponse = {
+    user: User | null;
+    role: Role | null;
+}
+
+export type Role = 'teacher' | 'establishment' | 'student' | 'standalone';

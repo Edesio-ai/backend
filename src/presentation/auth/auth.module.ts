@@ -8,6 +8,7 @@ import { LoginUseCase } from '../../application/auth/login.use-case';
 import { SendInvitationUseCase } from '../../application/auth/send-invitation.use-case';
 import { authPersistenceModule } from '../../infrastructure/persistence/supabase/auth-persistence.module';
 import { AuthController } from './auth.controller';
+import { GetUserSessionUseCase } from '../../application/auth/get-user-session.use-case';
 
 
 @Module({
@@ -21,7 +22,8 @@ import { AuthController } from './auth.controller';
     SignUpTeacherUseCase,
     RegisterUseCase,
     LoginUseCase,
-    SendInvitationUseCase
+    SendInvitationUseCase,
+    GetUserSessionUseCase
   ],
 })
 
