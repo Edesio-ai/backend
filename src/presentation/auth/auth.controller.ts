@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Param, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
 import type { Request, Response } from "express";
 
-import { GetUserSessionUseCase } from '../../application/auth/get-user-session.use-case';
+import { GenerateCsrfTokenUseCase } from '../../application/auth/generate-csrf-token.use-case';
 import { GetInvitationPreviewUseCase } from '../../application/auth/get-invitation-preview.use-case';
+import { GetUserSessionUseCase } from '../../application/auth/get-user-session.use-case';
 import { LoginUseCase } from '../../application/auth/login.use-case';
 import { RegisterUseCase } from '../../application/auth/register.use-case';
 import { SignUpTeacherUseCase } from '../../application/auth/sign-up-teacher.use-case';
@@ -18,6 +19,7 @@ import { RegisterBody } from './dto/register-body.dto';
 import { LoginBodyDto } from './dto/login-body.dto';
 import { SendInvitationBodyDto } from './dto/send-invitation-body.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { CsrfGuard } from './guards/csrf.guard';
 import { RolesGuard } from './guards/roles.guard';
 
 @Controller('auth')
@@ -29,7 +31,8 @@ export class AuthController {
     private readonly registerUseCase: RegisterUseCase,
     private readonly loginUseCase: LoginUseCase,
     private readonly sendInvitationUseCase: SendInvitationUseCase,
-    private readonly getUserSessionUseCase: GetUserSessionUseCase
+    private readonly getUserSessionUseCase: GetUserSessionUseCase,
+    private readonly generateCsrfTokenUseCase: GenerateCsrfTokenUseCase
   ) { }
 
   @Get('invitation-preview/:token')
@@ -50,6 +53,22 @@ export class AuthController {
     const user = await this.getUserSessionUseCase.execute(token);
     const role = user.user_metadata.role;
     return { user, role };
+  }
+
+  @Get("csrf")
+  getCsrf(@Res({ passthrough: true }) res: Response): { csrfToken: string } {
+    const { csrfToken, maxAgeMs } = this.generateCsrfTokenUseCase.execute();
+    const isProd = process.env.NODE_ENV === "production";
+
+    res.cookie("csrf_token", csrfToken, {
+      httpOnly: false,
+      secure: isProd,
+      sameSite: "lax",
+      path: "/",
+      maxAge: maxAgeMs,
+    });
+
+    return { csrfToken };
   }
 
   @Post('sign-up/teacher')
@@ -79,11 +98,11 @@ export class AuthController {
 
     res.cookie("access_token", session.access_token, cookieOptions);
     res.cookie("refresh_token", session.refresh_token, cookieOptions);
-
+    
     return session;
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
   @Roles('establishment')
   @Post('send-invitation')
   async sendInvitation(@Body() body: SendInvitationBodyDto): Promise<{ success: boolean }> {
