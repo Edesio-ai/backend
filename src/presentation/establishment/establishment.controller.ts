@@ -8,7 +8,7 @@ import { EstablishmentErrorFilter } from "../filters/establishment.filter";
 import { TeacherFilter } from "../filters/teacher.filter";
 import { CreateEstablishmentUseCase } from "../../application/establishment/create-establishment.use-case";
 import { CreateEstablishmentBodyDto } from "./dto/create-establishment.dto";
-import { Establishment } from "../../domain/establishment/establishment.type";
+import { Establishment, EstablishmentStats } from "../../domain/establishment/establishment.type";
 
 
 @Controller('establishment')
@@ -22,7 +22,7 @@ export class EstablishmentController {
     @Roles('establishment')
     @Get('stats')
     @UseFilters(EstablishmentErrorFilter, TeacherFilter)
-    async getEstablishmentStats(@Req() req: Request & { user: User }): Promise<any> {
+    async getEstablishmentStats(@Req() req: Request & { user: User }): Promise<EstablishmentStats> {
         const { user } = req;
         return await this.getEstablishmentsStatsUseCase.execute(user.id);
     }

@@ -63,18 +63,18 @@ class Fixtures {
         this.userId = "user-1";
         this.establishment = { id: "est-1", name: "Edesio Academy" };
         this.teachers = [
-            { id: "teacher-1", nom: "Prof 1" },
-            { id: "teacher-2", nom: "Prof 2" },
+            { id: "teacher-1", name: "Prof 1" },
+            { id: "teacher-2", name: "Prof 2" },
         ];
         this.sessions = [
-            { id: "session-1", professeur_id: "teacher-1" },
-            { id: "session-2", professeur_id: "teacher-1" },
-            { id: "session-3", professeur_id: "teacher-2" },
+            { id: "session-1", teacher_id: "teacher-1" },
+            { id: "session-2", teacher_id: "teacher-1" },
+            { id: "session-3", teacher_id: "teacher-2" },
         ];
         this.studentSessions = [
-            { session_id: "session-1", eleve_id: "student-1" },
-            { session_id: "session-2", eleve_id: "student-2" },
-            { session_id: "session-2", eleve_id: "student-1" },
+            { session_id: "session-1", student_id: "student-1" },
+            { session_id: "session-2", student_id: "student-2" },
+            { session_id: "session-2", student_id: "student-1" },
         ];
         this.repositoryError = new Error("establishment not found");
     }
@@ -114,11 +114,29 @@ class Fixtures {
     thenReturnExpectedStats(result: any) {
         expect(result).toEqual({
             establishment: this.establishment,
-            professeurs: undefined,
+            teachers: [
+                {
+                    id: "teacher-1",
+                    name: "Prof 1",
+                    sessions_count: 2,
+                    students_count: 0,
+                    sessions: [
+                        { id: "session-1", teacher_id: "teacher-1", students_count: 0 },
+                        { id: "session-2", teacher_id: "teacher-1", students_count: 0 },
+                    ],
+                },
+                {
+                    id: "teacher-2",
+                    name: "Prof 2",
+                    sessions_count: 1,
+                    students_count: 0,
+                    sessions: [{ id: "session-3", teacher_id: "teacher-2", students_count: 0 }],
+                },
+            ],
             stats: {
-                totalProfesseurs: 2,
+                totalTeachers: 2,
                 totalSessions: 3,
-                totalEleves: 2,
+                totalStudents: 2,
             },
         });
     }

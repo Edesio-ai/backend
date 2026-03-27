@@ -75,7 +75,7 @@ class Fixtures {
     }
 
     thenQueryBuiltWithSessionIds(sessionIds: string[]) {
-        expect(this.fromMock).toHaveBeenCalledWith("stutent_sessions");
+        expect(this.fromMock).toHaveBeenCalledWith("student_sessions");
         expect(this.selectMock).toHaveBeenCalledWith("session_id, student_id");
         expect(this.inMock).toHaveBeenCalledWith("session_id", sessionIds);
     }
