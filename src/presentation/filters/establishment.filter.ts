@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
-import { EstablishmentError } from 'src/domain/establishment/error';
+import { EstablishmentError } from '../../domain/establishment/error';
 
 @Catch(EstablishmentError)
 export class EstablishmentErrorFilter implements ExceptionFilter {

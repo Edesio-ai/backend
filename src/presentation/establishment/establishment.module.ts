@@ -6,6 +6,7 @@ import { authPersistenceModule } from '../../infrastructure/persistence/supabase
 import { establishmentPersistenceModule } from '../../infrastructure/persistence/supabase/establishment/establishment-persistence.module';
 import { StudentPersistenceModule } from '../../infrastructure/persistence/supabase/student/student-persistence.module';
 import { TeacherPersistenceModule } from '../../infrastructure/persistence/supabase/teacher/teacher-persistence.module';
+import { CreateEstablishmentUseCase } from '../../application/establishment/create-establishment.use-case';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { TeacherPersistenceModule } from '../../infrastructure/persistence/supab
   controllers: [EstablishmentController],
   providers: [
     GetEstablishmentsStatsUseCase,
+    CreateEstablishmentUseCase,
   ],
 })
 export class EstablishmentModule {}

@@ -8,3 +8,9 @@ export class EstablishmentNotFoundError extends EstablishmentError {
     readonly httpStatus = 404;
     constructor(message?: string) { super(message || 'Establishment not found'); }
 }
+
+export class EstablishmentCreationFailedError extends EstablishmentError {
+    readonly code = 'ESTABLISHMENT_CREATION_FAILED';
+    readonly httpStatus = 500;
+    constructor(message?: string) { super(message || 'Establishment creation failed'); }
+}
