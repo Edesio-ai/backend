@@ -3,6 +3,8 @@ import { ESTABLISHMENT_REPOSITORY } from "../../interfaces/persistence/establish
 import { type EstablishmentRepository } from "../../interfaces/persistence/establishment.repository";
 import { STUDENT_REPOSITORY, type StudentRepository } from "../../interfaces/persistence/student.repository";
 import { TEACHER_REPOSITORY, type TeacherRepository } from "../../interfaces/persistence/teacher.repository";
+import { Teacher, TeacherSession, TeacherWithStats } from "../../domain/teaching/teacher.type";
+import { Establishment, EstablishmentStats } from "../../domain/establishment/establishment.type";
 
 export class GetEstablishmentsStatsUseCase {
     constructor(
@@ -15,7 +17,7 @@ export class GetEstablishmentsStatsUseCase {
     ) { }
 
 
-    async execute(userId: string): Promise<any> {
+    async execute(userId: string): Promise<EstablishmentStats> {
         const establishment = await this.establishmentRepository.getEstablishmentByUserId(userId);
 
         const teachers = await this.teacherRepository.getTeacherByEstablishmentId(establishment.id);
@@ -29,26 +31,26 @@ export class GetEstablishmentsStatsUseCase {
         const studentCountPerSession: Record<string, number> = {};
         const uniqueStudents = new Set<string>();
 
-        (studentsSessions || []).forEach(es => {
-            studentCountPerSession[es.session_id] = (studentCountPerSession[es.session_id] || 0) + 1;
-            uniqueStudents.add(es.eleve_id);
+        (studentsSessions || []).forEach(ss => {
+            studentCountPerSession[ss.session_id] = (studentCountPerSession[ss.session_id] || 0) + 1;
+            uniqueStudents.add(ss.student_id);
         });
 
-        const professeursWithStats = this.buildProfesseursWithStats(teachers, teachersSessions, studentsSessions);
+        const TeachersWithStats = this.buildTeachersWithStats(teachers, teachersSessions, studentsSessions);
 
-        return this.buildStats(establishment, teachers, teachersSessions, professeursWithStats, uniqueStudents);
+        return this.buildEstablishmentStats(establishment, teachers, teachersSessions, TeachersWithStats, uniqueStudents);
     }
 
-    private buildProfesseursWithStats(teachers: any, teachersSessions: any, studentCountPerSession: any): any {
-        (teachers || []).map(prof => {
-            const profSessions = (teachersSessions || []).filter(s => s.professeur_id === prof.id);
-            const profStudentCount = profSessions.reduce((sum, s) => sum + (studentCountPerSession[s.id] || 0), 0);
+    private buildTeachersWithStats(teachers: Teacher[], teachersSessions: TeacherSession[], studentCountPerSession: Record<string, number>): TeacherWithStats[] {
+        return(teachers || []).map(teacher => {
+            const teacherSessions = (teachersSessions || []).filter(s => s.teacher_id === teacher.id);
+            const profStudentCount = teacherSessions.reduce((sum, s) => sum + (studentCountPerSession[s.id] || 0), 0);
 
             return {
-                ...prof,
-                sessions_count: profSessions.length,
+                ...teacher,
+                sessions_count: teacherSessions.length,
                 students_count: profStudentCount,
-                sessions: profSessions.map(s => ({
+                sessions: teacherSessions.map(s => ({
                     ...s,
                     students_count: studentCountPerSession[s.id] || 0,
                 })),
@@ -57,14 +59,14 @@ export class GetEstablishmentsStatsUseCase {
 
     }
 
-    private buildStats(establishment: any, teachers: any, teachersSessions: any, professeursWithStats: any, uniqueStudents: any): any {
+    private buildEstablishmentStats(establishment: Establishment, teachers: Teacher[], teachersSessions: TeacherSession[], teachersWithStats: TeacherWithStats[], uniqueStudents: Set<string>): EstablishmentStats {
         return {
             establishment,
-            professeurs: professeursWithStats,
+            teachers: teachersWithStats,
             stats: {
-                totalProfesseurs: teachers?.length || 0,
+                totalTeachers: teachers?.length || 0,
                 totalSessions: teachersSessions?.length || 0,
-                totalEleves: uniqueStudents.size,
+                totalStudents: uniqueStudents.size,
             },
         };
     }

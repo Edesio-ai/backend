@@ -11,7 +11,7 @@ export class StudentSupabaseRepository implements StudentRepository {
 
     async getStudentsSessionsByIds(sessionIds: string[]): Promise<any> {
         const { data, error } = await this.supabase
-        .from("stutent_sessions")
+        .from("student_sessions")
         .select("session_id, student_id")
         .in("session_id", sessionIds.length > 0 ? sessionIds : ['00000000-0000-0000-0000-000000000000']);
 

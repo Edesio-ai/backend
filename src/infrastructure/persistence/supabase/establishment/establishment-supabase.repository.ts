@@ -2,6 +2,7 @@ import { Inject } from "@nestjs/common";
 import { EstablishmentRepository } from "src/interfaces/persistence/establishment.repository";
 import { SUPABASE_ADMIN } from "../supabase.module";
 import { EstablishmentCreationFailedError, EstablishmentNotFoundError } from "../../../../domain/establishment/error";
+import { Establishment } from "src/domain/establishment/establishment.type";
 
 export class EstablishmentSupabaseRepository implements EstablishmentRepository {
     constructor(
@@ -9,7 +10,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
         private readonly supabase: any,
     ) { }
 
-    async getEstablishmentByUserId(userId: string): Promise<any> {
+    async getEstablishmentByUserId(userId: string): Promise<Establishment> {
         const { data, error } = await this
         .supabase
         .from('establishment')
@@ -23,7 +24,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
         return data;
     }
 
-    async createEstablishment(supabaseUserId: string, name: string, email: string): Promise<any> {
+    async createEstablishment(supabaseUserId: string, name: string, email: string): Promise<Establishment> {
         const { data, error } = await this.supabase
         .from("establishment")
         .insert({

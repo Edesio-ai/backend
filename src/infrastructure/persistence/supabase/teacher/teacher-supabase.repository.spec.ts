@@ -55,8 +55,8 @@ class Fixtures {
     public readonly establishmentId = "est-1";
     public readonly teacherIds = ["teacher-1", "teacher-2"];
     public readonly fallbackId = "00000000-0000-0000-0000-000000000000";
-    public readonly teachers = [{ id: "teacher-1", nom: "Prof 1" }];
-    public readonly sessions = [{ id: "session-1", professeur_id: "teacher-1" }];
+    public readonly teachers = [{ id: "teacher-1", name: "Prof 1" }];
+    public readonly sessions = [{ id: "session-1", teacher_id: "teacher-1" }];
 
     private readonly teacherEqMock = jest.fn();
     private readonly teacherSelectMock = jest.fn(() => ({ eq: this.teacherEqMock }));
@@ -67,7 +67,7 @@ class Fixtures {
     private readonly sessionsFromMock = jest.fn(() => ({ select: this.sessionsSelectMock }));
 
     private readonly fromMock = jest.fn((table: string) => {
-        if (table === "professeurs") return this.teacherFromMock();
+        if (table === "teachers") return this.teacherFromMock();
         if (table === "sessions") return this.sessionsFromMock();
         return {};
     });
@@ -126,19 +126,19 @@ class Fixtures {
     }
 
     thenTeacherQueryBuiltWithExpectedArguments() {
-        expect(this.fromMock).toHaveBeenCalledWith("professeurs");
-        expect(this.teacherSelectMock).toHaveBeenCalledWith("id, nom, email, created_at");
-        expect(this.teacherEqMock).toHaveBeenCalledWith("etablissement_id", this.establishmentId);
+        expect(this.fromMock).toHaveBeenCalledWith("teachers");
+        expect(this.teacherSelectMock).toHaveBeenCalledWith("id, name, email, created_at");
+        expect(this.teacherEqMock).toHaveBeenCalledWith("establishment_id", this.establishmentId);
     }
 
     thenSessionsQueryBuiltWithTeacherIds(ids: string[]) {
         expect(this.fromMock).toHaveBeenCalledWith("sessions");
-        expect(this.sessionsSelectMock).toHaveBeenCalledWith("id, nom, code, langue, professeur_id, created_at");
-        expect(this.sessionsInMock).toHaveBeenCalledWith("professeur_id", ids);
+        expect(this.sessionsSelectMock).toHaveBeenCalledWith("id, name, code, language, teacher_id, created_at");
+        expect(this.sessionsInMock).toHaveBeenCalledWith("teacher_id", ids);
     }
 
     thenSessionsQueryBuiltWithFallbackId() {
-        expect(this.sessionsInMock).toHaveBeenCalledWith("professeur_id", [this.fallbackId]);
+        expect(this.sessionsInMock).toHaveBeenCalledWith("teacher_id", [this.fallbackId]);
     }
 
     thenReturnExpectedTeachers(result: any) {

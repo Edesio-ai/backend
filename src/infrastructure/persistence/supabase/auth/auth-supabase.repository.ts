@@ -16,7 +16,8 @@ import {
     UserLoginError,
     TokenUserNotFoundError
 } from "../../../../domain/auth/errors";
-import { User, Teacher, Session } from "../../../../domain/auth/auth.type";
+import { User, Session } from "../../../../domain/auth/auth.type";
+import { Teacher } from "../../../../domain/teaching/teacher.type";
 import { UserMetadata } from "../../../../domain/auth/auth.type";
 
 @Injectable()

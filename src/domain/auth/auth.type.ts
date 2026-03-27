@@ -69,16 +69,6 @@ type IdentityData = {
     sub: string;
 }
 
-export type Teacher = {
-    id: string;
-    supabase_user_id: string;
-    name: string;
-    email: string;
-    created_at: string;
-    establishment_id: string;
-    available_chatbots: number;
-}
-
 export type RegisterBody = {
     role: Role;
     email: string;
