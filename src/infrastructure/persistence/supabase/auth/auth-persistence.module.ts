@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SupabaseModule } from './supabase.module';
+import { SupabaseModule } from '../supabase.module';
 import { AUTH_REPOSITORY } from 'src/interfaces/persistence/auth.repository';
 import { AuthSupabaseRepository } from './auth-supabase.repository';
 

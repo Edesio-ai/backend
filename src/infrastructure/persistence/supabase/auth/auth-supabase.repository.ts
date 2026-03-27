@@ -1,8 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 
-import { AuthRepository } from "../../../interfaces/persistence/auth.repository";
-import { SUPABASE_ADMIN } from "./supabase.module";
-import { InvitationToken, InvitationTokenPreview } from "../../../domain/auth/invitation.type";
+import { AuthRepository } from "../../../../interfaces/persistence/auth.repository";
+import { SUPABASE_ADMIN } from "../supabase.module";
+import { InvitationToken, InvitationTokenPreview } from "../../../../domain/auth/invitation.type";
 import {
     InvitationTokenAlreadyUsedError,
     InvitationTokenEmailMismatchError,
@@ -15,9 +15,9 @@ import {
     TokenUpdateError,
     UserLoginError,
     TokenUserNotFoundError
-} from "../../../domain/auth/errors";
-import { User, Teacher, Session } from "../../../domain/auth/auth.type";
-import { UserMetadata } from "../../../domain/auth/auth.type";
+} from "../../../../domain/auth/errors";
+import { User, Teacher, Session } from "../../../../domain/auth/auth.type";
+import { UserMetadata } from "../../../../domain/auth/auth.type";
 
 @Injectable()
 export class AuthSupabaseRepository

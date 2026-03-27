@@ -1,5 +1,5 @@
 import { AuthSupabaseRepository } from './auth-supabase.repository';
-import { InvitationToken, InvitationTokenPreview } from '../../../domain/auth/invitation.type';
+import { InvitationToken, InvitationTokenPreview } from '../../../../domain/auth/invitation.type';
 import {
   InvitationTokenAlreadyUsedError,
   InvitationTokenEmailMismatchError,
@@ -11,8 +11,8 @@ import {
   TeacherProfileCreationError,
   TokenUpdateError,
   UserLoginError,
-} from '../../../domain/auth/errors';
-import { Session } from '../../../domain/auth/auth.type';
+} from '../../../../domain/auth/errors';
+import { Session } from '../../../../domain/auth/auth.type';
 
 describe('AuthSupabaseRepository', () => {
   describe('getInvitationPreview', () => {
