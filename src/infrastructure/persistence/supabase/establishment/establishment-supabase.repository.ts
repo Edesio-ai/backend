@@ -46,16 +46,12 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
     }
 
     async getInvitationTokenByEstablishmentId(establishmentId: string): Promise<InvitationToken[]> {
-        console.log("🚀 ~ EstablishmentSupabaseRepository ~ getInvitationTokenByEstablishmentId ~ establishmentId:", establishmentId)
         const { data, error } = await this.supabase
             .from("invitation_tokens")
             .select("*")
             .eq("establishment_id", establishmentId)
             .order("created_at", { ascending: false });
             
-        console.log("🚀 ~ EstablishmentSupabaseRepository ~ getInvitationTokenByEstablishmentId ~ error:", error)
-
-
         if (error) {
             throw new InvitationTokenNotFoundError(error.message);
         }
