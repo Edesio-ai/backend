@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { EstablishmentModule } from './establishment/establishment.module';
+import { BillingModule } from './billing/billing.module';
 
 
 @Module({
@@ -12,6 +13,7 @@ import { EstablishmentModule } from './establishment/establishment.module';
     }),
     AuthModule,
     EstablishmentModule,
+    BillingModule,
   ],
   controllers: [],
   providers: [],
