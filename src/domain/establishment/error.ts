@@ -9,6 +9,12 @@ export class EstablishmentNotFoundError extends EstablishmentError {
     constructor(message?: string) { super(message || 'Establishment not found'); }
 }
 
+export class EstablishmentIdNotFoundError extends EstablishmentError {
+    readonly code = 'ESTABLISHMENT_ID_NOT_FOUND';
+    readonly httpStatus = 400;
+    constructor(message?: string) { super(message || 'Establishment id not found'); }
+}
+
 export class EstablishmentCreationFailedError extends EstablishmentError {
     readonly code = 'ESTABLISHMENT_CREATION_FAILED';
     readonly httpStatus = 500;

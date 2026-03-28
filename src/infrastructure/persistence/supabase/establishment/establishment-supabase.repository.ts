@@ -1,8 +1,11 @@
 import { Inject } from "@nestjs/common";
-import { EstablishmentRepository } from "src/interfaces/persistence/establishment.repository";
+
+import { type EstablishmentRepository } from "../../../../interfaces/persistence/establishment.repository";
 import { SUPABASE_ADMIN } from "../supabase.module";
 import { EstablishmentCreationFailedError, EstablishmentNotFoundError } from "../../../../domain/establishment/error";
-import { Establishment } from "src/domain/establishment/establishment.type";
+import { Establishment } from "../../../../domain/establishment/establishment.type";
+import { InvitationTokenNotFoundError } from "../../../../domain/auth/errors";
+import { InvitationToken } from "../../../../domain/auth/invitation.type";
 
 export class EstablishmentSupabaseRepository implements EstablishmentRepository {
     constructor(
@@ -39,6 +42,23 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
             throw new EstablishmentCreationFailedError(error.message);
         }
         
+        return data;
+    }
+
+    async getInvitationTokenByEstablishmentId(establishmentId: string): Promise<InvitationToken[]> {
+        console.log("🚀 ~ EstablishmentSupabaseRepository ~ getInvitationTokenByEstablishmentId ~ establishmentId:", establishmentId)
+        const { data, error } = await this.supabase
+            .from("invitation_tokens")
+            .select("*")
+            .eq("establishment_id", establishmentId)
+            .order("created_at", { ascending: false });
+            
+        console.log("🚀 ~ EstablishmentSupabaseRepository ~ getInvitationTokenByEstablishmentId ~ error:", error)
+
+
+        if (error) {
+            throw new InvitationTokenNotFoundError(error.message);
+        }
         return data;
     }
 }

@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post, Req, UseFilters, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Req, UseFilters, UseGuards } from "@nestjs/common";
+
 import { GetEstablishmentsStatsUseCase } from '../../application/establishment/get-establishment-stats.use-case';
 import { Roles } from "../auth/decorator/role.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
@@ -9,6 +10,8 @@ import { TeacherFilter } from "../filters/teacher.filter";
 import { CreateEstablishmentUseCase } from "../../application/establishment/create-establishment.use-case";
 import { CreateEstablishmentBodyDto } from "./dto/create-establishment.dto";
 import { Establishment, EstablishmentStats } from "../../domain/establishment/establishment.type";
+import { GetInvitationTokenUseCase } from "../../application/establishment/get-invitation-token.use-case";
+import { InvitationToken } from "../../domain/auth/invitation.type";
 
 
 @Controller('establishment')
@@ -16,6 +19,7 @@ export class EstablishmentController {
     constructor(
         private readonly getEstablishmentsStatsUseCase: GetEstablishmentsStatsUseCase,
         private readonly createEstablishmentUseCase: CreateEstablishmentUseCase,
+        private readonly getInvitationTokenUseCase: GetInvitationTokenUseCase,
     ) {}
 
     @UseGuards(JwtAuthGuard, RolesGuard)
@@ -24,7 +28,17 @@ export class EstablishmentController {
     @UseFilters(EstablishmentErrorFilter, TeacherFilter)
     async getEstablishmentStats(@Req() req: Request & { user: User }): Promise<EstablishmentStats> {
         const { user } = req;
-        return await this.getEstablishmentsStatsUseCase.execute(user.id);
+        const stats = await this.getEstablishmentsStatsUseCase.execute(user.id);
+        return stats;
+    }
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('establishment')
+    @Get('invitation-token/:establishmentId')
+    @UseFilters(EstablishmentErrorFilter)
+    async getInvitationToken(@Param('establishmentId') establishmentId: string): Promise<InvitationToken[]> {
+        const tokens = await this.getInvitationTokenUseCase.execute(establishmentId);
+        return tokens;
     }
 
     @Post('create')
