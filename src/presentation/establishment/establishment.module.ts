@@ -7,6 +7,7 @@ import { establishmentPersistenceModule } from '../../infrastructure/persistence
 import { StudentPersistenceModule } from '../../infrastructure/persistence/supabase/student/student-persistence.module';
 import { TeacherPersistenceModule } from '../../infrastructure/persistence/supabase/teacher/teacher-persistence.module';
 import { CreateEstablishmentUseCase } from '../../application/establishment/create-establishment.use-case';
+import { GetInvitationTokenUseCase } from '../../application/establishment/get-invitation-token.use-case';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CreateEstablishmentUseCase } from '../../application/establishment/crea
   providers: [
     GetEstablishmentsStatsUseCase,
     CreateEstablishmentUseCase,
+    GetInvitationTokenUseCase,
   ],
 })
 export class EstablishmentModule {}

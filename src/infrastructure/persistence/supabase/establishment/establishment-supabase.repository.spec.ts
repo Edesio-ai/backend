@@ -1,5 +1,6 @@
 import { EstablishmentSupabaseRepository } from "./establishment-supabase.repository";
 import { EstablishmentCreationFailedError, EstablishmentNotFoundError } from "../../../../domain/establishment/error";
+import { InvitationTokenNotFoundError } from "../../../../domain/auth/errors";
 
 describe("EstablishmentSupabaseRepository", () => {
     let fixtures: Fixtures;
@@ -43,6 +44,24 @@ describe("EstablishmentSupabaseRepository", () => {
         await fixtures.thenThrowCreationFailed(promise);
         fixtures.thenCreateQueryBuiltWithExpectedArguments();
     });
+
+    it("should return invitation tokens when query succeeds", async () => {
+        fixtures.whenInvitationTokensQueryReturnsData();
+
+        const result = await fixtures.whenGetInvitationTokenByEstablishmentId();
+
+        fixtures.thenInvitationTokensQueryBuiltWithExpectedArguments();
+        fixtures.thenReturnExpectedInvitationTokens(result);
+    });
+
+    it("should throw InvitationTokenNotFoundError when invitation tokens query fails", async () => {
+        fixtures.whenInvitationTokensQueryReturnsError();
+
+        const promise = fixtures.whenGetInvitationTokenByEstablishmentId();
+
+        await fixtures.thenThrowInvitationTokenNotFound(promise);
+        fixtures.thenInvitationTokensQueryBuiltWithExpectedArguments();
+    });
 });
 
 class Fixtures {
@@ -57,6 +76,19 @@ class Fixtures {
         name: "Edesio New",
         email: "new@edesio.io",
     };
+    public readonly invitationTokens = [
+        {
+            id: "token-1",
+            establishment_id: "est-1",
+            token: "abc",
+            invited_email: "teacher@school.com",
+            expires_at: "2026-04-01T00:00:00.000Z",
+            used_at: null,
+            used_by: null,
+            created_at: "2026-03-28T00:00:00.000Z",
+            assigned_chatbots: 2,
+        },
+    ];
     public readonly createdEstablishment = {
         id: "est-2",
         supabase_user_id: this.createBody.supabaseUserId,
@@ -72,12 +104,20 @@ class Fixtures {
     private readonly createSelectMock = jest.fn(() => ({ single: this.createSingleMock }));
     private readonly insertMock = jest.fn(() => ({ select: this.createSelectMock }));
 
+    private readonly invitationTokensOrderMock = jest.fn();
+    private readonly invitationTokensEqMock = jest.fn(() => ({ order: this.invitationTokensOrderMock }));
+    private readonly invitationTokensSelectMock = jest.fn(() => ({ eq: this.invitationTokensEqMock }));
+    private readonly invitationTokensFromMock = jest.fn(() => ({ select: this.invitationTokensSelectMock }));
+
     private readonly fromMock = jest.fn((table: string) => {
         if (table === "establishment") {
             return {
                 select: this.selectMock,
                 insert: this.insertMock,
             };
+        }
+        if (table === "invitation_tokens") {
+            return this.invitationTokensFromMock();
         }
         return {};
     });
@@ -101,6 +141,10 @@ class Fixtures {
             this.createBody.name,
             this.createBody.email,
         );
+    }
+
+    whenGetInvitationTokenByEstablishmentId() {
+        return this.repository.getInvitationTokenByEstablishmentId(this.establishment.id);
     }
 
     whenSupabaseReturnsData() {
@@ -131,12 +175,30 @@ class Fixtures {
         });
     }
 
+    whenInvitationTokensQueryReturnsData() {
+        this.invitationTokensOrderMock.mockResolvedValue({
+            data: this.invitationTokens,
+            error: null,
+        });
+    }
+
+    whenInvitationTokensQueryReturnsError() {
+        this.invitationTokensOrderMock.mockResolvedValue({
+            data: null,
+            error: { message: "invitation tokens query failed" },
+        });
+    }
+
     async thenThrowNotFound(promise: Promise<unknown>) {
         await expect(promise).rejects.toBeInstanceOf(EstablishmentNotFoundError);
     }
 
     async thenThrowCreationFailed(promise: Promise<unknown>) {
         await expect(promise).rejects.toBeInstanceOf(EstablishmentCreationFailedError);
+    }
+
+    async thenThrowInvitationTokenNotFound(promise: Promise<unknown>) {
+        await expect(promise).rejects.toBeInstanceOf(InvitationTokenNotFoundError);
     }
 
     thenQueryBuiltWithExpectedArguments() {
@@ -163,5 +225,17 @@ class Fixtures {
 
     thenReturnExpectedCreatedEstablishment(result: any) {
         expect(result).toEqual(this.createdEstablishment);
+    }
+
+    thenInvitationTokensQueryBuiltWithExpectedArguments() {
+        expect(this.fromMock).toHaveBeenCalledWith("invitation_tokens");
+        expect(this.invitationTokensSelectMock).toHaveBeenCalledWith("*");
+        expect(this.invitationTokensEqMock).toHaveBeenCalledWith("establishment_id", this.establishment.id);
+        expect(this.invitationTokensOrderMock).toHaveBeenCalledWith("created_at", { ascending: false });
+        expect(this.invitationTokensOrderMock).toHaveBeenCalledTimes(1);
+    }
+
+    thenReturnExpectedInvitationTokens(result: any) {
+        expect(result).toEqual(this.invitationTokens);
     }
 }
