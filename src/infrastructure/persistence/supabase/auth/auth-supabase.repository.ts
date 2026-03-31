@@ -14,7 +14,8 @@ import {
     TeacherProfileCreationError,
     TokenUpdateError,
     UserLoginError,
-    TokenUserNotFoundError
+    TokenUserNotFoundError,
+    LogoutError
 } from "../../../../domain/auth/errors";
 import { User, Session } from "../../../../domain/auth/auth.type";
 import { Teacher } from "../../../../domain/teaching/teacher.type";
@@ -31,6 +32,18 @@ export class AuthSupabaseRepository
             throw new TokenUserNotFoundError(error.message);
         }
         return data.user;
+    }
+
+    public async logoutUser(accessToken: string): Promise<void> {
+        const { error } = await this.supabaseAdmin
+            .auth
+            .admin
+            .signOut(accessToken, "global")
+            
+        if (error) {
+            throw new LogoutError(error.message);
+        }
+        return;
     }
 
     public async loginUser(email: string, password: string): Promise<Session> {

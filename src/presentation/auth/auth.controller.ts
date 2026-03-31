@@ -21,6 +21,7 @@ import { SendInvitationBodyDto } from './dto/send-invitation-body.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CsrfGuard } from './guards/csrf.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { LogoutUseCase } from '../../application/auth/logout.use-case';
 
 @Controller('auth')
 @UseFilters(AuthErrorFilter, EmailErrorFilter)
@@ -32,7 +33,8 @@ export class AuthController {
     private readonly loginUseCase: LoginUseCase,
     private readonly sendInvitationUseCase: SendInvitationUseCase,
     private readonly getUserSessionUseCase: GetUserSessionUseCase,
-    private readonly generateCsrfTokenUseCase: GenerateCsrfTokenUseCase
+    private readonly generateCsrfTokenUseCase: GenerateCsrfTokenUseCase,
+    private readonly logoutUseCase: LogoutUseCase
   ) { }
 
   @Get('invitation-preview/:token')
@@ -98,7 +100,7 @@ export class AuthController {
 
     res.cookie("access_token", session.access_token, cookieOptions);
     res.cookie("refresh_token", session.refresh_token, cookieOptions);
-    
+
     return session;
   }
 
@@ -108,5 +110,23 @@ export class AuthController {
   async sendInvitation(@Body() body: SendInvitationBodyDto): Promise<{ success: boolean }> {
     await this.sendInvitationUseCase.execute(body);
     return { success: true }
+  }
+
+  @Post("logout")
+  @UseGuards(CsrfGuard)
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const accessToken = req.cookies?.access_token;
+    if (accessToken) {
+      await this.logoutUseCase.execute(accessToken);
+    }
+
+    const isProd = process.env.NODE_ENV === "production";
+    const cookieOpts = { httpOnly: true, secure: isProd, sameSite: "lax" as const, path: "/" };
+
+    res.clearCookie("access_token", cookieOpts);
+    res.clearCookie("refresh_token", cookieOpts);
+    res.clearCookie("csrf_token", { ...cookieOpts, httpOnly: false });
+
+    return { success: true };
   }
 }
