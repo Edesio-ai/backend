@@ -12,6 +12,7 @@ import { authPersistenceModule } from '../../infrastructure/persistence/supabase
 import { TOKEN_GENERATOR } from '../../interfaces/security/token-generator.provider';
 import { AuthController } from './auth.controller';
 import { GetUserSessionUseCase } from '../../application/auth/get-user-session.use-case';
+import { LogoutUseCase } from '../../application/auth/logout.use-case';
 
 
 @Module({
@@ -31,7 +32,8 @@ import { GetUserSessionUseCase } from '../../application/auth/get-user-session.u
     RegisterUseCase,
     LoginUseCase,
     SendInvitationUseCase,
-    GetUserSessionUseCase
+    GetUserSessionUseCase,
+    LogoutUseCase
   ],
 })
 

@@ -68,3 +68,9 @@ export class UserLoginError extends AuthError {
     readonly httpStatus = 401;
     constructor(message?: string) { super(message || 'User login error'); }
 }
+
+export class LogoutError extends AuthError {
+    readonly code = 'LOGOUT_ERROR';
+    readonly httpStatus = 500;
+    constructor(message?: string) { super(message || 'Logout error'); }
+}

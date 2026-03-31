@@ -9,4 +9,5 @@ export interface AuthRepository {
   createUser(email: string, password: string, metadata: UserMetadata, invitationToken?: InvitationToken): Promise<void>;
   loginUser(email: string, password: string): Promise<Session>;
   validateToken(token: string): Promise<User>;
+  logoutUser(accessToken: string): Promise<void>;
 }

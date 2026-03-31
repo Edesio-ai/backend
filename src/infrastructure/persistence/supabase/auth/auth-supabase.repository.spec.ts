@@ -5,6 +5,7 @@ import {
   InvitationTokenEmailMismatchError,
   InvitationTokenExpiredError,
   InvitationTokenNotFoundError,
+  LogoutError,
   UserAlereadyExistsError,
   UserCreationError,
   UserCreationFailedError,
@@ -128,6 +129,31 @@ describe('AuthSupabaseRepository', () => {
 
       await fixtures.thenThrowUserLoginError(promise);
       fixtures.thenSignInWithPasswordCalledWithNormalizedEmail();
+    });
+  });
+
+  describe('logoutUser', () => {
+    let fixtures: LogoutUserFixtures;
+
+    beforeEach(() => {
+      fixtures = new LogoutUserFixtures();
+    });
+
+    it('should call auth.admin.signOut with global scope when logout succeeds', async () => {
+      fixtures.whenSignOutSucceeds();
+
+      await fixtures.whenLogoutUser();
+
+      fixtures.thenSignOutCalledWithExpectedArgs();
+    });
+
+    it('should throw LogoutError when signOut returns error', async () => {
+      fixtures.whenSignOutFails();
+
+      const promise = fixtures.whenLogoutUser();
+
+      await fixtures.thenThrowLogoutError(promise);
+      fixtures.thenSignOutCalledWithExpectedArgs();
     });
   });
 
@@ -616,5 +642,49 @@ class CreateUserFixtures {
 
   async thenThrowTokenUpdateError(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(TokenUpdateError);
+  }
+}
+
+class LogoutUserFixtures {
+  public readonly accessToken = 'access-token';
+  public readonly signOutMock = jest.fn();
+  public readonly sut: AuthSupabaseRepository;
+
+  constructor() {
+    const supabaseAdminMock = {
+      auth: {
+        admin: {
+          signOut: this.signOutMock,
+        },
+      },
+    };
+
+    this.sut = new AuthSupabaseRepository(supabaseAdminMock as any);
+  }
+
+  whenLogoutUser() {
+    return this.sut.logoutUser(this.accessToken);
+  }
+
+  whenSignOutSucceeds() {
+    this.signOutMock.mockResolvedValue({
+      error: null,
+    });
+  }
+
+  whenSignOutFails() {
+    this.signOutMock.mockResolvedValue({
+      error: { message: 'logout failed' },
+    });
+  }
+
+  thenSignOutCalledWithExpectedArgs() {
+    expect(this.signOutMock).toHaveBeenCalledWith(this.accessToken, 'global');
+    expect(this.signOutMock).toHaveBeenCalledTimes(1);
+  }
+
+  async thenThrowLogoutError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(LogoutError);
+    await expect(promise).rejects.toThrow('logout failed');
   }
 }
