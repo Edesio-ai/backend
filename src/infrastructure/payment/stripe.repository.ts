@@ -3,12 +3,30 @@ import Stripe from "stripe";
 import { PaymentClientInterface } from "../../interfaces/payment.interface";
 import { STRIPE_CLIENT } from "./stripe.module";
 import { StripeError } from "../../domain/billing/error";
+import { User } from "src/domain/auth/auth.type";
+import { StripeSession } from "src/domain/billing/billing.type";
 
 export class StripeRepository implements PaymentClientInterface {
     constructor(
         @Inject(STRIPE_CLIENT)
         private readonly stripeClient: Stripe,
     ) { }
+    async getCheckoutSession(sessionId: string): Promise<StripeSession> {
+        try {
+            const session = await this.stripeClient.checkout.sessions.retrieve(sessionId);
+            return {
+                id: session.id,
+                customerId: typeof session.customer === "string" ? session.customer : session.customer?.id ?? null,
+                subscriptionId: typeof session.subscription === "string" ? session.subscription : session.subscription?.id ?? null,
+                status: session.status ?? "open",
+                paymentStatus: session.payment_status,
+                metadata: session.metadata ?? {},
+            };
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Unknown error";
+            throw new StripeError(`Error retrieving checkout session: ${message}`);
+        }
+    }
 
     async getCustomerByEmail(email: string): Promise<any> {
         try {
@@ -51,13 +69,45 @@ export class StripeRepository implements PaymentClientInterface {
             const subscriptions = await this.stripeClient.subscriptions.list({
                 customer: customerId,
                 limit: 10,
-              });
+            });
 
             return subscriptions.data;
         }
         catch (error) {
             const message = error instanceof Error ? error.message : "Unknown error";
             throw new StripeError(`Error searching subscriptions: ${message}`);
+        }
+    }
+
+    async createCheckoutSession(user: User, priceId: string, planType: string): Promise<any> {
+        try {
+            const { email } = user;
+
+            const session = await this.stripeClient.checkout.sessions.create({
+                mode: "subscription",
+                customer_email: email,
+                line_items: [
+                    {
+                        price: priceId,
+                        quantity: 1,
+                    },
+                ],
+                metadata: {
+                    plan: planType,
+                },
+                subscription_data: {
+                    metadata: {
+                        plan: planType,
+                        priceId: priceId,
+                    },
+                },
+                success_url: `${process.env.STRIPE_REDIRECT_URI}/success?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${process.env.STRIPE_REDIRECT_URI}/cancel?session_id={CHECKOUT_SESSION_ID}`,
+            });
+            return { url: session.url! };
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "";
+            throw new StripeError(`Error creating checkout session: ${message}`);
         }
     }
 }

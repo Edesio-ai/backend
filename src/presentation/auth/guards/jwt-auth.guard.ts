@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { AUTH_REPOSITORY, type AuthRepository } from "src/interfaces/persistence/auth.repository";
 import { Request } from "express";
+import { TokenUserNotFoundError } from "src/domain/auth/errors";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -11,9 +12,9 @@ export class JwtAuthGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const req = context.switchToHttp().getRequest();
         const token = this.extractToken(req);
-
+        
         if(!token) {
-            throw new UnauthorizedException('Missing authentication token');
+            throw new TokenUserNotFoundError('Missing authentication token');
         }
         const user = await this.authRepository.validateToken(token);
         req.user = user;
