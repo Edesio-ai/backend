@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { StripeSession } from "src/domain/billing/billing.type";
-import { PAYMENT_CLIENT, type PaymentClientInterface } from "src/interfaces/payment.interface";
+import { StripeSession } from "../../domain/billing/billing.type";
+import { PAYMENT_CLIENT, type PaymentClientInterface } from "../../interfaces/payment.interface";
 
 @Injectable()
 export class PaymentSuccessUseCase {

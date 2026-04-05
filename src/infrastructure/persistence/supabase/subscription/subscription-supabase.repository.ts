@@ -1,6 +1,6 @@
 import { Inject } from "@nestjs/common";
 import { SUPABASE_ADMIN } from "../supabase.module";
-import { FetchSubscriptionError } from "src/domain/subscription/error";
+import { FetchSubscriptionError } from "../../../../domain/subscription/error";
 
 export class SubscriptionSupabaseRepository implements SubscriptionSupabaseRepository {
     constructor(

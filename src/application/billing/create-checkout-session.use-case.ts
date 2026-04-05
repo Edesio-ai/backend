@@ -1,8 +1,8 @@
 import { Inject } from "@nestjs/common";
-import { User } from "src/domain/auth/auth.type";
-import { TokenUserNotFoundError } from "src/domain/auth/errors";
-import { SUBSCRIPTION_REPOSITORY, type SubscriptionRepository } from "src/interfaces/persistence/subscription.repository";
-import { PAYMENT_CLIENT, type PaymentClientInterface } from "src/interfaces/payment.interface";
+import { User } from "../../domain/auth/auth.type";
+import { TokenUserNotFoundError } from "../../domain/auth/errors";
+import { SUBSCRIPTION_REPOSITORY, type SubscriptionRepository } from "../../interfaces/persistence/subscription.repository";
+import { PAYMENT_CLIENT, type PaymentClientInterface } from "../../interfaces/payment.interface";
 
 export class CreateCheckoutSessionsUseCase {
     constructor(
