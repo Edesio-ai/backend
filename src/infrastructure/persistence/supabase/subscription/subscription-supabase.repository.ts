@@ -10,9 +10,9 @@ export class SubscriptionSupabaseRepository implements SubscriptionSupabaseRepos
 
     async getUserSubscription(userId: string): Promise<any> {
         const { data, error } = await this.supabase
-        .from("subscription")
+        .from("subscriptions")
         .select("*")
-        .eq("suscriber_id", userId);
+        .eq("subscriber_id", userId);
         
         if (error) {
             const message = error instanceof Error ? error.message : "";
