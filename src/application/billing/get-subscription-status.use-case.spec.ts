@@ -78,6 +78,8 @@ class Fixtures {
             getCustomerByEmail: jest.fn(),
             getCheckoutSessionByUserId: jest.fn(),
             getSubscriptionsByCustomerId: jest.fn(),
+            createCheckoutSession: jest.fn(),
+            getCheckoutSession: jest.fn(),
         };
 
         this.getSubscriptionStatusUseCase = new GetSubscriptionStatusUseCase(this.paymentClient);
@@ -121,27 +123,29 @@ class Fixtures {
     }
 
     whenSubscriptionsReturnActive() {
-        this.paymentClient.getSubscriptionsByCustomerId.mockResolvedValue({
-            data: [
-                {
-                    status: "active",
-                    cancel_at_period_end: false,
-                    current_period_end: Math.floor(Date.now() / 1000) + 3600,
-                },
-            ],
-        });
+        this.paymentClient.getSubscriptionsByCustomerId.mockResolvedValue(this.createSubscriptionsPayload([
+            {
+                status: "active",
+                cancel_at_period_end: false,
+                current_period_end: Math.floor(Date.now() / 1000) + 3600,
+            },
+        ]));
     }
 
     whenSubscriptionsReturnPastDue() {
-        this.paymentClient.getSubscriptionsByCustomerId.mockResolvedValue({
-            data: [
-                {
-                    status: "past_due",
-                    cancel_at_period_end: false,
-                    current_period_end: Math.floor(Date.now() / 1000) + 3600,
-                },
-            ],
-        });
+        this.paymentClient.getSubscriptionsByCustomerId.mockResolvedValue(this.createSubscriptionsPayload([
+            {
+                status: "past_due",
+                cancel_at_period_end: false,
+                current_period_end: Math.floor(Date.now() / 1000) + 3600,
+            },
+        ]));
+    }
+
+    private createSubscriptionsPayload(subscriptions: any[]) {
+        const payload = [...subscriptions] as any;
+        payload.data = subscriptions;
+        return payload;
     }
 
     whenCustomerLookupThrowsError() {

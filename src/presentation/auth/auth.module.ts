@@ -13,6 +13,7 @@ import { TOKEN_GENERATOR } from '../../interfaces/security/token-generator.provi
 import { AuthController } from './auth.controller';
 import { GetUserSessionUseCase } from '../../application/auth/get-user-session.use-case';
 import { LogoutUseCase } from '../../application/auth/logout.use-case';
+import { CreateInvitationTokenUseCase } from '../../application/auth/create-invitation-toke.use-case';
 
 
 @Module({
@@ -33,7 +34,8 @@ import { LogoutUseCase } from '../../application/auth/logout.use-case';
     LoginUseCase,
     SendInvitationUseCase,
     GetUserSessionUseCase,
-    LogoutUseCase
+    LogoutUseCase,
+    CreateInvitationTokenUseCase
   ],
 })
 

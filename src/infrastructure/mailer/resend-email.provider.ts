@@ -8,20 +8,20 @@ import { EmailSendingError } from "../../domain/email/errors";
 import { buildProfesseurInvitationTemplateData } from "./templates/invitation/professeur-invitation-email.data";
 import { renderProfesseurInvitationEmailHtml } from "./templates/invitation/professeur-invitation-email.renderer";
 
-const APP_URL = 'http://localhost:5000';
-const LOGO_URL = `${APP_URL}/icon-192.png`;
 
 @Injectable()
 export class ResendEmailProvider implements EmailProviderInterface {
     constructor(@Inject(RESEND_CLIENT) private readonly resend: Resend) { }
 
     public async sendProfesseurInvitation(email: string, name: string, invitationToken: string, availableChatbots: number): Promise<void> {
+        const appUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
+
         const templateData = buildProfesseurInvitationTemplateData({
             inviterName: name,
             invitationToken,
             availableChatbots,
-            appUrl: APP_URL,
-            logoUrl: LOGO_URL,
+            appUrl: appUrl,
+            logoUrl: `${appUrl}/icon-192.png`,
         });
         const html = renderProfesseurInvitationEmailHtml(templateData);
 
@@ -46,11 +46,13 @@ export class ResendEmailProvider implements EmailProviderInterface {
     }
 
     public async sendWelcomeEmail(email: string, name: string, role: string): Promise<void> {
+        const appUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
+
         const templateData = buildWelcomeEmailTemplateData({
             role,
             name,
-            appUrl: APP_URL,
-            logoUrl: LOGO_URL,
+            appUrl: appUrl,
+            logoUrl: `${appUrl}/icon-192.png`,
         });
         const html = renderWelcomeEmailHtml(templateData);
 

@@ -15,7 +15,8 @@ import {
     TokenUpdateError,
     UserLoginError,
     TokenUserNotFoundError,
-    LogoutError
+    LogoutError,
+    InvitationTokenCreationError
 } from "../../../../domain/auth/errors";
 import { User, Session } from "../../../../domain/auth/auth.type";
 import { Teacher } from "../../../../domain/teaching/teacher.type";
@@ -34,12 +35,32 @@ export class AuthSupabaseRepository
         return data.user;
     }
 
+    public async createInvitationToken(establishmentId: string, token: string, invitedEmail: string, expiresAt: Date, assignedChatbots: number): Promise<void> {
+        const { error } = await this.supabaseAdmin
+            .from("invitation_tokens")
+            .insert({
+                establishment_id: establishmentId,
+                token,
+                invited_email: invitedEmail.toLowerCase().trim(),
+                expires_at: expiresAt.toISOString(),
+                assigned_chatbots: assignedChatbots,
+            })
+            .select()
+            .single();
+
+        if (error) {
+            throw new InvitationTokenCreationError(error.message);
+        }
+
+        return;
+    }
+
     public async logoutUser(accessToken: string): Promise<void> {
         const { error } = await this.supabaseAdmin
             .auth
             .admin
             .signOut(accessToken, "global")
-            
+
         if (error) {
             throw new LogoutError(error.message);
         }
@@ -127,7 +148,7 @@ export class AuthSupabaseRepository
 
     public async createUser(email: string, password: string, metadata: UserMetadata, invitationToken?: InvitationToken): Promise<void> {
         const authUser = await this.createAuthUser(email, password, metadata);
-        if(invitationToken) {
+        if (invitationToken) {
             const teacher = await this.createTeacherWithInvitationTokenProfile(authUser, invitationToken);
             await this.updateTokenUsedAt(invitationToken.id, teacher.id);
         }
