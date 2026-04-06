@@ -81,7 +81,7 @@ class Fixtures {
 
   thenCreateInvitationTokenCalledWithExpectedArguments() {
     expect(this.authRepository.createInvitationToken).toHaveBeenCalledWith(
-      this.body.establishmentId + "test",
+      this.body.establishmentId,
       this.body.token,
       this.body.invitedEmail,
       this.body.expiresAt,
