@@ -6,6 +6,11 @@ describe('ResendEmailProvider', () => {
 
     beforeEach(() => {
         fixtures = new Fixtures();
+        fixtures.whenFrontendUrlIsUnset();
+    });
+
+    afterEach(() => {
+        fixtures.restoreFrontendUrl();
     });
 
     it('should send welcome email with rendered template', async () => {
@@ -55,6 +60,23 @@ describe('ResendEmailProvider', () => {
 
         await fixtures.thenThrowEmailSendingError(promise);
     });
+
+    it('should use FRONTEND_URL in invitation email payload when defined', async () => {
+        fixtures.whenResendSendResolvesWithoutError();
+        fixtures.whenFrontendUrlIs('https://app.edesio.test');
+
+        await fixtures.whenSendProfesseurInvitation();
+
+        fixtures.thenInvitationHtmlContainsFrontendUrl('https://app.edesio.test');
+    });
+
+    it('should wrap non Error thrown value in EmailSendingError', async () => {
+        fixtures.whenResendSendThrowsString();
+
+        const promise = fixtures.whenSendWelcomeEmail('teacher');
+
+        await fixtures.thenThrowEmailSendingErrorWithMessage(promise, 'provider exploded');
+    });
 });
 
 class Fixtures {
@@ -65,6 +87,7 @@ class Fixtures {
     public readonly invitationToken = 'inv-token-123';
     public readonly availableChatbots = 3;
     public readonly resendErrorMessage = 'resend failure';
+    private readonly initialFrontendUrl = process.env.FRONTEND_URL;
 
     constructor() {
         const resendMock = {
@@ -107,6 +130,26 @@ class Fixtures {
         this.sendMock.mockRejectedValue(new Error(this.resendErrorMessage));
     }
 
+    whenResendSendThrowsString() {
+        this.sendMock.mockRejectedValue('provider exploded');
+    }
+
+    whenFrontendUrlIs(url: string) {
+        process.env.FRONTEND_URL = url;
+    }
+
+    whenFrontendUrlIsUnset() {
+        delete process.env.FRONTEND_URL;
+    }
+
+    restoreFrontendUrl() {
+        if (this.initialFrontendUrl === undefined) {
+            delete process.env.FRONTEND_URL;
+            return;
+        }
+        process.env.FRONTEND_URL = this.initialFrontendUrl;
+    }
+
     thenResendCalledWithWelcomePayload() {
         expect(this.sendMock).toHaveBeenCalledTimes(1);
         expect(this.sendMock).toHaveBeenCalledWith(
@@ -142,5 +185,16 @@ class Fixtures {
     async thenThrowEmailSendingError(promise: Promise<unknown>) {
         await expect(promise).rejects.toBeInstanceOf(EmailSendingError);
         await expect(promise).rejects.toThrow(this.resendErrorMessage);
+    }
+
+    async thenThrowEmailSendingErrorWithMessage(promise: Promise<unknown>, message: string) {
+        await expect(promise).rejects.toBeInstanceOf(EmailSendingError);
+        await expect(promise).rejects.toThrow(message);
+    }
+
+    thenInvitationHtmlContainsFrontendUrl(url: string) {
+        const payload = this.sendMock.mock.calls[0][0];
+        expect(payload.html).toContain(`${url}/inscription/professeur/${this.invitationToken}`);
+        expect(payload.html).toContain(`${url}/icon-192.png`);
     }
 }

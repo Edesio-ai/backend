@@ -22,6 +22,8 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CsrfGuard } from './guards/csrf.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { LogoutUseCase } from '../../application/auth/logout.use-case';
+import { CreateInvitationTokenBodyDto } from './dto/create-invitation-token.dto';
+import { CreateInvitationTokenUseCase } from '../../application/auth/create-invitation-toke.use-case';
 
 @Controller('auth')
 @UseFilters(AuthErrorFilter, EmailErrorFilter)
@@ -34,7 +36,8 @@ export class AuthController {
     private readonly sendInvitationUseCase: SendInvitationUseCase,
     private readonly getUserSessionUseCase: GetUserSessionUseCase,
     private readonly generateCsrfTokenUseCase: GenerateCsrfTokenUseCase,
-    private readonly logoutUseCase: LogoutUseCase
+    private readonly logoutUseCase: LogoutUseCase,
+    private readonly createInvitationTokenUseCase: CreateInvitationTokenUseCase
   ) { }
 
   @Get('invitation-preview/:token')
@@ -109,6 +112,14 @@ export class AuthController {
   @Post('send-invitation')
   async sendInvitation(@Body() body: SendInvitationBodyDto): Promise<{ success: boolean }> {
     await this.sendInvitationUseCase.execute(body);
+    return { success: true }
+  }
+
+  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+  @Roles('establishment')
+  @Post('invitation-token/create')
+  async createInvitationToken(@Body() body: CreateInvitationTokenBodyDto): Promise<{ success: boolean }> {
+    await this.createInvitationTokenUseCase.execute(body);
     return { success: true }
   }
 

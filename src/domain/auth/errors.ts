@@ -9,6 +9,12 @@ export class InvitationTokenNotFoundError extends AuthError {
     constructor(message?: string) { super(message || 'Invitation token not found'); }
 }
 
+export class InvitationTokenCreationError extends AuthError {
+    readonly code = 'INVITATION_TOKEN_CREATION_ERROR';
+    readonly httpStatus = 400;
+    constructor(message?: string) { super(message || 'Invitation token creation error'); }
+}
+
 export class TokenUserNotFoundError extends AuthError {
     readonly code = 'TOKEN_USER_NOT_FOUND';
     readonly httpStatus = 401;

@@ -10,4 +10,5 @@ export interface AuthRepository {
   loginUser(email: string, password: string): Promise<Session>;
   validateToken(token: string): Promise<User>;
   logoutUser(accessToken: string): Promise<void>;
+  createInvitationToken(establishmentId: string, token: string, invitedEmail: string, expiresAt: Date, assignedChatbots: number): Promise<void>;
 }

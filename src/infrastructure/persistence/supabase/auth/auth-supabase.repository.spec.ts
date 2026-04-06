@@ -1,6 +1,7 @@
 import { AuthSupabaseRepository } from './auth-supabase.repository';
 import { InvitationToken, InvitationTokenPreview } from '../../../../domain/auth/invitation.type';
 import {
+  InvitationTokenCreationError,
   InvitationTokenAlreadyUsedError,
   InvitationTokenEmailMismatchError,
   InvitationTokenExpiredError,
@@ -103,6 +104,31 @@ describe('AuthSupabaseRepository', () => {
       const promise = fixtures.whenValideInvitationToken('other@school.com');
 
       await fixtures.thenThrowEmailMismatch(promise);
+    });
+  });
+
+  describe('createInvitationToken', () => {
+    let fixtures: CreateInvitationTokenFixtures;
+
+    beforeEach(() => {
+      fixtures = new CreateInvitationTokenFixtures();
+    });
+
+    it('should insert invitation token with normalized email and mapped fields', async () => {
+      fixtures.whenInsertSucceeds();
+
+      await fixtures.whenCreateInvitationToken();
+
+      fixtures.thenInsertQueryBuiltWithExpectedPayload();
+    });
+
+    it('should throw InvitationTokenCreationError when insert fails', async () => {
+      fixtures.whenInsertFails();
+
+      const promise = fixtures.whenCreateInvitationToken();
+
+      await fixtures.thenThrowInvitationTokenCreationError(promise);
+      fixtures.thenInsertQueryBuiltWithExpectedPayload();
     });
   });
 
@@ -485,6 +511,68 @@ class LoginUserFixtures {
   async thenThrowUserLoginError(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(UserLoginError);
     await expect(promise).rejects.toThrow('Invalid login credentials');
+  }
+}
+
+class CreateInvitationTokenFixtures {
+  public readonly establishmentId = 'est-1';
+  public readonly token = 'inv-token-123';
+  public readonly invitedEmail = 'Teacher@School.com ';
+  public readonly normalizedEmail = 'teacher@school.com';
+  public readonly expiresAt = new Date('2027-01-01T00:00:00.000Z');
+  public readonly assignedChatbots = 2;
+
+  private readonly singleMock = jest.fn();
+  private readonly selectMock = jest.fn(() => ({ single: this.singleMock }));
+  private readonly insertMock = jest.fn(() => ({ select: this.selectMock }));
+  private readonly fromMock = jest.fn(() => ({ insert: this.insertMock }));
+
+  private readonly supabaseAdminMock = {
+    from: this.fromMock,
+  };
+
+  public readonly sut = new AuthSupabaseRepository(this.supabaseAdminMock as any);
+
+  whenInsertSucceeds() {
+    this.singleMock.mockResolvedValue({
+      data: { id: 'new-token-id' },
+      error: null,
+    });
+  }
+
+  whenInsertFails() {
+    this.singleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'insert failed' },
+    });
+  }
+
+  whenCreateInvitationToken() {
+    return this.sut.createInvitationToken(
+      this.establishmentId,
+      this.token,
+      this.invitedEmail,
+      this.expiresAt,
+      this.assignedChatbots,
+    );
+  }
+
+  thenInsertQueryBuiltWithExpectedPayload() {
+    expect(this.fromMock).toHaveBeenCalledWith('invitation_tokens');
+    expect(this.insertMock).toHaveBeenCalledWith({
+      establishment_id: this.establishmentId,
+      token: this.token,
+      invited_email: this.normalizedEmail,
+      expires_at: this.expiresAt.toISOString(),
+      assigned_chatbots: this.assignedChatbots,
+    });
+    expect(this.selectMock).toHaveBeenCalledWith();
+    expect(this.singleMock).toHaveBeenCalledTimes(1);
+  }
+
+  async thenThrowInvitationTokenCreationError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(InvitationTokenCreationError);
+    await expect(promise).rejects.toThrow('insert failed');
   }
 }
 
