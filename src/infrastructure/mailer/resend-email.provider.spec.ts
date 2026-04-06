@@ -201,7 +201,7 @@ class Fixtures {
   thenInvitationHtmlContainsFrontendUrl(url: string) {
     const payload = this.sendMock.mock.calls[0][0];
     expect(payload.html).toContain(
-      `${url}/inscription/professeur/${this.invitationToken}`,
+      `${url}/register/teacher-invitation/${this.invitationToken}`,
     );
     expect(payload.html).toContain(`${url}/icon-192.png`);
   }

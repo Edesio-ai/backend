@@ -90,9 +90,9 @@ class Fixtures {
   }
 
   thenQueryBuiltWithExpectedArguments() {
-    expect(this.fromMock).toHaveBeenCalledWith('subscriptions');
+    expect(this.fromMock).toHaveBeenCalledWith('subscription');
     expect(this.selectMock).toHaveBeenCalledWith('*');
-    expect(this.eqMock).toHaveBeenCalledWith('subscriber_id', this.userId);
+    expect(this.eqMock).toHaveBeenCalledWith('suscriber_id', this.userId);
     expect(this.eqMock).toHaveBeenCalledTimes(1);
   }
 
