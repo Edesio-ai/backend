@@ -59,7 +59,6 @@ export class GetSubscriptionStatusUseCase {
         let subscription = subscriptions.find(
             sub => sub.status === "active" || sub.status === "trialing"
         );
-        console.log("🚀 ~ GetSubscriptionStatusUseCase ~ getSubscriptionStatus ~ subscription:", subscription)
 
         if (!subscription) {
             subscription = subscriptions.data.find(sub => {
