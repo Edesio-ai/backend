@@ -1,7 +1,6 @@
-import { Module } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { Resend } from "resend";
-
+import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Resend } from 'resend';
 
 export const RESEND_CLIENT = Symbol('RESEND_CLIENT');
 
@@ -21,5 +20,4 @@ export const RESEND_CLIENT = Symbol('RESEND_CLIENT');
   ],
   exports: [RESEND_CLIENT],
 })
-
 export class ResendModule {}

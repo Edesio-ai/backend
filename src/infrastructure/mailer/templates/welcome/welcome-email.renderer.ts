@@ -1,11 +1,11 @@
-import { WelcomeEmailTemplateData } from "./welcome-email.types";
+import { WelcomeEmailTemplateData } from './welcome-email.types';
 
 export function renderWelcomeEmailHtml(data: WelcomeEmailTemplateData): string {
-    const quickStartItems = data.quickStartItems
-        .map((item) => `      <li>${escapeHtml(item)}</li>`)
-        .join("\n");
+  const quickStartItems = data.quickStartItems
+    .map((item) => `      <li>${escapeHtml(item)}</li>`)
+    .join('\n');
 
-    return `
+  return `
             <!DOCTYPE html>
                 <html lang="fr">
                 <head>
@@ -105,10 +105,10 @@ ${quickStartItems}
 }
 
 function escapeHtml(value: string): string {
-    return value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }

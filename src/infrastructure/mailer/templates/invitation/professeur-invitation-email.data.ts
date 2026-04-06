@@ -1,4 +1,4 @@
-import { ProfesseurInvitationTemplateData } from "./professeur-invitation-email.types";
+import { ProfesseurInvitationTemplateData } from './professeur-invitation-email.types';
 
 export function buildProfesseurInvitationTemplateData(params: {
   inviterName: string;

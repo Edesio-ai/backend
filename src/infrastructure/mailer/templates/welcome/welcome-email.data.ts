@@ -1,51 +1,54 @@
-import { WelcomeEmailRole, WelcomeEmailTemplateData } from "./welcome-email.types";
+import {
+  WelcomeEmailRole,
+  WelcomeEmailTemplateData,
+} from './welcome-email.types';
 
 const ROLE_LABELS: Record<WelcomeEmailRole, string> = {
-  teacher: "Teacher",
-  student: "Student",
-  establishment: "Establishment",
-  standalone: "Standalone",
+  teacher: 'Teacher',
+  student: 'Student',
+  establishment: 'Establishment',
+  standalone: 'Standalone',
 };
 
 const DASHBOARD_PATHS: Record<WelcomeEmailRole, string> = {
-  teacher: "/teacher",
-  student: "/student",
-  establishment: "/establishment",
-  standalone: "/standalone",
+  teacher: '/teacher',
+  student: '/student',
+  establishment: '/establishment',
+  standalone: '/standalone',
 };
 
 const QUICK_START_ITEMS: Record<WelcomeEmailRole, string[]> = {
   teacher: [
-    "Creez votre premiere session de classe",
-    "Ajoutez vos cours et documents PDF",
+    'Creez votre premiere session de classe',
+    'Ajoutez vos cours et documents PDF',
     "Generez des questions avec l'IA",
-    "Partagez le code de session avec vos eleves",
+    'Partagez le code de session avec vos eleves',
   ],
   establishment: [
-    "Invitez des professeurs a rejoindre votre etablissement",
+    'Invitez des professeurs a rejoindre votre etablissement',
     "Suivez l'activite de vos professeurs et sessions",
-    "Consultez les statistiques globales de votre etablissement",
+    'Consultez les statistiques globales de votre etablissement',
     "Gerez les codes d'invitation pour les nouveaux professeurs",
   ],
   standalone: [
-    "Creez vos propres cours et ajoutez du contenu",
-    "Uploadez vos documents PDF",
+    'Creez vos propres cours et ajoutez du contenu',
+    'Uploadez vos documents PDF',
     "Generez des questions avec l'IA",
-    "Entrainez-vous avec le chatbot intelligent",
+    'Entrainez-vous avec le chatbot intelligent',
   ],
   student: [
-    "Rejoignez une session avec le code de votre professeur",
-    "Discutez avec Edesio pour reviser",
-    "Repondez aux questions pour progresser",
-    "Suivez votre classement dans le cours",
+    'Rejoignez une session avec le code de votre professeur',
+    'Discutez avec Edesio pour reviser',
+    'Repondez aux questions pour progresser',
+    'Suivez votre classement dans le cours',
   ],
 };
 
 const ROLE_ALIASES: Record<string, WelcomeEmailRole> = {
-  teacher: "teacher",
-  student: "student",
-  establishment: "establishment",
-  standalone: "standalone",
+  teacher: 'teacher',
+  student: 'student',
+  establishment: 'establishment',
+  standalone: 'standalone',
 };
 
 export function buildWelcomeEmailTemplateData(params: {
@@ -67,5 +70,5 @@ export function buildWelcomeEmailTemplateData(params: {
 
 function normalizeRole(role: string): WelcomeEmailRole {
   const key = role.toLowerCase().trim();
-  return ROLE_ALIASES[key] ?? "student";
+  return ROLE_ALIASES[key] ?? 'student';
 }

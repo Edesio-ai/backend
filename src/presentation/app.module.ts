@@ -4,7 +4,6 @@ import { AuthModule } from './auth/auth.module';
 import { EstablishmentModule } from './establishment/establishment.module';
 import { BillingModule } from './billing/billing.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({

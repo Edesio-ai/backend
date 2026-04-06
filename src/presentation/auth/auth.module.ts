@@ -15,12 +15,8 @@ import { GetUserSessionUseCase } from '../../application/auth/get-user-session.u
 import { LogoutUseCase } from '../../application/auth/logout.use-case';
 import { CreateInvitationTokenUseCase } from '../../application/auth/create-invitation-toke.use-case';
 
-
 @Module({
-  imports: [
-    authPersistenceModule,
-    MailerModule
-  ],
+  imports: [authPersistenceModule, MailerModule],
   controllers: [AuthController],
   providers: [
     {
@@ -35,8 +31,7 @@ import { CreateInvitationTokenUseCase } from '../../application/auth/create-invi
     SendInvitationUseCase,
     GetUserSessionUseCase,
     LogoutUseCase,
-    CreateInvitationTokenUseCase
+    CreateInvitationTokenUseCase,
   ],
 })
-
-export class AuthModule { }
+export class AuthModule {}

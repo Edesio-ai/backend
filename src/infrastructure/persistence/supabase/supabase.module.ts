@@ -1,6 +1,6 @@
-import { Module } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { createClient } from "@supabase/supabase-js";
+import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { createClient } from '@supabase/supabase-js';
 
 export const SUPABASE_ADMIN = Symbol('SUPABASE_ADMIN');
 
@@ -22,5 +22,4 @@ export const SUPABASE_ADMIN = Symbol('SUPABASE_ADMIN');
   ],
   exports: [SUPABASE_ADMIN],
 })
-
 export class SupabaseModule {}

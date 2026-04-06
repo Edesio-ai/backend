@@ -1,5 +1,15 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
-import type { Request, Response } from "express";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
+import type { Request, Response } from 'express';
 
 import { GenerateCsrfTokenUseCase } from '../../application/auth/generate-csrf-token.use-case';
 import { GetInvitationPreviewUseCase } from '../../application/auth/get-invitation-preview.use-case';
@@ -9,7 +19,10 @@ import { RegisterUseCase } from '../../application/auth/register.use-case';
 import { SignUpTeacherUseCase } from '../../application/auth/sign-up-teacher.use-case';
 import { SendInvitationUseCase } from '../../application/auth/send-invitation.use-case';
 import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
-import { AuthSession, GetUserSessionResponse } from '../../domain/auth/auth.type';
+import {
+  AuthSession,
+  GetUserSessionResponse,
+} from '../../domain/auth/auth.type';
 import { AuthErrorFilter } from '../filters/auth.filter';
 import { EmailErrorFilter } from '../filters/email.filter';
 import { Roles } from './decorator/role.decorator';
@@ -37,12 +50,15 @@ export class AuthController {
     private readonly getUserSessionUseCase: GetUserSessionUseCase,
     private readonly generateCsrfTokenUseCase: GenerateCsrfTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
-    private readonly createInvitationTokenUseCase: CreateInvitationTokenUseCase
-  ) { }
+    private readonly createInvitationTokenUseCase: CreateInvitationTokenUseCase,
+  ) {}
 
   @Get('invitation-preview/:token')
-  async getInvitationPreview(@Param() params: GetInvitationPreviewParamsDto): Promise<InvitationTokenPreview> {
-    const invitationTokenPreview = await this.getInvitationPreviewUseCase.execute(params.token);
+  async getInvitationPreview(
+    @Param() params: GetInvitationPreviewParamsDto,
+  ): Promise<InvitationTokenPreview> {
+    const invitationTokenPreview =
+      await this.getInvitationPreviewUseCase.execute(params.token);
     return invitationTokenPreview;
   }
 
@@ -53,23 +69,23 @@ export class AuthController {
       return {
         user: null,
         role: null,
-      }
+      };
     }
     const user = await this.getUserSessionUseCase.execute(token);
     const role = user.user_metadata.role;
     return { user, role };
   }
 
-  @Get("csrf")
+  @Get('csrf')
   getCsrf(@Res({ passthrough: true }) res: Response): { csrfToken: string } {
     const { csrfToken, maxAgeMs } = this.generateCsrfTokenUseCase.execute();
-    const isProd = process.env.NODE_ENV === "production";
+    const isProd = process.env.NODE_ENV === 'production';
 
-    res.cookie("csrf_token", csrfToken, {
+    res.cookie('csrf_token', csrfToken, {
       httpOnly: false,
       secure: isProd,
-      sameSite: "lax",
-      path: "/",
+      sameSite: 'lax',
+      path: '/',
       maxAge: maxAgeMs,
     });
 
@@ -89,20 +105,23 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() body: LoginBodyDto, @Res({ passthrough: true }) res: Response): Promise<AuthSession> {
-    const isProd = process.env.NODE_ENV === "production";
+  async login(
+    @Body() body: LoginBodyDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthSession> {
+    const isProd = process.env.NODE_ENV === 'production';
     const session = await this.loginUseCase.execute(body);
 
     const cookieOptions = {
       httpOnly: true,
       secure: isProd,
-      sameSite: "lax" as const,
-      path: "/",
+      sameSite: 'lax' as const,
+      path: '/',
       maxAge: session.expires_in * 1000,
     };
 
-    res.cookie("access_token", session.access_token, cookieOptions);
-    res.cookie("refresh_token", session.refresh_token, cookieOptions);
+    res.cookie('access_token', session.access_token, cookieOptions);
+    res.cookie('refresh_token', session.refresh_token, cookieOptions);
 
     return session;
   }
@@ -110,20 +129,24 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
   @Roles('establishment')
   @Post('send-invitation')
-  async sendInvitation(@Body() body: SendInvitationBodyDto): Promise<{ success: boolean }> {
+  async sendInvitation(
+    @Body() body: SendInvitationBodyDto,
+  ): Promise<{ success: boolean }> {
     await this.sendInvitationUseCase.execute(body);
-    return { success: true }
+    return { success: true };
   }
 
   @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
   @Roles('establishment')
   @Post('invitation-token/create')
-  async createInvitationToken(@Body() body: CreateInvitationTokenBodyDto): Promise<{ success: boolean }> {
+  async createInvitationToken(
+    @Body() body: CreateInvitationTokenBodyDto,
+  ): Promise<{ success: boolean }> {
     await this.createInvitationTokenUseCase.execute(body);
-    return { success: true }
+    return { success: true };
   }
 
-  @Post("logout")
+  @Post('logout')
   @UseGuards(CsrfGuard)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const accessToken = req.cookies?.access_token;
@@ -131,12 +154,17 @@ export class AuthController {
       await this.logoutUseCase.execute(accessToken);
     }
 
-    const isProd = process.env.NODE_ENV === "production";
-    const cookieOpts = { httpOnly: true, secure: isProd, sameSite: "lax" as const, path: "/" };
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieOpts = {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax' as const,
+      path: '/',
+    };
 
-    res.clearCookie("access_token", cookieOpts);
-    res.clearCookie("refresh_token", cookieOpts);
-    res.clearCookie("csrf_token", { ...cookieOpts, httpOnly: false });
+    res.clearCookie('access_token', cookieOpts);
+    res.clearCookie('refresh_token', cookieOpts);
+    res.clearCookie('csrf_token', { ...cookieOpts, httpOnly: false });
 
     return { success: true };
   }

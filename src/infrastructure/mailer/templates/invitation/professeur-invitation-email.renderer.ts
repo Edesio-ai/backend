@@ -1,12 +1,14 @@
-import { ProfesseurInvitationTemplateData } from "./professeur-invitation-email.types";
+import { ProfesseurInvitationTemplateData } from './professeur-invitation-email.types';
 
-export function renderProfesseurInvitationEmailHtml(data: ProfesseurInvitationTemplateData): string {
+export function renderProfesseurInvitationEmailHtml(
+  data: ProfesseurInvitationTemplateData,
+): string {
   const chatbotsText =
     data.availableChatbots > 0
       ? `<p style="color: #d97706; font-size: 14px; margin: 16px 0; padding: 12px; background-color: #fef3c7; border-radius: 8px;">
-        <strong>${data.availableChatbots} chatbot${data.availableChatbots > 1 ? "s" : ""}</strong> vous seront alloues pour creer vos sessions de classe.
+        <strong>${data.availableChatbots} chatbot${data.availableChatbots > 1 ? 's' : ''}</strong> vous seront alloues pour creer vos sessions de classe.
       </p>`
-      : "";
+      : '';
 
   return `
     <!DOCTYPE html>
@@ -87,9 +89,9 @@ export function renderProfesseurInvitationEmailHtml(data: ProfesseurInvitationTe
 
 function escapeHtml(value: string): string {
   return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
