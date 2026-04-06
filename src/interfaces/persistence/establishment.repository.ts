@@ -1,11 +1,16 @@
-import { InvitationToken } from "../../domain/auth/invitation.type";
-import { Establishment } from "../../domain/establishment/establishment.type";
-
+import { InvitationToken } from '../../domain/auth/invitation.type';
+import { Establishment } from '../../domain/establishment/establishment.type';
 
 export const ESTABLISHMENT_REPOSITORY = Symbol('ESTABLISHMENT_REPOSITORY');
 
 export interface EstablishmentRepository {
-    getEstablishmentByUserId(userId: string): Promise<Establishment>;
-    createEstablishment(supabaseUserId: string, name: string, email: string): Promise<Establishment>;
-    getInvitationTokenByEstablishmentId(establishmentId: string): Promise<InvitationToken[]>;
+  getEstablishmentByUserId(userId: string): Promise<Establishment>;
+  createEstablishment(
+    supabaseUserId: string,
+    name: string,
+    email: string,
+  ): Promise<Establishment>;
+  getInvitationTokenByEstablishmentId(
+    establishmentId: string,
+  ): Promise<InvitationToken[]>;
 }

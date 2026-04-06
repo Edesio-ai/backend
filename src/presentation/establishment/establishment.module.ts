@@ -14,7 +14,7 @@ import { GetInvitationTokenUseCase } from '../../application/establishment/get-i
     authPersistenceModule,
     establishmentPersistenceModule,
     StudentPersistenceModule,
-    TeacherPersistenceModule
+    TeacherPersistenceModule,
   ],
   controllers: [EstablishmentController],
   providers: [

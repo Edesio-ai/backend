@@ -2,54 +2,56 @@ import { GenerateCsrfTokenUseCase } from './generate-csrf-token.use-case';
 import { TokenGeneratorProvider } from '../../interfaces/security/token-generator.provider';
 
 describe('GenerateCsrfTokenUseCase', () => {
-    let fixtures: Fixtures;
+  let fixtures: Fixtures;
 
-    beforeEach(() => {
-        fixtures = new Fixtures();
-    });
+  beforeEach(() => {
+    fixtures = new Fixtures();
+  });
 
-    it('should return csrf payload with generated token and maxAge', () => {
-        fixtures.whenTokenGeneratorReturnsToken();
+  it('should return csrf payload with generated token and maxAge', () => {
+    fixtures.whenTokenGeneratorReturnsToken();
 
-        const result = fixtures.whenExecute();
+    const result = fixtures.whenExecute();
 
-        fixtures.thenTokenGeneratorCalledWithDefaultBytes();
-        fixtures.thenReturnExpectedPayload(result);
-    });
+    fixtures.thenTokenGeneratorCalledWithDefaultBytes();
+    fixtures.thenReturnExpectedPayload(result);
+  });
 });
 
 class Fixtures {
-    public readonly tokenGenerator: jest.Mocked<TokenGeneratorProvider>;
-    public readonly generateCsrfTokenUseCase: GenerateCsrfTokenUseCase;
+  public readonly tokenGenerator: jest.Mocked<TokenGeneratorProvider>;
+  public readonly generateCsrfTokenUseCase: GenerateCsrfTokenUseCase;
 
-    public readonly generatedToken: string;
+  public readonly generatedToken: string;
 
-    constructor() {
-        this.tokenGenerator = {
-            generateHex: jest.fn(),
-        };
+  constructor() {
+    this.tokenGenerator = {
+      generateHex: jest.fn(),
+    };
 
-        this.generateCsrfTokenUseCase = new GenerateCsrfTokenUseCase(this.tokenGenerator);
-        this.generatedToken = 'csrf-token-123';
-    }
+    this.generateCsrfTokenUseCase = new GenerateCsrfTokenUseCase(
+      this.tokenGenerator,
+    );
+    this.generatedToken = 'csrf-token-123';
+  }
 
-    whenExecute() {
-        return this.generateCsrfTokenUseCase.execute();
-    }
+  whenExecute() {
+    return this.generateCsrfTokenUseCase.execute();
+  }
 
-    whenTokenGeneratorReturnsToken() {
-        this.tokenGenerator.generateHex.mockReturnValue(this.generatedToken);
-    }
+  whenTokenGeneratorReturnsToken() {
+    this.tokenGenerator.generateHex.mockReturnValue(this.generatedToken);
+  }
 
-    thenTokenGeneratorCalledWithDefaultBytes() {
-        expect(this.tokenGenerator.generateHex).toHaveBeenCalledWith(32);
-        expect(this.tokenGenerator.generateHex).toHaveBeenCalledTimes(1);
-    }
+  thenTokenGeneratorCalledWithDefaultBytes() {
+    expect(this.tokenGenerator.generateHex).toHaveBeenCalledWith(32);
+    expect(this.tokenGenerator.generateHex).toHaveBeenCalledTimes(1);
+  }
 
-    thenReturnExpectedPayload(result: { csrfToken: string; maxAgeMs: number }) {
-        expect(result).toEqual({
-            csrfToken: this.generatedToken,
-            maxAgeMs: 24 * 60 * 60 * 1000,
-        });
-    }
+  thenReturnExpectedPayload(result: { csrfToken: string; maxAgeMs: number }) {
+    expect(result).toEqual({
+      csrfToken: this.generatedToken,
+      maxAgeMs: 24 * 60 * 60 * 1000,
+    });
+  }
 }

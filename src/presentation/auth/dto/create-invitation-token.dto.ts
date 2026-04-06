@@ -1,25 +1,31 @@
-import { IsDate, IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator";
-import { Type } from "class-transformer";
+import {
+  IsDate,
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateInvitationTokenBodyDto {
-    @IsString()
-    @IsNotEmpty()
-    establishmentId: string;
+  @IsString()
+  @IsNotEmpty()
+  establishmentId: string;
 
-    @IsString()
-    @IsNotEmpty()
-    token: string
+  @IsString()
+  @IsNotEmpty()
+  token: string;
 
-    @IsEmail()
-    @IsNotEmpty()
-    invitedEmail: string;
+  @IsEmail()
+  @IsNotEmpty()
+  invitedEmail: string;
 
-    @Type(() => Date)
-    @IsDate()
-    @IsNotEmpty()
-    expiresAt: Date;
+  @Type(() => Date)
+  @IsDate()
+  @IsNotEmpty()
+  expiresAt: Date;
 
-    @IsNumber()
-    @IsNotEmpty()
-    assignedChatbots: number;
+  @IsNumber()
+  @IsNotEmpty()
+  assignedChatbots: number;
 }

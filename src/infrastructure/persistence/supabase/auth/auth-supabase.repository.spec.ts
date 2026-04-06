@@ -1,5 +1,8 @@
 import { AuthSupabaseRepository } from './auth-supabase.repository';
-import { InvitationToken, InvitationTokenPreview } from '../../../../domain/auth/invitation.type';
+import {
+  InvitationToken,
+  InvitationTokenPreview,
+} from '../../../../domain/auth/invitation.type';
 import {
   InvitationTokenCreationError,
   InvitationTokenAlreadyUsedError,
@@ -200,7 +203,10 @@ describe('AuthSupabaseRepository', () => {
       expect(fixtures.tokensUpdateMock).toHaveBeenCalledTimes(1);
       expect(fixtures.deleteUserMock).not.toHaveBeenCalled();
 
-      expect(fixtures.tokensEqMock).toHaveBeenCalledWith('id', fixtures.invitationToken.id);
+      expect(fixtures.tokensEqMock).toHaveBeenCalledWith(
+        'id',
+        fixtures.invitationToken.id,
+      );
       expect(fixtures.tokensIsMock).toHaveBeenCalledWith('used_at', null);
     });
 
@@ -277,7 +283,9 @@ class GetInvitationPreviewFixtures {
     from: this.fromMock,
   };
 
-  public readonly sut = new AuthSupabaseRepository(this.supabaseAdminMock as any);
+  public readonly sut = new AuthSupabaseRepository(
+    this.supabaseAdminMock as any,
+  );
 
   whenSupabaseReturnsData() {
     this.singleMock.mockResolvedValue({
@@ -333,7 +341,9 @@ class GetInvitationPreviewFixtures {
   }
 
   async thenThrowAlreadyUsed(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(InvitationTokenAlreadyUsedError);
+    await expect(promise).rejects.toBeInstanceOf(
+      InvitationTokenAlreadyUsedError,
+    );
     await expect(promise).rejects.toThrow('Invitation token already used');
   }
 
@@ -368,7 +378,9 @@ class ValideInvitationTokenFixtures {
     from: this.fromMock,
   };
 
-  public readonly sut = new AuthSupabaseRepository(this.supabaseAdminMock as any);
+  public readonly sut = new AuthSupabaseRepository(
+    this.supabaseAdminMock as any,
+  );
 
   whenSupabaseReturnsValidRow() {
     this.singleMock.mockResolvedValue({
@@ -420,7 +432,9 @@ class ValideInvitationTokenFixtures {
   }
 
   async thenThrowAlreadyUsed(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(InvitationTokenAlreadyUsedError);
+    await expect(promise).rejects.toBeInstanceOf(
+      InvitationTokenAlreadyUsedError,
+    );
   }
 
   async thenThrowExpired(promise: Promise<unknown>) {
@@ -428,7 +442,9 @@ class ValideInvitationTokenFixtures {
   }
 
   async thenThrowEmailMismatch(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(InvitationTokenEmailMismatchError);
+    await expect(promise).rejects.toBeInstanceOf(
+      InvitationTokenEmailMismatchError,
+    );
   }
 }
 
@@ -531,7 +547,9 @@ class CreateInvitationTokenFixtures {
     from: this.fromMock,
   };
 
-  public readonly sut = new AuthSupabaseRepository(this.supabaseAdminMock as any);
+  public readonly sut = new AuthSupabaseRepository(
+    this.supabaseAdminMock as any,
+  );
 
   whenInsertSucceeds() {
     this.singleMock.mockResolvedValue({
@@ -593,14 +611,22 @@ class CreateUserFixtures {
   public readonly deleteUserMock = jest.fn();
 
   public readonly teachersSingleMock = jest.fn();
-  private readonly teachersSelectMock = jest.fn(() => ({ single: this.teachersSingleMock }));
-  public readonly teachersInsertMock = jest.fn(() => ({ select: this.teachersSelectMock }));
-  private readonly teachersFromMock = jest.fn(() => ({ insert: this.teachersInsertMock }));
+  private readonly teachersSelectMock = jest.fn(() => ({
+    single: this.teachersSingleMock,
+  }));
+  public readonly teachersInsertMock = jest.fn(() => ({
+    select: this.teachersSelectMock,
+  }));
+  private readonly teachersFromMock = jest.fn(() => ({
+    insert: this.teachersInsertMock,
+  }));
 
   public readonly tokensIsMock = jest.fn();
   public readonly tokensEqMock = jest.fn(() => ({ is: this.tokensIsMock }));
   public readonly tokensUpdateMock = jest.fn(() => ({ eq: this.tokensEqMock }));
-  private readonly tokensFromMock = jest.fn(() => ({ update: this.tokensUpdateMock }));
+  private readonly tokensFromMock = jest.fn(() => ({
+    update: this.tokensUpdateMock,
+  }));
 
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'teachers') {
@@ -622,7 +648,9 @@ class CreateUserFixtures {
     },
   };
 
-  public readonly sut = new AuthSupabaseRepository(this.supabaseAdminMock as any);
+  public readonly sut = new AuthSupabaseRepository(
+    this.supabaseAdminMock as any,
+  );
 
   private readonly teacherRow = {
     id: 'teacher-row-id-1',
@@ -640,12 +668,19 @@ class CreateUserFixtures {
         user: {
           id: 'user-uuid-1',
           email: 'teacher@school.com',
-          user_metadata: { firstname: 'Jean', lastname: 'Dupont', role: 'teacher' },
+          user_metadata: {
+            firstname: 'Jean',
+            lastname: 'Dupont',
+            role: 'teacher',
+          },
         },
       },
       error: null,
     });
-    this.teachersSingleMock.mockResolvedValue({ data: this.teacherRow, error: null });
+    this.teachersSingleMock.mockResolvedValue({
+      data: this.teacherRow,
+      error: null,
+    });
     this.tokensIsMock.mockResolvedValue({ error: null });
   }
 
@@ -676,7 +711,11 @@ class CreateUserFixtures {
         user: {
           id: 'user-uuid-1',
           email: 'teacher@school.com',
-          user_metadata: { firstname: 'Jean', lastname: 'Dupont', role: 'teacher' },
+          user_metadata: {
+            firstname: 'Jean',
+            lastname: 'Dupont',
+            role: 'teacher',
+          },
         },
       },
       error: null,
@@ -694,13 +733,22 @@ class CreateUserFixtures {
         user: {
           id: 'user-uuid-1',
           email: 'teacher@school.com',
-          user_metadata: { firstname: 'Jean', lastname: 'Dupont', role: 'teacher' },
+          user_metadata: {
+            firstname: 'Jean',
+            lastname: 'Dupont',
+            role: 'teacher',
+          },
         },
       },
       error: null,
     });
-    this.teachersSingleMock.mockResolvedValue({ data: this.teacherRow, error: null });
-    this.tokensIsMock.mockResolvedValue({ error: { message: 'update failed' } });
+    this.teachersSingleMock.mockResolvedValue({
+      data: this.teacherRow,
+      error: null,
+    });
+    this.tokensIsMock.mockResolvedValue({
+      error: { message: 'update failed' },
+    });
   }
 
   whenCreateUser() {
