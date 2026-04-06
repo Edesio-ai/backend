@@ -9,7 +9,7 @@ export function buildProfesseurInvitationTemplateData(params: {
 }): ProfesseurInvitationTemplateData {
   return {
     inviterName: params.inviterName,
-    signupUrl: `${params.appUrl}/inscription/teacher/${params.invitationToken}`,
+    signupUrl: `${params.appUrl}/register/teacher/${params.invitationToken}`,
     appUrl: params.appUrl,
     logoUrl: params.logoUrl,
     availableChatbots: params.availableChatbots,
