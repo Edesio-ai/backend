@@ -8,6 +8,8 @@ import { StudentPersistenceModule } from '../../infrastructure/persistence/supab
 import { TeacherPersistenceModule } from '../../infrastructure/persistence/supabase/teacher/teacher-persistence.module';
 import { CreateEstablishmentUseCase } from '../../application/establishment/create-establishment.use-case';
 import { GetInvitationTokenUseCase } from '../../application/establishment/get-invitation-token.use-case';
+import { DeleteInvitationTokenUseCase } from '../../application/establishment/delete-invitation-token.use-case';
+import { TokenPersistenceModule } from 'src/infrastructure/persistence/supabase/token/token-persistence.module';
 
 @Module({
   imports: [
@@ -15,12 +17,14 @@ import { GetInvitationTokenUseCase } from '../../application/establishment/get-i
     establishmentPersistenceModule,
     StudentPersistenceModule,
     TeacherPersistenceModule,
+    TokenPersistenceModule,
   ],
   controllers: [EstablishmentController],
   providers: [
     GetEstablishmentsStatsUseCase,
     CreateEstablishmentUseCase,
     GetInvitationTokenUseCase,
+    DeleteInvitationTokenUseCase,
   ],
 })
 export class EstablishmentModule {}

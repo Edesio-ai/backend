@@ -12,7 +12,7 @@ export class SubscriptionSupabaseRepository implements SubscriptionSupabaseRepos
     const { data, error } = await this.supabase
       .from('subscription')
       .select('*')
-      .eq('suscriber_id', userId);
+      .eq('subscriber_id', userId);
 
     if (error) {
       const message = error instanceof Error ? error.message : '';
