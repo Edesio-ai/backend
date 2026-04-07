@@ -92,10 +92,11 @@ export class AuthController {
     return { csrfToken };
   }
 
+  @UseGuards(CsrfGuard)
   @Post('sign-up/teacher')
-  async signUpTeacher(@Body() body: SignUpTeacherBody): Promise<void> {
+  async signUpTeacher(@Body() body: SignUpTeacherBody): Promise<{ success: boolean }> {
     await this.signUpTeacherUseCase.execute(body);
-    return;
+    return { success: true };
   }
 
   @Post('register')
@@ -103,7 +104,6 @@ export class AuthController {
     await this.registerUseCase.execute(body);
     return;
   }
-
   @Post('login')
   async login(
     @Body() body: LoginBodyDto,
