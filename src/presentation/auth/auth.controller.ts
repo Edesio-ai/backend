@@ -94,7 +94,9 @@ export class AuthController {
 
   @UseGuards(CsrfGuard)
   @Post('sign-up/teacher')
-  async signUpTeacher(@Body() body: SignUpTeacherBody): Promise<{ success: boolean }> {
+  async signUpTeacher(
+    @Body() body: SignUpTeacherBody,
+  ): Promise<{ success: boolean }> {
     await this.signUpTeacherUseCase.execute(body);
     return { success: true };
   }
