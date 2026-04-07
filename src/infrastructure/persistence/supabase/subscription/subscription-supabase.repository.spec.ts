@@ -41,7 +41,7 @@ class Fixtures {
   public readonly subscriptions = [
     {
       id: 'sub-row-1',
-      suscriber_id: this.userId,
+      subscriber_id: this.userId,
       checkout_url: 'https://checkout.existing',
     },
   ];
@@ -92,7 +92,7 @@ class Fixtures {
   thenQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('subscription');
     expect(this.selectMock).toHaveBeenCalledWith('*');
-    expect(this.eqMock).toHaveBeenCalledWith('suscriber_id', this.userId);
+    expect(this.eqMock).toHaveBeenCalledWith('subscriber_id', this.userId);
     expect(this.eqMock).toHaveBeenCalledTimes(1);
   }
 

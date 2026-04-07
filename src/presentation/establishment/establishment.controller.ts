@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -24,6 +25,9 @@ import {
 } from '../../domain/establishment/establishment.type';
 import { GetInvitationTokenUseCase } from '../../application/establishment/get-invitation-token.use-case';
 import { InvitationToken } from '../../domain/auth/invitation.type';
+import { CsrfGuard } from '../auth/guards/csrf.guard';
+import { DeleteInvitationTokenUseCase } from 'src/application/establishment/delete-invitation-token.use-case';
+import { TokenErrorFilter } from '../filters/token.filter';
 
 @Controller('establishment')
 export class EstablishmentController {
@@ -31,6 +35,7 @@ export class EstablishmentController {
     private readonly getEstablishmentsStatsUseCase: GetEstablishmentsStatsUseCase,
     private readonly createEstablishmentUseCase: CreateEstablishmentUseCase,
     private readonly getInvitationTokenUseCase: GetInvitationTokenUseCase,
+    private readonly deleteInvitationTokenUseCase: DeleteInvitationTokenUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -63,5 +68,16 @@ export class EstablishmentController {
   ): Promise<Establishment> {
     const establishment = await this.createEstablishmentUseCase.execute(body);
     return establishment;
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard, CsrfGuard)
+  @UseFilters(TokenErrorFilter)
+  @Roles('establishment')
+  @Delete('invitation-token/:token')
+  async deleteInvitationToken(
+    @Param('token') token: string,
+  ): Promise<{ success: boolean }> {
+    await this.deleteInvitationTokenUseCase.execute(token);
+    return { success: true };
   }
 }
