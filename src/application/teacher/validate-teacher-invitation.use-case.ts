@@ -1,0 +1,79 @@
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  TEACHER_REPOSITORY,
+  type TeacherRepository,
+} from 'src/interfaces/persistence/teacher.repository';
+import {
+  TeacherBadRequestError,
+  TeacherNotFoundError,
+} from 'src/domain/teaching/error';
+import {
+  TOKEN_REPOSITORY,
+  type TokenRepository,
+} from 'src/interfaces/persistence/token.repository';
+import {
+  InvitationTokenAlreadyUsedError,
+  InvitationTokenEmailMismatchError,
+  InvitationTokenExpiredError,
+  InvitationTokenNotFoundError,
+} from 'src/domain/auth/errors';
+import { InvitationToken } from 'src/domain/auth/invitation.type';
+
+@Injectable()
+export class ValidateTeacherInvitationUseCase {
+  constructor(
+    @Inject(TEACHER_REPOSITORY)
+    private readonly teacherRepository: TeacherRepository,
+    @Inject(TOKEN_REPOSITORY)
+    private readonly tokenRepository: TokenRepository,
+  ) {}
+
+  async execute(userId: string, token: string): Promise<InvitationToken> {
+    const teacher = await this.teacherRepository.getTeacherByUserId(userId);
+    if (!teacher) {
+      throw new TeacherNotFoundError();
+    }
+
+    if (teacher.establishment_id) {
+      throw new TeacherBadRequestError(
+        'Teacher already attached to an establishment',
+      );
+    }
+
+    const invitation = await this.tokenRepository.getInvitationByToken(token);
+
+    if (!invitation) {
+      throw new InvitationTokenNotFoundError('Invitation token not found');
+    }
+
+    if (new Date(invitation.expires_at) < new Date()) {
+      throw new InvitationTokenExpiredError('Invitation token expired');
+    }
+
+    if (invitation.used_at) {
+      throw new InvitationTokenAlreadyUsedError(
+        'Invitation token already used',
+      );
+    }
+
+    if (
+      invitation.invited_email.toLowerCase() !== teacher.email?.toLowerCase()
+    ) {
+      throw new InvitationTokenEmailMismatchError(
+        'Invitation email mismatch with the teacher provided',
+      );
+    }
+
+    await this.tokenRepository.markInvitationTokenAsUsed(
+      invitation.id,
+      teacher.id,
+    );
+    await this.teacherRepository.linkTeacherToEstablishment(
+      invitation.id,
+      teacher.id,
+      invitation.establishment_id,
+    );
+
+    return invitation;
+  }
+}

@@ -77,6 +77,7 @@ export type RegisterBody = {
   lastname: string;
   acceptTerms: boolean;
   establishment?: string;
+  invitationToken?: string;
 };
 
 export type LoginBody = {

@@ -106,3 +106,11 @@ export class LogoutError extends AuthError {
     super(message || 'Logout error');
   }
 }
+
+export class InvitationTokenBadRequestError extends AuthError {
+  readonly code = 'INVITATION_TOKEN_BAD_REQUEST';
+  readonly httpStatus = 400;
+  constructor(message?: string) {
+    super(message || 'Invitation token bad request');
+  }
+}

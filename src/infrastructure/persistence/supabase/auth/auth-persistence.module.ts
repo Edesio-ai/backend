@@ -13,4 +13,4 @@ import { AuthSupabaseRepository } from './auth-supabase.repository';
   ],
   exports: [AUTH_REPOSITORY],
 })
-export class authPersistenceModule {}
+export class AuthPersistenceModule {}
