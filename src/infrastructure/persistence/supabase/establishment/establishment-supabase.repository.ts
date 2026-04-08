@@ -16,6 +16,19 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
     private readonly supabase: any,
   ) {}
 
+  async getEstablishmentById(establishmentId: string): Promise<Establishment> {
+    const { data, error } = await this.supabase
+      .from('establishment')
+      .select('*')
+      .eq('id', establishmentId)
+      .single();
+
+    if (error || !data) {
+      throw new EstablishmentNotFoundError(error.message);
+    }
+    return data;
+  }
+
   async getEstablishmentByUserId(userId: string): Promise<Establishment> {
     const { data, error } = await this.supabase
       .from('establishment')

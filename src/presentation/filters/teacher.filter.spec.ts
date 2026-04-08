@@ -1,4 +1,4 @@
-import { TeacherFilter } from './teacher.filter';
+import { TeacherErrorFilter } from './teacher.filter';
 import { TeacherSessionsNotFoundError } from '../../domain/teaching/error';
 
 describe('TeacherFilter', () => {
@@ -22,12 +22,12 @@ describe('TeacherFilter', () => {
 });
 
 class Fixtures {
-  public readonly teacherFilter: TeacherFilter;
+  public readonly teacherFilter: TeacherErrorFilter;
   private readonly jsonMock = jest.fn();
   private readonly statusMock = jest.fn(() => ({ json: this.jsonMock }));
 
   constructor() {
-    this.teacherFilter = new TeacherFilter();
+    this.teacherFilter = new TeacherErrorFilter();
   }
 
   givenTeachingError() {

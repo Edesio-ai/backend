@@ -46,4 +46,8 @@ export class RegisterBody {
   @IsString()
   @IsOptional()
   establishment?: string;
+
+  @IsString()
+  @IsOptional()
+  invitationToken?: string;
 }

@@ -1,6 +1,10 @@
 import { GetSubscriptionStatusUseCase } from './get-subscription-status.use-case';
-import { PaymentClientInterface } from '../../interfaces/payment.interface';
 import { User } from '../../domain/auth/auth.type';
+import { EstablishmentNotFoundError } from '../../domain/establishment/error';
+import { TeacherNotFoundError } from '../../domain/teaching/error';
+import { PaymentClientInterface } from '../../interfaces/payment.interface';
+import { EstablishmentRepository } from '../../interfaces/persistence/establishment.repository';
+import { TeacherRepository } from '../../interfaces/persistence/teacher.repository';
 
 describe('GetSubscriptionStatusUseCase', () => {
   let fixtures: Fixtures;
@@ -65,13 +69,32 @@ describe('GetSubscriptionStatusUseCase', () => {
 
 class Fixtures {
   public readonly paymentClient: jest.Mocked<PaymentClientInterface>;
+  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
   public readonly getSubscriptionStatusUseCase: GetSubscriptionStatusUseCase;
 
   public readonly establishmentUser: User;
   public readonly studentUser: User;
+  public readonly teacherUser: User;
   public readonly userWithoutEmail: User;
   public readonly customerId: string;
   public readonly paymentClientError: Error;
+  public readonly teacher = {
+    id: 'teacher-1',
+    name: 'Teacher',
+    email: 'teacher@school.com',
+    created_at: '2026-01-01T00:00:00.000Z',
+    establishment_id: 'est-1',
+    available_chatbots: 2,
+    supabase_user_id: 'user-2',
+  };
+  public readonly establishment = {
+    id: 'est-1',
+    supabase_user_id: 'owner-1',
+    name: 'Edesio Academy',
+    email: 'billing@academy.com',
+    created_at: '2026-01-01T00:00:00.000Z',
+  };
 
   constructor() {
     this.paymentClient = {
@@ -81,9 +104,24 @@ class Fixtures {
       createCheckoutSession: jest.fn(),
       getCheckoutSession: jest.fn(),
     };
+    this.teacherRepository = {
+      linkTeacherToEstablishment: jest.fn(),
+      getTeacherByEstablishmentId: jest.fn(),
+      getTeachersSessionsByIds: jest.fn(),
+      getTeacherByUserId: jest.fn(),
+      createTeacher: jest.fn(),
+    };
+    this.establishmentRepository = {
+      getEstablishmentById: jest.fn(),
+      getEstablishmentByUserId: jest.fn(),
+      createEstablishment: jest.fn(),
+      getInvitationTokenByEstablishmentId: jest.fn(),
+    };
 
     this.getSubscriptionStatusUseCase = new GetSubscriptionStatusUseCase(
       this.paymentClient,
+      this.teacherRepository,
+      this.establishmentRepository,
     );
 
     this.customerId = 'cus_123';
@@ -92,14 +130,24 @@ class Fixtures {
     this.establishmentUser = this.createUser(
       'establishment',
       'owner@school.com',
+      'user-1',
     );
-    this.studentUser = this.createUser('student', 'student@school.com');
-    this.userWithoutEmail = this.createUser('establishment', '');
+    this.studentUser = this.createUser(
+      'student',
+      'student@school.com',
+      'user-3',
+    );
+    this.teacherUser = this.createUser(
+      'teacher',
+      'teacher@school.com',
+      'user-2',
+    );
+    this.userWithoutEmail = this.createUser('establishment', '', 'user-4');
   }
 
-  private createUser(role: string, email: string): User {
+  private createUser(role: string, email: string, id: string): User {
     return {
-      id: 'user-1',
+      id,
       aud: 'authenticated',
       role: 'authenticated',
       email,
@@ -127,6 +175,31 @@ class Fixtures {
     this.paymentClient.getCustomerByEmail.mockResolvedValue([
       { id: this.customerId },
     ]);
+  }
+
+  whenTeacherFound(
+    establishmentId: string | null = this.teacher.establishment_id,
+  ) {
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue({
+      ...this.teacher,
+      establishment_id: establishmentId as any,
+    });
+  }
+
+  whenTeacherNotFound() {
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
+  }
+
+  whenEstablishmentFound() {
+    this.establishmentRepository.getEstablishmentById.mockResolvedValue(
+      this.establishment as any,
+    );
+  }
+
+  whenEstablishmentNotFound() {
+    this.establishmentRepository.getEstablishmentById.mockResolvedValue(
+      null as any,
+    );
   }
 
   whenSubscriptionsReturnActive() {
@@ -176,6 +249,16 @@ class Fixtures {
     ).not.toHaveBeenCalled();
     expect(
       this.paymentClient.getSubscriptionsByCustomerId,
+    ).not.toHaveBeenCalled();
+  }
+
+  thenTeacherRepositoryNotCalled() {
+    expect(this.teacherRepository.getTeacherByUserId).not.toHaveBeenCalled();
+  }
+
+  thenEstablishmentRepositoryNotCalled() {
+    expect(
+      this.establishmentRepository.getEstablishmentById,
     ).not.toHaveBeenCalled();
   }
 
@@ -253,3 +336,65 @@ class Fixtures {
     });
   }
 }
+
+describe('GetSubscriptionStatusUseCase - teacher flow', () => {
+  let fixtures: Fixtures;
+
+  beforeEach(() => {
+    fixtures = new Fixtures();
+  });
+
+  it('should throw TeacherNotFoundError when teacher does not exist', async () => {
+    fixtures.whenTeacherNotFound();
+
+    const promise = fixtures.whenExecuteWith(fixtures.teacherUser);
+
+    await expect(promise).rejects.toBeInstanceOf(TeacherNotFoundError);
+    expect(fixtures.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
+      fixtures.teacherUser.id,
+    );
+  });
+
+  it('should use teacher email when teacher has no establishment', async () => {
+    fixtures.whenTeacherFound(null);
+    fixtures.whenCustomerFound();
+    fixtures.whenSubscriptionsReturnActive();
+
+    const result = await fixtures.whenExecuteWith(fixtures.teacherUser);
+
+    expect(fixtures.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
+      fixtures.teacherUser.id,
+    );
+    fixtures.thenEstablishmentRepositoryNotCalled();
+    expect(fixtures.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(
+      fixtures.teacherUser.email,
+    );
+    expect(result.hasActiveSubscription).toBe(true);
+    expect(result.role).toBe('teacher');
+  });
+
+  it('should use establishment billing email when teacher is attached', async () => {
+    fixtures.whenTeacherFound();
+    fixtures.whenEstablishmentFound();
+    fixtures.whenCustomerFound();
+    fixtures.whenSubscriptionsReturnActive();
+
+    await fixtures.whenExecuteWith(fixtures.teacherUser);
+
+    expect(
+      fixtures.establishmentRepository.getEstablishmentById,
+    ).toHaveBeenCalledWith(fixtures.teacher.establishment_id);
+    expect(fixtures.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(
+      fixtures.establishment.email,
+    );
+  });
+
+  it('should throw EstablishmentNotFoundError when teacher establishment is missing', async () => {
+    fixtures.whenTeacherFound();
+    fixtures.whenEstablishmentNotFound();
+
+    const promise = fixtures.whenExecuteWith(fixtures.teacherUser);
+
+    await expect(promise).rejects.toBeInstanceOf(EstablishmentNotFoundError);
+  });
+});

@@ -15,6 +15,8 @@ import { CsrfGuard } from '../auth/guards/csrf.guard';
 import { CreateCheckoutSessionsUseCase } from '../../application/billing/create-checkout-session.use-case';
 import { CreateCheckoutSessionBodyDto } from './dto/createCheckoutSession.dto';
 import { AuthErrorFilter } from '../filters/auth.filter';
+import { TeacherErrorFilter } from '../filters/teacher.filter';
+import { EstablishmentErrorFilter } from '../filters/establishment.filter';
 
 @Controller('billing')
 export class BillingController {
@@ -24,7 +26,7 @@ export class BillingController {
   ) {}
 
   @UseGuards(JwtAuthGuard)
-  @UseFilters(BillingErrorFilter)
+  @UseFilters(BillingErrorFilter, TeacherErrorFilter, EstablishmentErrorFilter)
   @Get('subscription-status')
   async getSubscriptionStatus(
     @Req() req: Request & { user: User },

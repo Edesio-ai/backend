@@ -1,10 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { SUPABASE_ADMIN } from '../supabase.module';
 import { TeacherRepository } from '../../../../interfaces/persistence/teacher.repository';
-import {
-  TeacherNotFoundError,
-  TeacherSessionsNotFoundError,
-} from '../../../../domain/teaching/error';
+import { TeacheServerError } from '../../../../domain/teaching/error';
 import {
   Teacher,
   TeacherSession,
@@ -16,7 +13,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
     private readonly supabase: any,
   ) {}
 
-  async getTeacherByEstablishmentId(
+  public async getTeacherByEstablishmentId(
     establishmentId: string,
   ): Promise<Teacher[]> {
     const { data, error } = await this.supabase
@@ -25,12 +22,12 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       .eq('establishment_id', establishmentId);
 
     if (error) {
-      throw new TeacherNotFoundError(error.message);
+      throw new TeacheServerError(error.message);
     }
     return data;
   }
 
-  async getTeachersSessionsByIds(
+  public async getTeachersSessionsByIds(
     teacherIds: string[],
   ): Promise<TeacherSession[]> {
     const { data, error } = await this.supabase
@@ -44,8 +41,63 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       );
 
     if (error) {
-      throw new TeacherSessionsNotFoundError(error.message);
+      throw new TeacheServerError(error.message);
     }
     return data;
+  }
+
+  public async getTeacherByUserId(userId: string): Promise<Teacher | null> {
+    const { data, error } = await this.supabase
+      .from('teachers')
+      .select('*')
+      .eq('supabase_user_id', userId)
+      .maybeSingle();
+
+    if (error) {
+      throw new TeacheServerError(error.message);
+    }
+
+    return data;
+  }
+
+  public async createTeacher(
+    userId: string,
+    name: string,
+    email: string,
+  ): Promise<Teacher | null> {
+    const { data, error } = await this.supabase
+      .from('teachers')
+      .insert({
+        supabase_user_id: userId,
+        name,
+        email: email || '',
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw new TeacheServerError(error.message);
+    }
+
+    return data;
+  }
+
+  public async linkTeacherToEstablishment(
+    invitationTokenId: string,
+    teacherId: string,
+    establishmentId: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('teachers')
+      .update({ establishment_id: establishmentId })
+      .eq('id', teacherId);
+
+    if (error) {
+      await this.supabase
+        .from('invitation_tokens')
+        .update({ used_at: null, used_by: null })
+        .eq('id', invitationTokenId);
+      throw new TeacheServerError(error.message);
+    }
   }
 }

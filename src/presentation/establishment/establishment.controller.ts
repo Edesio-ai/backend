@@ -16,7 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { User } from '../../domain/auth/auth.type';
 import { EstablishmentErrorFilter } from '../filters/establishment.filter';
-import { TeacherFilter } from '../filters/teacher.filter';
+import { TeacherErrorFilter } from '../filters/teacher.filter';
 import { CreateEstablishmentUseCase } from '../../application/establishment/create-establishment.use-case';
 import { CreateEstablishmentBodyDto } from './dto/create-establishment.dto';
 import {
@@ -41,7 +41,7 @@ export class EstablishmentController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('establishment')
   @Get('stats')
-  @UseFilters(EstablishmentErrorFilter, TeacherFilter)
+  @UseFilters(EstablishmentErrorFilter, TeacherErrorFilter)
   async getEstablishmentStats(
     @Req() req: Request & { user: User },
   ): Promise<EstablishmentStats> {

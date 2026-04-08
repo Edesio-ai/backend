@@ -28,6 +28,7 @@ export class RegisterUseCase {
       lastname,
       acceptTerms,
       establishment,
+      invitationToken,
     } = body;
 
     const metadata: UserMetadata = {
@@ -35,6 +36,7 @@ export class RegisterUseCase {
       firstname,
       lastname,
       acceptTerms,
+      invitationToken,
     };
 
     if (role === 'student') {

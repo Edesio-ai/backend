@@ -13,4 +13,4 @@ import { EstablishmentSupabaseRepository } from './establishment-supabase.reposi
   ],
   exports: [ESTABLISHMENT_REPOSITORY],
 })
-export class establishmentPersistenceModule {}
+export class EstablishmentPersistenceModule {}

@@ -16,7 +16,6 @@ import { GetInvitationPreviewUseCase } from '../../application/auth/get-invitati
 import { GetUserSessionUseCase } from '../../application/auth/get-user-session.use-case';
 import { LoginUseCase } from '../../application/auth/login.use-case';
 import { RegisterUseCase } from '../../application/auth/register.use-case';
-import { SignUpTeacherUseCase } from '../../application/auth/sign-up-teacher.use-case';
 import { SendInvitationUseCase } from '../../application/auth/send-invitation.use-case';
 import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
 import {
@@ -27,7 +26,6 @@ import { AuthErrorFilter } from '../filters/auth.filter';
 import { EmailErrorFilter } from '../filters/email.filter';
 import { Roles } from './decorator/role.decorator';
 import { GetInvitationPreviewParamsDto } from './dto/get-invitation-preview.dto';
-import { SignUpTeacherBody } from './dto/sign-up-teacher.dto';
 import { RegisterBody } from './dto/register-body.dto';
 import { LoginBodyDto } from './dto/login-body.dto';
 import { SendInvitationBodyDto } from './dto/send-invitation-body.dto';
@@ -43,7 +41,6 @@ import { CreateInvitationTokenUseCase } from '../../application/auth/create-invi
 export class AuthController {
   constructor(
     private readonly getInvitationPreviewUseCase: GetInvitationPreviewUseCase,
-    private readonly signUpTeacherUseCase: SignUpTeacherUseCase,
     private readonly registerUseCase: RegisterUseCase,
     private readonly loginUseCase: LoginUseCase,
     private readonly sendInvitationUseCase: SendInvitationUseCase,
@@ -90,15 +87,6 @@ export class AuthController {
     });
 
     return { csrfToken };
-  }
-
-  @UseGuards(CsrfGuard)
-  @Post('sign-up/teacher')
-  async signUpTeacher(
-    @Body() body: SignUpTeacherBody,
-  ): Promise<{ success: boolean }> {
-    await this.signUpTeacherUseCase.execute(body);
-    return { success: true };
   }
 
   @Post('register')

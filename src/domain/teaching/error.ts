@@ -3,6 +3,22 @@ export abstract class TeachingError extends Error {
   abstract readonly httpStatus: number;
 }
 
+export class TeacheServerError extends TeachingError {
+  readonly code = 'TEACHER_SERVER_ERROR';
+  readonly httpStatus = 500;
+  constructor(message?: string) {
+    super(message || 'Teacher server error');
+  }
+}
+
+export class TeacherBadRequestError extends TeachingError {
+  readonly code = 'TEACHER_BAD_REQUEST';
+  readonly httpStatus = 400;
+  constructor(message?: string) {
+    super(message || 'Teacher bad request');
+  }
+}
+
 export class TeacherNotFoundError extends TeachingError {
   readonly code = 'TEACHER_NOT_FOUND';
   readonly httpStatus = 404;

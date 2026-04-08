@@ -3,7 +3,6 @@ import {
   ExecutionContext,
   Inject,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import {
   AUTH_REPOSITORY,

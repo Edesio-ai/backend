@@ -4,6 +4,16 @@ import {
   PAYMENT_CLIENT,
   type PaymentClientInterface,
 } from '../../interfaces/payment.interface';
+import {
+  TEACHER_REPOSITORY,
+  type TeacherRepository,
+} from 'src/interfaces/persistence/teacher.repository';
+import {
+  ESTABLISHMENT_REPOSITORY,
+  type EstablishmentRepository,
+} from 'src/interfaces/persistence/establishment.repository';
+import { TeacherNotFoundError } from 'src/domain/teaching/error';
+import { EstablishmentNotFoundError } from 'src/domain/establishment/error';
 
 @Injectable()
 export class GetSubscriptionStatusUseCase {
@@ -11,19 +21,55 @@ export class GetSubscriptionStatusUseCase {
   constructor(
     @Inject(PAYMENT_CLIENT)
     private readonly paymentClient: PaymentClientInterface,
+    @Inject(TEACHER_REPOSITORY)
+    private readonly teacherRepository: TeacherRepository,
+    @Inject(ESTABLISHMENT_REPOSITORY)
+    private readonly establishmentRepository: EstablishmentRepository,
   ) {}
 
   async execute(user: User): Promise<any> {
     const { email, id } = user;
     const { role } = user.user_metadata;
 
-    if (role === 'student') {
-      return {
-        hasActiveSubscription: true,
-        role,
-      };
-    }
+    switch (role) {
+      case 'student': {
+        return {
+          hasActiveSubscription: true,
+          role,
+        };
+      }
+      case 'teacher': {
+        const teacher = await this.teacherRepository.getTeacherByUserId(id);
+        if (!teacher) {
+          throw new TeacherNotFoundError();
+        }
+        const isTeacherWithEstablishment = teacher?.establishment_id !== null;
 
+        if (!isTeacherWithEstablishment) {
+          return this.handleSubscriptionFormat(email, id, role);
+        }
+        const establishment =
+          await this.establishmentRepository.getEstablishmentById(
+            teacher.establishment_id,
+          );
+
+        if (!establishment) {
+          throw new EstablishmentNotFoundError('Establishment not found');
+        }
+
+        return this.handleSubscriptionFormat(
+          establishment.email,
+          establishment.id,
+          role,
+        );
+      }
+      default: {
+        return this.handleSubscriptionFormat(email, id, role);
+      }
+    }
+  }
+
+  async handleSubscriptionFormat(email: string, id: string, role: string) {
     if (!email) {
       console.error(
         `Subscription check: no email for user ${id}, role=${role}`,
