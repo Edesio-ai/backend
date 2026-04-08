@@ -21,6 +21,15 @@ describe('EstablishmentSupabaseRepository', () => {
     fixtures.thenReturnExpectedEstablishment(result);
   });
 
+  it('should return establishment by id when query succeeds', async () => {
+    fixtures.whenSupabaseReturnsData();
+
+    const result = await fixtures.whenGetEstablishmentById();
+
+    fixtures.thenGetByIdQueryBuiltWithExpectedArguments();
+    fixtures.thenReturnExpectedEstablishment(result);
+  });
+
   it('should throw EstablishmentNotFoundError when query fails', async () => {
     fixtures.whenSupabaseReturnsError();
 
@@ -28,6 +37,15 @@ describe('EstablishmentSupabaseRepository', () => {
 
     await fixtures.thenThrowNotFound(promise);
     fixtures.thenQueryBuiltWithExpectedArguments();
+  });
+
+  it('should throw EstablishmentNotFoundError when get by id query fails', async () => {
+    fixtures.whenSupabaseReturnsError();
+
+    const promise = fixtures.whenGetEstablishmentById();
+
+    await fixtures.thenThrowNotFound(promise);
+    fixtures.thenGetByIdQueryBuiltWithExpectedArguments();
   });
 
   it('should create establishment when insert succeeds', async () => {
@@ -148,6 +166,10 @@ class Fixtures {
     return this.repository.getEstablishmentByUserId(this.userId);
   }
 
+  whenGetEstablishmentById() {
+    return this.repository.getEstablishmentById(this.establishment.id);
+  }
+
   whenCreateEstablishment() {
     return this.repository.createEstablishment(
       this.createBody.supabaseUserId,
@@ -222,6 +244,13 @@ class Fixtures {
     expect(this.fromMock).toHaveBeenCalledWith('establishment');
     expect(this.selectMock).toHaveBeenCalledWith('*');
     expect(this.eqMock).toHaveBeenCalledWith('supabase_user_id', this.userId);
+    expect(this.singleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenGetByIdQueryBuiltWithExpectedArguments() {
+    expect(this.fromMock).toHaveBeenCalledWith('establishment');
+    expect(this.selectMock).toHaveBeenCalledWith('*');
+    expect(this.eqMock).toHaveBeenCalledWith('id', this.establishment.id);
     expect(this.singleMock).toHaveBeenCalledTimes(1);
   }
 
