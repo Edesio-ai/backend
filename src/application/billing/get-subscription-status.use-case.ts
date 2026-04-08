@@ -46,7 +46,7 @@ export class GetSubscriptionStatusUseCase {
         const isTeacherWithEstablishment = teacher?.establishment_id !== null;
 
         if (!isTeacherWithEstablishment) {
-          return this.handleSubscriptionFormat(email, id, role);
+          return await this.handleSubscriptionFormat(email, id, role);
         }
         const establishment =
           await this.establishmentRepository.getEstablishmentById(
@@ -57,14 +57,14 @@ export class GetSubscriptionStatusUseCase {
           throw new EstablishmentNotFoundError('Establishment not found');
         }
 
-        return this.handleSubscriptionFormat(
+        return await this.handleSubscriptionFormat(
           establishment.email,
           establishment.id,
           role,
         );
       }
       default: {
-        return this.handleSubscriptionFormat(email, id, role);
+        return await this.handleSubscriptionFormat(email, id, role);
       }
     }
   }

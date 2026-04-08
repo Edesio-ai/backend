@@ -24,13 +24,17 @@ import {
 import { User, Session } from '../../../../domain/auth/auth.type';
 import { Teacher } from '../../../../domain/teaching/teacher.type';
 import { UserMetadata } from '../../../../domain/auth/auth.type';
+import { SUPABASE_AUTH } from '../supabase-auth.module';
 
 @Injectable()
 export class AuthSupabaseRepository implements AuthRepository {
-  constructor(@Inject(SUPABASE_ADMIN) private readonly supabaseAdmin: any) {}
+  constructor(
+    @Inject(SUPABASE_AUTH) private readonly supabaseAuth: any,
+    @Inject(SUPABASE_ADMIN) private readonly supabaseAdmin: any,
+  ) {}
 
   public async validateToken(token: string): Promise<User> {
-    const { data, error } = await this.supabaseAdmin.auth.getUser(token);
+    const { data, error } = await this.supabaseAuth.auth.getUser(token);
     if (error) {
       throw new TokenUserNotFoundError(error.message);
     }
@@ -44,7 +48,7 @@ export class AuthSupabaseRepository implements AuthRepository {
     expiresAt: Date,
     assignedChatbots: number,
   ): Promise<void> {
-    const { error } = await this.supabaseAdmin
+    const { error } = await this.supabaseAuth
       .from('invitation_tokens')
       .insert({
         establishment_id: establishmentId,
@@ -64,7 +68,7 @@ export class AuthSupabaseRepository implements AuthRepository {
   }
 
   public async logoutUser(accessToken: string): Promise<void> {
-    const { error } = await this.supabaseAdmin.auth.admin.signOut(
+    const { error } = await this.supabaseAuth.auth.admin.signOut(
       accessToken,
       'global',
     );
@@ -76,7 +80,7 @@ export class AuthSupabaseRepository implements AuthRepository {
   }
 
   public async loginUser(email: string, password: string): Promise<Session> {
-    const { data, error } = await this.supabaseAdmin.auth.signInWithPassword({
+    const { data, error } = await this.supabaseAuth.auth.signInWithPassword({
       email: email.toLowerCase().trim(),
       password,
     });
@@ -182,7 +186,7 @@ export class AuthSupabaseRepository implements AuthRepository {
     password: string,
     metadata: UserMetadata,
   ): Promise<User> {
-    const { data, error } = await this.supabaseAdmin.auth.admin.createUser({
+    const { data, error } = await this.supabaseAuth.auth.admin.createUser({
       email: email.toLowerCase().trim(),
       password,
       email_confirm: true,
@@ -222,7 +226,7 @@ export class AuthSupabaseRepository implements AuthRepository {
       .single();
 
     if (error) {
-      await this.supabaseAdmin.auth.admin.deleteUser(adminData.id);
+      await this.supabaseAuth.auth.admin.deleteUser(adminData.id);
       throw new TeacherProfileCreationError(error.message);
     }
 
