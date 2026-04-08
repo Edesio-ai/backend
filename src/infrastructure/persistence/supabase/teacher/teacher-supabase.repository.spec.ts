@@ -69,6 +69,15 @@ describe('TeacherSupabaseRepository', () => {
     await fixtures.thenThrowTeacherServerError(promise);
   });
 
+  it('should return null when getTeacherByUserId has no match', async () => {
+    fixtures.whenGetTeacherByUserIdReturnsNull();
+
+    const result = await fixtures.whenGetTeacherByUserId();
+
+    fixtures.thenGetTeacherByUserIdQueryBuiltWithExpectedArguments();
+    expect(result).toBeNull();
+  });
+
   it('should create teacher', async () => {
     fixtures.whenCreateTeacherReturnsData();
 
@@ -270,6 +279,13 @@ class Fixtures {
     this.byUserMaybeSingleMock.mockResolvedValue({
       data: null,
       error: { message: 'teacher by user failed' },
+    });
+  }
+
+  whenGetTeacherByUserIdReturnsNull() {
+    this.byUserMaybeSingleMock.mockResolvedValue({
+      data: null,
+      error: null,
     });
   }
 

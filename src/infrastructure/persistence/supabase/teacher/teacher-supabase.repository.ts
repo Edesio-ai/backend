@@ -46,7 +46,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
     return data;
   }
 
-  public async getTeacherByUserId(userId: string): Promise<Teacher | null> {
+  public async getTeacherByUserId(userId: string): Promise<Teacher> {
     const { data, error } = await this.supabase
       .from('teachers')
       .select('*')

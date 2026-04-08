@@ -10,7 +10,7 @@ export interface TeacherRepository {
   ): Promise<void>;
   getTeacherByEstablishmentId(establishmentId: string): Promise<any>;
   getTeachersSessionsByIds(teacherIds: string[]): Promise<any>;
-  getTeacherByUserId(userId: string): Promise<Teacher | null>;
+  getTeacherByUserId(userId: string): Promise<Teacher>;
   createTeacher(
     userId: string,
     name: string,

@@ -7,7 +7,7 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { GetTeacherByUserIdUseCase } from 'src/application/teacher/get-teacher-by-user-id';
+import { GetTeacherByUserIdUseCase } from 'src/application/teacher/get-teacher-by-user-id.use-case';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorator/role.decorator';
@@ -20,6 +20,8 @@ import { CsrfGuard } from '../auth/guards/csrf.guard';
 import { ValidateTeacherInvitationBodyDto } from './dto/validate-teacher-invitation-body.dto';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/validate-teacher-invitation.use-case';
 import { TeacherErrorFilter } from '../filters/teacher.filter';
+import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
+import { Session } from 'src/domain/teaching/session.type';
 
 @Controller('teacher')
 export class TeacherController {
@@ -27,6 +29,7 @@ export class TeacherController {
     private readonly getTeacherByUserIdUseCase: GetTeacherByUserIdUseCase,
     private readonly createTeacherUseCase: CreateTeacherUseCase,
     private readonly validateTeacherInvitationUseCase: ValidateTeacherInvitationUseCase,
+    private readonly getTeacherSessionsUseCase: GetTeacherSessionsUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -63,12 +66,26 @@ export class TeacherController {
   ): Promise<any> {
     const { user } = req;
     const { id } = user;
-    const { establishment_id } =
-      await this.validateTeacherInvitationUseCase.execute(id, body.token);
+    const invitationToken = await this.validateTeacherInvitationUseCase.execute(
+      id,
+      body.token,
+    );
 
     return {
       success: true,
-      etablissementId: establishment_id,
+      etablissementId: invitationToken?.establishment_id,
     };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('teacher')
+  @Get('sessions')
+  async getTeacherSessions(
+    @Req() req: Request & { user: User },
+  ): Promise<Session[]> {
+    const { user } = req;
+    const { id } = user;
+
+    return await this.getTeacherSessionsUseCase.execute(id);
   }
 }

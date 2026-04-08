@@ -1,5 +1,5 @@
-import { GetTeacherByUserIdUseCase } from './get-teacher-by-user-id';
-import { TeacherRepository } from 'src/interfaces/persistence/teacher.repository';
+import { GetTeacherByUserIdUseCase } from './get-teacher-by-user-id.use-case';
+import { TeacherRepository } from '../../interfaces/persistence/teacher.repository';
 
 describe('GetTeacherByUserIdUseCase', () => {
   let fixtures: Fixtures;
@@ -25,6 +25,14 @@ describe('GetTeacherByUserIdUseCase', () => {
     fixtures.thenRepositoryCalledWithExpectedUserId();
     expect(result).toBeNull();
   });
+
+  it('should propagate repository errors', async () => {
+    fixtures.whenRepositoryFails();
+
+    const promise = fixtures.whenExecute();
+
+    await fixtures.thenThrowRepositoryError(promise);
+  });
 });
 
 class Fixtures {
@@ -38,6 +46,7 @@ class Fixtures {
     available_chatbots: 2,
     supabase_user_id: this.userId,
   };
+  public readonly repositoryError = new Error('teacher query failed');
 
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly useCase: GetTeacherByUserIdUseCase;
@@ -64,7 +73,13 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null as any);
+  }
+
+  whenRepositoryFails() {
+    this.teacherRepository.getTeacherByUserId.mockRejectedValue(
+      this.repositoryError,
+    );
   }
 
   thenRepositoryCalledWithExpectedUserId() {
@@ -76,5 +91,9 @@ class Fixtures {
 
   thenReturnTeacher(result: unknown) {
     expect(result).toEqual(this.teacher);
+  }
+
+  async thenThrowRepositoryError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBe(this.repositoryError);
   }
 }

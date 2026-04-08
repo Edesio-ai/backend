@@ -42,3 +42,11 @@ export class StudentSessionsNotFoundError extends TeachingError {
     super(message || 'Student sessions not found');
   }
 }
+
+export class SessionServerError extends TeachingError {
+  readonly code = 'SESSION_SERVER_ERROR';
+  readonly httpStatus = 500;
+  constructor(message?: string) {
+    super(message || 'Session server error');
+  }
+}
