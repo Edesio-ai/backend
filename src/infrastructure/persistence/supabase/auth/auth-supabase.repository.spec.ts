@@ -284,6 +284,7 @@ class GetInvitationPreviewFixtures {
   };
 
   public readonly sut = new AuthSupabaseRepository(
+    {} as any,
     this.supabaseAdminMock as any,
   );
 
@@ -379,6 +380,7 @@ class ValideInvitationTokenFixtures {
   };
 
   public readonly sut = new AuthSupabaseRepository(
+    {} as any,
     this.supabaseAdminMock as any,
   );
 
@@ -465,7 +467,7 @@ class LoginUserFixtures {
       },
     };
 
-    this.sut = new AuthSupabaseRepository(supabaseAdminMock as any);
+    this.sut = new AuthSupabaseRepository(supabaseAdminMock as any, {} as any);
 
     const authSession = {
       access_token: 'at',
@@ -549,6 +551,7 @@ class CreateInvitationTokenFixtures {
 
   public readonly sut = new AuthSupabaseRepository(
     this.supabaseAdminMock as any,
+    {} as any,
   );
 
   whenInsertSucceeds() {
@@ -649,6 +652,7 @@ class CreateUserFixtures {
   };
 
   public readonly sut = new AuthSupabaseRepository(
+    this.supabaseAdminMock as any,
     this.supabaseAdminMock as any,
   );
 
@@ -795,7 +799,7 @@ class LogoutUserFixtures {
       },
     };
 
-    this.sut = new AuthSupabaseRepository(supabaseAdminMock as any);
+    this.sut = new AuthSupabaseRepository(supabaseAdminMock as any, {} as any);
   }
 
   whenLogoutUser() {
