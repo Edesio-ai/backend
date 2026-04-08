@@ -28,16 +28,17 @@ export class ValidateTeacherInvitationUseCase {
     private readonly tokenRepository: TokenRepository,
   ) {}
 
-  async execute(userId: string, token: string): Promise<InvitationToken> {
+  async execute(
+    userId: string,
+    token: string,
+  ): Promise<InvitationToken | null> {
     const teacher = await this.teacherRepository.getTeacherByUserId(userId);
     if (!teacher) {
       throw new TeacherNotFoundError();
     }
 
     if (teacher.establishment_id) {
-      throw new TeacherBadRequestError(
-        'Teacher already attached to an establishment',
-      );
+      return null;
     }
 
     const invitation = await this.tokenRepository.getInvitationByToken(token);

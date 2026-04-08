@@ -5,10 +5,7 @@ import {
   InvitationTokenExpiredError,
   InvitationTokenNotFoundError,
 } from 'src/domain/auth/errors';
-import {
-  TeacherBadRequestError,
-  TeacherNotFoundError,
-} from 'src/domain/teaching/error';
+import { TeacherNotFoundError } from 'src/domain/teaching/error';
 import { TeacherRepository } from 'src/interfaces/persistence/teacher.repository';
 import { TokenRepository } from 'src/interfaces/persistence/token.repository';
 import { ValidateTeacherInvitationUseCase } from './validate-teacher-invitation.use-case';
@@ -28,12 +25,14 @@ describe('ValidateTeacherInvitationUseCase', () => {
     await expect(promise).rejects.toBeInstanceOf(TeacherNotFoundError);
   });
 
-  it('should throw when teacher is already attached to an establishment', async () => {
+  it('should return null when teacher is already attached to an establishment', async () => {
     fixtures.whenTeacherAlreadyAttached();
 
-    const promise = fixtures.whenExecute();
+    const result = await fixtures.whenExecute();
 
-    await expect(promise).rejects.toBeInstanceOf(TeacherBadRequestError);
+    expect(result).toBeNull();
+    fixtures.thenInvitationRepositoryNotCalled();
+    fixtures.thenTeacherLinkNotCalled();
   });
 
   it('should throw when invitation token does not exist', async () => {
@@ -210,5 +209,18 @@ class Fixtures {
     expect(
       this.teacherRepository.linkTeacherToEstablishment,
     ).toHaveBeenCalledTimes(1);
+  }
+
+  thenInvitationRepositoryNotCalled() {
+    expect(this.tokenRepository.getInvitationByToken).not.toHaveBeenCalled();
+    expect(
+      this.tokenRepository.markInvitationTokenAsUsed,
+    ).not.toHaveBeenCalled();
+  }
+
+  thenTeacherLinkNotCalled() {
+    expect(
+      this.teacherRepository.linkTeacherToEstablishment,
+    ).not.toHaveBeenCalled();
   }
 }
