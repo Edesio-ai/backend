@@ -8,6 +8,8 @@ import { CreateTeacherUseCase } from '../../application/teacher/create-teacher.u
 import { ValidateTeacherInvitationUseCase } from '../../application/teacher/validate-teacher-invitation.use-case';
 import { SessionsPersistenceModule } from '../../infrastructure/persistence/supabase/session/sessions-persistence.module';
 import { GetTeacherSessionsUseCase } from '../../application/teacher/get-teacher-sessions.use-case';
+import { GetSessionByCodeUseCase } from 'src/application/teacher/get-session-by-code.use-case';
+import { CreateSessionUseCase } from 'src/application/teacher/create-session.use-case';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { GetTeacherSessionsUseCase } from '../../application/teacher/get-teacher
     CreateTeacherUseCase,
     ValidateTeacherInvitationUseCase,
     GetTeacherSessionsUseCase,
+    GetSessionByCodeUseCase,
+    CreateSessionUseCase,
   ],
 })
 export class TeacherModule {}

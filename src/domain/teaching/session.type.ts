@@ -8,3 +8,10 @@ export interface Session {
 }
 
 export type SessionLanguage = 'francais' | 'anglais' | 'espagnol' | 'allemand';
+
+export type CreateSessionBody = {
+  name: string;
+  code: string;
+  language: SessionLanguage;
+  teacherId: string;
+};

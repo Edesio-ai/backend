@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Req,
   UseFilters,
@@ -22,6 +23,9 @@ import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/valida
 import { TeacherErrorFilter } from '../filters/teacher.filter';
 import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
 import { Session } from 'src/domain/teaching/session.type';
+import { GetSessionByCodeUseCase } from 'src/application/teacher/get-session-by-code.use-case';
+import { CreateSessionBodyDto } from './dto/create-session.dto';
+import { CreateSessionUseCase } from 'src/application/teacher/create-session.use-case';
 
 @Controller('teacher')
 export class TeacherController {
@@ -30,6 +34,8 @@ export class TeacherController {
     private readonly createTeacherUseCase: CreateTeacherUseCase,
     private readonly validateTeacherInvitationUseCase: ValidateTeacherInvitationUseCase,
     private readonly getTeacherSessionsUseCase: GetTeacherSessionsUseCase,
+    private readonly getSessionByCodeUseCase: GetSessionByCodeUseCase,
+    private readonly createSessionUseCase: CreateSessionUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -87,5 +93,24 @@ export class TeacherController {
     const { id } = user;
 
     return await this.getTeacherSessionsUseCase.execute(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('teacher')
+  @Get('sessions/:code')
+  async getSessionByCode(
+    @Param('code') code: string,
+  ): Promise<{ session: Session }> {
+    const session = await this.getSessionByCodeUseCase.execute(code);
+    return {
+      session,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+  @Roles('teacher')
+  @Post('sessions')
+  async createSession(@Body() body: CreateSessionBodyDto): Promise<Session> {
+    return await this.createSessionUseCase.execute(body);
   }
 }
