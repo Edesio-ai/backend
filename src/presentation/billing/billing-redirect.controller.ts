@@ -22,6 +22,6 @@ export class BillingRedirectController {
 
   @Get('cancel')
   async cancel(@Res() res: Response) {
-    return res.redirect(302, `${process.env.FRONTEND_URL}/billing/cancel`);
+    return res.redirect(302, `${process.env.FRONTEND_URL}/billing/choose-plan`);
   }
 }
