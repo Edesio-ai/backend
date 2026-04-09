@@ -45,7 +45,7 @@ export class TeacherController {
   async getTeacherByUserId(@Req() req: Request & { user: User }): Promise<any> {
     const { user } = req;
     const teacher = await this.getTeacherByUserIdUseCase.execute(user.id);
-    return teacher;
+    return { teacher };
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
