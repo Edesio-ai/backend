@@ -1,7 +1,10 @@
 import { Inject } from '@nestjs/common';
 import { SUPABASE_ADMIN } from '../supabase.module';
 import { SessionRepository } from '../../../../interfaces/persistence/session.repository';
-import { Session } from '../../../../domain/teaching/session.type';
+import {
+  CreateSessionBody,
+  Session,
+} from '../../../../domain/teaching/session.type';
 import { SessionServerError } from '../../../../domain/teaching/error';
 
 export class SupabaseSessionRepository implements SessionRepository {
@@ -16,6 +19,41 @@ export class SupabaseSessionRepository implements SessionRepository {
       .select('*')
       .eq('teacher_id', teacherId)
       .order('created_at', { ascending: false });
+
+    if (error) {
+      throw new SessionServerError(error.message);
+    }
+
+    return data;
+  }
+
+  public async getSessionByCode(code: string): Promise<Session> {
+    const { data, error } = await this.supabase
+      .from('sessions')
+      .select('id')
+      .eq('code', code)
+      .maybeSingle();
+
+    if (error) {
+      throw new SessionServerError(error.message);
+    }
+
+    return data;
+  }
+
+  public async createSession(body: CreateSessionBody): Promise<Session> {
+    const { teacherId, name, code, language } = body;
+
+    const { data, error } = await this.supabase
+      .from('sessions')
+      .insert({
+        teacher_id: teacherId,
+        name,
+        code,
+        language,
+      })
+      .select()
+      .single();
 
     if (error) {
       throw new SessionServerError(error.message);
