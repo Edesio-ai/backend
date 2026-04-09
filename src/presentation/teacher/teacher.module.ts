@@ -10,6 +10,7 @@ import { SessionsPersistenceModule } from '../../infrastructure/persistence/supa
 import { GetTeacherSessionsUseCase } from '../../application/teacher/get-teacher-sessions.use-case';
 import { GetSessionByCodeUseCase } from 'src/application/teacher/get-session-by-code.use-case';
 import { CreateSessionUseCase } from 'src/application/teacher/create-session.use-case';
+import { UpdateSessionNameUseCase } from 'src/application/teacher/update-session-name.use-case';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CreateSessionUseCase } from 'src/application/teacher/create-session.use
     GetTeacherSessionsUseCase,
     GetSessionByCodeUseCase,
     CreateSessionUseCase,
+    UpdateSessionNameUseCase,
   ],
 })
 export class TeacherModule {}

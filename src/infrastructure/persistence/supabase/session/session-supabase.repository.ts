@@ -4,6 +4,7 @@ import { SessionRepository } from '../../../../interfaces/persistence/session.re
 import {
   CreateSessionBody,
   Session,
+  UpdateSessionNameBody,
 } from '../../../../domain/teaching/session.type';
 import { SessionServerError } from '../../../../domain/teaching/error';
 
@@ -52,6 +53,27 @@ export class SupabaseSessionRepository implements SessionRepository {
         code,
         language,
       })
+      .select()
+      .single();
+
+    if (error) {
+      throw new SessionServerError(error.message);
+    }
+
+    return data;
+  }
+
+  public async updateSessionName(
+    sessionId: string,
+    body: UpdateSessionNameBody,
+  ): Promise<Session> {
+    const { name, teacherId } = body;
+
+    const { data, error } = await this.supabase
+      .from('sessions')
+      .update({ name })
+      .eq('id', sessionId)
+      .eq('teacher_id', teacherId)
       .select()
       .single();
 

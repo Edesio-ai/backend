@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
   UseFilters,
   UseGuards,
@@ -26,6 +27,8 @@ import { Session } from 'src/domain/teaching/session.type';
 import { GetSessionByCodeUseCase } from 'src/application/teacher/get-session-by-code.use-case';
 import { CreateSessionBodyDto } from './dto/create-session.dto';
 import { CreateSessionUseCase } from 'src/application/teacher/create-session.use-case';
+import { UpdateSessionBodyDto } from './dto/uppdate-session-body.dto';
+import { UpdateSessionNameUseCase } from 'src/application/teacher/update-session-name.use-case';
 
 @Controller('teacher')
 export class TeacherController {
@@ -36,6 +39,7 @@ export class TeacherController {
     private readonly getTeacherSessionsUseCase: GetTeacherSessionsUseCase,
     private readonly getSessionByCodeUseCase: GetSessionByCodeUseCase,
     private readonly createSessionUseCase: CreateSessionUseCase,
+    private readonly updateSessionNameUseCase: UpdateSessionNameUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -112,5 +116,19 @@ export class TeacherController {
   @Post('sessions')
   async createSession(@Body() body: CreateSessionBodyDto): Promise<Session> {
     return await this.createSessionUseCase.execute(body);
+  }
+
+  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+  @Roles('teacher')
+  @Put('sessions/:sessionId')
+  async updateSessionName(
+    @Param('sessionId') sessionId: string,
+    @Body() body: UpdateSessionBodyDto,
+  ): Promise<{ session: Session }> {
+    const session = await this.updateSessionNameUseCase.execute(
+      sessionId,
+      body,
+    );
+    return { session };
   }
 }

@@ -61,6 +61,24 @@ describe('SupabaseSessionRepository', () => {
     await fixtures.thenThrowSessionServerError(promise);
     fixtures.thenCreateSessionQueryBuiltWithExpectedArguments();
   });
+
+  it('should update session name', async () => {
+    fixtures.whenUpdateSessionNameSucceeds();
+
+    const result = await fixtures.whenUpdateSessionName();
+
+    fixtures.thenUpdateSessionNameQueryBuiltWithExpectedArguments();
+    fixtures.thenReturnExpectedUpdatedSession(result);
+  });
+
+  it('should throw SessionServerError when updateSessionName fails', async () => {
+    fixtures.whenUpdateSessionNameFails();
+
+    const promise = fixtures.whenUpdateSessionName();
+
+    await fixtures.thenThrowSessionServerError(promise);
+    fixtures.thenUpdateSessionNameQueryBuiltWithExpectedArguments();
+  });
 });
 
 class Fixtures {
@@ -93,6 +111,19 @@ class Fixtures {
     language: this.createSessionBody.language,
     created_at: '2026-01-01T00:00:00.000Z',
   };
+  public readonly updateSessionBody = {
+    name: 'Updated Session Name',
+    teacherId: this.teacherId,
+  };
+  public readonly sessionIdToUpdate = 'session-2';
+  public readonly updatedSession = {
+    id: this.sessionIdToUpdate,
+    teacher_id: this.teacherId,
+    name: this.updateSessionBody.name,
+    code: 'NEW123',
+    language: 'francais',
+    created_at: '2026-01-01T00:00:00.000Z',
+  };
 
   private readonly orderMock = jest.fn();
   private readonly listEqMock = jest.fn(() => ({ order: this.orderMock }));
@@ -114,11 +145,26 @@ class Fixtures {
     select: this.createSelectMock,
   }));
 
-  private mode: 'list' | 'byCode' | 'create' = 'list';
+  private readonly updateSingleMock = jest.fn();
+  private readonly updateSelectMock = jest.fn(() => ({
+    single: this.updateSingleMock,
+  }));
+  private readonly updateTeacherEqMock = jest.fn(() => ({
+    select: this.updateSelectMock,
+  }));
+  private readonly updateIdEqMock = jest.fn(() => ({
+    eq: this.updateTeacherEqMock,
+  }));
+  private readonly updateUpdateMock = jest.fn(() => ({
+    eq: this.updateIdEqMock,
+  }));
+
+  private mode: 'list' | 'byCode' | 'create' | 'update' = 'list';
   private readonly fromMock = jest.fn(() => {
     if (this.mode === 'list') return { select: this.listSelectMock };
     if (this.mode === 'byCode') return { select: this.byCodeSelectMock };
-    return { insert: this.createInsertMock };
+    if (this.mode === 'create') return { insert: this.createInsertMock };
+    return { update: this.updateUpdateMock };
   });
 
   public readonly repository: SupabaseSessionRepository;
@@ -143,6 +189,14 @@ class Fixtures {
   whenCreateSession() {
     this.mode = 'create';
     return this.repository.createSession(this.createSessionBody as any);
+  }
+
+  whenUpdateSessionName() {
+    this.mode = 'update';
+    return this.repository.updateSessionName(
+      this.sessionIdToUpdate,
+      this.updateSessionBody as any,
+    );
   }
 
   whenSessionsQuerySucceeds() {
@@ -184,6 +238,20 @@ class Fixtures {
     this.createSingleMock.mockResolvedValue({
       data: null,
       error: { message: 'create session query failed' },
+    });
+  }
+
+  whenUpdateSessionNameSucceeds() {
+    this.updateSingleMock.mockResolvedValue({
+      data: this.updatedSession,
+      error: null,
+    });
+  }
+
+  whenUpdateSessionNameFails() {
+    this.updateSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'update session query failed' },
     });
   }
 
@@ -230,5 +298,26 @@ class Fixtures {
 
   thenReturnExpectedCreatedSession(result: unknown) {
     expect(result).toEqual(this.createdSession);
+  }
+
+  thenUpdateSessionNameQueryBuiltWithExpectedArguments() {
+    expect(this.fromMock).toHaveBeenCalledWith('sessions');
+    expect(this.updateUpdateMock).toHaveBeenCalledWith({
+      name: this.updateSessionBody.name,
+    });
+    expect(this.updateIdEqMock).toHaveBeenCalledWith(
+      'id',
+      this.sessionIdToUpdate,
+    );
+    expect(this.updateTeacherEqMock).toHaveBeenCalledWith(
+      'teacher_id',
+      this.updateSessionBody.teacherId,
+    );
+    expect(this.updateSelectMock).toHaveBeenCalledTimes(1);
+    expect(this.updateSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenReturnExpectedUpdatedSession(result: unknown) {
+    expect(result).toEqual(this.updatedSession);
   }
 }

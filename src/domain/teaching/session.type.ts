@@ -15,3 +15,8 @@ export type CreateSessionBody = {
   language: SessionLanguage;
   teacherId: string;
 };
+
+export type UpdateSessionNameBody = {
+  name: string;
+  teacherId: string;
+};
