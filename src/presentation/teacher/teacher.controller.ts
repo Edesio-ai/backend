@@ -2,9 +2,7 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   Post,
-  Put,
   Req,
   UseFilters,
   UseGuards,
@@ -22,13 +20,6 @@ import { CsrfGuard } from '../auth/guards/csrf.guard';
 import { ValidateTeacherInvitationBodyDto } from './dto/validate-teacher-invitation-body.dto';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/validate-teacher-invitation.use-case';
 import { TeacherErrorFilter } from '../filters/teacher.filter';
-import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
-import { Session } from 'src/domain/teaching/session.type';
-import { GetSessionByCodeUseCase } from 'src/application/teacher/get-session-by-code.use-case';
-import { CreateSessionBodyDto } from './dto/create-session.dto';
-import { CreateSessionUseCase } from 'src/application/teacher/create-session.use-case';
-import { UpdateSessionBodyDto } from './dto/uppdate-session-body.dto';
-import { UpdateSessionNameUseCase } from 'src/application/teacher/update-session-name.use-case';
 
 @Controller('teacher')
 export class TeacherController {
@@ -36,10 +27,6 @@ export class TeacherController {
     private readonly getTeacherByUserIdUseCase: GetTeacherByUserIdUseCase,
     private readonly createTeacherUseCase: CreateTeacherUseCase,
     private readonly validateTeacherInvitationUseCase: ValidateTeacherInvitationUseCase,
-    private readonly getTeacherSessionsUseCase: GetTeacherSessionsUseCase,
-    private readonly getSessionByCodeUseCase: GetSessionByCodeUseCase,
-    private readonly createSessionUseCase: CreateSessionUseCase,
-    private readonly updateSessionNameUseCase: UpdateSessionNameUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -85,50 +72,5 @@ export class TeacherController {
       success: true,
       etablissementId: invitationToken?.establishment_id,
     };
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('teacher')
-  @Get('sessions')
-  async getTeacherSessions(
-    @Req() req: Request & { user: User },
-  ): Promise<Session[]> {
-    const { user } = req;
-    const { id } = user;
-
-    return await this.getTeacherSessionsUseCase.execute(id);
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('teacher')
-  @Get('sessions/:code')
-  async getSessionByCode(
-    @Param('code') code: string,
-  ): Promise<{ session: Session }> {
-    const session = await this.getSessionByCodeUseCase.execute(code);
-    return {
-      session,
-    };
-  }
-
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('teacher')
-  @Post('sessions')
-  async createSession(@Body() body: CreateSessionBodyDto): Promise<Session> {
-    return await this.createSessionUseCase.execute(body);
-  }
-
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('teacher')
-  @Put('sessions/:sessionId')
-  async updateSessionName(
-    @Param('sessionId') sessionId: string,
-    @Body() body: UpdateSessionBodyDto,
-  ): Promise<{ session: Session }> {
-    const session = await this.updateSessionNameUseCase.execute(
-      sessionId,
-      body,
-    );
-    return { session };
   }
 }

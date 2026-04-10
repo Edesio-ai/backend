@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { EstablishmentModule } from './establishment/establishment.module';
 import { BillingModule } from './billing/billing.module';
 import { TeacherModule } from './teacher/teacher.module';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TeacherModule } from './teacher/teacher.module';
     EstablishmentModule,
     BillingModule,
     TeacherModule,
+    SessionModule,
   ],
   controllers: [],
   providers: [],
