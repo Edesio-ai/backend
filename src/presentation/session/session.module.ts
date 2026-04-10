@@ -4,9 +4,9 @@ import { AuthPersistenceModule } from "src/infrastructure/persistence/supabase/a
 import { GetTeacherSessionsUseCase } from "src/application/teacher/get-teacher-sessions.use-case";
 import { TeacherPersistenceModule } from "src/infrastructure/persistence/supabase/teacher/teacher-persistence.module";
 import { SessionsPersistenceModule } from "src/infrastructure/persistence/supabase/session/sessions-persistence.module";
-import { CreateSessionUseCase } from "src/application/teacher/create-session.use-case";
-import { UpdateSessionNameUseCase } from "src/application/teacher/update-session-name.use-case";
-import { GetSessionByCodeUseCase } from "src/application/teacher/get-session-by-code.use-case";
+import { CreateSessionUseCase } from "src/application/session/create-session.use-case";
+import { UpdateSessionNameUseCase } from "src/application/session/update-session-name.use-case";
+import { GetSessionByCodeUseCase } from "src/application/session/get-session-by-code.use-case";
 
 @Module({
     imports: [

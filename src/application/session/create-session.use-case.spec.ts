@@ -54,6 +54,7 @@ class Fixtures {
       getSessionsByTeacherId: jest.fn(),
       getSessionByCode: jest.fn(),
       createSession: jest.fn(),
+      updateSessionName: jest.fn(),
     };
     this.useCase = new CreateSessionUseCase(this.sessionRepository);
   }

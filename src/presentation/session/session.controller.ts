@@ -7,10 +7,10 @@ import { GetTeacherSessionsUseCase } from "src/application/teacher/get-teacher-s
 import { User } from "src/domain/auth/auth.type";
 import { Session } from "src/domain/teaching/session.type";
 import { CreateSessionBodyDto } from "../teacher/dto/create-session.dto";
-import { CreateSessionUseCase } from "src/application/teacher/create-session.use-case";
+import { CreateSessionUseCase } from "src/application/session/create-session.use-case";
 import { UpdateSessionBodyDto } from "../teacher/dto/uppdate-session-body.dto";
-import { UpdateSessionNameUseCase } from "src/application/teacher/update-session-name.use-case";
-import { GetSessionByCodeUseCase } from "src/application/teacher/get-session-by-code.use-case";
+import { UpdateSessionNameUseCase } from "src/application/session/update-session-name.use-case";
+import { GetSessionByCodeUseCase } from "src/application/session/get-session-by-code.use-case";
 
 @Controller('session')
 export class SessionController {
