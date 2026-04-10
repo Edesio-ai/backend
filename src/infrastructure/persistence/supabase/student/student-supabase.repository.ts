@@ -25,4 +25,15 @@ export class StudentSupabaseRepository implements StudentRepository {
     }
     return data;
   }
+
+  async deleteStudentSessionsBySessionId(sessionId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('student_sessions')
+      .delete()
+      .eq('session_id', sessionId);
+
+    if (error) {
+      throw new StudentSessionsNotFoundError(error.message);
+    }
+  }
 }
