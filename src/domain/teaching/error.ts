@@ -50,3 +50,19 @@ export class SessionServerError extends TeachingError {
     super(message || 'Session server error');
   }
 }
+
+export class CourseServerError extends TeachingError {
+  readonly code = 'COURSE_SERVER_ERROR';
+  readonly httpStatus = 500;
+  constructor(message?: string) {
+    super(message || 'Course server error');
+  }
+}
+
+export class QuestionServerError extends TeachingError {
+  readonly code = 'QUESTION_SERVER_ERROR';
+  readonly httpStatus = 500;
+  constructor(message?: string) {
+    super(message || 'Question server error');
+  }
+}

@@ -79,6 +79,23 @@ describe('SupabaseSessionRepository', () => {
     await fixtures.thenThrowSessionServerError(promise);
     fixtures.thenUpdateSessionNameQueryBuiltWithExpectedArguments();
   });
+
+  it('should delete session by id and teacher id', async () => {
+    fixtures.whenDeleteSessionSucceeds();
+
+    await fixtures.whenDeleteSessionByTeacherId();
+
+    fixtures.thenDeleteSessionQueryBuiltWithExpectedArguments();
+  });
+
+  it('should throw SessionServerError when deleteSessionByTeacherId fails', async () => {
+    fixtures.whenDeleteSessionFails();
+
+    const promise = fixtures.whenDeleteSessionByTeacherId();
+
+    await fixtures.thenThrowSessionServerError(promise);
+    fixtures.thenDeleteSessionQueryBuiltWithExpectedArguments();
+  });
 });
 
 class Fixtures {
@@ -116,6 +133,7 @@ class Fixtures {
     teacherId: this.teacherId,
   };
   public readonly sessionIdToUpdate = 'session-2';
+  public readonly sessionIdToDelete = 'session-1';
   public readonly updatedSession = {
     id: this.sessionIdToUpdate,
     teacher_id: this.teacherId,
@@ -159,12 +177,21 @@ class Fixtures {
     eq: this.updateIdEqMock,
   }));
 
-  private mode: 'list' | 'byCode' | 'create' | 'update' = 'list';
+  private readonly deleteTeacherEqMock = jest.fn();
+  private readonly deleteIdEqMock = jest.fn(() => ({
+    eq: this.deleteTeacherEqMock,
+  }));
+  private readonly sessionDeleteMock = jest.fn(() => ({
+    eq: this.deleteIdEqMock,
+  }));
+
+  private mode: 'list' | 'byCode' | 'create' | 'update' | 'delete' = 'list';
   private readonly fromMock = jest.fn(() => {
     if (this.mode === 'list') return { select: this.listSelectMock };
     if (this.mode === 'byCode') return { select: this.byCodeSelectMock };
     if (this.mode === 'create') return { insert: this.createInsertMock };
-    return { update: this.updateUpdateMock };
+    if (this.mode === 'update') return { update: this.updateUpdateMock };
+    return { delete: this.sessionDeleteMock };
   });
 
   public readonly repository: SupabaseSessionRepository;
@@ -196,6 +223,14 @@ class Fixtures {
     return this.repository.updateSessionName(
       this.sessionIdToUpdate,
       this.updateSessionBody as any,
+    );
+  }
+
+  whenDeleteSessionByTeacherId() {
+    this.mode = 'delete';
+    return this.repository.deleteSessionByTeacherId(
+      this.sessionIdToDelete,
+      this.teacherId,
     );
   }
 
@@ -252,6 +287,16 @@ class Fixtures {
     this.updateSingleMock.mockResolvedValue({
       data: null,
       error: { message: 'update session query failed' },
+    });
+  }
+
+  whenDeleteSessionSucceeds() {
+    this.deleteTeacherEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenDeleteSessionFails() {
+    this.deleteTeacherEqMock.mockResolvedValue({
+      error: { message: 'delete session failed' },
     });
   }
 
@@ -319,5 +364,18 @@ class Fixtures {
 
   thenReturnExpectedUpdatedSession(result: unknown) {
     expect(result).toEqual(this.updatedSession);
+  }
+
+  thenDeleteSessionQueryBuiltWithExpectedArguments() {
+    expect(this.fromMock).toHaveBeenCalledWith('sessions');
+    expect(this.sessionDeleteMock).toHaveBeenCalledTimes(1);
+    expect(this.deleteIdEqMock).toHaveBeenCalledWith(
+      'id',
+      this.sessionIdToDelete,
+    );
+    expect(this.deleteTeacherEqMock).toHaveBeenCalledWith(
+      'teacher_id',
+      this.teacherId,
+    );
   }
 }

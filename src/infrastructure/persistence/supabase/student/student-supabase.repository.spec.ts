@@ -34,10 +34,27 @@ describe('StudentSupabaseRepository', () => {
 
     await fixtures.thenThrowStudentSessionsNotFound(promise);
   });
+
+  it('should delete student_sessions by session id', async () => {
+    fixtures.whenDeleteStudentSessionsSucceeds();
+
+    await fixtures.whenDeleteStudentSessionsBySessionId();
+
+    fixtures.thenDeleteStudentSessionsQueryBuilt();
+  });
+
+  it('should throw StudentSessionsNotFoundError when delete student_sessions fails', async () => {
+    fixtures.whenDeleteStudentSessionsFails();
+
+    const promise = fixtures.whenDeleteStudentSessionsBySessionId();
+
+    await fixtures.thenThrowStudentSessionsNotFound(promise);
+  });
 });
 
 class Fixtures {
   public readonly sessionIds = ['session-1', 'session-2'];
+  public readonly sessionIdToDelete = 'session-1';
   public readonly fallbackId = '00000000-0000-0000-0000-000000000000';
   public readonly studentSessions = [
     { session_id: 'session-1', student_id: 'student-1' },
@@ -45,7 +62,17 @@ class Fixtures {
 
   private readonly inMock = jest.fn();
   private readonly selectMock = jest.fn(() => ({ in: this.inMock }));
-  private readonly fromMock = jest.fn(() => ({ select: this.selectMock }));
+
+  private readonly deleteEqMock = jest.fn();
+  private readonly deleteMock = jest.fn(() => ({ eq: this.deleteEqMock }));
+
+  private mode: 'select' | 'delete' = 'select';
+  private readonly fromMock = jest.fn(() => {
+    if (this.mode === 'delete') {
+      return { delete: this.deleteMock };
+    }
+    return { select: this.selectMock };
+  });
 
   public readonly repository: StudentSupabaseRepository;
 
@@ -57,7 +84,15 @@ class Fixtures {
   }
 
   whenGetStudentsSessionsByIds(sessionIds: string[]) {
+    this.mode = 'select';
     return this.repository.getStudentsSessionsByIds(sessionIds);
+  }
+
+  whenDeleteStudentSessionsBySessionId() {
+    this.mode = 'delete';
+    return this.repository.deleteStudentSessionsBySessionId(
+      this.sessionIdToDelete,
+    );
   }
 
   whenQueryReturnsData() {
@@ -71,6 +106,16 @@ class Fixtures {
     this.inMock.mockResolvedValue({
       data: null,
       error: { message: 'query failed' },
+    });
+  }
+
+  whenDeleteStudentSessionsSucceeds() {
+    this.deleteEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenDeleteStudentSessionsFails() {
+    this.deleteEqMock.mockResolvedValue({
+      error: { message: 'delete failed' },
     });
   }
 
@@ -90,5 +135,14 @@ class Fixtures {
 
   thenReturnExpectedStudentSessions(result: any) {
     expect(result).toEqual(this.studentSessions);
+  }
+
+  thenDeleteStudentSessionsQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_sessions');
+    expect(this.deleteMock).toHaveBeenCalledTimes(1);
+    expect(this.deleteEqMock).toHaveBeenCalledWith(
+      'session_id',
+      this.sessionIdToDelete,
+    );
   }
 }

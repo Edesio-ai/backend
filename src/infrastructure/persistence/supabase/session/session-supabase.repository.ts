@@ -83,4 +83,19 @@ export class SupabaseSessionRepository implements SessionRepository {
 
     return data;
   }
+
+  async deleteSessionByTeacherId(
+    sessionId: string,
+    teacherId: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('sessions')
+      .delete()
+      .eq('id', sessionId)
+      .eq('teacher_id', teacherId);
+
+    if (error) {
+      throw new SessionServerError(error.message);
+    }
+  }
 }
