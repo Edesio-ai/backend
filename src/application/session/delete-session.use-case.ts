@@ -2,23 +2,23 @@ import { Inject } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/interfaces/persistence/course.repository';
+} from 'src/domain/teaching/interface/course.repository';
 import {
   QUESTIONS_REPOSITORY,
   type QuestionsRepository,
-} from 'src/interfaces/persistence/questions.repository';
+} from 'src/domain/teaching/interface/questions.repository';
 import {
   SESSION_REPOSITORY,
   type SessionRepository,
-} from 'src/interfaces/persistence/session.repository';
+} from 'src/domain/teaching/interface/session.repository';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/interfaces/persistence/teacher.repository';
+} from 'src/domain/teaching/interface/teacher.repository';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/interfaces/persistence/student.repository';
+} from 'src/domain/teaching/interface/student.repository';
 
 export class DeleteSessionUseCase {
   constructor(

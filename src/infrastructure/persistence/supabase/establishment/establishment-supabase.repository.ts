@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 
-import { type EstablishmentRepository } from '../../../../interfaces/persistence/establishment.repository';
+import { type EstablishmentRepository } from 'src/domain/teaching/interface/establishment.repository';
 import { SUPABASE_ADMIN } from '../supabase.module';
 import {
   EstablishmentCreationFailedError,

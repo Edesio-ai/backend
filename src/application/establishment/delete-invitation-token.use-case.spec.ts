@@ -1,5 +1,5 @@
 import { DeleteInvitationTokenUseCase } from './delete-invitation-token.use-case';
-import { TokenRepository } from '../../interfaces/persistence/token.repository';
+import { TokenRepository } from '../../domain/token/contract/token.repository';
 
 describe('DeleteInvitationTokenUseCase', () => {
   let fixtures: Fixtures;

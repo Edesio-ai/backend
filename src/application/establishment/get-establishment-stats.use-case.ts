@@ -1,23 +1,24 @@
 import { Inject } from '@nestjs/common';
-import { ESTABLISHMENT_REPOSITORY } from '../../interfaces/persistence/establishment.repository';
-import { type EstablishmentRepository } from '../../interfaces/persistence/establishment.repository';
-import {
-  STUDENT_REPOSITORY,
-  type StudentRepository,
-} from '../../interfaces/persistence/student.repository';
+import { ESTABLISHMENT_REPOSITORY } from '../../domain/teaching/interface/establishment.repository';
+import { type EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
+
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from '../../interfaces/persistence/teacher.repository';
+} from '../../domain/teaching/interface/teacher.repository';
 import {
   Teacher,
   TeacherSession,
   TeacherWithStats,
-} from '../../domain/teaching/teacher.type';
+} from '../../domain/teaching/types/teacher.type';
 import {
   Establishment,
   EstablishmentStats,
 } from '../../domain/establishment/establishment.type';
+import {
+  STUDENT_REPOSITORY,
+  type StudentRepository,
+} from 'src/domain/teaching/interface/student.repository';
 
 export class GetEstablishmentsStatsUseCase {
   constructor(

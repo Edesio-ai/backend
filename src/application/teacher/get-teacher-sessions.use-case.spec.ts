@@ -1,6 +1,6 @@
 import { TeacherNotFoundError } from '../../domain/teaching/error';
-import { SessionRepository } from '../../interfaces/persistence/session.repository';
-import { TeacherRepository } from '../../interfaces/persistence/teacher.repository';
+import { SessionRepository } from '../../domain/teaching/interface/session.repository';
+import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
 import { GetTeacherSessionsUseCase } from './get-teacher-sessions.use-case';
 
 describe('GetTeacherSessionsUseCase', () => {

@@ -1,6 +1,6 @@
 import { CreateCheckoutSessionsUseCase } from './create-checkout-session.use-case';
-import { PaymentClientInterface } from '../../interfaces/payment.interface';
-import { SubscriptionRepository } from '../../interfaces/persistence/subscription.repository';
+import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
+import { SubscriptionRepository } from '../../domain/teaching/interface/subscription.repository';
 import { User } from '../../domain/auth/auth.type';
 import { TokenUserNotFoundError } from '../../domain/auth/errors';
 
@@ -67,7 +67,7 @@ describe('CreateCheckoutSessionsUseCase', () => {
 
 class Fixtures {
   public readonly subscriptionRepository: jest.Mocked<SubscriptionRepository>;
-  public readonly paymentClient: jest.Mocked<PaymentClientInterface>;
+  public readonly paymentClient: jest.Mocked<StripeClientInterface>;
   public readonly createCheckoutSessionsUseCase: CreateCheckoutSessionsUseCase;
 
   public readonly user: User;

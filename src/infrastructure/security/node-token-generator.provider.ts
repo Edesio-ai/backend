@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
-import { TokenGeneratorProvider } from '../../interfaces/security/token-generator.provider';
+import { TokenGeneratorProvider } from '../../domain/shared/security/interface/token-generator.provider';
 
 @Injectable()
 export class NodeTokenGeneratorProvider implements TokenGeneratorProvider {

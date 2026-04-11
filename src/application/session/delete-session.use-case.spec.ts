@@ -1,9 +1,9 @@
 import { DeleteSessionUseCase } from './delete-session.use-case';
-import { CourseRepository } from '../../interfaces/persistence/course.repository';
-import { QuestionsRepository } from '../../interfaces/persistence/questions.repository';
-import { SessionRepository } from '../../interfaces/persistence/session.repository';
-import { TeacherRepository } from '../../interfaces/persistence/teacher.repository';
-import { StudentRepository } from '../../interfaces/persistence/student.repository';
+import { CourseRepository } from '../../domain/teaching/interface/course.repository';
+import { QuestionsRepository } from '../../domain/teaching/interface/questions.repository';
+import { SessionRepository } from '../../domain/teaching/interface/session.repository';
+import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
+import { StudentRepository } from '../../domain/teaching/interface/student.repository';
 
 describe('DeleteSessionUseCase', () => {
   let fixtures: Fixtures;

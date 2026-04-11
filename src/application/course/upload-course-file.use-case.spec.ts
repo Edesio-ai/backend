@@ -1,6 +1,6 @@
 import { UploadCourseFileUseCase } from './upload-course-file.use-case';
-import { CourseRepository } from '../../interfaces/persistence/course.repository';
-import { CourseFileUpload } from '../../domain/teaching/course.type';
+import { CourseRepository } from '../../domain/teaching/interface/course.repository';
+import { CourseFileUpload } from '../../domain/teaching/types/course.type';
 
 describe('UploadCourseFileUseCase', () => {
   let fixtures: Fixtures;

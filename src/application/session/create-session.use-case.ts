@@ -1,9 +1,12 @@
 import { Inject } from '@nestjs/common';
-import { CreateSessionBody, Session } from 'src/domain/teaching/session.type';
+import {
+  CreateSessionBody,
+  Session,
+} from 'src/domain/teaching/types/session.type';
 import {
   SESSION_REPOSITORY,
   type SessionRepository,
-} from 'src/interfaces/persistence/session.repository';
+} from 'src/domain/teaching/interface/session.repository';
 
 export class CreateSessionUseCase {
   constructor(

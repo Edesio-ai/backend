@@ -1,9 +1,12 @@
 import { Inject } from '@nestjs/common';
-import { CourseFile, CourseFileUpload } from 'src/domain/teaching/course.type';
+import {
+  CourseFile,
+  CourseFileUpload,
+} from 'src/domain/teaching/types/course.type';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/interfaces/persistence/course.repository';
+} from 'src/domain/teaching/interface/course.repository';
 
 export class UploadCourseFileUseCase {
   constructor(

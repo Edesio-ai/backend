@@ -3,12 +3,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   AUTH_REPOSITORY,
   type AuthRepository,
-} from '../../interfaces/persistence/auth.repository';
+} from '../../domain/auth/contract/auth.repository';
 import { RegisterBody, UserMetadata } from '../../domain/auth/auth.type';
 import {
   EMAIL_PROVIDER,
   type EmailProviderInterface,
-} from '../../interfaces/mailer/email.provider';
+} from '../../domain/email/contract/email.interface';
 
 @Injectable()
 export class RegisterUseCase {

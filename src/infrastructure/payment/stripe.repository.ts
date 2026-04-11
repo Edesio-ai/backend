@@ -1,12 +1,12 @@
 import { Inject } from '@nestjs/common';
 import Stripe from 'stripe';
-import { PaymentClientInterface } from '../../interfaces/payment.interface';
+import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
 import { STRIPE_CLIENT } from './stripe.module';
 import { StripeError } from '../../domain/billing/error';
 import { User } from 'src/domain/auth/auth.type';
 import { StripeSession } from 'src/domain/billing/billing.type';
 
-export class StripeRepository implements PaymentClientInterface {
+export class StripeRepository implements StripeClientInterface {
   constructor(
     @Inject(STRIPE_CLIENT)
     private readonly stripeClient: Stripe,

@@ -1,5 +1,5 @@
 import { GetSessionByCodeUseCase } from './get-session-by-code.use-case';
-import { SessionRepository } from '../../interfaces/persistence/session.repository';
+import { SessionRepository } from '../../domain/teaching/interface/session.repository';
 
 describe('GetSessionByCodeUseCase', () => {
   let fixtures: Fixtures;

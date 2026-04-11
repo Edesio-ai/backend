@@ -15,7 +15,7 @@ import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
 import { User } from 'src/domain/auth/auth.type';
-import { Session } from 'src/domain/teaching/session.type';
+import { Session } from 'src/domain/teaching/types/session.type';
 import { CreateSessionUseCase } from 'src/application/session/create-session.use-case';
 import { UpdateSessionNameUseCase } from 'src/application/session/update-session-name.use-case';
 import { GetSessionByCodeUseCase } from 'src/application/session/get-session-by-code.use-case';

@@ -1,5 +1,5 @@
 import { GetCoursesSessionCountUseCase } from './get-courses-session-count.use-case';
-import { CourseRepository } from '../../interfaces/persistence/course.repository';
+import { CourseRepository } from '../../domain/teaching/interface/course.repository';
 
 describe('GetCoursesSessionCountUseCase', () => {
   let fixtures: Fixtures;

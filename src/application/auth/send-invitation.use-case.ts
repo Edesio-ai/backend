@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   EMAIL_PROVIDER,
   type EmailProviderInterface,
-} from '../../interfaces/mailer/email.provider';
-import { EmailBody } from '../../domain/email/email.type';
+} from '../../domain/email/contract/email.interface';
+import { EmailBody } from '../../domain/email/type/email.type';
 
 @Injectable()
 export class SendInvitationUseCase {

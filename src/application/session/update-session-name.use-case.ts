@@ -2,11 +2,11 @@ import { Inject } from '@nestjs/common';
 import {
   Session,
   UpdateSessionNameBody,
-} from '../../domain/teaching/session.type';
+} from '../../domain/teaching/types/session.type';
 import {
   SESSION_REPOSITORY,
   type SessionRepository,
-} from '../../interfaces/persistence/session.repository';
+} from '../../domain/teaching/interface/session.repository';
 
 export class UpdateSessionNameUseCase {
   constructor(

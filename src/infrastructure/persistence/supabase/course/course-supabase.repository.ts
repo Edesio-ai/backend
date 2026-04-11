@@ -1,12 +1,12 @@
 import { Inject } from '@nestjs/common';
 import { SUPABASE_ADMIN } from '../supabase.module';
-import { CourseRepository } from 'src/interfaces/persistence/course.repository';
+import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
 import {
   Course,
   CourseFile,
   CourseFileUpload,
   CreateCourseBody,
-} from 'src/domain/teaching/course.type';
+} from 'src/domain/teaching/types/course.type';
 import { CourseServerError } from 'src/domain/teaching/error';
 
 export class CourseSupabaseRepository implements CourseRepository {

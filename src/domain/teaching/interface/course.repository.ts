@@ -3,7 +3,7 @@ import {
   CourseFile,
   CourseFileUpload,
   CreateCourseBody,
-} from 'src/domain/teaching/course.type';
+} from '../types/course.type';
 
 export const COURSE_REPOSITORY = Symbol('COURSE_REPOSITORY');
 

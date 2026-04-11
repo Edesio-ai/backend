@@ -1,5 +1,5 @@
 import { GetTeacherByUserIdUseCase } from './get-teacher-by-user-id.use-case';
-import { TeacherRepository } from '../../interfaces/persistence/teacher.repository';
+import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
 
 describe('GetTeacherByUserIdUseCase', () => {
   let fixtures: Fixtures;

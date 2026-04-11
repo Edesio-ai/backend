@@ -1,5 +1,5 @@
 import { CreateTeacherUseCase } from './create-teacher.use-case';
-import { TeacherRepository } from 'src/interfaces/persistence/teacher.repository';
+import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
 
 describe('CreateTeacherUseCase', () => {
   let fixtures: Fixtures;

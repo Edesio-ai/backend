@@ -2,9 +2,9 @@ import { GetSubscriptionStatusUseCase } from './get-subscription-status.use-case
 import { User } from '../../domain/auth/auth.type';
 import { EstablishmentNotFoundError } from '../../domain/establishment/error';
 import { TeacherNotFoundError } from '../../domain/teaching/error';
-import { PaymentClientInterface } from '../../interfaces/payment.interface';
-import { EstablishmentRepository } from '../../interfaces/persistence/establishment.repository';
-import { TeacherRepository } from '../../interfaces/persistence/teacher.repository';
+import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
+import { EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
+import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
 
 describe('GetSubscriptionStatusUseCase', () => {
   let fixtures: Fixtures;
@@ -68,7 +68,7 @@ describe('GetSubscriptionStatusUseCase', () => {
 });
 
 class Fixtures {
-  public readonly paymentClient: jest.Mocked<PaymentClientInterface>;
+  public readonly paymentClient: jest.Mocked<StripeClientInterface>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
   public readonly getSubscriptionStatusUseCase: GetSubscriptionStatusUseCase;
@@ -187,7 +187,7 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null as any);
   }
 
   whenEstablishmentFound() {

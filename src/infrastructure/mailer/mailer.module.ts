@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { ResendEmailProvider } from './resend-email.provider';
-import { EMAIL_PROVIDER } from 'src/interfaces/mailer/email.provider';
+import { EMAIL_PROVIDER } from 'src/domain/email/contract/email.interface';
 import { ResendModule } from './resend.module';
 
 @Module({

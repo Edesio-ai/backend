@@ -1,4 +1,4 @@
-import { Teacher } from 'src/domain/teaching/teacher.type';
+import { Teacher } from 'src/domain/teaching/types/teacher.type';
 
 export const TEACHER_REPOSITORY = Symbol('TEACHER_REPOSITORY');
 

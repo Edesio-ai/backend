@@ -13,7 +13,7 @@ import {
   Course,
   CourseFile,
   CourseFileUpload,
-} from 'src/domain/teaching/course.type';
+} from 'src/domain/teaching/types/course.type';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CsrfGuard } from '../../auth/guards/csrf.guard';

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { AuthRepository } from '../../../../interfaces/persistence/auth.repository';
+import { AuthRepository } from '../../../../domain/auth/contract/auth.repository';
 import { SUPABASE_ADMIN } from '../supabase.module';
 import {
   InvitationToken,
@@ -22,7 +22,7 @@ import {
   InvitationTokenCreationError,
 } from '../../../../domain/auth/errors';
 import { User, Session } from '../../../../domain/auth/auth.type';
-import { Teacher } from '../../../../domain/teaching/teacher.type';
+import { Teacher } from '../../../../domain/teaching/types/teacher.type';
 import { UserMetadata } from '../../../../domain/auth/auth.type';
 import { SUPABASE_AUTH } from '../supabase-auth.module';
 

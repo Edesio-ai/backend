@@ -7,7 +7,7 @@ import {
 import {
   AUTH_REPOSITORY,
   type AuthRepository,
-} from 'src/interfaces/persistence/auth.repository';
+} from 'src/domain/auth/contract/auth.repository';
 import { Request } from 'express';
 import { TokenUserNotFoundError } from 'src/domain/auth/errors';
 

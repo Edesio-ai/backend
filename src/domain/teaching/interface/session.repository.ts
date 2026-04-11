@@ -2,7 +2,7 @@ import {
   CreateSessionBody,
   Session,
   UpdateSessionNameBody,
-} from 'src/domain/teaching/session.type';
+} from 'src/domain/teaching/types/session.type';
 
 export const SESSION_REPOSITORY = Symbol('SESSION_REPOSITORY');
 

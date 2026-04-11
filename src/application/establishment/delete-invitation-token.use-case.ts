@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import {
   TOKEN_REPOSITORY,
   type TokenRepository,
-} from '../../interfaces/persistence/token.repository';
+} from '../../domain/token/contract/token.repository';
 
 export class DeleteInvitationTokenUseCase {
   constructor(

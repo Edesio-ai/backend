@@ -1,9 +1,9 @@
 import { Inject } from '@nestjs/common';
-import { Session } from 'src/domain/teaching/session.type';
+import { Session } from 'src/domain/teaching/types/session.type';
 import {
   SESSION_REPOSITORY,
   type SessionRepository,
-} from 'src/interfaces/persistence/session.repository';
+} from 'src/domain/teaching/interface/session.repository';
 
 export class GetSessionByCodeUseCase {
   constructor(

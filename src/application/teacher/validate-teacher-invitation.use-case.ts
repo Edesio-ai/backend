@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/interfaces/persistence/teacher.repository';
+} from 'src/domain/teaching/interface/teacher.repository';
 import {
   TeacherBadRequestError,
   TeacherNotFoundError,
@@ -10,7 +10,7 @@ import {
 import {
   TOKEN_REPOSITORY,
   type TokenRepository,
-} from 'src/interfaces/persistence/token.repository';
+} from 'src/domain/token/contract/token.repository';
 import {
   InvitationTokenAlreadyUsedError,
   InvitationTokenEmailMismatchError,

@@ -1,6 +1,6 @@
 import { CreateCourseUseCase } from './create-course.use-case';
-import { CourseRepository } from '../../interfaces/persistence/course.repository';
-import { CreateCourseBody } from '../../domain/teaching/course.type';
+import { CourseRepository } from '../../domain/teaching/interface/course.repository';
+import { CreateCourseBody } from '../../domain/teaching/types/course.type';
 
 describe('CreateCourseUseCase', () => {
   let fixtures: Fixtures;

@@ -1,4 +1,4 @@
-import { SessionRepository } from '../../interfaces/persistence/session.repository';
+import { SessionRepository } from '../../domain/teaching/interface/session.repository';
 import { UpdateSessionNameUseCase } from './update-session-name.use-case';
 
 describe('UpdateSessionNameUseCase', () => {

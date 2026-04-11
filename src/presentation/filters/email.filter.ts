@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
-import { EmailError } from '../../domain/email/errors';
+import { EmailError } from '../../domain/email/error/email.errors';
 
 @Catch(EmailError)
 export class EmailErrorFilter implements ExceptionFilter {

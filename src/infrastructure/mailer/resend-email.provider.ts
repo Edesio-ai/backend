@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
-import { EmailProviderInterface } from '../../interfaces/mailer/email.provider';
+import { EmailProviderInterface } from '../../domain/email/contract/email.interface';
 import { RESEND_CLIENT } from './resend.module';
 import { buildWelcomeEmailTemplateData } from './templates/welcome/welcome-email.data';
 import { renderWelcomeEmailHtml } from './templates/welcome/welcome-email.renderer';
-import { EmailSendingError } from '../../domain/email/errors';
+import { EmailSendingError } from '../../domain/email/error/email.errors';
 import { buildProfesseurInvitationTemplateData } from './templates/invitation/professeur-invitation-email.data';
 import { renderProfesseurInvitationEmailHtml } from './templates/invitation/professeur-invitation-email.renderer';
 

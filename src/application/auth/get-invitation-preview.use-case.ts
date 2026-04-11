@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   AUTH_REPOSITORY,
   type AuthRepository,
-} from '../../interfaces/persistence/auth.repository';
+} from '../../domain/auth/contract/auth.repository';
 import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
 import { InvitationTokenNotFoundError } from '../../domain/auth/errors';
 

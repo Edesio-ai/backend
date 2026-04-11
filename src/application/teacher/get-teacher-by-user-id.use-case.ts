@@ -2,8 +2,8 @@ import { Inject } from '@nestjs/common';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from '../../interfaces/persistence/teacher.repository';
-import { Teacher } from '../../domain/teaching/teacher.type';
+} from '../../domain/teaching/interface/teacher.repository';
+import { Teacher } from '../../domain/teaching/types/teacher.type';
 
 export class GetTeacherByUserIdUseCase {
   constructor(

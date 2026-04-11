@@ -14,7 +14,7 @@ import { TokenErrorFilter } from 'src/presentation/filters/token.filter';
 import { User } from 'src/domain/auth/auth.type';
 import { CreateTeacherBodyDto } from 'src/presentation/teaching/dto/teacher/create-teacher-body.dto';
 import { CreateTeacherUseCase } from 'src/application/teacher/create-teacher.use-case';
-import { Teacher } from 'src/domain/teaching/teacher.type';
+import { Teacher } from 'src/domain/teaching/types/teacher.type';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { ValidateTeacherInvitationBodyDto } from 'src/presentation/teaching/dto/teacher/validate-teacher-invitation-body.dto';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/validate-teacher-invitation.use-case';

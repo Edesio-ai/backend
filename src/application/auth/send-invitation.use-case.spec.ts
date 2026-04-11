@@ -1,6 +1,6 @@
 import { SendInvitationUseCase } from './send-invitation.use-case';
-import { EmailProviderInterface } from '../../interfaces/mailer/email.provider';
-import { EmailBody } from '../../domain/email/email.type';
+import { EmailProviderInterface } from '../../domain/email/contract/email.interface';
+import { EmailBody } from '../../domain/email/type/email.type';
 
 describe('SendInvitationUseCase', () => {
   let fixtures: Fixtures;

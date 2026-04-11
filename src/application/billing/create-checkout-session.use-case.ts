@@ -4,18 +4,18 @@ import { TokenUserNotFoundError } from '../../domain/auth/errors';
 import {
   SUBSCRIPTION_REPOSITORY,
   type SubscriptionRepository,
-} from '../../interfaces/persistence/subscription.repository';
+} from '../../domain/teaching/interface/subscription.repository';
 import {
-  PAYMENT_CLIENT,
-  type PaymentClientInterface,
-} from '../../interfaces/payment.interface';
+  STRIPE_CLIENT_INTERFACE,
+  type StripeClientInterface,
+} from '../../domain/billing/contracts/stripe-client.interface';
 
 export class CreateCheckoutSessionsUseCase {
   constructor(
     @Inject(SUBSCRIPTION_REPOSITORY)
     private readonly subscriptionRepository: SubscriptionRepository,
-    @Inject(PAYMENT_CLIENT)
-    private readonly paymentClient: PaymentClientInterface,
+    @Inject(STRIPE_CLIENT_INTERFACE)
+    private readonly paymentClient: StripeClientInterface,
   ) {}
 
   async execute(priceId: string, planType: string, user: User): Promise<any> {

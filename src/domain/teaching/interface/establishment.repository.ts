@@ -1,5 +1,5 @@
-import { InvitationToken } from '../../domain/auth/invitation.type';
-import { Establishment } from '../../domain/establishment/establishment.type';
+import { InvitationToken } from '../../auth/invitation.type';
+import { Establishment } from '../../establishment/establishment.type';
 
 export const ESTABLISHMENT_REPOSITORY = Symbol('ESTABLISHMENT_REPOSITORY');
 

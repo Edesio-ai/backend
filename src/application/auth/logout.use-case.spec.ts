@@ -1,5 +1,5 @@
 import { LogoutUseCase } from './logout.use-case';
-import { AuthRepository } from '../../interfaces/persistence/auth.repository';
+import { AuthRepository } from '../../domain/auth/contract/auth.repository';
 
 describe('LogoutUseCase', () => {
   let fixtures: Fixtures;
@@ -41,6 +41,7 @@ class Fixtures {
       loginUser: jest.fn(),
       validateToken: jest.fn(),
       logoutUser: jest.fn(),
+      createInvitationToken: jest.fn(),
     };
 
     this.logoutUseCase = new LogoutUseCase(this.authRepository);

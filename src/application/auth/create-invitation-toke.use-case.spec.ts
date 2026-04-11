@@ -2,7 +2,7 @@ import {
   CreateInvitationTokenBody,
   CreateInvitationTokenUseCase,
 } from './create-invitation-toke.use-case';
-import { AuthRepository } from '../../interfaces/persistence/auth.repository';
+import { AuthRepository } from '../../domain/auth/contract/auth.repository';
 
 describe('CreateInvitationTokenUseCase', () => {
   let fixtures: Fixtures;

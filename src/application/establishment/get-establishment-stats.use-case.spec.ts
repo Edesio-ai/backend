@@ -1,7 +1,7 @@
 import { GetEstablishmentsStatsUseCase } from './get-establishment-stats.use-case';
-import { EstablishmentRepository } from '../../interfaces/persistence/establishment.repository';
-import { TeacherRepository } from '../../interfaces/persistence/teacher.repository';
-import { StudentRepository } from '../../interfaces/persistence/student.repository';
+import { EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
+import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
+import { StudentRepository } from '../../domain/teaching/interface/student.repository';
 
 describe('GetEstablishmentsStatsUseCase', () => {
   let fixtures: Fixtures;
@@ -44,14 +44,21 @@ class Fixtures {
 
   constructor() {
     this.establishmentRepository = {
+      getEstablishmentById: jest.fn(),
       getEstablishmentByUserId: jest.fn(),
+      createEstablishment: jest.fn(),
+      getInvitationTokenByEstablishmentId: jest.fn(),
     };
     this.teacherRepository = {
       getTeacherByEstablishmentId: jest.fn(),
       getTeachersSessionsByIds: jest.fn(),
+      getTeacherByUserId: jest.fn(),
+      linkTeacherToEstablishment: jest.fn(),
+      createTeacher: jest.fn(),
     };
     this.studentRepository = {
       getStudentsSessionsByIds: jest.fn(),
+      deleteStudentSessionsBySessionId: jest.fn(),
     };
 
     this.getEstablishmentsStatsUseCase = new GetEstablishmentsStatsUseCase(

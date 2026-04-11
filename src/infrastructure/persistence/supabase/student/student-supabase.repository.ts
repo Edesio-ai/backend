@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { StudentRepository } from '../../../../interfaces/persistence/student.repository';
+import { StudentRepository } from '../../../../domain/teaching/interface/student.repository';
 import { SUPABASE_ADMIN } from '../supabase.module';
 import { StudentSessionsNotFoundError } from '../../../../domain/teaching/error';
 

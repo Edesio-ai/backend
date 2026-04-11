@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from '../../domain/auth/auth.type';
 import {
-  PAYMENT_CLIENT,
-  type PaymentClientInterface,
-} from '../../interfaces/payment.interface';
+  STRIPE_CLIENT_INTERFACE,
+  type StripeClientInterface,
+} from '../../domain/billing/contracts/stripe-client.interface';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/interfaces/persistence/teacher.repository';
+} from 'src/domain/teaching/interface/teacher.repository';
 import {
   ESTABLISHMENT_REPOSITORY,
   type EstablishmentRepository,
-} from 'src/interfaces/persistence/establishment.repository';
+} from '../../domain/teaching/interface/establishment.repository';
 import { TeacherNotFoundError } from 'src/domain/teaching/error';
 import { EstablishmentNotFoundError } from 'src/domain/establishment/error';
 
@@ -19,8 +19,8 @@ import { EstablishmentNotFoundError } from 'src/domain/establishment/error';
 export class GetSubscriptionStatusUseCase {
   $;
   constructor(
-    @Inject(PAYMENT_CLIENT)
-    private readonly paymentClient: PaymentClientInterface,
+    @Inject(STRIPE_CLIENT_INTERFACE)
+    private readonly paymentClient: StripeClientInterface,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
     @Inject(ESTABLISHMENT_REPOSITORY)

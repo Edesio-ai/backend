@@ -6,8 +6,8 @@ import {
   InvitationTokenNotFoundError,
 } from 'src/domain/auth/errors';
 import { TeacherNotFoundError } from 'src/domain/teaching/error';
-import { TeacherRepository } from 'src/interfaces/persistence/teacher.repository';
-import { TokenRepository } from 'src/interfaces/persistence/token.repository';
+import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
+import { TokenRepository } from 'src/domain/token/contract/token.repository';
 import { ValidateTeacherInvitationUseCase } from './validate-teacher-invitation.use-case';
 
 describe('ValidateTeacherInvitationUseCase', () => {

@@ -1,5 +1,5 @@
 import { ResendEmailProvider } from './resend-email.provider';
-import { EmailSendingError } from '../../domain/email/errors';
+import { EmailSendingError } from '../../domain/email/error/email.errors';
 
 describe('ResendEmailProvider', () => {
   let fixtures: Fixtures;

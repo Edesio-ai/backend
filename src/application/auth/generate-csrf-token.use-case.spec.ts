@@ -1,5 +1,5 @@
 import { GenerateCsrfTokenUseCase } from './generate-csrf-token.use-case';
-import { TokenGeneratorProvider } from '../../interfaces/security/token-generator.provider';
+import { TokenGeneratorProvider } from '../../domain/shared/security/interface/token-generator.provider';
 
 describe('GenerateCsrfTokenUseCase', () => {
   let fixtures: Fixtures;

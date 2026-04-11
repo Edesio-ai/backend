@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import {
   AUTH_REPOSITORY,
   type AuthRepository,
-} from '../../interfaces/persistence/auth.repository';
+} from '../../domain/auth/contract/auth.repository';
 
 export type CreateInvitationTokenBody = {
   establishmentId: string;

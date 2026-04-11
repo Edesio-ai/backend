@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
-import { TOKEN_GENERATOR } from '../../interfaces/security/token-generator.provider';
-import type { TokenGeneratorProvider } from '../../interfaces/security/token-generator.provider';
+import { TOKEN_GENERATOR } from '../../domain/shared/security/interface/token-generator.provider';
+import type { TokenGeneratorProvider } from '../../domain/shared/security/interface/token-generator.provider';
 
 export type CsrfTokenPayload = {
   csrfToken: string;

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PAYMENT_CLIENT } from '../../interfaces/payment.interface';
+import { STRIPE_CLIENT_INTERFACE } from '../../domain/billing/contracts/stripe-client.interface';
 import { StripeRepository } from './stripe.repository';
 import { StripeModule } from './stripe.module';
 
@@ -7,10 +7,10 @@ import { StripeModule } from './stripe.module';
   imports: [StripeModule],
   providers: [
     {
-      provide: PAYMENT_CLIENT,
+      provide: STRIPE_CLIENT_INTERFACE,
       useClass: StripeRepository,
     },
   ],
-  exports: [PAYMENT_CLIENT],
+  exports: [STRIPE_CLIENT_INTERFACE],
 })
 export class PaymentModule {}

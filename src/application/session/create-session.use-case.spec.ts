@@ -1,6 +1,6 @@
 import { CreateSessionUseCase } from './create-session.use-case';
-import { SessionRepository } from '../../interfaces/persistence/session.repository';
-import { CreateSessionBody } from '../../domain/teaching/session.type';
+import { SessionRepository } from '../../domain/teaching/interface/session.repository';
+import { CreateSessionBody } from '../../domain/teaching/types/session.type';
 
 describe('CreateSessionUseCase', () => {
   let fixtures: Fixtures;

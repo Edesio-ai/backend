@@ -1,5 +1,5 @@
 import { GetInvitationTokenUseCase } from './get-invitation-token.use-case';
-import { EstablishmentRepository } from '../../interfaces/persistence/establishment.repository';
+import { EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
 import { InvitationToken } from '../../domain/auth/invitation.type';
 import { EstablishmentIdNotFoundError } from '../../domain/establishment/error';
 
@@ -46,10 +46,11 @@ class Fixtures {
 
   constructor() {
     this.establishmentRepository = {
+      getEstablishmentById: jest.fn(),
       getEstablishmentByUserId: jest.fn(),
-      createEstablishment: jest.fn(),
       getInvitationTokenByEstablishmentId: jest.fn(),
-    };
+      createEstablishment: jest.fn(),
+    } as any;
 
     this.getInvitationTokenUseCase = new GetInvitationTokenUseCase(
       this.establishmentRepository,

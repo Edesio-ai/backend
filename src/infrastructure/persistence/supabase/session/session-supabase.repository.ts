@@ -1,11 +1,11 @@
 import { Inject } from '@nestjs/common';
 import { SUPABASE_ADMIN } from '../supabase.module';
-import { SessionRepository } from '../../../../interfaces/persistence/session.repository';
+import { SessionRepository } from '../../../../domain/teaching/interface/session.repository';
 import {
   CreateSessionBody,
   Session,
   UpdateSessionNameBody,
-} from '../../../../domain/teaching/session.type';
+} from '../../../../domain/teaching/types/session.type';
 import { SessionServerError } from '../../../../domain/teaching/error';
 
 export class SupabaseSessionRepository implements SessionRepository {
