@@ -11,6 +11,7 @@ import { CoursePersistenceModule } from 'src/infrastructure/persistence/supabase
 import { DeleteSessionUseCase } from 'src/application/session/delete-session.use-case';
 import { QuestionPersistenceModule } from 'src/infrastructure/persistence/supabase/question/question-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/persistence/supabase/student/student-persistence.module';
+import { GetCoursesSessionCountUseCase } from 'src/application/session/get-courses-session-count.use-case';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { StudentPersistenceModule } from 'src/infrastructure/persistence/supabas
     UpdateSessionNameUseCase,
     GetSessionByCodeUseCase,
     DeleteSessionUseCase,
+    GetCoursesSessionCountUseCase,
   ],
 })
 export class SessionModule {}

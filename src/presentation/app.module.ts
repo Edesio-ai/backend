@@ -5,6 +5,7 @@ import { EstablishmentModule } from './establishment/establishment.module';
 import { BillingModule } from './billing/billing.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { SessionModule } from './session/session.module';
+import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SessionModule } from './session/session.module';
     BillingModule,
     TeacherModule,
     SessionModule,
+    CourseModule,
   ],
   controllers: [],
   providers: [],

@@ -1,5 +1,6 @@
 import { CourseServerError } from 'src/domain/teaching/error';
 import { CourseSupabaseRepository } from './course-supabase.repository';
+import { CreateCourseBody } from 'src/domain/teaching/course.type';
 
 describe('CourseSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -74,6 +75,74 @@ describe('CourseSupabaseRepository', () => {
 
     await fixtures.thenThrowCourseServerError(promise);
   });
+
+  it('should return count for getSessionCoursesCount', async () => {
+    fixtures.whenSessionCoursesCountSucceeds(7);
+
+    const result = await fixtures.whenGetSessionCoursesCount();
+
+    expect(result).toBe(7);
+    fixtures.thenSessionCoursesCountQueryBuilt();
+  });
+
+  it('should throw CourseServerError when getSessionCoursesCount fails', async () => {
+    fixtures.whenSessionCoursesCountFails();
+
+    const promise = fixtures.whenGetSessionCoursesCount();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
+
+  it('should create course with mapped columns', async () => {
+    fixtures.whenCreateCourseSucceeds();
+
+    const result = await fixtures.whenCreateCourse();
+
+    fixtures.thenCreateCourseInsertBuilt();
+    fixtures.thenReturnsCreatedCourse(result);
+  });
+
+  it('should throw CourseServerError when createCourse fails', async () => {
+    fixtures.whenCreateCourseFails();
+
+    const promise = fixtures.whenCreateCourse();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
+
+  it('should upload file to storage', async () => {
+    fixtures.whenUploadSucceeds();
+
+    await fixtures.whenStoreCourseFile();
+
+    fixtures.thenUploadBuiltWithExpectedArgs();
+  });
+
+  it('should throw CourseServerError when upload fails', async () => {
+    fixtures.whenUploadFails();
+
+    const promise = fixtures.whenStoreCourseFile();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
+
+  it('should insert course file row', async () => {
+    fixtures.whenInsertCourseFileSucceeds();
+
+    const result = await fixtures.whenInsertCourseFile();
+
+    fixtures.thenInsertCourseFileBuilt();
+    fixtures.thenReturnsInsertedCourseFile(result);
+  });
+
+  it('should remove uploaded file and throw when insertCourseFile fails', async () => {
+    fixtures.whenInsertCourseFileFails();
+
+    const promise = fixtures.whenInsertCourseFile();
+
+    await fixtures.thenThrowCourseServerError(promise);
+    fixtures.thenRemoveCalledAfterInsertFailure();
+  });
 });
 
 class Fixtures {
@@ -81,14 +150,61 @@ class Fixtures {
   public readonly courseIds = ['course-1', 'course-2'];
   public readonly coursesData = [{ id: 'course-1' }, { id: 'course-2' }];
 
+  public readonly createBody: CreateCourseBody = {
+    sessionId: 'session-1',
+    title: 'Titre',
+    description: 'D',
+    contentText: 'Contenu',
+  };
+
+  public readonly createdRow = {
+    id: 'new-course',
+    session_id: this.createBody.sessionId,
+    title: this.createBody.title,
+    description: this.createBody.description,
+    text_content: this.createBody.contentText,
+    created_at: '2026-01-01T00:00:00.000Z',
+  };
+
+  public readonly courseId = 'course-1';
+  public readonly storagePath = 'course-1/doc.pdf';
+  public readonly fileUpload = {
+    buffer: Buffer.from('x'),
+    originalFileName: 'doc.pdf',
+    mimeType: 'application/pdf',
+    byteLength: 1,
+  };
+
+  public readonly insertedCourseFileRow = {
+    id: 'cf-1',
+    course_id: this.courseId,
+    file_url: this.storagePath,
+    file_name: 'doc.pdf',
+    created_at: '2026-01-01T00:00:00.000Z',
+  };
+
   private readonly coursesListEqMock = jest.fn();
-  private readonly coursesSelectMock = jest.fn(() => ({
-    eq: this.coursesListEqMock,
-  }));
+  private readonly coursesCountEqMock = jest.fn();
+  private readonly coursesSelectMock = jest.fn(
+    (first: string, second?: object) => {
+      if (second && typeof second === 'object' && 'count' in second) {
+        return { eq: this.coursesCountEqMock };
+      }
+      return { eq: this.coursesListEqMock };
+    },
+  );
 
   private readonly coursesDeleteEqMock = jest.fn();
   private readonly coursesDeleteMock = jest.fn(() => ({
     eq: this.coursesDeleteEqMock,
+  }));
+
+  private readonly coursesInsertSingleMock = jest.fn();
+  private readonly coursesInsertSelectMock = jest.fn(() => ({
+    single: this.coursesInsertSingleMock,
+  }));
+  private readonly coursesInsertMock = jest.fn(() => ({
+    select: this.coursesInsertSelectMock,
   }));
 
   private readonly courseFilesEqMock = jest.fn();
@@ -96,9 +212,19 @@ class Fixtures {
     eq: this.courseFilesEqMock,
   }));
 
+  private readonly courseFilesInsertSingleMock = jest.fn();
+  private readonly courseFilesInsertSelectMock = jest.fn(() => ({
+    single: this.courseFilesInsertSingleMock,
+  }));
+  private readonly courseFilesInsertMock = jest.fn(() => ({
+    select: this.courseFilesInsertSelectMock,
+  }));
+
   public readonly removeMock = jest.fn();
+  public readonly uploadMock = jest.fn();
   private readonly storageFromMock = jest.fn(() => ({
     remove: this.removeMock,
+    upload: this.uploadMock,
   }));
 
   private readonly fromMock = jest.fn((table: string) => {
@@ -106,10 +232,14 @@ class Fixtures {
       return {
         select: this.coursesSelectMock,
         delete: this.coursesDeleteMock,
+        insert: this.coursesInsertMock,
       };
     }
     if (table === 'course_files') {
-      return { select: this.courseFilesSelectMock };
+      return {
+        select: this.courseFilesSelectMock,
+        insert: this.courseFilesInsertMock,
+      };
     }
     throw new Error(`unexpected table: ${table}`);
   });
@@ -134,6 +264,30 @@ class Fixtures {
 
   whenDeleteCoursesFilesByCourseIds() {
     return this.repository.deleteCoursesFilesByCourseIds(this.courseIds);
+  }
+
+  whenGetSessionCoursesCount() {
+    return this.repository.getSessionCoursesCount(this.sessionId);
+  }
+
+  whenCreateCourse() {
+    return this.repository.createCourse(this.createBody);
+  }
+
+  whenStoreCourseFile() {
+    return this.repository.storeCourseFile(
+      this.courseId,
+      this.fileUpload as any,
+      this.storagePath,
+    );
+  }
+
+  whenInsertCourseFile() {
+    return this.repository.insertCourseFile(
+      this.courseId,
+      this.fileUpload as any,
+      this.storagePath,
+    );
   }
 
   whenGetCoursesSucceeds() {
@@ -197,6 +351,56 @@ class Fixtures {
     });
   }
 
+  whenSessionCoursesCountSucceeds(count: number) {
+    this.coursesCountEqMock.mockResolvedValue({ count, error: null });
+  }
+
+  whenSessionCoursesCountFails() {
+    this.coursesCountEqMock.mockResolvedValue({
+      count: null,
+      error: { message: 'count failed' },
+    });
+  }
+
+  whenCreateCourseSucceeds() {
+    this.coursesInsertSingleMock.mockResolvedValue({
+      data: this.createdRow,
+      error: null,
+    });
+  }
+
+  whenCreateCourseFails() {
+    this.coursesInsertSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'insert course failed' },
+    });
+  }
+
+  whenUploadSucceeds() {
+    this.uploadMock.mockResolvedValue({ error: null });
+  }
+
+  whenUploadFails() {
+    this.uploadMock.mockResolvedValue({
+      error: { message: 'Bucket not found' },
+    });
+  }
+
+  whenInsertCourseFileSucceeds() {
+    this.courseFilesInsertSingleMock.mockResolvedValue({
+      data: this.insertedCourseFileRow,
+      error: null,
+    });
+  }
+
+  whenInsertCourseFileFails() {
+    this.courseFilesInsertSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'insert row failed' },
+    });
+    this.removeMock.mockResolvedValue({ error: null });
+  }
+
   async thenThrowCourseServerError(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(CourseServerError);
   }
@@ -227,5 +431,60 @@ class Fixtures {
     expect(this.storageFromMock).toHaveBeenCalledWith('courses-pdf');
     expect(this.removeMock).toHaveBeenCalledWith(['a.pdf', 'b.pdf']);
     expect(this.removeMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenSessionCoursesCountQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('courses');
+    expect(this.coursesSelectMock).toHaveBeenCalledWith('*', {
+      count: 'exact',
+      head: true,
+    });
+    expect(this.coursesCountEqMock).toHaveBeenCalledWith(
+      'session_id',
+      this.sessionId,
+    );
+  }
+
+  thenCreateCourseInsertBuilt() {
+    expect(this.coursesInsertMock).toHaveBeenCalledWith({
+      session_id: this.createBody.sessionId,
+      title: this.createBody.title,
+      description: this.createBody.description,
+      text_content: this.createBody.contentText,
+    });
+    expect(this.coursesInsertSelectMock).toHaveBeenCalledTimes(1);
+    expect(this.coursesInsertSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenReturnsCreatedCourse(result: unknown) {
+    expect(result).toEqual(this.createdRow);
+  }
+
+  thenUploadBuiltWithExpectedArgs() {
+    expect(this.storageFromMock).toHaveBeenCalledWith('courses-pdf');
+    expect(this.uploadMock).toHaveBeenCalledWith(
+      this.storagePath,
+      this.fileUpload.buffer,
+      {
+        contentType: this.fileUpload.mimeType,
+        upsert: false,
+      },
+    );
+  }
+
+  thenInsertCourseFileBuilt() {
+    expect(this.courseFilesInsertMock).toHaveBeenCalledWith({
+      course_id: this.courseId,
+      file_url: this.storagePath,
+      file_name: this.fileUpload.originalFileName,
+    });
+  }
+
+  thenReturnsInsertedCourseFile(result: unknown) {
+    expect(result).toEqual(this.insertedCourseFileRow);
+  }
+
+  thenRemoveCalledAfterInsertFailure() {
+    expect(this.removeMock).toHaveBeenCalledWith([this.storagePath]);
   }
 }
