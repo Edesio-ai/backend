@@ -22,6 +22,7 @@ import { UpdateSessionBodyDto } from '../teacher/dto/uppdate-session-body.dto';
 import { UpdateSessionNameUseCase } from 'src/application/session/update-session-name.use-case';
 import { GetSessionByCodeUseCase } from 'src/application/session/get-session-by-code.use-case';
 import { DeleteSessionUseCase } from 'src/application/session/delete-session.use-case';
+import { GetCoursesSessionCountUseCase } from 'src/application/session/get-courses-session-count.use-case';
 
 @Controller('session')
 export class SessionController {
@@ -31,6 +32,7 @@ export class SessionController {
     private readonly updateSessionNameUseCase: UpdateSessionNameUseCase,
     private readonly getSessionByCodeUseCase: GetSessionByCodeUseCase,
     private readonly deleteSessionUseCase: DeleteSessionUseCase,
+    private readonly getCoursesSessionCountUseCase: GetCoursesSessionCountUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard, CsrfGuard)
@@ -89,5 +91,15 @@ export class SessionController {
     return {
       session,
     };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('teacher')
+  @Get('/:sessionId/courses-count')
+  async getCoursesSessionCount(
+    @Param('sessionId') sessionId: string,
+  ): Promise<{ count: number }> {
+    const count = await this.getCoursesSessionCountUseCase.execute(sessionId);
+    return { count: count };
   }
 }
