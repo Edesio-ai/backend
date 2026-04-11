@@ -4,7 +4,7 @@ import {
   AUTH_REPOSITORY,
   type AuthRepository,
 } from '../../domain/auth/contract/auth.repository';
-import { RegisterBody, UserMetadata } from '../../domain/auth/auth.type';
+import { RegisterBody, UserMetadata } from '../../domain/auth/types/auth.type';
 import {
   EMAIL_PROVIDER,
   type EmailProviderInterface,

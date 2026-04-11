@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
-import { User } from '../../domain/auth/auth.type';
-import { TokenUserNotFoundError } from '../../domain/auth/errors';
+import { User } from '../../domain/auth/types/auth.type';
+import { TokenUserNotFoundError } from '../../domain/auth/errors/auth.errors';
 import {
   SUBSCRIPTION_REPOSITORY,
   type SubscriptionRepository,

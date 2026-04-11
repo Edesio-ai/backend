@@ -3,7 +3,7 @@ import {
   EstablishmentCreationFailedError,
   EstablishmentNotFoundError,
 } from '../../../../domain/establishment/error';
-import { InvitationTokenNotFoundError } from '../../../../domain/auth/errors';
+import { InvitationTokenNotFoundError } from '../../../../domain/auth/errors/auth.errors';
 
 describe('EstablishmentSupabaseRepository', () => {
   let fixtures: Fixtures;

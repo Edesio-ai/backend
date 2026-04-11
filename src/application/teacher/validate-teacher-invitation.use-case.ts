@@ -4,7 +4,6 @@ import {
   type TeacherRepository,
 } from 'src/domain/teaching/interface/teacher.repository';
 import {
-  TeacherBadRequestError,
   TeacherNotFoundError,
 } from 'src/domain/teaching/error';
 import {
@@ -16,7 +15,7 @@ import {
   InvitationTokenEmailMismatchError,
   InvitationTokenExpiredError,
   InvitationTokenNotFoundError,
-} from 'src/domain/auth/errors';
+} from 'src/domain/auth/errors/auth.errors';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 
 @Injectable()

@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
 import { STRIPE_CLIENT } from './stripe.module';
 import { StripeError } from '../../domain/billing/error';
-import { User } from 'src/domain/auth/auth.type';
+import { User } from 'src/domain/auth/types/auth.type';
 import { StripeSession } from 'src/domain/billing/billing.type';
 
 export class StripeRepository implements StripeClientInterface {

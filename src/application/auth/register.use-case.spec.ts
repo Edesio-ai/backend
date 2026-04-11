@@ -1,7 +1,7 @@
 import { RegisterUseCase } from './register.use-case';
 import { AuthRepository } from '../../interfaces/persistence/auth.repository';
 import { EmailProviderInterface } from '../../domain/email/contract/email.interface';
-import { RegisterBody } from '../../domain/auth/auth.type';
+import { RegisterBody } from '../../domain/auth/types/auth.type';
 
 describe('RegisterUseCase', () => {
   let fixtures: Fixtures;

@@ -1,7 +1,7 @@
 import { GetInvitationPreviewUseCase } from './get-invitation-preview.use-case';
 import { AuthRepository } from '../../interfaces/persistence/auth.repository';
 import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
-import { InvitationTokenNotFoundError } from '../../domain/auth/errors';
+import { InvitationTokenNotFoundError } from '../../domain/auth/errors/auth.errors';
 
 describe('GetInvitationPreviewUseCase', () => {
   let fixtures: Fixtures;

@@ -1,6 +1,6 @@
 import { GetUserSessionUseCase } from './get-user-session.use-case';
 import { AuthRepository } from '../../interfaces/persistence/auth.repository';
-import { User } from '../../domain/auth/auth.type';
+import { User } from '../../domain/auth/types/auth.type';
 
 describe('GetUserSessionUseCase', () => {
   let fixtures: Fixtures;

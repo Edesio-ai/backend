@@ -7,7 +7,7 @@ import {
   EstablishmentNotFoundError,
 } from '../../../../domain/establishment/error';
 import { Establishment } from '../../../../domain/establishment/establishment.type';
-import { InvitationTokenNotFoundError } from '../../../../domain/auth/errors';
+import { InvitationTokenNotFoundError } from '../../../../domain/auth/errors/auth.errors';
 import { InvitationToken } from '../../../../domain/auth/invitation.type';
 
 export class EstablishmentSupabaseRepository implements EstablishmentRepository {

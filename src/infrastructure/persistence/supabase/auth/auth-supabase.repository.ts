@@ -20,10 +20,10 @@ import {
   TokenUserNotFoundError,
   LogoutError,
   InvitationTokenCreationError,
-} from '../../../../domain/auth/errors';
-import { User, Session } from '../../../../domain/auth/auth.type';
+} from '../../../../domain/auth/errors/auth.errors';
+import { User, Session } from '../../../../domain/auth/types/auth.type';
 import { Teacher } from '../../../../domain/teaching/types/teacher.type';
-import { UserMetadata } from '../../../../domain/auth/auth.type';
+import { UserMetadata } from '../../../../domain/auth/types/auth.type';
 import { SUPABASE_AUTH } from '../supabase-auth.module';
 
 @Injectable()

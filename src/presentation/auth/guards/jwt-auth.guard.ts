@@ -9,7 +9,7 @@ import {
   type AuthRepository,
 } from 'src/domain/auth/contract/auth.repository';
 import { Request } from 'express';
-import { TokenUserNotFoundError } from 'src/domain/auth/errors';
+import { TokenUserNotFoundError } from 'src/domain/auth/errors/auth.errors';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

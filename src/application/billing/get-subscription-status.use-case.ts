@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { User } from '../../domain/auth/auth.type';
+import { User } from '../../domain/auth/types/auth.type';
 import {
   STRIPE_CLIENT_INTERFACE,
   type StripeClientInterface,

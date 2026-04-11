@@ -1,4 +1,4 @@
-import { User } from 'src/domain/auth/auth.type';
+import { User } from 'src/domain/auth/types/auth.type';
 import { StripeSession } from 'src/domain/billing/billing.type';
 
 export const STRIPE_CLIENT_INTERFACE = Symbol('STRIPE_CLIENT_INTERFACE');

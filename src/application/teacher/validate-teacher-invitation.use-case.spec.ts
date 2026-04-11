@@ -4,7 +4,7 @@ import {
   InvitationTokenEmailMismatchError,
   InvitationTokenExpiredError,
   InvitationTokenNotFoundError,
-} from 'src/domain/auth/errors';
+} from 'src/domain/auth/errors/auth.errors';
 import { TeacherNotFoundError } from 'src/domain/teaching/error';
 import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
 import { TokenRepository } from 'src/domain/token/contract/token.repository';

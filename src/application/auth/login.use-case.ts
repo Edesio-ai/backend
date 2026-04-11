@@ -4,7 +4,7 @@ import {
   AUTH_REPOSITORY,
   type AuthRepository,
 } from '../../domain/auth/contract/auth.repository';
-import { AuthSession, LoginBody } from '../../domain/auth/auth.type';
+import { AuthSession, LoginBody } from '../../domain/auth/types/auth.type';
 
 export class LoginUseCase {
   constructor(

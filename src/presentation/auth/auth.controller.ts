@@ -21,7 +21,7 @@ import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
 import {
   AuthSession,
   GetUserSessionResponse,
-} from '../../domain/auth/auth.type';
+} from '../../domain/auth/types/auth.type';
 import { AuthErrorFilter } from '../filters/auth.filter';
 import { EmailErrorFilter } from '../filters/email.filter';
 import { Roles } from './decorator/role.decorator';

@@ -1,5 +1,5 @@
 import { GetSubscriptionStatusUseCase } from './get-subscription-status.use-case';
-import { User } from '../../domain/auth/auth.type';
+import { User } from '../../domain/auth/types/auth.type';
 import { EstablishmentNotFoundError } from '../../domain/establishment/error';
 import { TeacherNotFoundError } from '../../domain/teaching/error';
 import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';

@@ -14,7 +14,7 @@ import { GetEstablishmentsStatsUseCase } from '../../../application/establishmen
 import { Roles } from '../../auth/decorator/role.decorator';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
-import { User } from '../../../domain/auth/auth.type';
+import { User } from '../../../domain/auth/types/auth.type';
 import { EstablishmentErrorFilter } from '../../filters/establishment.filter';
 import { TeacherErrorFilter } from '../../filters/teacher.filter';
 import { CreateEstablishmentUseCase } from '../../../application/establishment/create-establishment.use-case';

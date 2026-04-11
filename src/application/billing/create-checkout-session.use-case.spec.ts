@@ -1,8 +1,8 @@
 import { CreateCheckoutSessionsUseCase } from './create-checkout-session.use-case';
 import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
 import { SubscriptionRepository } from '../../domain/teaching/interface/subscription.repository';
-import { User } from '../../domain/auth/auth.type';
-import { TokenUserNotFoundError } from '../../domain/auth/errors';
+import { User } from '../../domain/auth/types/auth.type';
+import { TokenUserNotFoundError } from '../../domain/auth/errors/auth.errors';
 
 describe('CreateCheckoutSessionsUseCase', () => {
   let fixtures: Fixtures;

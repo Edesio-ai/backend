@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { GetSubscriptionStatusUseCase } from '../../application/billing/get-subscription-status.use-case';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { User } from '../../domain/auth/auth.type';
+import { User } from '../../domain/auth/types/auth.type';
 import { BillingErrorFilter } from '../filters/billing.filter';
 import { CsrfGuard } from '../auth/guards/csrf.guard';
 import { CreateCheckoutSessionsUseCase } from '../../application/billing/create-checkout-session.use-case';

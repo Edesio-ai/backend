@@ -1,4 +1,4 @@
-import { UserMetadata, Session, User } from '../auth.type';
+import { UserMetadata, Session, User } from '../types/auth.type';
 import { InvitationToken, InvitationTokenPreview } from '../invitation.type';
 
 export const AUTH_REPOSITORY = Symbol('AUTH_REPOSITORY');

@@ -11,7 +11,7 @@ import { GetTeacherByUserIdUseCase } from 'src/application/teacher/get-teacher-b
 import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { TokenErrorFilter } from 'src/presentation/filters/token.filter';
-import { User } from 'src/domain/auth/auth.type';
+import { User } from 'src/domain/auth/types/auth.type';
 import { CreateTeacherBodyDto } from 'src/presentation/teaching/dto/teacher/create-teacher-body.dto';
 import { CreateTeacherUseCase } from 'src/application/teacher/create-teacher.use-case';
 import { Teacher } from 'src/domain/teaching/types/teacher.type';

@@ -4,7 +4,7 @@ import { ServerTokenError } from '../../../../domain/token/token.error';
 import { SUPABASE_ADMIN } from '../supabase.module';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { TokenRepository } from 'src/domain/token/contract/token.repository';
-import { InvitationTokenBadRequestError } from 'src/domain/auth/errors';
+import { InvitationTokenBadRequestError } from 'src/domain/auth/errors/auth.errors';
 
 export class TokenSupabaseRepository implements TokenRepository {
   constructor(

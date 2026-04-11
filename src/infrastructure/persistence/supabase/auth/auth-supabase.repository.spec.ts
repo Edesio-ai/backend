@@ -16,8 +16,8 @@ import {
   TeacherProfileCreationError,
   TokenUpdateError,
   UserLoginError,
-} from '../../../../domain/auth/errors';
-import { Session } from '../../../../domain/auth/auth.type';
+} from '../../../../domain/auth/errors/auth.errors';
+import { Session } from '../../../../domain/auth/types/auth.type';
 
 describe('AuthSupabaseRepository', () => {
   describe('getInvitationPreview', () => {
