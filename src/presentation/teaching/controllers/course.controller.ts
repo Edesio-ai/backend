@@ -14,12 +14,12 @@ import {
   CourseFile,
   CourseFileUpload,
 } from 'src/domain/teaching/course.type';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CsrfGuard } from '../auth/guards/csrf.guard';
-import { Roles } from '../auth/decorator/role.decorator';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { CsrfGuard } from '../../auth/guards/csrf.guard';
+import { Roles } from '../../auth/decorator/role.decorator';
 import { CreateCourseUseCase } from 'src/application/course/create-course.use-case';
-import { CreateCourseBodyDto } from './dto/create-course-body.dto';
+import { CreateCourseBodyDto } from '../dto/course/create-course-body.dto';
 import { UploadCourseFileUseCase } from 'src/application/course/upload-course-file.use-case';
 
 @Controller('course')

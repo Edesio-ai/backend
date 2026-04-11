@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SessionController } from './session.controller';
+import { SessionController } from '../controllers/session.controller';
 import { AuthPersistenceModule } from 'src/infrastructure/persistence/supabase/auth/auth-persistence.module';
 import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
 import { TeacherPersistenceModule } from 'src/infrastructure/persistence/supabase/teacher/teacher-persistence.module';

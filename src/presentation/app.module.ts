@@ -1,11 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { EstablishmentModule } from './establishment/establishment.module';
 import { BillingModule } from './billing/billing.module';
-import { TeacherModule } from './teacher/teacher.module';
-import { SessionModule } from './session/session.module';
-import { CourseModule } from './course/course.module';
+import { TeachingModule } from './teaching/teaching.module';
 
 @Module({
   imports: [
@@ -14,11 +11,8 @@ import { CourseModule } from './course/course.module';
       envFilePath: '.env',
     }),
     AuthModule,
-    EstablishmentModule,
     BillingModule,
-    TeacherModule,
-    SessionModule,
-    CourseModule,
+    TeachingModule,
   ],
   controllers: [],
   providers: [],

@@ -10,24 +10,24 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { GetEstablishmentsStatsUseCase } from '../../application/establishment/get-establishment-stats.use-case';
-import { Roles } from '../auth/decorator/role.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { User } from '../../domain/auth/auth.type';
-import { EstablishmentErrorFilter } from '../filters/establishment.filter';
-import { TeacherErrorFilter } from '../filters/teacher.filter';
-import { CreateEstablishmentUseCase } from '../../application/establishment/create-establishment.use-case';
-import { CreateEstablishmentBodyDto } from './dto/create-establishment.dto';
+import { GetEstablishmentsStatsUseCase } from '../../../application/establishment/get-establishment-stats.use-case';
+import { Roles } from '../../auth/decorator/role.decorator';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { User } from '../../../domain/auth/auth.type';
+import { EstablishmentErrorFilter } from '../../filters/establishment.filter';
+import { TeacherErrorFilter } from '../../filters/teacher.filter';
+import { CreateEstablishmentUseCase } from '../../../application/establishment/create-establishment.use-case';
+import { CreateEstablishmentBodyDto } from '../dto/establishment/create-establishment.dto';
 import {
   Establishment,
   EstablishmentStats,
-} from '../../domain/establishment/establishment.type';
-import { GetInvitationTokenUseCase } from '../../application/establishment/get-invitation-token.use-case';
-import { InvitationToken } from '../../domain/auth/invitation.type';
-import { CsrfGuard } from '../auth/guards/csrf.guard';
+} from '../../../domain/establishment/establishment.type';
+import { GetInvitationTokenUseCase } from '../../../application/establishment/get-invitation-token.use-case';
+import { InvitationToken } from '../../../domain/auth/invitation.type';
+import { CsrfGuard } from '../../auth/guards/csrf.guard';
 import { DeleteInvitationTokenUseCase } from 'src/application/establishment/delete-invitation-token.use-case';
-import { TokenErrorFilter } from '../filters/token.filter';
+import { TokenErrorFilter } from '../../filters/token.filter';
 
 @Controller('establishment')
 export class EstablishmentController {

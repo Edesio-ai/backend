@@ -9,20 +9,20 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Roles } from '../auth/decorator/role.decorator';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { CsrfGuard } from '../auth/guards/csrf.guard';
+import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
+import { Roles } from 'src/presentation/auth/decorator/role.decorator';
+import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
+import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
 import { User } from 'src/domain/auth/auth.type';
 import { Session } from 'src/domain/teaching/session.type';
-import { CreateSessionBodyDto } from '../teacher/dto/create-session.dto';
 import { CreateSessionUseCase } from 'src/application/session/create-session.use-case';
-import { UpdateSessionBodyDto } from '../teacher/dto/uppdate-session-body.dto';
 import { UpdateSessionNameUseCase } from 'src/application/session/update-session-name.use-case';
 import { GetSessionByCodeUseCase } from 'src/application/session/get-session-by-code.use-case';
 import { DeleteSessionUseCase } from 'src/application/session/delete-session.use-case';
 import { GetCoursesSessionCountUseCase } from 'src/application/session/get-courses-session-count.use-case';
+import { CreateSessionBodyDto } from '../dto/session/create-session.dto';
+import { UpdateSessionBodyDto } from '../dto/session/uppdate-session-body.dto';
 
 @Controller('session')
 export class SessionController {

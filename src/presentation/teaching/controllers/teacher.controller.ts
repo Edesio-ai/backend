@@ -8,18 +8,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { GetTeacherByUserIdUseCase } from 'src/application/teacher/get-teacher-by-user-id.use-case';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorator/role.decorator';
-import { TokenErrorFilter } from '../filters/token.filter';
+import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
+import { Roles } from 'src/presentation/auth/decorator/role.decorator';
+import { TokenErrorFilter } from 'src/presentation/filters/token.filter';
 import { User } from 'src/domain/auth/auth.type';
-import { CreateTeacherBodyDto } from './dto/create-teacher-body.dto';
+import { CreateTeacherBodyDto } from 'src/presentation/teaching/dto/teacher/create-teacher-body.dto';
 import { CreateTeacherUseCase } from 'src/application/teacher/create-teacher.use-case';
 import { Teacher } from 'src/domain/teaching/teacher.type';
-import { CsrfGuard } from '../auth/guards/csrf.guard';
-import { ValidateTeacherInvitationBodyDto } from './dto/validate-teacher-invitation-body.dto';
+import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
+import { ValidateTeacherInvitationBodyDto } from 'src/presentation/teaching/dto/teacher/validate-teacher-invitation-body.dto';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/validate-teacher-invitation.use-case';
-import { TeacherErrorFilter } from '../filters/teacher.filter';
+import { TeacherErrorFilter } from 'src/presentation/filters/teacher.filter';
+import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
 
 @Controller('teacher')
 export class TeacherController {
