@@ -17,7 +17,6 @@ import { EstablishmentNotFoundError } from 'src/domain/establishment/error';
 
 @Injectable()
 export class GetSubscriptionStatusUseCase {
-  $;
   constructor(
     @Inject(STRIPE_CLIENT_INTERFACE)
     private readonly paymentClient: StripeClientInterface,

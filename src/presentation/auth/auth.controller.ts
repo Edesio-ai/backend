@@ -133,7 +133,6 @@ export class AuthController {
   async createInvitationToken(
     @Body() body: CreateInvitationTokenBodyDto,
   ): Promise<{ success: boolean }> {
-    console.log('create token');
     await this.createInvitationTokenUseCase.execute(body);
     return { success: true };
   }
