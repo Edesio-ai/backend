@@ -90,10 +90,10 @@ class Fixtures {
   };
   public readonly establishment = {
     id: 'est-1',
-    supabase_user_id: 'owner-1',
+    supabaseUserId: 'owner-1',
     name: 'Edesio Academy',
     email: 'billing@academy.com',
-    created_at: '2026-01-01T00:00:00.000Z',
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   constructor() {
@@ -192,7 +192,7 @@ class Fixtures {
 
   whenEstablishmentFound() {
     this.establishmentRepository.getEstablishmentById.mockResolvedValue(
-      this.establishment as any,
+      this.establishment,
     );
   }
 

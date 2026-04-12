@@ -68,7 +68,13 @@ class Fixtures {
     );
 
     this.userId = 'user-1';
-    this.establishment = { id: 'est-1', name: 'Edesio Academy' };
+    this.establishment = {
+      id: 'est-1',
+      supabaseUserId: this.userId,
+      name: 'Edesio Academy',
+      email: 'stats@edesio.io',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    };
     this.teachers = [
       { id: 'teacher-1', name: 'Prof 1' },
       { id: 'teacher-2', name: 'Prof 2' },
