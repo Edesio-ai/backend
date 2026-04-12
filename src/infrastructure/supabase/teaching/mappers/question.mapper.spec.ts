@@ -10,7 +10,7 @@ describe('question.mapper', () => {
       const row: SupabaseQuestion = {
         id: 'q-1',
         course_id: 'c-1',
-        type: 'qcm',
+        type: 'single',
         question: '2+2 ?',
         propositions: [{ id: 'a', label: '4' }],
         correct_answer: 'a',
@@ -23,7 +23,7 @@ describe('question.mapper', () => {
       expect(supabaseQuestionToQuestion(row)).toEqual({
         id: 'q-1',
         courseId: 'c-1',
-        type: 'qcm',
+        type: 'single',
         question: '2+2 ?',
         propositions: [{ id: 'a', label: '4' }],
         correctAnswer: 'a',
@@ -40,7 +40,7 @@ describe('question.mapper', () => {
       expect(
         createQuestionBodyToSupabaseQuestionInsert({
           courseId: 'c-1',
-          type: 'ouverte',
+          type: 'open',
           question: 'Votre avis ?',
           propositions: null,
           correctAnswer: null,
@@ -50,7 +50,7 @@ describe('question.mapper', () => {
         }),
       ).toEqual({
         course_id: 'c-1',
-        type: 'ouverte',
+        type: 'open',
         question: 'Votre avis ?',
         propositions: null,
         correct_answer: null,
@@ -64,12 +64,12 @@ describe('question.mapper', () => {
       expect(
         createQuestionBodyToSupabaseQuestionInsert({
           courseId: 'c-1',
-          type: 'qcm',
+          type: 'single',
           question: 'OK',
         }),
       ).toEqual({
         course_id: 'c-1',
-        type: 'qcm',
+        type: 'single',
         question: 'OK',
         propositions: null,
         correct_answer: null,

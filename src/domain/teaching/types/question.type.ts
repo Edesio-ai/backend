@@ -1,7 +1,9 @@
+export type QuestionType = 'single' | 'multiple' | 'open';
+
 export type SupabaseQuestion = {
   id: string;
   course_id: string;
-  type: string;
+  type: QuestionType;
   question: string;
   propositions: unknown;
   correct_answer: string | null;
@@ -14,7 +16,7 @@ export type SupabaseQuestion = {
 export type Question = {
   id: string;
   courseId: string;
-  type: string;
+  type: QuestionType;
   question: string;
   propositions: unknown;
   correctAnswer: string | null;
@@ -26,7 +28,7 @@ export type Question = {
 
 export type CreateQuestionBody = {
   courseId: string;
-  type: string;
+  type: QuestionType;
   question: string;
   propositions?: unknown;
   correctAnswer?: string | null;
