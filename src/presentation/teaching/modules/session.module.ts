@@ -7,7 +7,7 @@ import { SessionsPersistenceModule } from 'src/infrastructure/supabase/session/s
 import { CreateSessionUseCase } from 'src/application/session/create-session.use-case';
 import { UpdateSessionNameUseCase } from 'src/application/session/update-session-name.use-case';
 import { GetSessionByCodeUseCase } from 'src/application/session/get-session-by-code.use-case';
-import { CoursePersistenceModule } from 'src/infrastructure/supabase/course/course-persistence.module';
+import { CoursePersistenceModule } from 'src/infrastructure/supabase/course/repositories/course-persistence.module';
 import { DeleteSessionUseCase } from 'src/application/session/delete-session.use-case';
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/question/question-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/student/student-persistence.module';

@@ -1,5 +1,5 @@
 import { CourseServerError } from 'src/domain/teaching/error';
-import { CourseSupabaseRepository } from './course-supabase.repository';
+import { CourseSupabaseRepository } from '../course-supabase.repository';
 import { CreateCourseBody } from 'src/domain/teaching/types/course.type';
 
 describe('CourseSupabaseRepository', () => {
@@ -157,13 +157,23 @@ class Fixtures {
     contentText: 'Contenu',
   };
 
-  public readonly createdRow = {
+  public readonly createdCourseSupabaseRow = {
     id: 'new-course',
     session_id: this.createBody.sessionId,
     title: this.createBody.title,
     description: this.createBody.description,
     text_content: this.createBody.contentText,
     created_at: '2026-01-01T00:00:00.000Z',
+  };
+
+  public readonly expectedCreatedCourse = {
+    id: 'new-course',
+    sessionId: this.createBody.sessionId,
+    title: this.createBody.title,
+    description: this.createBody.description,
+    contentText: this.createBody.contentText,
+    validatedQuestions: undefined,
+    positionOrder: undefined,
   };
 
   public readonly courseId = 'course-1';
@@ -175,12 +185,20 @@ class Fixtures {
     byteLength: 1,
   };
 
-  public readonly insertedCourseFileRow = {
+  public readonly insertedCourseFileSupabaseRow = {
     id: 'cf-1',
     course_id: this.courseId,
     file_url: this.storagePath,
     file_name: 'doc.pdf',
     created_at: '2026-01-01T00:00:00.000Z',
+  };
+
+  public readonly expectedCourseFile = {
+    id: 'cf-1',
+    courseId: this.courseId,
+    fileUrl: this.storagePath,
+    fileName: 'doc.pdf',
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   private readonly coursesListEqMock = jest.fn();
@@ -276,7 +294,6 @@ class Fixtures {
 
   whenStoreCourseFile() {
     return this.repository.storeCourseFile(
-      this.courseId,
       this.fileUpload as any,
       this.storagePath,
     );
@@ -364,7 +381,7 @@ class Fixtures {
 
   whenCreateCourseSucceeds() {
     this.coursesInsertSingleMock.mockResolvedValue({
-      data: this.createdRow,
+      data: this.createdCourseSupabaseRow,
       error: null,
     });
   }
@@ -388,7 +405,7 @@ class Fixtures {
 
   whenInsertCourseFileSucceeds() {
     this.courseFilesInsertSingleMock.mockResolvedValue({
-      data: this.insertedCourseFileRow,
+      data: this.insertedCourseFileSupabaseRow,
       error: null,
     });
   }
@@ -457,7 +474,7 @@ class Fixtures {
   }
 
   thenReturnsCreatedCourse(result: unknown) {
-    expect(result).toEqual(this.createdRow);
+    expect(result).toEqual(this.expectedCreatedCourse);
   }
 
   thenUploadBuiltWithExpectedArgs() {
@@ -481,7 +498,7 @@ class Fixtures {
   }
 
   thenReturnsInsertedCourseFile(result: unknown) {
-    expect(result).toEqual(this.insertedCourseFileRow);
+    expect(result).toEqual(this.expectedCourseFile);
   }
 
   thenRemoveCalledAfterInsertFailure() {

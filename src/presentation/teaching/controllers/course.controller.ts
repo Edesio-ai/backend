@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
-  Course,
   CourseFile,
   CourseFileUpload,
+  Course,
 } from 'src/domain/teaching/types/course.type';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';

@@ -31,7 +31,6 @@ describe('UploadCourseFileUseCase', () => {
     await fixtures.whenExecute();
 
     expect(fixtures.courseRepository.storeCourseFile).toHaveBeenCalledWith(
-      fixtures.courseId,
       fixtures.file,
       `${fixtures.courseId}/1700000000000.pdf`,
     );
@@ -66,10 +65,10 @@ class Fixtures {
 
   public readonly insertedFile = {
     id: 'file-1',
-    course_id: this.courseId,
-    file_url: `${this.courseId}/1700000000000.pdf`,
-    file_name: 'notes.pdf',
-    created_at: '2026-01-01T00:00:00.000Z',
+    courseId: this.courseId,
+    fileUrl: `${this.courseId}/1700000000000.pdf`,
+    fileName: 'notes.pdf',
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   public readonly repositoryError = new Error('storage failed');
@@ -117,7 +116,6 @@ class Fixtures {
   thenStoreCourseFileCalledWithExpectedPath() {
     const expectedPath = `${this.courseId}/1700000000000.pdf`;
     expect(this.courseRepository.storeCourseFile).toHaveBeenCalledWith(
-      this.courseId,
       this.file,
       expectedPath,
     );
