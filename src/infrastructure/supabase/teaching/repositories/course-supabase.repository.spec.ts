@@ -1,5 +1,5 @@
 import { CourseServerError } from 'src/domain/teaching/error';
-import { CourseSupabaseRepository } from '../course-supabase.repository';
+import { CourseSupabaseRepository } from '../modules/course-persistance.repository';
 import { CreateCourseBody } from 'src/domain/teaching/types/course.type';
 
 describe('CourseSupabaseRepository', () => {

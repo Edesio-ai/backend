@@ -1,4 +1,4 @@
-import { SessionServerError } from '../../../domain/teaching/error';
+import { SessionServerError } from '../../../../domain/teaching/error';
 import { SupabaseSessionRepository } from './session-supabase.repository';
 
 describe('SupabaseSessionRepository', () => {

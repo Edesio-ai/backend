@@ -1,5 +1,5 @@
 import { StudentSupabaseRepository } from './student-supabase.repository';
-import { StudentSessionsNotFoundError } from '../../../domain/teaching/error';
+import { StudentSessionsNotFoundError } from '../../../../domain/teaching/error';
 
 describe('StudentSupabaseRepository', () => {
   let fixtures: Fixtures;

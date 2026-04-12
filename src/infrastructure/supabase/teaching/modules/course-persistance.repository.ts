@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { SUPABASE_ADMIN } from '../supabase.module';
+import { SUPABASE_ADMIN } from '../../supabase.module';
 import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
 import {
   SupabaseCourse,
@@ -14,7 +14,7 @@ import {
   mapFilesUrl,
   supabaseCourseFileToCourseFile,
   supabaseCourseToCourse,
-} from './mappers/course.mapper';
+} from '../mappers/course.mapper';
 
 export class CourseSupabaseRepository implements CourseRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}

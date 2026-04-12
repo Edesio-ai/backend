@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
-import { SUPABASE_ADMIN } from '../supabase.module';
+import { SUPABASE_ADMIN } from '../../supabase.module';
 import { QuestionServerError } from 'src/domain/teaching/error';
 
 export class QuestionSupabaseRepository implements QuestionsRepository {

@@ -1,5 +1,5 @@
 import { TeacherSupabaseRepository } from './teacher-supabase.repository';
-import { TeacheServerError } from '../../../domain/teaching/error';
+import { TeacheServerError } from '../../../../domain/teaching/error';
 
 describe('TeacherSupabaseRepository', () => {
   let fixtures: Fixtures;

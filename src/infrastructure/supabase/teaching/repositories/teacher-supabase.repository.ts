@@ -1,11 +1,11 @@
 import { Inject } from '@nestjs/common';
-import { SUPABASE_ADMIN } from '../supabase.module';
-import { TeacherRepository } from '../../../domain/teaching/interface/teacher.repository';
-import { TeacheServerError } from '../../../domain/teaching/error';
+import { SUPABASE_ADMIN } from '../../supabase.module';
+import { TeacherRepository } from '../../../../domain/teaching/interface/teacher.repository';
+import { TeacheServerError } from '../../../../domain/teaching/error';
 import {
   Teacher,
   TeacherSession,
-} from '../../../domain/teaching/types/teacher.type';
+} from '../../../../domain/teaching/types/teacher.type';
 
 export class TeacherSupabaseRepository implements TeacherRepository {
   constructor(

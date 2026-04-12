@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { QUESTIONS_REPOSITORY } from '../../../domain/teaching/interface/questions.repository';
-import { QuestionSupabaseRepository } from './question-supabase.repository';
-import { SupabaseModule } from '../supabase.module';
+import { QUESTIONS_REPOSITORY } from '../../../../domain/teaching/interface/questions.repository';
+import { QuestionSupabaseRepository } from '../repositories/question-supabase.repository';
+import { SupabaseModule } from '../../supabase.module';
 
 @Module({
   imports: [SupabaseModule],
