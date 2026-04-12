@@ -1,4 +1,7 @@
-import { Teacher } from 'src/domain/teaching/types/teacher.type';
+import {
+  Teacher,
+  TeacherSession,
+} from 'src/domain/teaching/types/teacher.type';
 
 export const TEACHER_REPOSITORY = Symbol('TEACHER_REPOSITORY');
 
@@ -8,9 +11,9 @@ export interface TeacherRepository {
     teacherId: string,
     establishmentId: string,
   ): Promise<void>;
-  getTeacherByEstablishmentId(establishmentId: string): Promise<any>;
-  getTeachersSessionsByIds(teacherIds: string[]): Promise<any>;
-  getTeacherByUserId(userId: string): Promise<Teacher>;
+  getTeacherByEstablishmentId(establishmentId: string): Promise<Teacher[]>;
+  getTeachersSessionsByIds(teacherIds: string[]): Promise<TeacherSession[]>;
+  getTeacherByUserId(userId: string): Promise<Teacher | null>;
   createTeacher(
     userId: string,
     name: string,

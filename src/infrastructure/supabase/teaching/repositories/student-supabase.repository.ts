@@ -2,6 +2,7 @@ import { Inject } from '@nestjs/common';
 import { StudentRepository } from '../../../../domain/teaching/interface/student.repository';
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import { StudentSessionsNotFoundError } from '../../../../domain/teaching/error';
+import { supabaseStudentSessionsToStudentSessions } from '../mappers/student.mapper';
 
 export class StudentSupabaseRepository implements StudentRepository {
   constructor(
@@ -9,7 +10,7 @@ export class StudentSupabaseRepository implements StudentRepository {
     private readonly supabase: any,
   ) {}
 
-  async getStudentsSessionsByIds(sessionIds: string[]): Promise<any> {
+  async getStudentsSessionsByIds(sessionIds: string[]) {
     const { data, error } = await this.supabase
       .from('student_sessions')
       .select('session_id, student_id')
@@ -23,7 +24,7 @@ export class StudentSupabaseRepository implements StudentRepository {
     if (error) {
       throw new StudentSessionsNotFoundError(error.message);
     }
-    return data;
+    return supabaseStudentSessionsToStudentSessions(data ?? []);
   }
 
   async deleteStudentSessionsBySessionId(sessionId: string): Promise<void> {

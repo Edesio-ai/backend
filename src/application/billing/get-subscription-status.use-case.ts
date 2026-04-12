@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { SupabaseUser } from '../../domain/auth/types/auth.type';
+import { User } from '../../domain/auth/types/auth.type';
 import {
   STRIPE_CLIENT_INTERFACE,
   type StripeClientInterface,
@@ -26,9 +26,9 @@ export class GetSubscriptionStatusUseCase {
     private readonly establishmentRepository: EstablishmentRepository,
   ) {}
 
-  async execute(user: SupabaseUser): Promise<any> {
+  async execute(user: User): Promise<any> {
     const { email, id } = user;
-    const { role } = user.user_metadata;
+    const { role } = user.metadata;
 
     switch (role) {
       case 'student': {
@@ -42,14 +42,13 @@ export class GetSubscriptionStatusUseCase {
         if (!teacher) {
           throw new TeacherNotFoundError();
         }
-        const isTeacherWithEstablishment = teacher?.establishment_id !== null;
-
-        if (!isTeacherWithEstablishment) {
+        const establishmentId = teacher.establishmentId;
+        if (establishmentId === null) {
           return await this.handleSubscriptionFormat(email, id, role);
         }
         const establishment =
           await this.establishmentRepository.getEstablishmentById(
-            teacher.establishment_id,
+            establishmentId,
           );
 
         if (!establishment) {

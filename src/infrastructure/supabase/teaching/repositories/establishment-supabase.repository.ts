@@ -9,6 +9,11 @@ import {
 import { Establishment } from '../../../../domain/establishment/establishment.type';
 import { InvitationTokenNotFoundError } from '../../../../domain/auth/errors/auth.errors';
 import { InvitationToken } from '../../../../domain/auth/invitation.type';
+import {
+  createEstablishmentBodyToSupabaseEstablishmentInsert,
+  supabaseEstablishmentToEstablishment,
+  supabaseInvitationTokenRowToInvitationToken,
+} from '../mappers/establishment.mapper';
 
 export class EstablishmentSupabaseRepository implements EstablishmentRepository {
   constructor(
@@ -24,9 +29,11 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
       .single();
 
     if (error || !data) {
-      throw new EstablishmentNotFoundError(error.message);
+      throw new EstablishmentNotFoundError(
+        error?.message ?? 'Establishment not found',
+      );
     }
-    return data;
+    return supabaseEstablishmentToEstablishment(data);
   }
 
   async getEstablishmentByUserId(userId: string): Promise<Establishment> {
@@ -37,9 +44,15 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
       .single();
 
     if (error || !data) {
-      throw new EstablishmentNotFoundError(error.message);
+      console.error(
+        'An error occure while getting establishment by user id:',
+        error,
+      );
+      throw new EstablishmentNotFoundError(
+        error?.message ?? 'Establishment not found',
+      );
     }
-    return data;
+    return supabaseEstablishmentToEstablishment(data);
   }
 
   async createEstablishment(
@@ -49,19 +62,24 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
   ): Promise<Establishment> {
     const { data, error } = await this.supabase
       .from('establishment')
-      .insert({
-        supabase_user_id: supabaseUserId,
-        name: name,
-        email: email,
-      })
+      .insert(
+        createEstablishmentBodyToSupabaseEstablishmentInsert({
+          supabaseUserId,
+          name,
+          email,
+        }),
+      )
       .select()
       .single();
 
     if (error || !data) {
-      throw new EstablishmentCreationFailedError(error.message);
+      console.error('An error occure while creating establishment:', error);
+      throw new EstablishmentCreationFailedError(
+        error?.message ?? 'Insert failed',
+      );
     }
 
-    return data;
+    return supabaseEstablishmentToEstablishment(data);
   }
 
   async getInvitationTokenByEstablishmentId(
@@ -76,6 +94,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
     if (error) {
       throw new InvitationTokenNotFoundError(error.message);
     }
-    return data;
+
+    return (data ?? []).map(supabaseInvitationTokenRowToInvitationToken);
   }
 }

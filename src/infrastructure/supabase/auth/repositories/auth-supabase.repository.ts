@@ -21,11 +21,14 @@ import {
   InvitationTokenCreationError,
 } from '../../../../domain/auth/errors/auth.errors';
 import {
-  SupabaseUser,
   AuthUserWithSession,
   User,
 } from '../../../../domain/auth/types/auth.type';
 import { Teacher } from '../../../../domain/teaching/types/teacher.type';
+import {
+  createTeacherWithEstablishmentInsertPayload,
+  supabaseTeacherToTeacher,
+} from '../../teaching/mappers/teacher.mapper';
 import { UserMetadata } from '../../../../domain/auth/types/auth.type';
 import { SUPABASE_AUTH } from '../../supabase-auth.module';
 import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-toke.use-case';
@@ -35,6 +38,7 @@ import {
   supabaseInvitationTokenToInvitationTokenPreview,
   supabaseSessionToAuthTokenData,
   supabaseSessionToAuthUser,
+  supabaseValidatedTokenUserToUser,
 } from '../mappers/auth.mappers';
 
 @Injectable()
@@ -44,12 +48,15 @@ export class AuthSupabaseRepository implements AuthRepository {
     @Inject(SUPABASE_ADMIN) private readonly supabaseAdmin: any,
   ) {}
 
-  public async validateToken(token: string): Promise<SupabaseUser> {
+  public async validateToken(token: string): Promise<User> {
     const { data, error } = await this.supabaseAuth.auth.getUser(token);
     if (error) {
       throw new TokenUserNotFoundError(error.message);
     }
-    return data.user;
+    if (!data?.user) {
+      throw new TokenUserNotFoundError('User not found');
+    }
+    return supabaseValidatedTokenUserToUser(data.user);
   }
 
   public async createInvitationToken(
@@ -184,13 +191,15 @@ export class AuthSupabaseRepository implements AuthRepository {
 
     const { data, error } = await this.supabaseAdmin
       .from('teachers')
-      .insert({
-        supabase_user_id: adminData.id,
-        name: `${firstname} ${lastname}`,
-        email: email.toLowerCase().trim(),
-        establishment_id: invitationToken.establishment_id,
-        available_chatbots: invitationToken.assigned_chatbots || 0,
-      })
+      .insert(
+        createTeacherWithEstablishmentInsertPayload(
+          adminData.id,
+          `${firstname} ${lastname}`,
+          email,
+          invitationToken.establishmentId,
+          invitationToken.assignedChatbots || 0,
+        ),
+      )
       .select()
       .single();
 
@@ -199,7 +208,7 @@ export class AuthSupabaseRepository implements AuthRepository {
       throw new TeacherProfileCreationError(error.message);
     }
 
-    return data;
+    return supabaseTeacherToTeacher(data);
   }
 
   private async updateTokenUsedAt(

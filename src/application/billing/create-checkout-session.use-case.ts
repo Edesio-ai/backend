@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { SupabaseUser } from '../../domain/auth/types/auth.type';
+import { User } from '../../domain/auth/types/auth.type';
 import { TokenUserNotFoundError } from '../../domain/auth/errors/auth.errors';
 import {
   SUBSCRIPTION_REPOSITORY,
@@ -18,11 +18,7 @@ export class CreateCheckoutSessionsUseCase {
     private readonly paymentClient: StripeClientInterface,
   ) {}
 
-  async execute(
-    priceId: string,
-    planType: string,
-    user: SupabaseUser,
-  ): Promise<any> {
+  async execute(priceId: string, planType: string, user: User): Promise<any> {
     if (!user) {
       throw new TokenUserNotFoundError('User not found');
     }

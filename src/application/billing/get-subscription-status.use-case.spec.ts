@@ -1,5 +1,5 @@
 import { GetSubscriptionStatusUseCase } from './get-subscription-status.use-case';
-import { SupabaseUser } from '../../domain/auth/types/auth.type';
+import { User } from '../../domain/auth/types/auth.type';
 import { EstablishmentNotFoundError } from '../../domain/establishment/error';
 import { TeacherNotFoundError } from '../../domain/teaching/error';
 import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
@@ -73,27 +73,27 @@ class Fixtures {
   public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
   public readonly getSubscriptionStatusUseCase: GetSubscriptionStatusUseCase;
 
-  public readonly establishmentUser: SupabaseUser;
-  public readonly studentUser: SupabaseUser;
-  public readonly teacherUser: SupabaseUser;
-  public readonly userWithoutEmail: SupabaseUser;
+  public readonly establishmentUser: User;
+  public readonly studentUser: User;
+  public readonly teacherUser: User;
+  public readonly userWithoutEmail: User;
   public readonly customerId: string;
   public readonly paymentClientError: Error;
   public readonly teacher = {
     id: 'teacher-1',
     name: 'Teacher',
     email: 'teacher@school.com',
-    created_at: '2026-01-01T00:00:00.000Z',
-    establishment_id: 'est-1',
-    available_chatbots: 2,
-    supabase_user_id: 'user-2',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    establishmentId: 'est-1',
+    availableChatbots: 2,
+    supabaseUserId: 'user-2',
   };
   public readonly establishment = {
     id: 'est-1',
-    supabase_user_id: 'owner-1',
+    supabaseUserId: 'owner-1',
     name: 'Edesio Academy',
     email: 'billing@academy.com',
-    created_at: '2026-01-01T00:00:00.000Z',
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   constructor() {
@@ -145,24 +145,15 @@ class Fixtures {
     this.userWithoutEmail = this.createUser('establishment', '', 'user-4');
   }
 
-  private createUser(role: string, email: string, id: string): SupabaseUser {
+  private createUser(role: string, email: string, id: string): User {
     return {
       id,
-      aud: 'authenticated',
-      role: 'authenticated',
       email,
-      email_confirmed_at: '2026-01-01T00:00:00.000Z',
-      phone: '',
-      app_metadata: { provider: 'email', providers: ['email'] },
-      user_metadata: { role },
-      identities: [],
-      created_at: '2026-01-01T00:00:00.000Z',
-      updated_at: '2026-01-01T00:00:00.000Z',
-      is_anonymous: false,
+      metadata: { role },
     };
   }
 
-  whenExecuteWith(user: SupabaseUser) {
+  whenExecuteWith(user: User) {
     return this.getSubscriptionStatusUseCase.execute(user);
   }
 
@@ -178,11 +169,11 @@ class Fixtures {
   }
 
   whenTeacherFound(
-    establishmentId: string | null = this.teacher.establishment_id,
+    establishmentId: string | null = this.teacher.establishmentId,
   ) {
     this.teacherRepository.getTeacherByUserId.mockResolvedValue({
       ...this.teacher,
-      establishment_id: establishmentId as any,
+      establishmentId,
     });
   }
 
@@ -192,7 +183,7 @@ class Fixtures {
 
   whenEstablishmentFound() {
     this.establishmentRepository.getEstablishmentById.mockResolvedValue(
-      this.establishment as any,
+      this.establishment,
     );
   }
 
@@ -250,10 +241,6 @@ class Fixtures {
     expect(
       this.paymentClient.getSubscriptionsByCustomerId,
     ).not.toHaveBeenCalled();
-  }
-
-  thenTeacherRepositoryNotCalled() {
-    expect(this.teacherRepository.getTeacherByUserId).not.toHaveBeenCalled();
   }
 
   thenEstablishmentRepositoryNotCalled() {
@@ -383,7 +370,7 @@ describe('GetSubscriptionStatusUseCase - teacher flow', () => {
 
     expect(
       fixtures.establishmentRepository.getEstablishmentById,
-    ).toHaveBeenCalledWith(fixtures.teacher.establishment_id);
+    ).toHaveBeenCalledWith(fixtures.teacher.establishmentId);
     expect(fixtures.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(
       fixtures.establishment.email,
     );

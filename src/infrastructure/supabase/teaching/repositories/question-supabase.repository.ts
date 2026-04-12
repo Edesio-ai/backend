@@ -7,7 +7,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
 
   async deleteQuestionsByCourseIds(courseIds: string[]): Promise<void> {
-    const { data, error } = await this.supabase
+    const { error } = await this.supabase
       .from('questions')
       .delete()
       .in('course_id', courseIds);
@@ -15,7 +15,5 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
     if (error) {
       throw new QuestionServerError(error.message);
     }
-
-    return data;
   }
 }

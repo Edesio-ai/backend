@@ -47,9 +47,9 @@ class Fixtures {
     id: this.teacherId,
     name: 'T',
     email: 't@example.com',
-    created_at: '2026-01-01T00:00:00.000Z',
-    establishment_id: 'est-1',
-    available_chatbots: 1,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    establishmentId: 'est-1',
+    availableChatbots: 1,
   };
 
   public readonly repositoryError = new Error('db failed');
@@ -113,9 +113,7 @@ class Fixtures {
     this.courseRepository.deleteCoursesFilesByCourseIds.mockResolvedValue();
     this.courseRepository.deleteCoursesBySessionId.mockResolvedValue();
     this.studentRepository.deleteStudentSessionsBySessionId.mockResolvedValue();
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(
-      this.teacher as any,
-    );
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(this.teacher);
     this.sessionRepository.deleteSessionByTeacherId.mockResolvedValue();
   }
 
@@ -123,9 +121,7 @@ class Fixtures {
     this.courseRepository.getCoursesBySessionId.mockResolvedValue([]);
     this.courseRepository.deleteCoursesBySessionId.mockResolvedValue();
     this.studentRepository.deleteStudentSessionsBySessionId.mockResolvedValue();
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(
-      this.teacher as any,
-    );
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(this.teacher);
     this.sessionRepository.deleteSessionByTeacherId.mockResolvedValue();
   }
 

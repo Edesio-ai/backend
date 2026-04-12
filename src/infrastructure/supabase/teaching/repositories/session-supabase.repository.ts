@@ -7,6 +7,11 @@ import {
   UpdateSessionNameBody,
 } from '../../../../domain/teaching/types/session.type';
 import { SessionServerError } from '../../../../domain/teaching/error';
+import {
+  createSessionBodyToSupabaseSessionInsert,
+  supabaseSessionToSession,
+  updateSessionNameBodyToSupabaseSessionUpdate,
+} from '../mappers/session.mapper';
 
 export class SupabaseSessionRepository implements SessionRepository {
   constructor(
@@ -25,34 +30,32 @@ export class SupabaseSessionRepository implements SessionRepository {
       throw new SessionServerError(error.message);
     }
 
-    return data;
+    return (data ?? []).map(supabaseSessionToSession);
   }
 
-  public async getSessionByCode(code: string): Promise<Session> {
+  public async getSessionByCode(code: string): Promise<Session | null> {
     const { data, error } = await this.supabase
       .from('sessions')
-      .select('id')
+      .select('*')
       .eq('code', code)
       .maybeSingle();
 
     if (error) {
+      console.error('An error occure while getting session by code:', error);
       throw new SessionServerError(error.message);
     }
 
-    return data;
+    if (!data) {
+      return null;
+    }
+
+    return supabaseSessionToSession(data);
   }
 
   public async createSession(body: CreateSessionBody): Promise<Session> {
-    const { teacherId, name, code, language } = body;
-
     const { data, error } = await this.supabase
       .from('sessions')
-      .insert({
-        teacher_id: teacherId,
-        name,
-        code,
-        language,
-      })
+      .insert(createSessionBodyToSupabaseSessionInsert(body))
       .select()
       .single();
 
@@ -60,20 +63,18 @@ export class SupabaseSessionRepository implements SessionRepository {
       throw new SessionServerError(error.message);
     }
 
-    return data;
+    return supabaseSessionToSession(data);
   }
 
   public async updateSessionName(
     sessionId: string,
     body: UpdateSessionNameBody,
   ): Promise<Session> {
-    const { name, teacherId } = body;
-
     const { data, error } = await this.supabase
       .from('sessions')
-      .update({ name })
+      .update(updateSessionNameBodyToSupabaseSessionUpdate(body))
       .eq('id', sessionId)
-      .eq('teacher_id', teacherId)
+      .eq('teacher_id', body.teacherId)
       .select()
       .single();
 
@@ -81,7 +82,7 @@ export class SupabaseSessionRepository implements SessionRepository {
       throw new SessionServerError(error.message);
     }
 
-    return data;
+    return supabaseSessionToSession(data);
   }
 
   async deleteSessionByTeacherId(

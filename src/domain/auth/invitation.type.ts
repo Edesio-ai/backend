@@ -9,6 +9,18 @@ export type InvitationTokenPreview = {
 
 export type InvitationToken = {
   id: string;
+  establishmentId: string;
+  token: string;
+  invitedEmail: string;
+  expiresAt: string;
+  usedAt: string | null;
+  usedBy: string | null;
+  createdAt: string;
+  assignedChatbots: number;
+};
+
+export type SupabaseInvitationTokenRow = {
+  id: string;
   establishment_id: string;
   token: string;
   invited_email: string;
@@ -20,12 +32,15 @@ export type InvitationToken = {
 };
 
 export type SupabaseInvitationTokenInsert = Omit<
-  InvitationToken,
+  SupabaseInvitationTokenRow,
   'id' | 'used_at' | 'used_by' | 'created_at'
 >;
-export type SupabaseInvitationToken = Omit<
-  InvitationToken,
-  'id' | 'used_by' | 'created_at' | 'token' | 'invited_email'
-> & {
-  establishment: SupabaseEstablishment;
+
+/** Ligne preview : colonnes invitation + jointure `establishment (name)`. */
+export type SupabaseInvitationToken = {
+  invited_email: string;
+  assigned_chatbots: number;
+  expires_at: string;
+  used_at: string | null;
+  establishment: Pick<SupabaseEstablishment, 'name'>;
 };

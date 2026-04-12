@@ -218,10 +218,8 @@ class GetInvitationPreviewFixtures {
   };
 
   private readonly validData = {
-    id: 'id-1',
     invited_email: 'john@acme.com',
     assigned_chatbots: 2,
-    assignedChatbots: 2,
     expires_at: new Date(Date.now() + 60_000).toISOString(),
     used_at: null,
     establishment: { name: 'Edesio Academy' },
@@ -485,14 +483,14 @@ class CreateInvitationTokenFixtures {
 class CreateUserFixtures {
   public readonly invitationToken: InvitationToken = {
     id: 'inv-token-id-1',
-    establishment_id: 'est-1',
+    establishmentId: 'est-1',
     token: 'tok',
-    invited_email: 'teacher@school.com',
-    expires_at: new Date(Date.now() + 60_000).toISOString(),
-    used_at: null,
-    used_by: null,
-    created_at: '2026-01-01T00:00:00.000Z',
-    assigned_chatbots: 3,
+    invitedEmail: 'teacher@school.com',
+    expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    usedAt: null,
+    usedBy: null,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    assignedChatbots: 3,
   };
 
   public readonly createUserMock = jest.fn();

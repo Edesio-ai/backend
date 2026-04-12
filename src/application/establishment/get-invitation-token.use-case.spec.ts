@@ -60,14 +60,14 @@ class Fixtures {
     this.invitationTokens = [
       {
         id: 'token-id-1',
-        establishment_id: this.establishmentId,
+        establishmentId: this.establishmentId,
         token: 'token-abc',
-        invited_email: 'teacher@school.com',
-        expires_at: '2026-04-01T00:00:00.000Z',
-        used_at: null,
-        used_by: null,
-        created_at: '2026-03-28T00:00:00.000Z',
-        assigned_chatbots: 2,
+        invitedEmail: 'teacher@school.com',
+        expiresAt: '2026-04-01T00:00:00.000Z',
+        usedAt: null,
+        usedBy: null,
+        createdAt: '2026-03-28T00:00:00.000Z',
+        assignedChatbots: 2,
       },
     ];
     this.repositoryError = new Error('query failed');

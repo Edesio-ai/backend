@@ -19,6 +19,7 @@ import {
   STUDENT_REPOSITORY,
   type StudentRepository,
 } from 'src/domain/teaching/interface/student.repository';
+import type { StudentSession } from 'src/domain/teaching/types/student.type';
 
 export class GetEstablishmentsStatsUseCase {
   constructor(
@@ -31,34 +32,48 @@ export class GetEstablishmentsStatsUseCase {
   ) {}
 
   async execute(userId: string): Promise<EstablishmentStats> {
+    console.log('avant establishment');
     const establishment =
       await this.establishmentRepository.getEstablishmentByUserId(userId);
 
+    console.log('avant teachers');
     const teachers = await this.teacherRepository.getTeacherByEstablishmentId(
       establishment.id,
     );
+    console.log('avant teachersIds');
     const teachersIds = (teachers || []).map((t) => t.id);
 
+    console.log('avant teachersSessions');
     const teachersSessions =
       await this.teacherRepository.getTeachersSessionsByIds(teachersIds);
+    console.log('avant teacherSessionIds');
     const teacherSessionIds = (teachersSessions || []).map((s) => s.id);
 
-    const studentsSessions =
+    console.log('avant studentsSessions');
+    const studentsSessions: StudentSession[] =
       await this.studentRepository.getStudentsSessionsByIds(teacherSessionIds);
 
+    console.log('avant studentCountPerSession');
     const studentCountPerSession: Record<string, number> = {};
+    console.log('avant uniqueStudents');
     const uniqueStudents = new Set<string>();
+    console.log('avant forEach');
 
     (studentsSessions || []).forEach((ss) => {
-      studentCountPerSession[ss.session_id] =
-        (studentCountPerSession[ss.session_id] || 0) + 1;
-      uniqueStudents.add(ss.student_id);
+      studentCountPerSession[ss.sessionId] =
+        (studentCountPerSession[ss.sessionId] || 0) + 1;
+      uniqueStudents.add(ss.studentId);
     });
 
+    console.log('avant buildTeachersWithStats');
     const TeachersWithStats = this.buildTeachersWithStats(
       teachers,
       teachersSessions,
-      studentsSessions,
+      studentCountPerSession,
+    );
+    console.log(
+      '🚀 ~ GetEstablishmentsStatsUseCase ~ execute ~ TeachersWithStats:',
+      TeachersWithStats,
     );
 
     return this.buildEstablishmentStats(
@@ -77,7 +92,7 @@ export class GetEstablishmentsStatsUseCase {
   ): TeacherWithStats[] {
     return (teachers || []).map((teacher) => {
       const teacherSessions = (teachersSessions || []).filter(
-        (s) => s.teacher_id === teacher.id,
+        (s) => s.teacherId === teacher.id,
       );
       const profStudentCount = teacherSessions.reduce(
         (sum, s) => sum + (studentCountPerSession[s.id] || 0),

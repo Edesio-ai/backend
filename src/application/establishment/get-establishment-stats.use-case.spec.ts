@@ -68,20 +68,61 @@ class Fixtures {
     );
 
     this.userId = 'user-1';
-    this.establishment = { id: 'est-1', name: 'Edesio Academy' };
+    this.establishment = {
+      id: 'est-1',
+      supabaseUserId: this.userId,
+      name: 'Edesio Academy',
+      email: 'stats@edesio.io',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    };
     this.teachers = [
-      { id: 'teacher-1', name: 'Prof 1' },
-      { id: 'teacher-2', name: 'Prof 2' },
+      {
+        id: 'teacher-1',
+        name: 'Prof 1',
+        email: 'p1@school.com',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        establishmentId: 'est-1',
+        availableChatbots: 0,
+      },
+      {
+        id: 'teacher-2',
+        name: 'Prof 2',
+        email: 'p2@school.com',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        establishmentId: 'est-1',
+        availableChatbots: 0,
+      },
     ];
     this.sessions = [
-      { id: 'session-1', teacher_id: 'teacher-1' },
-      { id: 'session-2', teacher_id: 'teacher-1' },
-      { id: 'session-3', teacher_id: 'teacher-2' },
+      {
+        id: 'session-1',
+        name: 'S1',
+        code: 'c1',
+        language: 'francais',
+        teacherId: 'teacher-1',
+        createdAt: '2026-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'session-2',
+        name: 'S2',
+        code: 'c2',
+        language: 'francais',
+        teacherId: 'teacher-1',
+        createdAt: '2026-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'session-3',
+        name: 'S3',
+        code: 'c3',
+        language: 'francais',
+        teacherId: 'teacher-2',
+        createdAt: '2026-01-01T00:00:00.000Z',
+      },
     ];
     this.studentSessions = [
-      { session_id: 'session-1', student_id: 'student-1' },
-      { session_id: 'session-2', student_id: 'student-2' },
-      { session_id: 'session-2', student_id: 'student-1' },
+      { sessionId: 'session-1', studentId: 'student-1' },
+      { sessionId: 'session-2', studentId: 'student-2' },
+      { sessionId: 'session-2', studentId: 'student-1' },
     ];
     this.repositoryError = new Error('establishment not found');
   }
@@ -149,20 +190,52 @@ class Fixtures {
         {
           id: 'teacher-1',
           name: 'Prof 1',
+          email: 'p1@school.com',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          establishmentId: 'est-1',
+          availableChatbots: 0,
           sessions_count: 2,
-          students_count: 0,
+          students_count: 3,
           sessions: [
-            { id: 'session-1', teacher_id: 'teacher-1', students_count: 0 },
-            { id: 'session-2', teacher_id: 'teacher-1', students_count: 0 },
+            {
+              id: 'session-1',
+              name: 'S1',
+              code: 'c1',
+              language: 'francais',
+              teacherId: 'teacher-1',
+              createdAt: '2026-01-01T00:00:00.000Z',
+              students_count: 1,
+            },
+            {
+              id: 'session-2',
+              name: 'S2',
+              code: 'c2',
+              language: 'francais',
+              teacherId: 'teacher-1',
+              createdAt: '2026-01-01T00:00:00.000Z',
+              students_count: 2,
+            },
           ],
         },
         {
           id: 'teacher-2',
           name: 'Prof 2',
+          email: 'p2@school.com',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          establishmentId: 'est-1',
+          availableChatbots: 0,
           sessions_count: 1,
           students_count: 0,
           sessions: [
-            { id: 'session-3', teacher_id: 'teacher-2', students_count: 0 },
+            {
+              id: 'session-3',
+              name: 'S3',
+              code: 'c3',
+              language: 'francais',
+              teacherId: 'teacher-2',
+              createdAt: '2026-01-01T00:00:00.000Z',
+              students_count: 0,
+            },
           ],
         },
       ],

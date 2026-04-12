@@ -34,7 +34,7 @@ export class ValidateTeacherInvitationUseCase {
       throw new TeacherNotFoundError();
     }
 
-    if (teacher.establishment_id) {
+    if (teacher.establishmentId) {
       return null;
     }
 
@@ -44,18 +44,18 @@ export class ValidateTeacherInvitationUseCase {
       throw new InvitationTokenNotFoundError('Invitation token not found');
     }
 
-    if (new Date(invitation.expires_at) < new Date()) {
+    if (new Date(invitation.expiresAt) < new Date()) {
       throw new InvitationTokenExpiredError('Invitation token expired');
     }
 
-    if (invitation.used_at) {
+    if (invitation.usedAt) {
       throw new InvitationTokenAlreadyUsedError(
         'Invitation token already used',
       );
     }
 
     if (
-      invitation.invited_email.toLowerCase() !== teacher.email?.toLowerCase()
+      invitation.invitedEmail.toLowerCase() !== teacher.email?.toLowerCase()
     ) {
       throw new InvitationTokenEmailMismatchError(
         'Invitation email mismatch with the teacher provided',
@@ -69,7 +69,7 @@ export class ValidateTeacherInvitationUseCase {
     await this.teacherRepository.linkTeacherToEstablishment(
       invitation.id,
       teacher.id,
-      invitation.establishment_id,
+      invitation.establishmentId,
     );
 
     return invitation;

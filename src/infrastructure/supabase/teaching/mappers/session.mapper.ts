@@ -1,0 +1,41 @@
+import {
+  CreateSessionBody,
+  Session,
+  SupabaseSession,
+  UpdateSessionNameBody,
+} from 'src/domain/teaching/types/session.type';
+
+type SupabaseSessionInsert = {
+  teacher_id: string;
+  name: string;
+  code: string;
+  language: string;
+};
+
+export function createSessionBodyToSupabaseSessionInsert(
+  body: CreateSessionBody,
+): SupabaseSessionInsert {
+  return {
+    teacher_id: body.teacherId,
+    name: body.name,
+    code: body.code,
+    language: body.language,
+  };
+}
+
+export function updateSessionNameBodyToSupabaseSessionUpdate(
+  body: UpdateSessionNameBody,
+): { name: string } {
+  return { name: body.name };
+}
+
+export function supabaseSessionToSession(row: SupabaseSession): Session {
+  return {
+    id: row.id,
+    teacherId: row.teacher_id,
+    name: row.name,
+    code: row.code,
+    language: row.language,
+    createdAt: row.created_at,
+  };
+}

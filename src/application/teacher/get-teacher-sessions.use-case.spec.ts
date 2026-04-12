@@ -46,19 +46,19 @@ class Fixtures {
     id: 'teacher-1',
     name: 'Teacher Name',
     email: 'teacher@school.com',
-    created_at: '2026-01-01T00:00:00.000Z',
-    establishment_id: null,
-    available_chatbots: 2,
-    supabase_user_id: this.userId,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    establishmentId: null,
+    availableChatbots: 2,
+    supabaseUserId: this.userId,
   };
   public readonly sessions = [
     {
       id: 'session-1',
-      teacher_id: this.teacher.id,
-      nom: 'Cours 1',
+      teacherId: this.teacher.id,
+      name: 'Cours 1',
       code: 'ABC123',
-      langue: 'francais',
-      created_at: '2026-01-01T00:00:00.000Z',
+      language: 'francais' as const,
+      createdAt: '2026-01-01T00:00:00.000Z',
     },
   ];
   public readonly sessionRepositoryError = new Error('sessions query failed');
@@ -93,9 +93,7 @@ class Fixtures {
   }
 
   whenTeacherFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(
-      this.teacher as any,
-    );
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(this.teacher);
   }
 
   whenTeacherNotFound() {
@@ -104,7 +102,7 @@ class Fixtures {
 
   whenSessionsFound() {
     this.sessionRepository.getSessionsByTeacherId.mockResolvedValue(
-      this.sessions as any,
+      this.sessions,
     );
   }
 

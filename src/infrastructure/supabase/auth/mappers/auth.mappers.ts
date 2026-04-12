@@ -69,3 +69,17 @@ export function SupabaseAuthUserToUser(user: SupabaseUser): User {
     },
   };
 }
+
+export function supabaseValidatedTokenUserToUser(user: SupabaseUser): User {
+  return {
+    id: user.id,
+    email: user.email,
+    metadata: {
+      role: user.user_metadata?.role,
+      firstname: user.user_metadata?.firstname,
+      lastname: user.user_metadata?.lastname,
+      establishment: user.user_metadata?.establishment,
+      invitationToken: user.user_metadata?.invitationToken,
+    },
+  };
+}

@@ -31,17 +31,17 @@ class Fixtures {
   public readonly body: CreateSessionBody = {
     name: 'Session A',
     code: 'ABC123',
-    language: 'francais',
+    language: 'francais' as const,
     teacherId: 'teacher-1',
   };
 
   public readonly createdSession = {
     id: 'session-1',
-    teacher_id: this.body.teacherId,
+    teacherId: this.body.teacherId,
     name: this.body.name,
     code: this.body.code,
     language: this.body.language,
-    created_at: '2026-01-01T00:00:00.000Z',
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   public readonly repositoryError = new Error('insert failed');
@@ -65,9 +65,7 @@ class Fixtures {
   }
 
   whenCreateSessionSucceeds() {
-    this.sessionRepository.createSession.mockResolvedValue(
-      this.createdSession as any,
-    );
+    this.sessionRepository.createSession.mockResolvedValue(this.createdSession);
   }
 
   whenCreateSessionFails() {

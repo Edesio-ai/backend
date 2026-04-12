@@ -119,8 +119,29 @@ class Fixtures {
   public readonly establishmentId = 'est-1';
   public readonly teacherIds = ['teacher-1', 'teacher-2'];
   public readonly fallbackId = '00000000-0000-0000-0000-000000000000';
-  public readonly teachers = [{ id: 'teacher-1', name: 'Prof 1' }];
-  public readonly teacher = {
+  public readonly teachersSupabaseRows = [
+    {
+      id: 'teacher-1',
+      name: 'Prof 1',
+      email: 'prof1@school.com',
+      created_at: '2026-01-01T00:00:00.000Z',
+      establishment_id: this.establishmentId,
+      available_chatbots: 0,
+      supabase_user_id: null,
+    },
+  ];
+  public readonly expectedTeachers = [
+    {
+      id: 'teacher-1',
+      name: 'Prof 1',
+      email: 'prof1@school.com',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      establishmentId: this.establishmentId,
+      availableChatbots: 0,
+      supabaseUserId: undefined,
+    },
+  ];
+  public readonly teacherSupabaseRow = {
     id: 'teacher-1',
     name: 'Prof 1',
     email: 'prof1@school.com',
@@ -129,7 +150,35 @@ class Fixtures {
     available_chatbots: 1,
     supabase_user_id: 'user-1',
   };
-  public readonly sessions = [{ id: 'session-1', teacher_id: 'teacher-1' }];
+  public readonly expectedTeacher = {
+    id: 'teacher-1',
+    name: 'Prof 1',
+    email: 'prof1@school.com',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    establishmentId: null,
+    availableChatbots: 1,
+    supabaseUserId: 'user-1',
+  };
+  public readonly sessionsSupabaseRows = [
+    {
+      id: 'session-1',
+      name: 'S1',
+      code: 'C1',
+      language: 'francais',
+      teacher_id: 'teacher-1',
+      created_at: '2026-01-01T00:00:00.000Z',
+    },
+  ];
+  public readonly expectedTeacherSessions = [
+    {
+      id: 'session-1',
+      name: 'S1',
+      code: 'C1',
+      language: 'francais',
+      teacherId: 'teacher-1',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    },
+  ];
   public readonly invitationTokenId = 'token-1';
   public readonly establishmentIdToLink = 'est-2';
 
@@ -219,15 +268,17 @@ class Fixtures {
 
   whenGetTeacherByUserId() {
     this.byUserModeEnabled = true;
-    return this.repository.getTeacherByUserId(this.teacher.supabase_user_id);
+    return this.repository.getTeacherByUserId(
+      this.teacherSupabaseRow.supabase_user_id,
+    );
   }
 
   whenCreateTeacher() {
     this.createModeEnabled = true;
     return this.repository.createTeacher(
-      this.teacher.supabase_user_id,
-      this.teacher.name,
-      this.teacher.email,
+      this.teacherSupabaseRow.supabase_user_id,
+      this.teacherSupabaseRow.name,
+      this.teacherSupabaseRow.email,
     );
   }
 
@@ -235,14 +286,14 @@ class Fixtures {
     this.linkModeEnabled = true;
     return this.repository.linkTeacherToEstablishment(
       this.invitationTokenId,
-      this.teacher.id,
+      this.teacherSupabaseRow.id,
       this.establishmentIdToLink,
     );
   }
 
   whenTeacherQueryReturnsData() {
     this.teacherEqMock.mockResolvedValue({
-      data: this.teachers,
+      data: this.teachersSupabaseRows,
       error: null,
     });
   }
@@ -256,7 +307,7 @@ class Fixtures {
 
   whenSessionsQueryReturnsData() {
     this.sessionsInMock.mockResolvedValue({
-      data: this.sessions,
+      data: this.sessionsSupabaseRows,
       error: null,
     });
   }
@@ -270,7 +321,7 @@ class Fixtures {
 
   whenGetTeacherByUserIdReturnsData() {
     this.byUserMaybeSingleMock.mockResolvedValue({
-      data: this.teacher,
+      data: this.teacherSupabaseRow,
       error: null,
     });
   }
@@ -291,7 +342,7 @@ class Fixtures {
 
   whenCreateTeacherReturnsData() {
     this.createSingleMock.mockResolvedValue({
-      data: this.teacher,
+      data: this.teacherSupabaseRow,
       error: null,
     });
   }
@@ -321,9 +372,7 @@ class Fixtures {
 
   thenTeacherQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('teachers');
-    expect(this.teacherSelectMock).toHaveBeenCalledWith(
-      'id, name, email, created_at',
-    );
+    expect(this.teacherSelectMock).toHaveBeenCalledWith('*');
     expect(this.teacherEqMock).toHaveBeenCalledWith(
       'establishment_id',
       this.establishmentId,
@@ -345,11 +394,11 @@ class Fixtures {
   }
 
   thenReturnExpectedTeachers(result: any) {
-    expect(result).toEqual(this.teachers);
+    expect(result).toEqual(this.expectedTeachers);
   }
 
   thenReturnExpectedSessions(result: any) {
-    expect(result).toEqual(this.sessions);
+    expect(result).toEqual(this.expectedTeacherSessions);
   }
 
   thenGetTeacherByUserIdQueryBuiltWithExpectedArguments() {
@@ -357,7 +406,7 @@ class Fixtures {
     expect(this.byUserSelectMock).toHaveBeenCalledWith('*');
     expect(this.byUserEqMock).toHaveBeenCalledWith(
       'supabase_user_id',
-      this.teacher.supabase_user_id,
+      this.teacherSupabaseRow.supabase_user_id,
     );
     expect(this.byUserMaybeSingleMock).toHaveBeenCalledTimes(1);
   }
@@ -365,9 +414,9 @@ class Fixtures {
   thenCreateTeacherQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('teachers');
     expect(this.createInsertMock).toHaveBeenCalledWith({
-      supabase_user_id: this.teacher.supabase_user_id,
-      name: this.teacher.name,
-      email: this.teacher.email,
+      supabase_user_id: this.teacherSupabaseRow.supabase_user_id,
+      name: this.teacherSupabaseRow.name,
+      email: this.teacherSupabaseRow.email,
     });
     expect(this.createSelectMock).toHaveBeenCalledTimes(1);
     expect(this.createSingleMock).toHaveBeenCalledTimes(1);
@@ -378,7 +427,10 @@ class Fixtures {
     expect(this.linkUpdateMock).toHaveBeenCalledWith({
       establishment_id: this.establishmentIdToLink,
     });
-    expect(this.linkEqMock).toHaveBeenCalledWith('id', this.teacher.id);
+    expect(this.linkEqMock).toHaveBeenCalledWith(
+      'id',
+      this.teacherSupabaseRow.id,
+    );
   }
 
   thenRollbackInvitationTokenCalled() {
@@ -399,6 +451,6 @@ class Fixtures {
   }
 
   thenReturnExpectedTeacher(result: any) {
-    expect(result).toEqual(this.teacher);
+    expect(result).toEqual(this.expectedTeacher);
   }
 }

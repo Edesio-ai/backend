@@ -34,11 +34,11 @@ class Fixtures {
   };
   public readonly updatedSession = {
     id: this.sessionId,
-    teacher_id: this.body.teacherId,
+    teacherId: this.body.teacherId,
     name: this.body.name,
     code: 'ABC123',
-    language: 'francais',
-    created_at: '2026-01-01T00:00:00.000Z',
+    language: 'francais' as const,
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
   public readonly repositoryError = new Error('update failed');
 
@@ -62,7 +62,7 @@ class Fixtures {
 
   whenUpdateSessionNameSucceeds() {
     this.sessionRepository.updateSessionName.mockResolvedValue(
-      this.updatedSession as any,
+      this.updatedSession,
     );
   }
 

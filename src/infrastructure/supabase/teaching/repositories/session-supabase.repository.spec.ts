@@ -44,6 +44,15 @@ describe('SupabaseSessionRepository', () => {
     fixtures.thenGetSessionByCodeQueryBuiltWithExpectedArguments();
   });
 
+  it('should return null when getSessionByCode has no row', async () => {
+    fixtures.whenGetSessionByCodeReturnsNull();
+
+    const result = await fixtures.whenGetSessionByCode();
+
+    expect(result).toBeNull();
+    fixtures.thenGetSessionByCodeQueryBuiltWithExpectedArguments();
+  });
+
   it('should create session', async () => {
     fixtures.whenCreateSessionSucceeds();
 
@@ -101,26 +110,49 @@ describe('SupabaseSessionRepository', () => {
 class Fixtures {
   public readonly teacherId = 'teacher-1';
   public readonly code = 'ABCD';
-  public readonly sessions = [
+  public readonly sessionsSupabaseRows = [
     {
       id: 'session-1',
       teacher_id: this.teacherId,
-      nom: 'Cours 1',
+      name: 'Cours 1',
       code: 'ABCD',
-      langue: 'francais',
+      language: 'francais' as const,
       created_at: '2026-01-01T00:00:00.000Z',
     },
   ];
-  public readonly sessionByCode = {
+  public readonly expectedSessions = [
+    {
+      id: 'session-1',
+      teacherId: this.teacherId,
+      name: 'Cours 1',
+      code: 'ABCD',
+      language: 'francais' as const,
+      createdAt: '2026-01-01T00:00:00.000Z',
+    },
+  ];
+  public readonly sessionByCodeSupabaseRow = {
     id: 'session-1',
+    teacher_id: this.teacherId,
+    name: 'By code',
+    code: this.code,
+    language: 'francais' as const,
+    created_at: '2026-01-01T00:00:00.000Z',
+  };
+  public readonly expectedSessionByCode = {
+    id: 'session-1',
+    teacherId: this.teacherId,
+    name: 'By code',
+    code: this.code,
+    language: 'francais' as const,
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
   public readonly createSessionBody = {
     teacherId: this.teacherId,
     name: 'Cours 1',
     code: this.code,
-    language: 'francais',
+    language: 'francais' as const,
   };
-  public readonly createdSession = {
+  public readonly createdSessionSupabaseRow = {
     id: 'session-2',
     teacher_id: this.teacherId,
     name: this.createSessionBody.name,
@@ -128,19 +160,35 @@ class Fixtures {
     language: this.createSessionBody.language,
     created_at: '2026-01-01T00:00:00.000Z',
   };
+  public readonly expectedCreatedSession = {
+    id: 'session-2',
+    teacherId: this.teacherId,
+    name: this.createSessionBody.name,
+    code: this.createSessionBody.code,
+    language: this.createSessionBody.language,
+    createdAt: '2026-01-01T00:00:00.000Z',
+  };
   public readonly updateSessionBody = {
     name: 'Updated Session Name',
     teacherId: this.teacherId,
   };
   public readonly sessionIdToUpdate = 'session-2';
   public readonly sessionIdToDelete = 'session-1';
-  public readonly updatedSession = {
+  public readonly updatedSessionSupabaseRow = {
     id: this.sessionIdToUpdate,
     teacher_id: this.teacherId,
     name: this.updateSessionBody.name,
     code: 'NEW123',
-    language: 'francais',
+    language: 'francais' as const,
     created_at: '2026-01-01T00:00:00.000Z',
+  };
+  public readonly expectedUpdatedSession = {
+    id: this.sessionIdToUpdate,
+    teacherId: this.teacherId,
+    name: this.updateSessionBody.name,
+    code: 'NEW123',
+    language: 'francais' as const,
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   private readonly orderMock = jest.fn();
@@ -215,14 +263,14 @@ class Fixtures {
 
   whenCreateSession() {
     this.mode = 'create';
-    return this.repository.createSession(this.createSessionBody as any);
+    return this.repository.createSession(this.createSessionBody);
   }
 
   whenUpdateSessionName() {
     this.mode = 'update';
     return this.repository.updateSessionName(
       this.sessionIdToUpdate,
-      this.updateSessionBody as any,
+      this.updateSessionBody,
     );
   }
 
@@ -236,7 +284,7 @@ class Fixtures {
 
   whenSessionsQuerySucceeds() {
     this.orderMock.mockResolvedValue({
-      data: this.sessions,
+      data: this.sessionsSupabaseRows,
       error: null,
     });
   }
@@ -250,7 +298,7 @@ class Fixtures {
 
   whenGetSessionByCodeSucceeds() {
     this.byCodeMaybeSingleMock.mockResolvedValue({
-      data: this.sessionByCode,
+      data: this.sessionByCodeSupabaseRow,
       error: null,
     });
   }
@@ -262,9 +310,16 @@ class Fixtures {
     });
   }
 
+  whenGetSessionByCodeReturnsNull() {
+    this.byCodeMaybeSingleMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+  }
+
   whenCreateSessionSucceeds() {
     this.createSingleMock.mockResolvedValue({
-      data: this.createdSession,
+      data: this.createdSessionSupabaseRow,
       error: null,
     });
   }
@@ -278,7 +333,7 @@ class Fixtures {
 
   whenUpdateSessionNameSucceeds() {
     this.updateSingleMock.mockResolvedValue({
-      data: this.updatedSession,
+      data: this.updatedSessionSupabaseRow,
       error: null,
     });
   }
@@ -315,18 +370,18 @@ class Fixtures {
   }
 
   thenReturnExpectedSessions(result: unknown) {
-    expect(result).toEqual(this.sessions);
+    expect(result).toEqual(this.expectedSessions);
   }
 
   thenGetSessionByCodeQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('sessions');
-    expect(this.byCodeSelectMock).toHaveBeenCalledWith('id');
+    expect(this.byCodeSelectMock).toHaveBeenCalledWith('*');
     expect(this.byCodeEqMock).toHaveBeenCalledWith('code', this.code);
     expect(this.byCodeMaybeSingleMock).toHaveBeenCalledTimes(1);
   }
 
   thenReturnExpectedSessionByCode(result: unknown) {
-    expect(result).toEqual(this.sessionByCode);
+    expect(result).toEqual(this.expectedSessionByCode);
   }
 
   thenCreateSessionQueryBuiltWithExpectedArguments() {
@@ -342,7 +397,7 @@ class Fixtures {
   }
 
   thenReturnExpectedCreatedSession(result: unknown) {
-    expect(result).toEqual(this.createdSession);
+    expect(result).toEqual(this.expectedCreatedSession);
   }
 
   thenUpdateSessionNameQueryBuiltWithExpectedArguments() {
@@ -363,7 +418,7 @@ class Fixtures {
   }
 
   thenReturnExpectedUpdatedSession(result: unknown) {
-    expect(result).toEqual(this.updatedSession);
+    expect(result).toEqual(this.expectedUpdatedSession);
   }
 
   thenDeleteSessionQueryBuiltWithExpectedArguments() {

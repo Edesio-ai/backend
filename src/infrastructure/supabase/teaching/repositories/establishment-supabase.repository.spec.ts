@@ -87,17 +87,27 @@ describe('EstablishmentSupabaseRepository', () => {
 
 class Fixtures {
   public readonly userId = 'user-1';
-  public readonly establishment = {
+  public readonly establishmentSupabaseRow = {
     id: 'est-1',
     name: 'Edesio Academy',
+    email: 'owner@edesio.io',
     supabase_user_id: this.userId,
+    created_at: '2026-01-01T00:00:00.000Z',
+  };
+
+  public readonly expectedEstablishment = {
+    id: 'est-1',
+    name: 'Edesio Academy',
+    email: 'owner@edesio.io',
+    supabaseUserId: this.userId,
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
   public readonly createBody = {
     supabaseUserId: 'user-2',
     name: 'Edesio New',
     email: 'new@edesio.io',
   };
-  public readonly invitationTokens = [
+  public readonly invitationTokensSupabaseRows = [
     {
       id: 'token-1',
       establishment_id: 'est-1',
@@ -110,11 +120,33 @@ class Fixtures {
       assigned_chatbots: 2,
     },
   ];
-  public readonly createdEstablishment = {
+  public readonly expectedInvitationTokens = [
+    {
+      id: 'token-1',
+      establishmentId: 'est-1',
+      token: 'abc',
+      invitedEmail: 'teacher@school.com',
+      expiresAt: '2026-04-01T00:00:00.000Z',
+      usedAt: null,
+      usedBy: null,
+      createdAt: '2026-03-28T00:00:00.000Z',
+      assignedChatbots: 2,
+    },
+  ];
+  public readonly createdEstablishmentSupabaseRow = {
     id: 'est-2',
     supabase_user_id: this.createBody.supabaseUserId,
     name: this.createBody.name,
     email: this.createBody.email,
+    created_at: '2026-01-02T00:00:00.000Z',
+  };
+
+  public readonly expectedCreatedEstablishment = {
+    id: 'est-2',
+    supabaseUserId: this.createBody.supabaseUserId,
+    name: this.createBody.name,
+    email: this.createBody.email,
+    createdAt: '2026-01-02T00:00:00.000Z',
   };
 
   private readonly singleMock = jest.fn();
@@ -167,7 +199,9 @@ class Fixtures {
   }
 
   whenGetEstablishmentById() {
-    return this.repository.getEstablishmentById(this.establishment.id);
+    return this.repository.getEstablishmentById(
+      this.establishmentSupabaseRow.id,
+    );
   }
 
   whenCreateEstablishment() {
@@ -180,13 +214,13 @@ class Fixtures {
 
   whenGetInvitationTokenByEstablishmentId() {
     return this.repository.getInvitationTokenByEstablishmentId(
-      this.establishment.id,
+      this.establishmentSupabaseRow.id,
     );
   }
 
   whenSupabaseReturnsData() {
     this.singleMock.mockResolvedValue({
-      data: this.establishment,
+      data: this.establishmentSupabaseRow,
       error: null,
     });
   }
@@ -200,7 +234,7 @@ class Fixtures {
 
   whenCreateSupabaseReturnsData() {
     this.createSingleMock.mockResolvedValue({
-      data: this.createdEstablishment,
+      data: this.createdEstablishmentSupabaseRow,
       error: null,
     });
   }
@@ -214,7 +248,7 @@ class Fixtures {
 
   whenInvitationTokensQueryReturnsData() {
     this.invitationTokensOrderMock.mockResolvedValue({
-      data: this.invitationTokens,
+      data: this.invitationTokensSupabaseRows,
       error: null,
     });
   }
@@ -250,12 +284,15 @@ class Fixtures {
   thenGetByIdQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('establishment');
     expect(this.selectMock).toHaveBeenCalledWith('*');
-    expect(this.eqMock).toHaveBeenCalledWith('id', this.establishment.id);
+    expect(this.eqMock).toHaveBeenCalledWith(
+      'id',
+      this.establishmentSupabaseRow.id,
+    );
     expect(this.singleMock).toHaveBeenCalledTimes(1);
   }
 
   thenReturnExpectedEstablishment(result: any) {
-    expect(result).toEqual(this.establishment);
+    expect(result).toEqual(this.expectedEstablishment);
   }
 
   thenCreateQueryBuiltWithExpectedArguments() {
@@ -270,7 +307,7 @@ class Fixtures {
   }
 
   thenReturnExpectedCreatedEstablishment(result: any) {
-    expect(result).toEqual(this.createdEstablishment);
+    expect(result).toEqual(this.expectedCreatedEstablishment);
   }
 
   thenInvitationTokensQueryBuiltWithExpectedArguments() {
@@ -278,7 +315,7 @@ class Fixtures {
     expect(this.invitationTokensSelectMock).toHaveBeenCalledWith('*');
     expect(this.invitationTokensEqMock).toHaveBeenCalledWith(
       'establishment_id',
-      this.establishment.id,
+      this.establishmentSupabaseRow.id,
     );
     expect(this.invitationTokensOrderMock).toHaveBeenCalledWith('created_at', {
       ascending: false,
@@ -287,6 +324,6 @@ class Fixtures {
   }
 
   thenReturnExpectedInvitationTokens(result: any) {
-    expect(result).toEqual(this.invitationTokens);
+    expect(result).toEqual(this.expectedInvitationTokens);
   }
 }
