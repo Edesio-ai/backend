@@ -1,6 +1,5 @@
 import {
   SupabaseCourse,
-  SupabaseCourseFile,
   CourseFileUpload,
   CreateCourseBody,
   Course,
