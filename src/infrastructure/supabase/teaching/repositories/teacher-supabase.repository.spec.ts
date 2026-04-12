@@ -268,7 +268,9 @@ class Fixtures {
 
   whenGetTeacherByUserId() {
     this.byUserModeEnabled = true;
-    return this.repository.getTeacherByUserId(this.teacherSupabaseRow.supabase_user_id);
+    return this.repository.getTeacherByUserId(
+      this.teacherSupabaseRow.supabase_user_id,
+    );
   }
 
   whenCreateTeacher() {
@@ -425,7 +427,10 @@ class Fixtures {
     expect(this.linkUpdateMock).toHaveBeenCalledWith({
       establishment_id: this.establishmentIdToLink,
     });
-    expect(this.linkEqMock).toHaveBeenCalledWith('id', this.teacherSupabaseRow.id);
+    expect(this.linkEqMock).toHaveBeenCalledWith(
+      'id',
+      this.teacherSupabaseRow.id,
+    );
   }
 
   thenRollbackInvitationTokenCalled() {

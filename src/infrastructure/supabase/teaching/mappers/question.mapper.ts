@@ -8,7 +8,7 @@ type SupabaseQuestionInsert = {
   course_id: string;
   type: string;
   question: string;
-  propositions?: unknown | null;
+  propositions?: unknown;
   correct_answer?: string | null;
   correct_answers?: string[] | null;
   explication?: string | null;
@@ -22,7 +22,7 @@ export function createQuestionBodyToSupabaseQuestionInsert(
     course_id: body.courseId,
     type: body.type,
     question: body.question,
-    propositions: body.options ?? null,
+    propositions: body.propositions ?? null,
     correct_answer: body.correctAnswer ?? null,
     correct_answers: body.correctAnswers ?? null,
     explication: body.explanation ?? null,
@@ -36,7 +36,7 @@ export function supabaseQuestionToQuestion(row: SupabaseQuestion): Question {
     courseId: row.course_id,
     type: row.type,
     question: row.question,
-    options: row.propositions,
+    propositions: row.propositions,
     correctAnswer: row.correct_answer,
     correctAnswers: row.correct_answers,
     explanation: row.explication,

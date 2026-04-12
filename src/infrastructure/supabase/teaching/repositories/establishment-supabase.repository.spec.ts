@@ -186,7 +186,9 @@ class Fixtures {
   }
 
   whenGetEstablishmentById() {
-    return this.repository.getEstablishmentById(this.establishmentSupabaseRow.id);
+    return this.repository.getEstablishmentById(
+      this.establishmentSupabaseRow.id,
+    );
   }
 
   whenCreateEstablishment() {

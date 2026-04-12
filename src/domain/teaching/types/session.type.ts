@@ -1,8 +1,4 @@
-export type SessionLanguage =
-  | 'francais'
-  | 'anglais'
-  | 'espagnol'
-  | 'allemand';
+export type SessionLanguage = 'francais' | 'anglais' | 'espagnol' | 'allemand';
 
 /** Row returned by Supabase for `public.sessions` (snake_case columns). */
 export type SupabaseSession = {

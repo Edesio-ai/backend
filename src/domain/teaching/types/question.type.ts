@@ -1,10 +1,9 @@
-/** Row shape returned by Supabase for `public.questions` (snake_case columns). */
 export type SupabaseQuestion = {
   id: string;
   course_id: string;
   type: string;
   question: string;
-  propositions: unknown | null;
+  propositions: unknown;
   correct_answer: string | null;
   correct_answers: string[] | null;
   explication: string | null;
@@ -17,7 +16,7 @@ export type Question = {
   courseId: string;
   type: string;
   question: string;
-  options: unknown | null;
+  propositions: unknown;
   correctAnswer: string | null;
   correctAnswers: string[] | null;
   explanation: string | null;
@@ -29,7 +28,7 @@ export type CreateQuestionBody = {
   courseId: string;
   type: string;
   question: string;
-  options?: unknown | null;
+  propositions?: unknown;
   correctAnswer?: string | null;
   correctAnswers?: string[] | null;
   explanation?: string | null;
