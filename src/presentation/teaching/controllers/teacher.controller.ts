@@ -72,7 +72,7 @@ export class TeacherController {
 
     return {
       success: true,
-      etablissementId: invitationToken?.establishment_id,
+      etablissementId: invitationToken?.establishmentId,
     };
   }
 }

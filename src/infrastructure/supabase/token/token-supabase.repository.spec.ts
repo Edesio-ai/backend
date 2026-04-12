@@ -68,7 +68,7 @@ class Fixtures {
   public readonly invitationTokenId = 'invitation-id-1';
   public readonly teacherId = 'teacher-1';
   public readonly queryErrorMessage = 'delete failed';
-  public readonly invitation = {
+  public readonly invitationSupabaseRow = {
     id: this.invitationTokenId,
     establishment_id: 'est-1',
     token: this.invitationToken,
@@ -78,6 +78,17 @@ class Fixtures {
     used_by: null,
     created_at: '2026-01-01T00:00:00.000Z',
     assigned_chatbots: 2,
+  };
+  public readonly expectedInvitation = {
+    id: this.invitationTokenId,
+    establishmentId: 'est-1',
+    token: this.invitationToken,
+    invitedEmail: 'teacher@school.com',
+    expiresAt: '2099-01-01T00:00:00.000Z',
+    usedAt: null,
+    usedBy: null,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    assignedChatbots: 2,
   };
 
   private readonly eqMock = jest.fn();
@@ -146,7 +157,7 @@ class Fixtures {
 
   whenGetInvitationByTokenSucceeds() {
     this.getSingleMock.mockResolvedValue({
-      data: this.invitation,
+      data: this.invitationSupabaseRow,
       error: null,
     });
   }
@@ -160,7 +171,7 @@ class Fixtures {
 
   whenMarkInvitationTokenAsUsedSucceeds() {
     this.markSingleMock.mockResolvedValue({
-      data: this.invitation,
+      data: this.invitationSupabaseRow,
       error: null,
     });
   }
@@ -209,6 +220,6 @@ class Fixtures {
   }
 
   thenReturnExpectedInvitation(result: unknown) {
-    expect(result).toEqual(this.invitation);
+    expect(result).toEqual(this.expectedInvitation);
   }
 }

@@ -101,14 +101,14 @@ class Fixtures {
   };
   public readonly invitation: InvitationToken = {
     id: 'invitation-id-1',
-    establishment_id: 'establishment-1',
+    establishmentId: 'establishment-1',
     token: this.token,
-    invited_email: this.teacher.email,
-    expires_at: '2099-01-01T00:00:00.000Z',
-    used_at: null,
-    used_by: null,
-    created_at: '2026-01-01T00:00:00.000Z',
-    assigned_chatbots: 2,
+    invitedEmail: this.teacher.email,
+    expiresAt: '2099-01-01T00:00:00.000Z',
+    usedAt: null,
+    usedBy: null,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    assignedChatbots: 2,
   };
 
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
@@ -160,21 +160,21 @@ class Fixtures {
   whenInvitationExpired() {
     this.tokenRepository.getInvitationByToken.mockResolvedValue({
       ...this.invitation,
-      expires_at: '2000-01-01T00:00:00.000Z',
+      expiresAt: '2000-01-01T00:00:00.000Z',
     });
   }
 
   whenInvitationAlreadyUsed() {
     this.tokenRepository.getInvitationByToken.mockResolvedValue({
       ...this.invitation,
-      used_at: '2026-01-01T10:00:00.000Z',
+      usedAt: '2026-01-01T10:00:00.000Z',
     });
   }
 
   whenInvitationEmailMismatch() {
     this.tokenRepository.getInvitationByToken.mockResolvedValue({
       ...this.invitation,
-      invited_email: 'another@school.com',
+      invitedEmail: 'another@school.com',
     });
   }
 
@@ -202,7 +202,7 @@ class Fixtures {
     ).toHaveBeenCalledWith(
       this.invitation.id,
       this.teacher.id,
-      this.invitation.establishment_id,
+      this.invitation.establishmentId,
     );
     expect(
       this.teacherRepository.linkTeacherToEstablishment,

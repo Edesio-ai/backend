@@ -107,7 +107,7 @@ class Fixtures {
     name: 'Edesio New',
     email: 'new@edesio.io',
   };
-  public readonly invitationTokens = [
+  public readonly invitationTokensSupabaseRows = [
     {
       id: 'token-1',
       establishment_id: 'est-1',
@@ -118,6 +118,19 @@ class Fixtures {
       used_by: null,
       created_at: '2026-03-28T00:00:00.000Z',
       assigned_chatbots: 2,
+    },
+  ];
+  public readonly expectedInvitationTokens = [
+    {
+      id: 'token-1',
+      establishmentId: 'est-1',
+      token: 'abc',
+      invitedEmail: 'teacher@school.com',
+      expiresAt: '2026-04-01T00:00:00.000Z',
+      usedAt: null,
+      usedBy: null,
+      createdAt: '2026-03-28T00:00:00.000Z',
+      assignedChatbots: 2,
     },
   ];
   public readonly createdEstablishmentSupabaseRow = {
@@ -235,7 +248,7 @@ class Fixtures {
 
   whenInvitationTokensQueryReturnsData() {
     this.invitationTokensOrderMock.mockResolvedValue({
-      data: this.invitationTokens,
+      data: this.invitationTokensSupabaseRows,
       error: null,
     });
   }
@@ -311,6 +324,6 @@ class Fixtures {
   }
 
   thenReturnExpectedInvitationTokens(result: any) {
-    expect(result).toEqual(this.invitationTokens);
+    expect(result).toEqual(this.expectedInvitationTokens);
   }
 }

@@ -11,7 +11,7 @@ export class GetSessionByCodeUseCase {
     private readonly teacherSessionsRepository: SessionRepository,
   ) {}
 
-  async execute(code: string): Promise<Session> {
+  async execute(code: string): Promise<Session | null> {
     const session = await this.teacherSessionsRepository.getSessionByCode(code);
 
     return session;

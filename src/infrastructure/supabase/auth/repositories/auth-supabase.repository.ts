@@ -196,8 +196,8 @@ export class AuthSupabaseRepository implements AuthRepository {
           adminData.id,
           `${firstname} ${lastname}`,
           email,
-          invitationToken.establishment_id,
-          invitationToken.assigned_chatbots || 0,
+          invitationToken.establishmentId,
+          invitationToken.assignedChatbots || 0,
         ),
       )
       .select()

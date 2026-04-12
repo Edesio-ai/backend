@@ -18,11 +18,7 @@ export class CreateCheckoutSessionsUseCase {
     private readonly paymentClient: StripeClientInterface,
   ) {}
 
-  async execute(
-    priceId: string,
-    planType: string,
-    user: User,
-  ): Promise<any> {
+  async execute(priceId: string, planType: string, user: User): Promise<any> {
     if (!user) {
       throw new TokenUserNotFoundError('User not found');
     }

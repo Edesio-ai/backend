@@ -1,8 +1,4 @@
-import {
-  UserMetadata,
-  AuthUserWithSession,
-  User,
-} from '../types/auth.type';
+import { UserMetadata, AuthUserWithSession, User } from '../types/auth.type';
 import { InvitationToken, InvitationTokenPreview } from '../invitation.type';
 import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-toke.use-case';
 

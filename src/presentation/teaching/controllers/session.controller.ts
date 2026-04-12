@@ -86,7 +86,7 @@ export class SessionController {
   @Get('code/:code')
   async getSessionByCode(
     @Param('code') code: string,
-  ): Promise<{ session: Session }> {
+  ): Promise<{ session: Session | null }> {
     const session = await this.getSessionByCodeUseCase.execute(code);
     return {
       session,

@@ -8,7 +8,7 @@ export const SESSION_REPOSITORY = Symbol('SESSION_REPOSITORY');
 
 export interface SessionRepository {
   getSessionsByTeacherId(teacherId: string): Promise<Session[]>;
-  getSessionByCode(code: string): Promise<Session>;
+  getSessionByCode(code: string): Promise<Session | null>;
   createSession(body: CreateSessionBody): Promise<Session>;
   updateSessionName(
     sessionId: string,

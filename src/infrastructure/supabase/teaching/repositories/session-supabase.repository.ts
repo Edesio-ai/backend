@@ -33,7 +33,7 @@ export class SupabaseSessionRepository implements SessionRepository {
     return (data ?? []).map(supabaseSessionToSession);
   }
 
-  public async getSessionByCode(code: string): Promise<Session> {
+  public async getSessionByCode(code: string): Promise<Session | null> {
     const { data, error } = await this.supabase
       .from('sessions')
       .select('*')
@@ -41,11 +41,12 @@ export class SupabaseSessionRepository implements SessionRepository {
       .maybeSingle();
 
     if (error) {
+      console.error('An error occure while getting session by code:', error);
       throw new SessionServerError(error.message);
     }
 
     if (!data) {
-      throw new SessionServerError('Session not found');
+      return null;
     }
 
     return supabaseSessionToSession(data);

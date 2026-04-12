@@ -12,6 +12,7 @@ import { InvitationToken } from '../../../../domain/auth/invitation.type';
 import {
   createEstablishmentBodyToSupabaseEstablishmentInsert,
   supabaseEstablishmentToEstablishment,
+  supabaseInvitationTokenRowToInvitationToken,
 } from '../mappers/establishment.mapper';
 
 export class EstablishmentSupabaseRepository implements EstablishmentRepository {
@@ -43,7 +44,10 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
       .single();
 
     if (error || !data) {
-      console.error("An error occure while getting establishment by user id:", error)
+      console.error(
+        'An error occure while getting establishment by user id:',
+        error,
+      );
       throw new EstablishmentNotFoundError(
         error?.message ?? 'Establishment not found',
       );
@@ -69,7 +73,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
       .single();
 
     if (error || !data) {
-      console.error("An error occure while creating establishment:", error)
+      console.error('An error occure while creating establishment:', error);
       throw new EstablishmentCreationFailedError(
         error?.message ?? 'Insert failed',
       );
@@ -90,6 +94,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
     if (error) {
       throw new InvitationTokenNotFoundError(error.message);
     }
-    return data;
+
+    return (data ?? []).map(supabaseInvitationTokenRowToInvitationToken);
   }
 }

@@ -44,12 +44,12 @@ describe('SupabaseSessionRepository', () => {
     fixtures.thenGetSessionByCodeQueryBuiltWithExpectedArguments();
   });
 
-  it('should throw SessionServerError when getSessionByCode has no row', async () => {
+  it('should return null when getSessionByCode has no row', async () => {
     fixtures.whenGetSessionByCodeReturnsNull();
 
-    const promise = fixtures.whenGetSessionByCode();
+    const result = await fixtures.whenGetSessionByCode();
 
-    await fixtures.thenThrowSessionServerError(promise);
+    expect(result).toBeNull();
     fixtures.thenGetSessionByCodeQueryBuiltWithExpectedArguments();
   });
 

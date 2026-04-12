@@ -71,7 +71,10 @@ export class GetEstablishmentsStatsUseCase {
       teachersSessions,
       studentCountPerSession,
     );
-    console.log("🚀 ~ GetEstablishmentsStatsUseCase ~ execute ~ TeachersWithStats:", TeachersWithStats)
+    console.log(
+      '🚀 ~ GetEstablishmentsStatsUseCase ~ execute ~ TeachersWithStats:',
+      TeachersWithStats,
+    );
 
     return this.buildEstablishmentStats(
       establishment,
