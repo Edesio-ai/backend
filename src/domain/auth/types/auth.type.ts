@@ -11,6 +11,17 @@ export type Session = {
   session: AuthSession;
 };
 
+export type AuthUserWithSession = {
+  authUser: AuthUser;
+  session: AuthTokenData;
+};
+
+export type AuthTokenData = {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+};
+
 export type AuthSession = {
   access_token: string;
   token_type: string;
@@ -20,14 +31,14 @@ export type AuthSession = {
   user: UserSession;
   weak_password: boolean | null;
 };
-export type UserSession = User & {
+export type UserSession = SupabaseUser & {
   confirmed_at: string;
   last_sign_in_at: string;
   created_at: string;
   updated_at: string;
 };
 
-export type User = {
+export type SupabaseUser = {
   id: string;
   aud: string;
   role: string;
@@ -86,8 +97,21 @@ export type LoginBody = {
 };
 
 export type GetUserSessionResponse = {
-  user: User | null;
+  user: SupabaseUser | null;
   role: Role | null;
 };
 
 export type Role = 'teacher' | 'establishment' | 'student' | 'standalone';
+
+export type AuthUser = {
+  id: string;
+  email: string;
+  emailConfirmedAt: string;
+  metadata: UserMetadata;
+};
+
+export type User = {
+  id: string;
+  email: string;
+  metadata: UserMetadata;
+};

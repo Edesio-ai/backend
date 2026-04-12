@@ -1,6 +1,6 @@
 import { GetUserSessionUseCase } from './get-user-session.use-case';
-import { AuthRepository } from '../../interfaces/persistence/auth.repository';
-import { User } from '../../domain/auth/types/auth.type';
+import { AuthRepository } from '../../domain/auth/contract/auth.repository';
+import { SupabaseUser } from '../../domain/auth/types/auth.type';
 
 describe('GetUserSessionUseCase', () => {
   let fixtures: Fixtures;
@@ -34,15 +34,16 @@ class Fixtures {
 
   public readonly token: string;
   public readonly repositoryError: Error;
-  public readonly user: User;
+  public readonly user: SupabaseUser;
 
   constructor() {
     this.authRepository = {
       getInvitationPreview: jest.fn(),
-      valideInvitationToken: jest.fn(),
       createUser: jest.fn(),
       loginUser: jest.fn(),
       validateToken: jest.fn(),
+      logoutUser: jest.fn(),
+      createInvitationToken: jest.fn(),
     };
 
     this.getUserSessionUseCase = new GetUserSessionUseCase(this.authRepository);
@@ -90,7 +91,7 @@ class Fixtures {
     expect(this.authRepository.validateToken).toHaveBeenCalledTimes(1);
   }
 
-  thenReturnsExpectedUser(result: User) {
+  thenReturnsExpectedUser(result: SupabaseUser) {
     expect(result).toEqual(this.user);
   }
 }

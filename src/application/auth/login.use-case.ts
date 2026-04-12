@@ -4,7 +4,10 @@ import {
   AUTH_REPOSITORY,
   type AuthRepository,
 } from '../../domain/auth/contract/auth.repository';
-import { AuthSession, LoginBody } from '../../domain/auth/types/auth.type';
+import {
+  AuthUserWithSession,
+  LoginBody,
+} from '../../domain/auth/types/auth.type';
 
 export class LoginUseCase {
   constructor(
@@ -12,10 +15,9 @@ export class LoginUseCase {
     private readonly authRepository: AuthRepository,
   ) {}
 
-  async execute(body: LoginBody): Promise<AuthSession> {
+  async execute(body: LoginBody): Promise<AuthUserWithSession> {
     const { email, password } = body;
 
-    const { session } = await this.authRepository.loginUser(email, password);
-    return session;
+    return await this.authRepository.loginUser(email, password);
   }
 }

@@ -1,5 +1,5 @@
 import { RegisterUseCase } from './register.use-case';
-import { AuthRepository } from '../../interfaces/persistence/auth.repository';
+import { AuthRepository } from '../../domain/auth/contract/auth.repository';
 import { EmailProviderInterface } from '../../domain/email/contract/email.interface';
 import { RegisterBody } from '../../domain/auth/types/auth.type';
 
@@ -72,8 +72,11 @@ class Fixtures {
   constructor() {
     this.authRepository = {
       getInvitationPreview: jest.fn(),
-      valideInvitationToken: jest.fn(),
       createUser: jest.fn(),
+      loginUser: jest.fn(),
+      validateToken: jest.fn(),
+      logoutUser: jest.fn(),
+      createInvitationToken: jest.fn(),
     };
 
     this.emailProvider = {

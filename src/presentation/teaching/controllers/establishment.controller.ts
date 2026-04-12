@@ -14,7 +14,7 @@ import { GetEstablishmentsStatsUseCase } from '../../../application/establishmen
 import { Roles } from '../../auth/decorator/role.decorator';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
-import { User } from '../../../domain/auth/types/auth.type';
+import { SupabaseUser } from '../../../domain/auth/types/auth.type';
 import { EstablishmentErrorFilter } from '../../filters/establishment.filter';
 import { TeacherErrorFilter } from '../../filters/teacher.filter';
 import { CreateEstablishmentUseCase } from '../../../application/establishment/create-establishment.use-case';
@@ -43,7 +43,7 @@ export class EstablishmentController {
   @Get('stats')
   @UseFilters(EstablishmentErrorFilter, TeacherErrorFilter)
   async getEstablishmentStats(
-    @Req() req: Request & { user: User },
+    @Req() req: Request & { user: SupabaseUser },
   ): Promise<EstablishmentStats> {
     const { user } = req;
     const stats = await this.getEstablishmentsStatsUseCase.execute(user.id);

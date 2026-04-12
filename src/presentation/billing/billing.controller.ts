@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { GetSubscriptionStatusUseCase } from '../../application/billing/get-subscription-status.use-case';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { User } from '../../domain/auth/types/auth.type';
+import { SupabaseUser } from '../../domain/auth/types/auth.type';
 import { BillingErrorFilter } from '../filters/billing.filter';
 import { CsrfGuard } from '../auth/guards/csrf.guard';
 import { CreateCheckoutSessionsUseCase } from '../../application/billing/create-checkout-session.use-case';
@@ -29,7 +29,7 @@ export class BillingController {
   @UseFilters(BillingErrorFilter, TeacherErrorFilter, EstablishmentErrorFilter)
   @Get('subscription-status')
   async getSubscriptionStatus(
-    @Req() req: Request & { user: User },
+    @Req() req: Request & { user: SupabaseUser },
   ): Promise<any> {
     const { user } = req;
     return this.getSubscriptionStatusUseCase.execute(user);
@@ -39,7 +39,7 @@ export class BillingController {
   @UseFilters(BillingErrorFilter, AuthErrorFilter)
   @Post('checkout-session')
   async createCheckoutSession(
-    @Req() req: Request & { user: User },
+    @Req() req: Request & { user: SupabaseUser },
     @Body() body: CreateCheckoutSessionBodyDto,
   ): Promise<any> {
     const { priceId, planType } = body;

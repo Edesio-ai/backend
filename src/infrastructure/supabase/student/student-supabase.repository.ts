@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
-import { StudentRepository } from '../../../../domain/teaching/interface/student.repository';
+import { StudentRepository } from '../../../domain/teaching/interface/student.repository';
 import { SUPABASE_ADMIN } from '../supabase.module';
-import { StudentSessionsNotFoundError } from '../../../../domain/teaching/error';
+import { StudentSessionsNotFoundError } from '../../../domain/teaching/error';
 
 export class StudentSupabaseRepository implements StudentRepository {
   constructor(

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { BillingController } from './billing.controller';
 import { GetSubscriptionStatusUseCase } from '../../application/billing/get-subscription-status.use-case';
-import { AuthPersistenceModule } from '../../infrastructure/persistence/supabase/auth/auth-persistence.module';
+import { AuthPersistenceModule } from '../../infrastructure/supabase/auth/auth-persistence.module';
 import { PaymentModule } from '../../infrastructure/payment/payment.module';
 import { CreateCheckoutSessionsUseCase } from '../../application/billing/create-checkout-session.use-case';
-import { SubscriptionPersistenceModule } from '../../infrastructure/persistence/supabase/subscription/student-persistence.module';
+import { SubscriptionPersistenceModule } from '../../infrastructure/supabase/subscription/student-persistence.module';
 import { BillingRedirectController } from './billing-redirect.controller';
 import { PaymentSuccessUseCase } from '../../application/billing/payment-success.use-case';
-import { TeacherPersistenceModule } from 'src/infrastructure/persistence/supabase/teacher/teacher-persistence.module';
-import { EstablishmentPersistenceModule } from 'src/infrastructure/persistence/supabase/establishment/establishment-persistence.module';
+import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teacher/teacher-persistence.module';
+import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/establishment/establishment-persistence.module';
 
 @Module({
   imports: [

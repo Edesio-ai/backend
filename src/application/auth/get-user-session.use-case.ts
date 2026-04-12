@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 
-import { User } from '../../domain/auth/types/auth.type';
+import { SupabaseUser } from '../../domain/auth/types/auth.type';
 import {
   AUTH_REPOSITORY,
   type AuthRepository,
@@ -12,7 +12,7 @@ export class GetUserSessionUseCase {
     private readonly authRepository: AuthRepository,
   ) {}
 
-  async execute(token: string): Promise<User> {
+  async execute(token: string): Promise<SupabaseUser> {
     return await this.authRepository.validateToken(token);
   }
 }

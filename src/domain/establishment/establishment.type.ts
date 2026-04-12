@@ -25,3 +25,11 @@ export type Stats = {
   totalSessions: number;
   totalStudents: number;
 };
+
+export type SupabaseEstablishment = {
+  id: string;
+  supabase_user_id: string;
+  name: string;
+  email: string;
+  created_at: string;
+};

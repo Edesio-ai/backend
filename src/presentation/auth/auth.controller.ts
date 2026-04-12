@@ -20,6 +20,7 @@ import { SendInvitationUseCase } from '../../application/auth/send-invitation.us
 import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
 import {
   AuthSession,
+  AuthUser,
   GetUserSessionResponse,
 } from '../../domain/auth/types/auth.type';
 import { AuthErrorFilter } from '../filters/auth.filter';
@@ -98,22 +99,22 @@ export class AuthController {
   async login(
     @Body() body: LoginBodyDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthSession> {
+  ): Promise<AuthUser> {
     const isProd = process.env.NODE_ENV === 'production';
-    const session = await this.loginUseCase.execute(body);
+    const { authUser, session } = await this.loginUseCase.execute(body);
 
     const cookieOptions = {
       httpOnly: true,
       secure: isProd,
       sameSite: 'lax' as const,
       path: '/',
-      maxAge: session.expires_in * 1000,
+      maxAge: session.expiresIn * 1000,
     };
 
-    res.cookie('access_token', session.access_token, cookieOptions);
-    res.cookie('refresh_token', session.refresh_token, cookieOptions);
+    res.cookie('access_token', session.accessToken, cookieOptions);
+    res.cookie('refresh_token', session.refreshToken, cookieOptions);
 
-    return session;
+    return authUser;
   }
 
   @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
@@ -132,6 +133,7 @@ export class AuthController {
   async createInvitationToken(
     @Body() body: CreateInvitationTokenBodyDto,
   ): Promise<{ success: boolean }> {
+    console.log('create token');
     await this.createInvitationTokenUseCase.execute(body);
     return { success: true };
   }

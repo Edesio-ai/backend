@@ -5,10 +5,10 @@ import { SUPABASE_ADMIN } from '../supabase.module';
 import {
   EstablishmentCreationFailedError,
   EstablishmentNotFoundError,
-} from '../../../../domain/establishment/error';
-import { Establishment } from '../../../../domain/establishment/establishment.type';
-import { InvitationTokenNotFoundError } from '../../../../domain/auth/errors/auth.errors';
-import { InvitationToken } from '../../../../domain/auth/invitation.type';
+} from '../../../domain/establishment/error';
+import { Establishment } from '../../../domain/establishment/establishment.type';
+import { InvitationTokenNotFoundError } from '../../../domain/auth/errors/auth.errors';
+import { InvitationToken } from '../../../domain/auth/invitation.type';
 
 export class EstablishmentSupabaseRepository implements EstablishmentRepository {
   constructor(

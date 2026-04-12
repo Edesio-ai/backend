@@ -3,9 +3,7 @@ import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
 } from 'src/domain/teaching/interface/teacher.repository';
-import {
-  TeacherNotFoundError,
-} from 'src/domain/teaching/error';
+import { TeacherNotFoundError } from 'src/domain/teaching/error';
 import {
   TOKEN_REPOSITORY,
   type TokenRepository,

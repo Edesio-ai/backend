@@ -39,7 +39,6 @@ class Fixtures {
   constructor() {
     this.authRepository = {
       getInvitationPreview: jest.fn(),
-      valideInvitationToken: jest.fn(),
       createUser: jest.fn(),
       loginUser: jest.fn(),
       validateToken: jest.fn(),
@@ -81,11 +80,7 @@ class Fixtures {
 
   thenCreateInvitationTokenCalledWithExpectedArguments() {
     expect(this.authRepository.createInvitationToken).toHaveBeenCalledWith(
-      this.body.establishmentId,
-      this.body.token,
-      this.body.invitedEmail,
-      this.body.expiresAt,
-      this.body.assignedChatbots,
+      this.body,
     );
     expect(this.authRepository.createInvitationToken).toHaveBeenCalledTimes(1);
   }

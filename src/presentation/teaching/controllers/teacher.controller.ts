@@ -11,7 +11,7 @@ import { GetTeacherByUserIdUseCase } from 'src/application/teacher/get-teacher-b
 import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { TokenErrorFilter } from 'src/presentation/filters/token.filter';
-import { User } from 'src/domain/auth/types/auth.type';
+import { SupabaseUser } from 'src/domain/auth/types/auth.type';
 import { CreateTeacherBodyDto } from 'src/presentation/teaching/dto/teacher/create-teacher-body.dto';
 import { CreateTeacherUseCase } from 'src/application/teacher/create-teacher.use-case';
 import { Teacher } from 'src/domain/teaching/types/teacher.type';
@@ -33,7 +33,9 @@ export class TeacherController {
   @Roles('teacher')
   @Get()
   @UseFilters(TokenErrorFilter)
-  async getTeacherByUserId(@Req() req: Request & { user: User }): Promise<any> {
+  async getTeacherByUserId(
+    @Req() req: Request & { user: SupabaseUser },
+  ): Promise<any> {
     const { user } = req;
     const teacher = await this.getTeacherByUserIdUseCase.execute(user.id);
     return { teacher };
@@ -44,7 +46,7 @@ export class TeacherController {
   @Post()
   @UseFilters(TokenErrorFilter)
   async createTeacher(
-    @Req() req: Request & { user: User },
+    @Req() req: Request & { user: SupabaseUser },
     @Body() body: CreateTeacherBodyDto,
   ): Promise<Teacher | null> {
     const { user } = req;
@@ -58,7 +60,7 @@ export class TeacherController {
   @Post('validate-invitation')
   @UseFilters(TokenErrorFilter, TeacherErrorFilter)
   async validateTeacherInvitation(
-    @Req() req: Request & { user: User },
+    @Req() req: Request & { user: SupabaseUser },
     @Body() body: ValidateTeacherInvitationBodyDto,
   ): Promise<any> {
     const { user } = req;

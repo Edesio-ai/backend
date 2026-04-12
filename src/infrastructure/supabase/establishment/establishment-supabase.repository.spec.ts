@@ -2,8 +2,8 @@ import { EstablishmentSupabaseRepository } from './establishment-supabase.reposi
 import {
   EstablishmentCreationFailedError,
   EstablishmentNotFoundError,
-} from '../../../../domain/establishment/error';
-import { InvitationTokenNotFoundError } from '../../../../domain/auth/errors/auth.errors';
+} from '../../../domain/establishment/error';
+import { InvitationTokenNotFoundError } from '../../../domain/auth/errors/auth.errors';
 
 describe('EstablishmentSupabaseRepository', () => {
   let fixtures: Fixtures;

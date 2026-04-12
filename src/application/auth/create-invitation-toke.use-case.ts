@@ -19,19 +19,6 @@ export class CreateInvitationTokenUseCase {
   ) {}
 
   async execute(body: CreateInvitationTokenBody): Promise<void> {
-    const {
-      establishmentId,
-      token,
-      invitedEmail,
-      expiresAt,
-      assignedChatbots,
-    } = body;
-    return await this.authRepository.createInvitationToken(
-      establishmentId,
-      token,
-      invitedEmail,
-      expiresAt,
-      assignedChatbots,
-    );
+    return await this.authRepository.createInvitationToken(body);
   }
 }
