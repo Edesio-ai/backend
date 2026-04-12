@@ -19,6 +19,7 @@ import {
   STUDENT_REPOSITORY,
   type StudentRepository,
 } from 'src/domain/teaching/interface/student.repository';
+import type { StudentSession } from 'src/domain/teaching/types/student.type';
 
 export class GetEstablishmentsStatsUseCase {
   constructor(
@@ -43,22 +44,22 @@ export class GetEstablishmentsStatsUseCase {
       await this.teacherRepository.getTeachersSessionsByIds(teachersIds);
     const teacherSessionIds = (teachersSessions || []).map((s) => s.id);
 
-    const studentsSessions =
+    const studentsSessions: StudentSession[] =
       await this.studentRepository.getStudentsSessionsByIds(teacherSessionIds);
 
     const studentCountPerSession: Record<string, number> = {};
     const uniqueStudents = new Set<string>();
 
     (studentsSessions || []).forEach((ss) => {
-      studentCountPerSession[ss.session_id] =
-        (studentCountPerSession[ss.session_id] || 0) + 1;
-      uniqueStudents.add(ss.student_id);
+      studentCountPerSession[ss.sessionId] =
+        (studentCountPerSession[ss.sessionId] || 0) + 1;
+      uniqueStudents.add(ss.studentId);
     });
 
     const TeachersWithStats = this.buildTeachersWithStats(
       teachers,
       teachersSessions,
-      studentsSessions,
+      studentCountPerSession,
     );
 
     return this.buildEstablishmentStats(

@@ -85,9 +85,9 @@ class Fixtures {
       { id: 'session-3', teacher_id: 'teacher-2' },
     ];
     this.studentSessions = [
-      { session_id: 'session-1', student_id: 'student-1' },
-      { session_id: 'session-2', student_id: 'student-2' },
-      { session_id: 'session-2', student_id: 'student-1' },
+      { sessionId: 'session-1', studentId: 'student-1' },
+      { sessionId: 'session-2', studentId: 'student-2' },
+      { sessionId: 'session-2', studentId: 'student-1' },
     ];
     this.repositoryError = new Error('establishment not found');
   }
@@ -156,10 +156,10 @@ class Fixtures {
           id: 'teacher-1',
           name: 'Prof 1',
           sessions_count: 2,
-          students_count: 0,
+          students_count: 3,
           sessions: [
-            { id: 'session-1', teacher_id: 'teacher-1', students_count: 0 },
-            { id: 'session-2', teacher_id: 'teacher-1', students_count: 0 },
+            { id: 'session-1', teacher_id: 'teacher-1', students_count: 1 },
+            { id: 'session-2', teacher_id: 'teacher-1', students_count: 2 },
           ],
         },
         {

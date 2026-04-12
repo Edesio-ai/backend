@@ -56,8 +56,11 @@ class Fixtures {
   public readonly sessionIds = ['session-1', 'session-2'];
   public readonly sessionIdToDelete = 'session-1';
   public readonly fallbackId = '00000000-0000-0000-0000-000000000000';
-  public readonly studentSessions = [
+  public readonly studentSessionsSupabaseRows = [
     { session_id: 'session-1', student_id: 'student-1' },
+  ];
+  public readonly expectedStudentSessions = [
+    { sessionId: 'session-1', studentId: 'student-1' },
   ];
 
   private readonly inMock = jest.fn();
@@ -97,7 +100,7 @@ class Fixtures {
 
   whenQueryReturnsData() {
     this.inMock.mockResolvedValue({
-      data: this.studentSessions,
+      data: this.studentSessionsSupabaseRows,
       error: null,
     });
   }
@@ -134,7 +137,7 @@ class Fixtures {
   }
 
   thenReturnExpectedStudentSessions(result: any) {
-    expect(result).toEqual(this.studentSessions);
+    expect(result).toEqual(this.expectedStudentSessions);
   }
 
   thenDeleteStudentSessionsQueryBuilt() {
