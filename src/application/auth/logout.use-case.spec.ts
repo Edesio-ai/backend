@@ -36,7 +36,6 @@ class Fixtures {
   constructor() {
     this.authRepository = {
       getInvitationPreview: jest.fn(),
-      valideInvitationToken: jest.fn(),
       createUser: jest.fn(),
       loginUser: jest.fn(),
       validateToken: jest.fn(),

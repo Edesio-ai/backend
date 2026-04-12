@@ -66,6 +66,10 @@ class Fixtures {
       getCoursesBySessionId: jest.fn(),
       deleteCoursesFilesByCourseIds: jest.fn(),
       deleteCoursesBySessionId: jest.fn(),
+      getSessionCoursesCount: jest.fn(),
+      createCourse: jest.fn(),
+      storeCourseFile: jest.fn(),
+      insertCourseFile: jest.fn(),
     };
     this.questionsRepository = {
       deleteQuestionsByCourseIds: jest.fn(),

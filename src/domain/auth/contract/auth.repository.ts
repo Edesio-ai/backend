@@ -1,25 +1,23 @@
-import { UserMetadata, Session, User } from '../types/auth.type';
+import {
+  UserMetadata,
+  SupabaseUser,
+  AuthUserWithSession,
+} from '../types/auth.type';
 import { InvitationToken, InvitationTokenPreview } from '../invitation.type';
+import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-toke.use-case';
 
 export const AUTH_REPOSITORY = Symbol('AUTH_REPOSITORY');
 
 export interface AuthRepository {
   getInvitationPreview(token: string): Promise<InvitationTokenPreview>;
-  valideInvitationToken(token: string, email: string): Promise<InvitationToken>;
   createUser(
     email: string,
     password: string,
     metadata: UserMetadata,
     invitationToken?: InvitationToken,
   ): Promise<void>;
-  loginUser(email: string, password: string): Promise<Session>;
-  validateToken(token: string): Promise<User>;
+  loginUser(email: string, password: string): Promise<AuthUserWithSession>;
+  validateToken(token: string): Promise<SupabaseUser>;
   logoutUser(accessToken: string): Promise<void>;
-  createInvitationToken(
-    establishmentId: string,
-    token: string,
-    invitedEmail: string,
-    expiresAt: Date,
-    assignedChatbots: number,
-  ): Promise<void>;
+  createInvitationToken(body: CreateInvitationTokenBody): Promise<void>;
 }

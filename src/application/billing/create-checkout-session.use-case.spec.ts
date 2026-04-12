@@ -1,7 +1,7 @@
 import { CreateCheckoutSessionsUseCase } from './create-checkout-session.use-case';
 import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
 import { SubscriptionRepository } from '../../domain/teaching/interface/subscription.repository';
-import { User } from '../../domain/auth/types/auth.type';
+import { SupabaseUser } from '../../domain/auth/types/auth.type';
 import { TokenUserNotFoundError } from '../../domain/auth/errors/auth.errors';
 
 describe('CreateCheckoutSessionsUseCase', () => {
@@ -15,7 +15,7 @@ describe('CreateCheckoutSessionsUseCase', () => {
     const promise = fixtures.whenExecuteWith(
       fixtures.priceId,
       fixtures.planType,
-      null as unknown as User,
+      null as unknown as SupabaseUser,
     );
 
     await fixtures.thenThrowTokenUserNotFound(promise);
@@ -70,7 +70,7 @@ class Fixtures {
   public readonly paymentClient: jest.Mocked<StripeClientInterface>;
   public readonly createCheckoutSessionsUseCase: CreateCheckoutSessionsUseCase;
 
-  public readonly user: User;
+  public readonly user: SupabaseUser;
   public readonly priceId: string;
   public readonly planType: string;
   public readonly existingSubscription: { checkout_url: string };
@@ -118,7 +118,7 @@ class Fixtures {
   whenExecuteWith(
     priceId: string,
     planType: string,
-    user: User,
+    user: SupabaseUser,
   ): Promise<unknown> {
     return this.createCheckoutSessionsUseCase.execute(priceId, planType, user);
   }

@@ -77,6 +77,10 @@ class Fixtures {
     };
     this.sessionRepository = {
       getSessionsByTeacherId: jest.fn(),
+      getSessionByCode: jest.fn(),
+      createSession: jest.fn(),
+      updateSessionName: jest.fn(),
+      deleteSessionByTeacherId: jest.fn(),
     };
     this.useCase = new GetTeacherSessionsUseCase(
       this.sessionRepository,
@@ -95,7 +99,7 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null as any);
   }
 
   whenSessionsFound() {

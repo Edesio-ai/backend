@@ -1,5 +1,5 @@
 import { SubscriptionSupabaseRepository } from './subscription-supabase.repository';
-import { FetchSubscriptionError } from '../../../../domain/subscription/subscription.error';
+import { FetchSubscriptionError } from '../../../domain/subscription/subscription.error';
 
 describe('SubscriptionSupabaseRepository', () => {
   let fixtures: Fixtures;

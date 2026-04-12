@@ -1,5 +1,5 @@
 import { CreateEstablishmentUseCase } from './create-establishment.use-case';
-import { EstablishmentRepository } from '../../interfaces/persistence/establishment.repository';
+import { EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
 import {
   CreateEstablishmentBody,
   Establishment,
@@ -41,8 +41,10 @@ class Fixtures {
 
   constructor() {
     this.establishmentRepository = {
+      getEstablishmentById: jest.fn(),
       getEstablishmentByUserId: jest.fn(),
       createEstablishment: jest.fn(),
+      getInvitationTokenByEstablishmentId: jest.fn(),
     };
 
     this.createEstablishmentUseCase = new CreateEstablishmentUseCase(

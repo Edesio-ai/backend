@@ -1,6 +1,9 @@
 import { LoginUseCase } from './login.use-case';
-import { AuthRepository } from '../../interfaces/persistence/auth.repository';
-import { AuthSession, LoginBody, Session } from '../../domain/auth/types/auth.type';
+import { AuthRepository } from '../../domain/auth/contract/auth.repository';
+import {
+  AuthUserWithSession,
+  LoginBody,
+} from '../../domain/auth/types/auth.type';
 
 describe('LoginUseCase', () => {
   let fixtures: Fixtures;
@@ -18,7 +21,7 @@ describe('LoginUseCase', () => {
       fixtures.loginBody.email,
       fixtures.loginBody.password,
     );
-    fixtures.thenReturnsExpectedSession(result);
+    fixtures.thenReturnsExpectedAuthUserWithSession(result);
   });
 
   it('should propagate repository error when login fails', async () => {
@@ -40,15 +43,16 @@ class Fixtures {
 
   public readonly loginBody: LoginBody;
   public readonly repositoryError: Error;
-  public readonly authSession: AuthSession;
+  public readonly authUserWithSession: AuthUserWithSession;
 
   constructor() {
     this.authRepository = {
       getInvitationPreview: jest.fn(),
-      valideInvitationToken: jest.fn(),
       createUser: jest.fn(),
       loginUser: jest.fn(),
       validateToken: jest.fn(),
+      logoutUser: jest.fn(),
+      createInvitationToken: jest.fn(),
     };
 
     this.loginUseCase = new LoginUseCase(this.authRepository);
@@ -60,29 +64,22 @@ class Fixtures {
 
     this.repositoryError = new Error('Invalid login credentials');
 
-    this.authSession = {
-      access_token: 'access-token',
-      token_type: 'bearer',
-      expires_in: 3600,
-      expires_at: '2026-01-01T12:00:00.000Z',
-      refresh_token: 'refresh-token',
-      user: {
+    this.authUserWithSession = {
+      authUser: {
         id: 'user-1',
-        aud: 'authenticated',
-        role: 'authenticated',
         email: this.loginBody.email,
-        email_confirmed_at: '2026-01-01T00:00:00.000Z',
-        phone: '',
-        app_metadata: { provider: 'email', providers: ['email'] },
-        user_metadata: {},
-        identities: [],
-        created_at: '2026-01-01T00:00:00.000Z',
-        updated_at: '2026-01-01T00:00:00.000Z',
-        is_anonymous: false,
-        confirmed_at: '2026-01-01T00:00:00.000Z',
-        last_sign_in_at: '2026-01-01T00:00:00.000Z',
+        emailConfirmedAt: '2026-01-01T00:00:00.000Z',
+        metadata: {
+          role: 'teacher',
+          firstname: 'Ada',
+          lastname: 'Lovelace',
+        },
       },
-      weak_password: null,
+      session: {
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
+        expiresIn: 3600,
+      },
     };
   }
 
@@ -91,11 +88,7 @@ class Fixtures {
   }
 
   whenLoginUserReturnsSession() {
-    const sessionPayload: Session = {
-      user: this.authSession.user,
-      session: this.authSession,
-    };
-    this.authRepository.loginUser.mockResolvedValue(sessionPayload);
+    this.authRepository.loginUser.mockResolvedValue(this.authUserWithSession);
   }
 
   whenLoginUserThrowsError() {
@@ -111,7 +104,7 @@ class Fixtures {
     expect(this.authRepository.loginUser).toHaveBeenCalledTimes(1);
   }
 
-  thenReturnsExpectedSession(result: AuthSession) {
-    expect(result).toEqual(this.authSession);
+  thenReturnsExpectedAuthUserWithSession(result: AuthUserWithSession) {
+    expect(result).toEqual(this.authUserWithSession);
   }
 }

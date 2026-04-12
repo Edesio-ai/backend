@@ -1,3 +1,5 @@
+import { SupabaseEstablishment } from '../establishment/establishment.type';
+
 export type InvitationTokenPreview = {
   isValid: true;
   maskedEmail: string;
@@ -15,4 +17,15 @@ export type InvitationToken = {
   used_by: string | null;
   created_at: string;
   assigned_chatbots: number;
+};
+
+export type SupabaseInvitationTokenInsert = Omit<
+  InvitationToken,
+  'id' | 'used_at' | 'used_by' | 'created_at'
+>;
+export type SupabaseInvitationToken = Omit<
+  InvitationToken,
+  'id' | 'used_by' | 'created_at' | 'token' | 'invited_email'
+> & {
+  establishment: SupabaseEstablishment;
 };

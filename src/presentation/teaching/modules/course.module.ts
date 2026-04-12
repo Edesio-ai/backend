@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CourseController } from '../controllers/course.controller';
-import { CoursePersistenceModule } from 'src/infrastructure/persistence/supabase/course/course-persistence.module';
+import { CoursePersistenceModule } from 'src/infrastructure/supabase/course/course-persistence.module';
 import { CreateCourseUseCase } from 'src/application/course/create-course.use-case';
 import { UploadCourseFileUseCase } from 'src/application/course/upload-course-file.use-case';
-import { AuthPersistenceModule } from 'src/infrastructure/persistence/supabase/auth/auth-persistence.module';
+import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 
 @Module({
   imports: [CoursePersistenceModule, AuthPersistenceModule],

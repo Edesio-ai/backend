@@ -139,7 +139,7 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null as any);
   }
 
   whenTeacherFound() {

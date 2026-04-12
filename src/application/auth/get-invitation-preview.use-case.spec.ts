@@ -1,5 +1,5 @@
 import { GetInvitationPreviewUseCase } from './get-invitation-preview.use-case';
-import { AuthRepository } from '../../interfaces/persistence/auth.repository';
+import { AuthRepository } from '../../domain/auth/contract/auth.repository';
 import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
 import { InvitationTokenNotFoundError } from '../../domain/auth/errors/auth.errors';
 
@@ -45,8 +45,11 @@ class Fixtures {
   constructor() {
     this.authRepository = {
       getInvitationPreview: jest.fn(),
-      valideInvitationToken: jest.fn(),
       createUser: jest.fn(),
+      loginUser: jest.fn(),
+      validateToken: jest.fn(),
+      logoutUser: jest.fn(),
+      createInvitationToken: jest.fn(),
     };
 
     this.getInvitationPreviewUseCase = new GetInvitationPreviewUseCase(

@@ -1,14 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import { AuthRepository } from '../../../../domain/auth/contract/auth.repository';
-import { SUPABASE_ADMIN } from '../supabase.module';
+import { SUPABASE_ADMIN } from '../../supabase.module';
 import {
   InvitationToken,
   InvitationTokenPreview,
 } from '../../../../domain/auth/invitation.type';
 import {
   InvitationTokenAlreadyUsedError,
-  InvitationTokenEmailMismatchError,
   InvitationTokenExpiredError,
   InvitationTokenNotFoundError,
   UserAlereadyExistsError,
@@ -21,10 +20,22 @@ import {
   LogoutError,
   InvitationTokenCreationError,
 } from '../../../../domain/auth/errors/auth.errors';
-import { User, Session } from '../../../../domain/auth/types/auth.type';
+import {
+  SupabaseUser,
+  AuthUserWithSession,
+  User,
+} from '../../../../domain/auth/types/auth.type';
 import { Teacher } from '../../../../domain/teaching/types/teacher.type';
 import { UserMetadata } from '../../../../domain/auth/types/auth.type';
-import { SUPABASE_AUTH } from '../supabase-auth.module';
+import { SUPABASE_AUTH } from '../../supabase-auth.module';
+import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-toke.use-case';
+import {
+  invitationTokenToSupabase,
+  SupabaseAuthUserToUser,
+  supabaseInvitationTokenToInvitationTokenPreview,
+  supabaseSessionToAuthTokenData,
+  supabaseSessionToAuthUser,
+} from '../mappers/auth.mappers';
 
 @Injectable()
 export class AuthSupabaseRepository implements AuthRepository {
@@ -33,7 +44,7 @@ export class AuthSupabaseRepository implements AuthRepository {
     @Inject(SUPABASE_ADMIN) private readonly supabaseAdmin: any,
   ) {}
 
-  public async validateToken(token: string): Promise<User> {
+  public async validateToken(token: string): Promise<SupabaseUser> {
     const { data, error } = await this.supabaseAuth.auth.getUser(token);
     if (error) {
       throw new TokenUserNotFoundError(error.message);
@@ -42,21 +53,11 @@ export class AuthSupabaseRepository implements AuthRepository {
   }
 
   public async createInvitationToken(
-    establishmentId: string,
-    token: string,
-    invitedEmail: string,
-    expiresAt: Date,
-    assignedChatbots: number,
+    body: CreateInvitationTokenBody,
   ): Promise<void> {
     const { error } = await this.supabaseAuth
       .from('invitation_tokens')
-      .insert({
-        establishment_id: establishmentId,
-        token,
-        invited_email: invitedEmail.toLowerCase().trim(),
-        expires_at: expiresAt.toISOString(),
-        assigned_chatbots: assignedChatbots,
-      })
+      .insert(invitationTokenToSupabase(body))
       .select()
       .single();
 
@@ -79,7 +80,10 @@ export class AuthSupabaseRepository implements AuthRepository {
     return;
   }
 
-  public async loginUser(email: string, password: string): Promise<Session> {
+  public async loginUser(
+    email: string,
+    password: string,
+  ): Promise<AuthUserWithSession> {
     const { data, error } = await this.supabaseAuth.auth.signInWithPassword({
       email: email.toLowerCase().trim(),
       password,
@@ -88,8 +92,10 @@ export class AuthSupabaseRepository implements AuthRepository {
     if (error) {
       throw new UserLoginError(error.message);
     }
-
-    return data;
+    return {
+      authUser: supabaseSessionToAuthUser(data),
+      session: supabaseSessionToAuthTokenData(data),
+    };
   }
 
   public async getInvitationPreview(
@@ -99,7 +105,6 @@ export class AuthSupabaseRepository implements AuthRepository {
       .from('invitation_tokens')
       .select(
         `
-                id,
                 invited_email,
                 assigned_chatbots,
                 expires_at,
@@ -126,43 +131,7 @@ export class AuthSupabaseRepository implements AuthRepository {
 
     const maskedEmail = this.maskEmail(data.invited_email);
 
-    return {
-      isValid: true,
-      maskedEmail: maskedEmail,
-      establishmentName: data.establishment.name,
-      assignedChatbots: data.assigned_chatbots,
-    };
-  }
-
-  public async valideInvitationToken(
-    token: string,
-    email: string,
-  ): Promise<InvitationToken> {
-    const { data, error } = await this.supabaseAdmin
-      .from('invitation_tokens')
-      .select('*')
-      .eq('token', token)
-      .single();
-
-    if (error || !data) {
-      throw new InvitationTokenNotFoundError(error?.message);
-    }
-
-    if (data.used_at) {
-      throw new InvitationTokenAlreadyUsedError();
-    }
-
-    const expiresAt = new Date(data.expires_at);
-
-    if (expiresAt < new Date()) {
-      throw new InvitationTokenExpiredError();
-    }
-
-    if (data.invited_email.toLowerCase() !== email.toLowerCase().trim()) {
-      throw new InvitationTokenEmailMismatchError();
-    }
-
-    return data;
+    return supabaseInvitationTokenToInvitationTokenPreview(data, maskedEmail);
   }
 
   public async createUser(
@@ -203,14 +172,14 @@ export class AuthSupabaseRepository implements AuthRepository {
     if (!data.user) {
       throw new UserCreationFailedError();
     }
-    return data.user;
+    return SupabaseAuthUserToUser(data.user);
   }
 
   private async createTeacherWithInvitationTokenProfile(
     adminData: User,
     invitationToken: InvitationToken,
   ): Promise<Teacher> {
-    const { firstname, lastname } = adminData.user_metadata;
+    const { firstname, lastname } = adminData.metadata;
     const email = adminData.email;
 
     const { data, error } = await this.supabaseAdmin

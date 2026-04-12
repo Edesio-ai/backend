@@ -1,5 +1,5 @@
 import { GetSubscriptionStatusUseCase } from './get-subscription-status.use-case';
-import { User } from '../../domain/auth/types/auth.type';
+import { SupabaseUser } from '../../domain/auth/types/auth.type';
 import { EstablishmentNotFoundError } from '../../domain/establishment/error';
 import { TeacherNotFoundError } from '../../domain/teaching/error';
 import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
@@ -73,10 +73,10 @@ class Fixtures {
   public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
   public readonly getSubscriptionStatusUseCase: GetSubscriptionStatusUseCase;
 
-  public readonly establishmentUser: User;
-  public readonly studentUser: User;
-  public readonly teacherUser: User;
-  public readonly userWithoutEmail: User;
+  public readonly establishmentUser: SupabaseUser;
+  public readonly studentUser: SupabaseUser;
+  public readonly teacherUser: SupabaseUser;
+  public readonly userWithoutEmail: SupabaseUser;
   public readonly customerId: string;
   public readonly paymentClientError: Error;
   public readonly teacher = {
@@ -145,7 +145,7 @@ class Fixtures {
     this.userWithoutEmail = this.createUser('establishment', '', 'user-4');
   }
 
-  private createUser(role: string, email: string, id: string): User {
+  private createUser(role: string, email: string, id: string): SupabaseUser {
     return {
       id,
       aud: 'authenticated',
@@ -162,7 +162,7 @@ class Fixtures {
     };
   }
 
-  whenExecuteWith(user: User) {
+  whenExecuteWith(user: SupabaseUser) {
     return this.getSubscriptionStatusUseCase.execute(user);
   }
 

@@ -1,5 +1,5 @@
 import { TokenSupabaseRepository } from './token-supabase.repository';
-import { ServerTokenError } from '../../../../domain/token/token.error';
+import { ServerTokenError } from '../../../domain/token/token.error';
 import { InvitationTokenBadRequestError } from 'src/domain/auth/errors/auth.errors';
 
 describe('TokenSupabaseRepository', () => {

@@ -34,6 +34,8 @@ class Fixtures {
   constructor() {
     this.tokenRepository = {
       deleteInvitationToken: jest.fn().mockResolvedValue(undefined),
+      getInvitationByToken: jest.fn(),
+      markInvitationTokenAsUsed: jest.fn(),
     };
     this.useCase = new DeleteInvitationTokenUseCase(this.tokenRepository);
   }
