@@ -30,11 +30,11 @@ class Fixtures {
   public readonly code = 'ABC123';
   public readonly session = {
     id: 'session-1',
-    teacher_id: 'teacher-1',
+    teacherId: 'teacher-1',
     name: 'Session A',
     code: this.code,
-    language: 'francais',
-    created_at: '2026-01-01T00:00:00.000Z',
+    language: 'francais' as const,
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   public readonly repositoryError = new Error('query failed');
@@ -59,9 +59,7 @@ class Fixtures {
   }
 
   whenSessionFound() {
-    this.sessionRepository.getSessionByCode.mockResolvedValue(
-      this.session as any,
-    );
+    this.sessionRepository.getSessionByCode.mockResolvedValue(this.session);
   }
 
   whenRepositoryFails() {

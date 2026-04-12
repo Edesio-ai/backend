@@ -54,11 +54,11 @@ class Fixtures {
   public readonly sessions = [
     {
       id: 'session-1',
-      teacher_id: this.teacher.id,
-      nom: 'Cours 1',
+      teacherId: this.teacher.id,
+      name: 'Cours 1',
       code: 'ABC123',
-      langue: 'francais',
-      created_at: '2026-01-01T00:00:00.000Z',
+      language: 'francais' as const,
+      createdAt: '2026-01-01T00:00:00.000Z',
     },
   ];
   public readonly sessionRepositoryError = new Error('sessions query failed');
@@ -104,7 +104,7 @@ class Fixtures {
 
   whenSessionsFound() {
     this.sessionRepository.getSessionsByTeacherId.mockResolvedValue(
-      this.sessions as any,
+      this.sessions,
     );
   }
 
