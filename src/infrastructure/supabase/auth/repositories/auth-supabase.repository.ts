@@ -21,7 +21,6 @@ import {
   InvitationTokenCreationError,
 } from '../../../../domain/auth/errors/auth.errors';
 import {
-  SupabaseUser,
   AuthUserWithSession,
   User,
 } from '../../../../domain/auth/types/auth.type';
@@ -39,6 +38,7 @@ import {
   supabaseInvitationTokenToInvitationTokenPreview,
   supabaseSessionToAuthTokenData,
   supabaseSessionToAuthUser,
+  supabaseValidatedTokenUserToUser,
 } from '../mappers/auth.mappers';
 
 @Injectable()
@@ -48,12 +48,15 @@ export class AuthSupabaseRepository implements AuthRepository {
     @Inject(SUPABASE_ADMIN) private readonly supabaseAdmin: any,
   ) {}
 
-  public async validateToken(token: string): Promise<SupabaseUser> {
+  public async validateToken(token: string): Promise<User> {
     const { data, error } = await this.supabaseAuth.auth.getUser(token);
     if (error) {
       throw new TokenUserNotFoundError(error.message);
     }
-    return data.user;
+    if (!data?.user) {
+      throw new TokenUserNotFoundError('User not found');
+    }
+    return supabaseValidatedTokenUserToUser(data.user);
   }
 
   public async createInvitationToken(

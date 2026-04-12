@@ -4,6 +4,7 @@ import {
   supabaseSessionToAuthTokenData,
   supabaseSessionToAuthUser,
   SupabaseAuthUserToUser,
+  supabaseValidatedTokenUserToUser,
 } from './auth.mappers';
 import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-toke.use-case';
 import { SupabaseInvitationToken } from 'src/domain/auth/invitation.type';
@@ -150,6 +151,43 @@ describe('auth.mappers', () => {
         maskedEmail: 'i***@school.com',
         establishmentName: 'École',
         assignedChatbots: 5,
+      });
+    });
+  });
+
+  describe('supabaseValidatedTokenUserToUser', () => {
+    it('maps JWT getUser payload to domain User with session-like metadata', () => {
+      const user: SupabaseUser = {
+        id: 'uid-jwt',
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: 'jwt@example.com',
+        email_confirmed_at: '2026-01-01T00:00:00.000Z',
+        phone: '',
+        app_metadata: { provider: 'email', providers: ['email'] },
+        user_metadata: {
+          role: 'teacher',
+          firstname: 'Marie',
+          lastname: 'Curie',
+          establishment: 'Lycée',
+          invitationToken: 'tok-1',
+        },
+        identities: [],
+        created_at: '2026-01-01T00:00:00.000Z',
+        updated_at: '2026-01-01T00:00:00.000Z',
+        is_anonymous: false,
+      };
+
+      expect(supabaseValidatedTokenUserToUser(user)).toEqual({
+        id: 'uid-jwt',
+        email: 'jwt@example.com',
+        metadata: {
+          role: 'teacher',
+          firstname: 'Marie',
+          lastname: 'Curie',
+          establishment: 'Lycée',
+          invitationToken: 'tok-1',
+        },
       });
     });
   });

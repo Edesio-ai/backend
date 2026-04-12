@@ -19,7 +19,6 @@ import { RegisterUseCase } from '../../application/auth/register.use-case';
 import { SendInvitationUseCase } from '../../application/auth/send-invitation.use-case';
 import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
 import {
-  AuthSession,
   AuthUser,
   GetUserSessionResponse,
 } from '../../domain/auth/types/auth.type';
@@ -70,7 +69,7 @@ export class AuthController {
       };
     }
     const user = await this.getUserSessionUseCase.execute(token);
-    const role = user.user_metadata.role;
+    const role = user.metadata.role;
     return { user, role };
   }
 

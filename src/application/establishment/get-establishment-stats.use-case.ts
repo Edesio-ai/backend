@@ -32,23 +32,32 @@ export class GetEstablishmentsStatsUseCase {
   ) {}
 
   async execute(userId: string): Promise<EstablishmentStats> {
+    console.log('avant establishment');
     const establishment =
       await this.establishmentRepository.getEstablishmentByUserId(userId);
 
+    console.log('avant teachers');
     const teachers = await this.teacherRepository.getTeacherByEstablishmentId(
       establishment.id,
     );
+    console.log('avant teachersIds');
     const teachersIds = (teachers || []).map((t) => t.id);
 
+    console.log('avant teachersSessions');
     const teachersSessions =
       await this.teacherRepository.getTeachersSessionsByIds(teachersIds);
+    console.log('avant teacherSessionIds');
     const teacherSessionIds = (teachersSessions || []).map((s) => s.id);
 
+    console.log('avant studentsSessions');
     const studentsSessions: StudentSession[] =
       await this.studentRepository.getStudentsSessionsByIds(teacherSessionIds);
 
+    console.log('avant studentCountPerSession');
     const studentCountPerSession: Record<string, number> = {};
+    console.log('avant uniqueStudents');
     const uniqueStudents = new Set<string>();
+    console.log('avant forEach');
 
     (studentsSessions || []).forEach((ss) => {
       studentCountPerSession[ss.sessionId] =
@@ -56,11 +65,13 @@ export class GetEstablishmentsStatsUseCase {
       uniqueStudents.add(ss.studentId);
     });
 
+    console.log('avant buildTeachersWithStats');
     const TeachersWithStats = this.buildTeachersWithStats(
       teachers,
       teachersSessions,
       studentCountPerSession,
     );
+    console.log("🚀 ~ GetEstablishmentsStatsUseCase ~ execute ~ TeachersWithStats:", TeachersWithStats)
 
     return this.buildEstablishmentStats(
       establishment,

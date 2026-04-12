@@ -43,6 +43,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
       .single();
 
     if (error || !data) {
+      console.error("An error occure while getting establishment by user id:", error)
       throw new EstablishmentNotFoundError(
         error?.message ?? 'Establishment not found',
       );
@@ -68,6 +69,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
       .single();
 
     if (error || !data) {
+      console.error("An error occure while creating establishment:", error)
       throw new EstablishmentCreationFailedError(
         error?.message ?? 'Insert failed',
       );

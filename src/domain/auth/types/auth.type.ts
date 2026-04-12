@@ -97,7 +97,7 @@ export type LoginBody = {
 };
 
 export type GetUserSessionResponse = {
-  user: SupabaseUser | null;
+  user: User | null;
   role: Role | null;
 };
 

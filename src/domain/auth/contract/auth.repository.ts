@@ -1,7 +1,7 @@
 import {
   UserMetadata,
-  SupabaseUser,
   AuthUserWithSession,
+  User,
 } from '../types/auth.type';
 import { InvitationToken, InvitationTokenPreview } from '../invitation.type';
 import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-toke.use-case';
@@ -17,7 +17,7 @@ export interface AuthRepository {
     invitationToken?: InvitationToken,
   ): Promise<void>;
   loginUser(email: string, password: string): Promise<AuthUserWithSession>;
-  validateToken(token: string): Promise<SupabaseUser>;
+  validateToken(token: string): Promise<User>;
   logoutUser(accessToken: string): Promise<void>;
   createInvitationToken(body: CreateInvitationTokenBody): Promise<void>;
 }
