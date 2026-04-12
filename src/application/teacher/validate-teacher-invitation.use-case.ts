@@ -34,7 +34,7 @@ export class ValidateTeacherInvitationUseCase {
       throw new TeacherNotFoundError();
     }
 
-    if (teacher.establishment_id) {
+    if (teacher.establishmentId) {
       return null;
     }
 

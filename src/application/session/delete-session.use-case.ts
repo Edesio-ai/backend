@@ -19,6 +19,7 @@ import {
   STUDENT_REPOSITORY,
   type StudentRepository,
 } from 'src/domain/teaching/interface/student.repository';
+import { TeacherNotFoundError } from 'src/domain/teaching/error';
 
 export class DeleteSessionUseCase {
   constructor(
@@ -55,6 +56,9 @@ export class DeleteSessionUseCase {
     );
 
     const teacher = await this.teacherRepository.getTeacherByUserId(userId);
+    if (!teacher) {
+      throw new TeacherNotFoundError();
+    }
     const teahcerId = teacher.id;
 
     await this.sessionRepository.deleteSessionByTeacherId(sessionId, teahcerId);

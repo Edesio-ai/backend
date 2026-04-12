@@ -26,6 +26,10 @@ import {
   User,
 } from '../../../../domain/auth/types/auth.type';
 import { Teacher } from '../../../../domain/teaching/types/teacher.type';
+import {
+  createTeacherWithEstablishmentInsertPayload,
+  supabaseTeacherToTeacher,
+} from '../../teaching/mappers/teacher.mapper';
 import { UserMetadata } from '../../../../domain/auth/types/auth.type';
 import { SUPABASE_AUTH } from '../../supabase-auth.module';
 import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-toke.use-case';
@@ -184,13 +188,15 @@ export class AuthSupabaseRepository implements AuthRepository {
 
     const { data, error } = await this.supabaseAdmin
       .from('teachers')
-      .insert({
-        supabase_user_id: adminData.id,
-        name: `${firstname} ${lastname}`,
-        email: email.toLowerCase().trim(),
-        establishment_id: invitationToken.establishment_id,
-        available_chatbots: invitationToken.assigned_chatbots || 0,
-      })
+      .insert(
+        createTeacherWithEstablishmentInsertPayload(
+          adminData.id,
+          `${firstname} ${lastname}`,
+          email,
+          invitationToken.establishment_id,
+          invitationToken.assigned_chatbots || 0,
+        ),
+      )
       .select()
       .single();
 
@@ -199,7 +205,7 @@ export class AuthSupabaseRepository implements AuthRepository {
       throw new TeacherProfileCreationError(error.message);
     }
 
-    return data;
+    return supabaseTeacherToTeacher(data);
   }
 
   private async updateTokenUsedAt(

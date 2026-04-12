@@ -42,14 +42,13 @@ export class GetSubscriptionStatusUseCase {
         if (!teacher) {
           throw new TeacherNotFoundError();
         }
-        const isTeacherWithEstablishment = teacher?.establishment_id !== null;
-
-        if (!isTeacherWithEstablishment) {
+        const establishmentId = teacher.establishmentId;
+        if (establishmentId === null) {
           return await this.handleSubscriptionFormat(email, id, role);
         }
         const establishment =
           await this.establishmentRepository.getEstablishmentById(
-            teacher.establishment_id,
+            establishmentId,
           );
 
         if (!establishment) {

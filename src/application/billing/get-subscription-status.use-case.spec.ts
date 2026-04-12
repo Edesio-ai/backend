@@ -83,10 +83,10 @@ class Fixtures {
     id: 'teacher-1',
     name: 'Teacher',
     email: 'teacher@school.com',
-    created_at: '2026-01-01T00:00:00.000Z',
-    establishment_id: 'est-1',
-    available_chatbots: 2,
-    supabase_user_id: 'user-2',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    establishmentId: 'est-1',
+    availableChatbots: 2,
+    supabaseUserId: 'user-2',
   };
   public readonly establishment = {
     id: 'est-1',
@@ -178,11 +178,11 @@ class Fixtures {
   }
 
   whenTeacherFound(
-    establishmentId: string | null = this.teacher.establishment_id,
+    establishmentId: string | null = this.teacher.establishmentId,
   ) {
     this.teacherRepository.getTeacherByUserId.mockResolvedValue({
       ...this.teacher,
-      establishment_id: establishmentId as any,
+      establishmentId,
     });
   }
 
@@ -383,7 +383,7 @@ describe('GetSubscriptionStatusUseCase - teacher flow', () => {
 
     expect(
       fixtures.establishmentRepository.getEstablishmentById,
-    ).toHaveBeenCalledWith(fixtures.teacher.establishment_id);
+    ).toHaveBeenCalledWith(fixtures.teacher.establishmentId);
     expect(fixtures.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(
       fixtures.establishment.email,
     );

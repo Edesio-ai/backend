@@ -78,7 +78,7 @@ export class GetEstablishmentsStatsUseCase {
   ): TeacherWithStats[] {
     return (teachers || []).map((teacher) => {
       const teacherSessions = (teachersSessions || []).filter(
-        (s) => s.teacher_id === teacher.id,
+        (s) => s.teacherId === teacher.id,
       );
       const profStudentCount = teacherSessions.reduce(
         (sum, s) => sum + (studentCountPerSession[s.id] || 0),

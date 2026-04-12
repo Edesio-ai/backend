@@ -94,10 +94,10 @@ class Fixtures {
     id: 'teacher-1',
     name: 'Teacher Name',
     email: 'teacher@school.com',
-    created_at: '2026-01-01T00:00:00.000Z',
-    establishment_id: null,
-    available_chatbots: 2,
-    supabase_user_id: this.userId,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    establishmentId: null,
+    availableChatbots: 2,
+    supabaseUserId: this.userId,
   };
   public readonly invitation: InvitationToken = {
     id: 'invitation-id-1',
@@ -143,16 +143,14 @@ class Fixtures {
   }
 
   whenTeacherFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(
-      this.teacher as any,
-    );
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(this.teacher);
   }
 
   whenTeacherAlreadyAttached() {
     this.teacherRepository.getTeacherByUserId.mockResolvedValue({
       ...this.teacher,
-      establishment_id: 'est-1',
-    } as any);
+      establishmentId: 'est-1',
+    });
   }
 
   whenInvitationNotFound() {

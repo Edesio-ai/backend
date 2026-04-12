@@ -36,10 +36,10 @@ class Fixtures {
     id: 'teacher-1',
     name: this.body.name,
     email: this.body.email,
-    created_at: '2026-01-01T00:00:00.000Z',
-    establishment_id: null,
-    available_chatbots: 2,
-    supabase_user_id: this.userId,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    establishmentId: null,
+    availableChatbots: 2,
+    supabaseUserId: this.userId,
   };
   public readonly repositoryError = new Error('insert failed');
 
@@ -63,9 +63,7 @@ class Fixtures {
   }
 
   whenCreateTeacherSucceeds() {
-    this.teacherRepository.createTeacher.mockResolvedValue(
-      this.createdTeacher as any,
-    );
+    this.teacherRepository.createTeacher.mockResolvedValue(this.createdTeacher);
   }
 
   whenCreateTeacherFails() {

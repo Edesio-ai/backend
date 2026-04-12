@@ -6,6 +6,12 @@ import {
   Teacher,
   TeacherSession,
 } from '../../../../domain/teaching/types/teacher.type';
+import {
+  createTeacherInsertPayload,
+  linkTeacherEstablishmentUpdatePayload,
+  supabaseTeacherSessionsToTeacherSessions,
+  supabaseTeacherToTeacher,
+} from '../mappers/teacher.mapper';
 
 export class TeacherSupabaseRepository implements TeacherRepository {
   constructor(
@@ -18,13 +24,13 @@ export class TeacherSupabaseRepository implements TeacherRepository {
   ): Promise<Teacher[]> {
     const { data, error } = await this.supabase
       .from('teachers')
-      .select('id, name, email, created_at')
+      .select('*')
       .eq('establishment_id', establishmentId);
 
     if (error) {
       throw new TeacheServerError(error.message);
     }
-    return data;
+    return (data ?? []).map(supabaseTeacherToTeacher);
   }
 
   public async getTeachersSessionsByIds(
@@ -43,10 +49,10 @@ export class TeacherSupabaseRepository implements TeacherRepository {
     if (error) {
       throw new TeacheServerError(error.message);
     }
-    return data;
+    return supabaseTeacherSessionsToTeacherSessions(data ?? []);
   }
 
-  public async getTeacherByUserId(userId: string): Promise<Teacher> {
+  public async getTeacherByUserId(userId: string): Promise<Teacher | null> {
     const { data, error } = await this.supabase
       .from('teachers')
       .select('*')
@@ -57,7 +63,11 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       throw new TeacheServerError(error.message);
     }
 
-    return data;
+    if (!data) {
+      return null;
+    }
+
+    return supabaseTeacherToTeacher(data);
   }
 
   public async createTeacher(
@@ -67,11 +77,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
   ): Promise<Teacher | null> {
     const { data, error } = await this.supabase
       .from('teachers')
-      .insert({
-        supabase_user_id: userId,
-        name,
-        email: email || '',
-      })
+      .insert(createTeacherInsertPayload(userId, name, email))
       .select()
       .single();
 
@@ -79,7 +85,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       throw new TeacheServerError(error.message);
     }
 
-    return data;
+    return supabaseTeacherToTeacher(data);
   }
 
   public async linkTeacherToEstablishment(
@@ -89,7 +95,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
   ): Promise<void> {
     const { error } = await this.supabase
       .from('teachers')
-      .update({ establishment_id: establishmentId })
+      .update(linkTeacherEstablishmentUpdatePayload(establishmentId))
       .eq('id', teacherId);
 
     if (error) {
