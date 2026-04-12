@@ -1,7 +1,8 @@
 import { Inject } from '@nestjs/common';
 import {
-  Course,
+  SupabaseCourse,
   CreateCourseBody,
+  Course,
 } from 'src/domain/teaching/types/course.type';
 import {
   COURSE_REPOSITORY,

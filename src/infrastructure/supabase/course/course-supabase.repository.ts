@@ -2,17 +2,24 @@ import { Inject } from '@nestjs/common';
 import { SUPABASE_ADMIN } from '../supabase.module';
 import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
 import {
-  Course,
-  CourseFile,
+  SupabaseCourse,
   CourseFileUpload,
   CreateCourseBody,
+  Course,
+  CourseFile,
 } from 'src/domain/teaching/types/course.type';
 import { CourseServerError } from 'src/domain/teaching/error';
+import {
+  courseCourseBodyToSupabaseCourseInsert,
+  mapFilesUrl,
+  supabaseCourseFileToCourseFile,
+  supabaseCourseToCourse,
+} from './mappers/course.mapper';
 
 export class CourseSupabaseRepository implements CourseRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
 
-  async getCoursesBySessionId(sessionId: string): Promise<Course[]> {
+  async getCoursesBySessionId(sessionId: string): Promise<SupabaseCourse[]> {
     const { data, error } = await this.supabase
       .from('courses')
       .select('id')
@@ -29,7 +36,7 @@ export class CourseSupabaseRepository implements CourseRepository {
     for (const courseId of courseIds) {
       const files = await this.getCoursesFilesByCourseIds(courseId);
       if (files && files.length > 0) {
-        const filePaths = files.map((file) => file.file_url);
+        const filePaths = files.map((file) => file.fileUrl);
         await this.deleteCoursesFilesFromStorage(filePaths);
       }
     }
@@ -49,12 +56,7 @@ export class CourseSupabaseRepository implements CourseRepository {
   async createCourse(body: CreateCourseBody): Promise<Course> {
     const { data, error } = await this.supabase
       .from('courses')
-      .insert({
-        session_id: body.sessionId,
-        title: body.title,
-        description: body.description,
-        text_content: body.contentText,
-      })
+      .insert(courseCourseBodyToSupabaseCourseInsert(body))
       .select()
       .single();
 
@@ -62,12 +64,12 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return data;
+    return supabaseCourseToCourse(data);
   }
 
   private async getCoursesFilesByCourseIds(
     courseId: string,
-  ): Promise<{ file_url: string }[]> {
+  ): Promise<{ fileUrl: string }[]> {
     const { data, error } = await this.supabase
       .from('course_files')
       .select('file_url')
@@ -77,7 +79,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return data;
+    return mapFilesUrl(data);
   }
 
   private async deleteCoursesFilesFromStorage(files: string[]): Promise<void> {
@@ -104,7 +106,6 @@ export class CourseSupabaseRepository implements CourseRepository {
   }
 
   public async storeCourseFile(
-    courseId: string,
     file: CourseFileUpload,
     storagePath: string,
   ): Promise<void> {
@@ -142,6 +143,6 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return data;
+    return supabaseCourseFileToCourseFile(data);
   }
 }
