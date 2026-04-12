@@ -13,7 +13,31 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
       .in('course_id', courseIds);
 
     if (error) {
+      console.error(
+        'error deleting questions by course ids for course ids',
+        courseIds,
+        error,
+      );
       throw new QuestionServerError(error.message);
     }
+  }
+
+  async getPendingQuestionCount(courseIds: string[]): Promise<number> {
+    const { count, error: countError } = await this.supabase
+      .from('course_questions')
+      .select('*', { count: 'exact', head: true })
+      .in('course_id', courseIds)
+      .is('answer', null);
+
+    if (countError) {
+      console.error(
+        'error getting pending question count for course ids',
+        courseIds,
+        countError,
+      );
+      throw new QuestionServerError(countError.message);
+    }
+
+    return count ?? 0;
   }
 }
