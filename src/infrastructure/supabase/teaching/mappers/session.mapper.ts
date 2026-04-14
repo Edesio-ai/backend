@@ -4,6 +4,10 @@ import {
   SupabaseSession,
   UpdateSessionNameBody,
 } from 'src/domain/teaching/types/session.type';
+import {
+  SupabaseCourseWithSession,
+  CourseWithSession,
+} from 'src/domain/teaching/types/course.type';
 
 type SupabaseSessionInsert = {
   teacher_id: string;
@@ -37,5 +41,16 @@ export function supabaseSessionToSession(row: SupabaseSession): Session {
     code: row.code,
     language: row.language,
     createdAt: row.created_at,
+  };
+}
+
+export function supabaseCourseWithSessionToCourseWithSession(
+  row: SupabaseCourseWithSession,
+): CourseWithSession {
+  return {
+    id: row.id,
+    session: {
+      teacherId: row.session.teacher_id,
+    },
   };
 }

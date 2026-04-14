@@ -1,5 +1,5 @@
 import { StudentSupabaseRepository } from './student-supabase.repository';
-import { StudentSessionsNotFoundError } from '../../../../domain/teaching/error';
+import { StudentServerError } from '../../../../domain/teaching/error';
 
 describe('StudentSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -27,12 +27,12 @@ describe('StudentSupabaseRepository', () => {
     fixtures.thenQueryBuiltWithFallbackId();
   });
 
-  it('should throw StudentSessionsNotFoundError when query fails', async () => {
+  it('should throw StudentServerError when getStudentsSessionsByIds query fails', async () => {
     fixtures.whenQueryReturnsError();
 
     const promise = fixtures.whenGetStudentsSessionsByIds(fixtures.sessionIds);
 
-    await fixtures.thenThrowStudentSessionsNotFound(promise);
+    await fixtures.thenThrowStudentServerError(promise);
   });
 
   it('should delete student_sessions by session id', async () => {
@@ -43,12 +43,29 @@ describe('StudentSupabaseRepository', () => {
     fixtures.thenDeleteStudentSessionsQueryBuilt();
   });
 
-  it('should throw StudentSessionsNotFoundError when delete student_sessions fails', async () => {
+  it('should throw StudentServerError when delete student_sessions fails', async () => {
     fixtures.whenDeleteStudentSessionsFails();
 
     const promise = fixtures.whenDeleteStudentSessionsBySessionId();
 
-    await fixtures.thenThrowStudentSessionsNotFound(promise);
+    await fixtures.thenThrowStudentServerError(promise);
+  });
+
+  it('should return student course stats mapped for course id', async () => {
+    fixtures.whenStudentStatsQueryReturnsData();
+
+    const result = await fixtures.whenGetStudentStatsByCourseId();
+
+    fixtures.thenStudentStatsQueryBuilt();
+    expect(result).toEqual(fixtures.expectedStudentCourseStats);
+  });
+
+  it('should throw StudentServerError when getStudentStatsByCourseId fails', async () => {
+    fixtures.whenStudentStatsQueryFails();
+
+    const promise = fixtures.whenGetStudentStatsByCourseId();
+
+    await fixtures.thenThrowStudentServerError(promise);
   });
 });
 
@@ -63,14 +80,40 @@ class Fixtures {
     { sessionId: 'session-1', studentId: 'student-1' },
   ];
 
+  public readonly courseIdForStats = 'course-stats-1';
+  public readonly studentStatsSupabaseRows = [
+    {
+      student_id: 'stu-1',
+      attempted_questions: 10,
+      correct_answers: 8,
+      last_attempt_at: '2026-01-01T12:00:00.000Z',
+      students: { name: 'Alice', photo_url: 'https://x/a.png' },
+    },
+  ];
+  public readonly expectedStudentCourseStats = [
+    {
+      studentId: 'stu-1',
+      attemptedQuestions: 10,
+      correctAnswers: 8,
+      lastAttemptAt: '2026-01-01T12:00:00.000Z',
+      student: { name: 'Alice', photoUrl: 'https://x/a.png' },
+    },
+  ];
+
   private readonly inMock = jest.fn();
   private readonly selectMock = jest.fn(() => ({ in: this.inMock }));
+
+  private readonly statsEqMock = jest.fn();
+  private readonly statsSelectMock = jest.fn(() => ({ eq: this.statsEqMock }));
 
   private readonly deleteEqMock = jest.fn();
   private readonly deleteMock = jest.fn(() => ({ eq: this.deleteEqMock }));
 
-  private mode: 'select' | 'delete' = 'select';
-  private readonly fromMock = jest.fn(() => {
+  private mode: 'select' | 'delete' | 'stats' = 'select';
+  private readonly fromMock = jest.fn((table: string) => {
+    if (table === 'student_course_stats') {
+      return { select: this.statsSelectMock };
+    }
     if (this.mode === 'delete') {
       return { delete: this.deleteMock };
     }
@@ -98,6 +141,11 @@ class Fixtures {
     );
   }
 
+  whenGetStudentStatsByCourseId() {
+    this.mode = 'stats';
+    return this.repository.getStudentStatsByCourseId(this.courseIdForStats);
+  }
+
   whenQueryReturnsData() {
     this.inMock.mockResolvedValue({
       data: this.studentSessionsSupabaseRows,
@@ -122,8 +170,31 @@ class Fixtures {
     });
   }
 
-  async thenThrowStudentSessionsNotFound(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(StudentSessionsNotFoundError);
+  whenStudentStatsQueryReturnsData() {
+    this.statsEqMock.mockResolvedValue({
+      data: this.studentStatsSupabaseRows,
+      error: null,
+    });
+  }
+
+  whenStudentStatsQueryFails() {
+    this.statsEqMock.mockResolvedValue({
+      data: null,
+      error: { message: 'stats query failed' },
+    });
+  }
+
+  async thenThrowStudentServerError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(StudentServerError);
+  }
+
+  thenStudentStatsQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_course_stats');
+    expect(this.statsSelectMock).toHaveBeenCalled();
+    expect(this.statsEqMock).toHaveBeenCalledWith(
+      'course_id',
+      this.courseIdForStats,
+    );
   }
 
   thenQueryBuiltWithSessionIds(sessionIds: string[]) {

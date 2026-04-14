@@ -105,6 +105,24 @@ describe('SupabaseSessionRepository', () => {
     await fixtures.thenThrowSessionServerError(promise);
     fixtures.thenDeleteSessionQueryBuiltWithExpectedArguments();
   });
+
+  it('should return session when getSessionById succeeds', async () => {
+    fixtures.whenGetSessionByIdSucceeds();
+
+    const result = await fixtures.whenGetSessionById();
+
+    fixtures.thenGetSessionByIdQueryBuilt();
+    expect(result).toEqual(fixtures.expectedSessionById);
+  });
+
+  it('should throw SessionServerError when getSessionById fails', async () => {
+    fixtures.whenGetSessionByIdFails();
+
+    const promise = fixtures.whenGetSessionById();
+
+    await fixtures.thenThrowSessionServerError(promise);
+    fixtures.thenGetSessionByIdQueryBuilt();
+  });
 });
 
 class Fixtures {
@@ -191,6 +209,32 @@ class Fixtures {
     createdAt: '2026-01-01T00:00:00.000Z',
   };
 
+  public readonly sessionIdForGetById = 'session-by-id-1';
+  public readonly sessionByIdSupabaseRow = {
+    id: this.sessionIdForGetById,
+    teacher_id: this.teacherId,
+    name: 'Session par id',
+    code: 'CODE1',
+    language: 'francais' as const,
+    created_at: '2026-01-01T00:00:00.000Z',
+  };
+  public readonly expectedSessionById = {
+    id: this.sessionIdForGetById,
+    teacherId: this.teacherId,
+    name: 'Session par id',
+    code: 'CODE1',
+    language: 'francais' as const,
+    createdAt: '2026-01-01T00:00:00.000Z',
+  };
+
+  private readonly byIdSingleMock = jest.fn();
+  private readonly byIdEqMock = jest.fn(() => ({
+    single: this.byIdSingleMock,
+  }));
+  private readonly byIdSelectMock = jest.fn(() => ({
+    eq: this.byIdEqMock,
+  }));
+
   private readonly orderMock = jest.fn();
   private readonly listEqMock = jest.fn(() => ({ order: this.orderMock }));
   private readonly listSelectMock = jest.fn(() => ({ eq: this.listEqMock }));
@@ -233,10 +277,12 @@ class Fixtures {
     eq: this.deleteIdEqMock,
   }));
 
-  private mode: 'list' | 'byCode' | 'create' | 'update' | 'delete' = 'list';
+  private mode: 'list' | 'byCode' | 'byId' | 'create' | 'update' | 'delete' =
+    'list';
   private readonly fromMock = jest.fn(() => {
     if (this.mode === 'list') return { select: this.listSelectMock };
     if (this.mode === 'byCode') return { select: this.byCodeSelectMock };
+    if (this.mode === 'byId') return { select: this.byIdSelectMock };
     if (this.mode === 'create') return { insert: this.createInsertMock };
     if (this.mode === 'update') return { update: this.updateUpdateMock };
     return { delete: this.sessionDeleteMock };
@@ -280,6 +326,11 @@ class Fixtures {
       this.sessionIdToDelete,
       this.teacherId,
     );
+  }
+
+  whenGetSessionById() {
+    this.mode = 'byId';
+    return this.repository.getSessionById(this.sessionIdForGetById);
   }
 
   whenSessionsQuerySucceeds() {
@@ -352,6 +403,20 @@ class Fixtures {
   whenDeleteSessionFails() {
     this.deleteTeacherEqMock.mockResolvedValue({
       error: { message: 'delete session failed' },
+    });
+  }
+
+  whenGetSessionByIdSucceeds() {
+    this.byIdSingleMock.mockResolvedValue({
+      data: this.sessionByIdSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenGetSessionByIdFails() {
+    this.byIdSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'session by id failed' },
     });
   }
 
@@ -432,5 +497,15 @@ class Fixtures {
       'teacher_id',
       this.teacherId,
     );
+  }
+
+  thenGetSessionByIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('sessions');
+    expect(this.byIdSelectMock).toHaveBeenCalledWith('id, teacher_id');
+    expect(this.byIdEqMock).toHaveBeenCalledWith(
+      'id',
+      this.sessionIdForGetById,
+    );
+    expect(this.byIdSingleMock).toHaveBeenCalledTimes(1);
   }
 }

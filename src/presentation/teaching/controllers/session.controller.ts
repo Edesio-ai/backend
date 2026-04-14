@@ -14,7 +14,7 @@ import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
-import { SupabaseUser } from 'src/domain/auth/types/auth.type';
+import { AuthUser, SupabaseUser } from 'src/domain/auth/types/auth.type';
 import { Session } from 'src/domain/teaching/types/session.type';
 import { CreateSessionUseCase } from 'src/application/session/create-session.use-case';
 import { UpdateSessionNameUseCase } from 'src/application/session/update-session-name.use-case';
@@ -23,6 +23,8 @@ import { DeleteSessionUseCase } from 'src/application/session/delete-session.use
 import { GetCoursesSessionCountUseCase } from 'src/application/session/get-courses-session-count.use-case';
 import { CreateSessionBodyDto } from '../dto/session/create-session.dto';
 import { UpdateSessionBodyDto } from '../dto/session/uppdate-session-body.dto';
+import { Course, CourseRanking } from 'src/domain/teaching/types/course.type';
+import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
 
 @Controller('session')
 export class SessionController {
@@ -33,6 +35,7 @@ export class SessionController {
     private readonly getSessionByCodeUseCase: GetSessionByCodeUseCase,
     private readonly deleteSessionUseCase: DeleteSessionUseCase,
     private readonly getCoursesSessionCountUseCase: GetCoursesSessionCountUseCase,
+    private readonly getSessionCoursesUseCase: GetSessionCoursesUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard, CsrfGuard)
@@ -101,5 +104,16 @@ export class SessionController {
   ): Promise<{ count: number }> {
     const count = await this.getCoursesSessionCountUseCase.execute(sessionId);
     return { count: count };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('teacher')
+  @Get('/:sessionId/courses')
+  async getSessionCourses(
+    @Param('sessionId') sessionId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<Course[]> {
+    const { user } = req;
+    return (await this.getSessionCoursesUseCase.execute(sessionId, user)) || [];
   }
 }

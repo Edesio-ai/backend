@@ -7,6 +7,7 @@ import {
   CreateCourseBody,
   Course,
   CourseFile,
+  CourseWithSession,
 } from 'src/domain/teaching/types/course.type';
 import { CourseServerError } from 'src/domain/teaching/error';
 import {
@@ -14,10 +15,31 @@ import {
   mapFilesUrl,
   supabaseCourseFileToCourseFile,
   supabaseCourseToCourse,
+  supabaseValidatedQuestionsToValidatedQuestions,
 } from '../mappers/course.mapper';
+import { supabaseCourseWithSessionToCourseWithSession } from '../mappers/session.mapper';
 
 export class CourseSupabaseRepository implements CourseRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
+
+  async getCourseById(courseId: string): Promise<Course> {
+    const { data, error } = await this.supabase
+      .from('courses')
+      .select('id, session_id')
+      .eq('id', courseId)
+      .single();
+
+    if (error) {
+      console.error(
+        'An error occurred while getting the course by id: ',
+        courseId,
+        error,
+      );
+      throw new CourseServerError(error.message);
+    }
+
+    return supabaseCourseToCourse(data);
+  }
 
   async getCoursesBySessionId(sessionId: string): Promise<SupabaseCourse[]> {
     const { data, error } = await this.supabase
@@ -144,5 +166,95 @@ export class CourseSupabaseRepository implements CourseRepository {
     }
 
     return supabaseCourseFileToCourseFile(data);
+  }
+
+  public async getCourseValidatedQuestions(
+    courseId: string,
+  ): Promise<{ validatedQuestions: boolean }> {
+    const { data, error } = await this.supabase
+      .from('courses')
+      .select('validated_questions')
+      .eq('id', courseId)
+      .single();
+
+    if (error) {
+      console.error(
+        'An error occurred while getting the validated questions for courseId: ',
+        courseId,
+        error,
+      );
+      throw new CourseServerError(error.message);
+    }
+
+    return supabaseValidatedQuestionsToValidatedQuestions(data);
+  }
+
+  public async getCourseFilesByCourseId(
+    courseId: string,
+  ): Promise<CourseFile[]> {
+    const { data, error } = await this.supabase
+      .from('course_files')
+      .select('*')
+      .eq('course_id', courseId);
+
+    if (error) {
+      console.error(
+        'An error occurred while getting the course files for courseId: ',
+        courseId,
+        error,
+      );
+      throw new CourseServerError(error.message);
+    }
+
+    return data.map(supabaseCourseFileToCourseFile);
+  }
+
+  public async getCourseWithSessionById(
+    courseId: string,
+  ): Promise<CourseWithSession> {
+    const { data, error } = await this.supabase
+      .from('courses')
+      .select(
+        `
+        id,
+        session:sessions!inner (
+          teacher_id
+        )
+      `,
+      )
+      .eq('id', courseId)
+      .single();
+
+    if (error) {
+      console.error(
+        'An error occurred while getting the course with session for courseId: ',
+        courseId,
+        error,
+      );
+      throw new CourseServerError(error.message);
+    }
+
+    return supabaseCourseWithSessionToCourseWithSession(data);
+  }
+
+  public async getSessionCoursesBySessionId(
+    sessionId: string,
+  ): Promise<Course[]> {
+    const { data, error } = await this.supabase
+      .from('courses')
+      .select('*')
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(
+        'An error occurred while getting the session courses for sessionId: ',
+        sessionId,
+        error,
+      );
+      throw new CourseServerError(error.message);
+    }
+
+    return data ? data.map(supabaseCourseToCourse) : [];
   }
 }

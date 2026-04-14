@@ -1,8 +1,12 @@
 import { Inject } from '@nestjs/common';
 import { StudentRepository } from '../../../../domain/teaching/interface/student.repository';
 import { SUPABASE_ADMIN } from '../../supabase.module';
-import { StudentSessionsNotFoundError } from '../../../../domain/teaching/error';
-import { supabaseStudentSessionsToStudentSessions } from '../mappers/student.mapper';
+import { StudentServerError } from '../../../../domain/teaching/error';
+import {
+  supabaseStudentCourseStatsToStudentCourseStats,
+  supabaseStudentSessionsToStudentSessions,
+} from '../mappers/student.mapper';
+import { StudentCourseStats } from 'src/domain/teaching/types/student.type';
 
 export class StudentSupabaseRepository implements StudentRepository {
   constructor(
@@ -10,7 +14,7 @@ export class StudentSupabaseRepository implements StudentRepository {
     private readonly supabase: any,
   ) {}
 
-  async getStudentsSessionsByIds(sessionIds: string[]) {
+  public async getStudentsSessionsByIds(sessionIds: string[]) {
     const { data, error } = await this.supabase
       .from('student_sessions')
       .select('session_id, student_id')
@@ -22,19 +26,61 @@ export class StudentSupabaseRepository implements StudentRepository {
       );
 
     if (error) {
-      throw new StudentSessionsNotFoundError(error.message);
+      console.log(
+        'An error occurred while getting students sessions by ids',
+        sessionIds,
+        error,
+      );
+      throw new StudentServerError(error.message);
     }
     return supabaseStudentSessionsToStudentSessions(data ?? []);
   }
 
-  async deleteStudentSessionsBySessionId(sessionId: string): Promise<void> {
+  public async deleteStudentSessionsBySessionId(
+    sessionId: string,
+  ): Promise<void> {
     const { error } = await this.supabase
       .from('student_sessions')
       .delete()
       .eq('session_id', sessionId);
 
     if (error) {
-      throw new StudentSessionsNotFoundError(error.message);
+      console.log(
+        'An error occurred while deleting student sessions by session id',
+        sessionId,
+        error,
+      );
+      throw new StudentServerError(error.message);
     }
+  }
+
+  public async getStudentStatsByCourseId(
+    courseId: string,
+  ): Promise<StudentCourseStats[]> {
+    const { data, error } = await this.supabase
+      .from('student_course_stats')
+      .select(
+        `
+        student_id,
+        attempted_questions,
+        correct_answers,
+        last_attempt_at,
+        students (
+          name,
+          photo_url
+        )
+      `,
+      )
+      .eq('course_id', courseId);
+
+    if (error) {
+      console.log(
+        'An error occurred while getting student stats by course id',
+        courseId,
+        error,
+      );
+      throw new StudentServerError(error.message);
+    }
+    return supabaseStudentCourseStatsToStudentCourseStats(data ?? []);
   }
 }
