@@ -56,3 +56,11 @@ export function supabaseCourseFileToCourseFile(
     createdAt: data.created_at,
   };
 }
+
+export function supabaseValidatedQuestionsToValidatedQuestions(data: {
+  validated_questions: boolean;
+}): { validatedQuestions: boolean } {
+  return {
+    validatedQuestions: data.validated_questions,
+  };
+}

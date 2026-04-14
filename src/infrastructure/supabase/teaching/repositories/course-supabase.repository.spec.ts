@@ -143,6 +143,82 @@ describe('CourseSupabaseRepository', () => {
     await fixtures.thenThrowCourseServerError(promise);
     fixtures.thenRemoveCalledAfterInsertFailure();
   });
+
+  it('should return course by id', async () => {
+    fixtures.whenGetCourseByIdSucceeds();
+
+    const result = await fixtures.whenGetCourseById();
+
+    fixtures.thenGetCourseByIdQueryBuilt();
+    expect(result).toEqual(fixtures.expectedCourseById);
+  });
+
+  it('should throw CourseServerError when getCourseById fails', async () => {
+    fixtures.whenGetCourseByIdFails();
+
+    const promise = fixtures.whenGetCourseById();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
+
+  it('should return validated questions flag', async () => {
+    fixtures.whenGetCourseValidatedQuestionsSucceeds();
+
+    const result = await fixtures.whenGetCourseValidatedQuestions();
+
+    fixtures.thenGetCourseValidatedQuestionsQueryBuilt();
+    expect(result).toEqual({ validatedQuestions: true });
+  });
+
+  it('should throw CourseServerError when getCourseValidatedQuestions fails', async () => {
+    fixtures.whenGetCourseValidatedQuestionsFails();
+
+    const promise = fixtures.whenGetCourseValidatedQuestions();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
+
+  it('should return session courses mapped and ordered', async () => {
+    fixtures.whenGetSessionCoursesBySessionIdSucceeds();
+
+    const result = await fixtures.whenGetSessionCoursesBySessionId();
+
+    fixtures.thenGetSessionCoursesBySessionIdQueryBuilt();
+    expect(result).toEqual(fixtures.expectedSessionCourses);
+  });
+
+  it('should return empty array when getSessionCoursesBySessionId data is null', async () => {
+    fixtures.whenGetSessionCoursesBySessionIdReturnsNullData();
+
+    const result = await fixtures.whenGetSessionCoursesBySessionId();
+
+    expect(result).toEqual([]);
+  });
+
+  it('should throw CourseServerError when getSessionCoursesBySessionId fails', async () => {
+    fixtures.whenGetSessionCoursesBySessionIdFails();
+
+    const promise = fixtures.whenGetSessionCoursesBySessionId();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
+
+  it('should return course files by course id', async () => {
+    fixtures.whenGetCourseFilesSucceeds();
+
+    const result = await fixtures.whenGetCourseFilesByCourseId();
+
+    fixtures.thenGetCourseFilesQueryBuilt();
+    expect(result).toEqual([fixtures.expectedCourseFile]);
+  });
+
+  it('should throw CourseServerError when getCourseFilesByCourseId fails', async () => {
+    fixtures.whenGetCourseFilesFails();
+
+    const promise = fixtures.whenGetCourseFilesByCourseId();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
 });
 
 class Fixtures {
@@ -201,12 +277,90 @@ class Fixtures {
     createdAt: '2026-01-01T00:00:00.000Z',
   };
 
+  public readonly courseDetailId = 'course-detail-1';
+  public readonly courseByIdSupabaseRow = {
+    id: this.courseDetailId,
+    session_id: 'session-99',
+    title: 'Titre cours',
+    description: null,
+    text_content: null,
+    created_at: '2026-01-01T00:00:00.000Z',
+  };
+  public readonly expectedCourseById = {
+    id: this.courseDetailId,
+    sessionId: 'session-99',
+    title: 'Titre cours',
+    description: null,
+    contentText: null,
+    validatedQuestions: undefined,
+    positionOrder: undefined,
+  };
+
+  public readonly sessionCoursesSupabaseRows = [
+    {
+      id: 'c-a',
+      session_id: this.sessionId,
+      title: 'A',
+      description: null,
+      text_content: null,
+      created_at: '2026-01-02T00:00:00.000Z',
+    },
+    {
+      id: 'c-b',
+      session_id: this.sessionId,
+      title: 'B',
+      description: null,
+      text_content: null,
+      created_at: '2026-01-01T00:00:00.000Z',
+    },
+  ];
+  public readonly expectedSessionCourses = [
+    {
+      id: 'c-a',
+      sessionId: this.sessionId,
+      title: 'A',
+      description: null,
+      contentText: null,
+      validatedQuestions: undefined,
+      positionOrder: undefined,
+    },
+    {
+      id: 'c-b',
+      sessionId: this.sessionId,
+      title: 'B',
+      description: null,
+      contentText: null,
+      validatedQuestions: undefined,
+      positionOrder: undefined,
+    },
+  ];
+
   private readonly coursesListEqMock = jest.fn();
   private readonly coursesCountEqMock = jest.fn();
+
+  private readonly coursesByIdSingleMock = jest.fn();
+  private readonly coursesByIdEqMock = jest.fn(() => ({
+    single: this.coursesByIdSingleMock,
+  }));
+
+  private readonly coursesSessionOrderMock = jest.fn();
+  private readonly coursesSessionCoursesEqMock = jest.fn(() => ({
+    order: this.coursesSessionOrderMock,
+  }));
+
   private readonly coursesSelectMock = jest.fn(
     (first: string, second?: object) => {
       if (second && typeof second === 'object' && 'count' in second) {
         return { eq: this.coursesCountEqMock };
+      }
+      if (first === 'id') {
+        return { eq: this.coursesListEqMock };
+      }
+      if (first === 'id, session_id' || first === 'validated_questions') {
+        return { eq: this.coursesByIdEqMock };
+      }
+      if (first === '*') {
+        return { eq: this.coursesSessionCoursesEqMock };
       }
       return { eq: this.coursesListEqMock };
     },
@@ -305,6 +459,85 @@ class Fixtures {
       this.fileUpload as any,
       this.storagePath,
     );
+  }
+
+  whenGetCourseById() {
+    return this.repository.getCourseById(this.courseDetailId);
+  }
+
+  whenGetCourseValidatedQuestions() {
+    return this.repository.getCourseValidatedQuestions(this.courseDetailId);
+  }
+
+  whenGetSessionCoursesBySessionId() {
+    return this.repository.getSessionCoursesBySessionId(this.sessionId);
+  }
+
+  whenGetCourseFilesByCourseId() {
+    return this.repository.getCourseFilesByCourseId(this.courseId);
+  }
+
+  whenGetCourseByIdSucceeds() {
+    this.coursesByIdSingleMock.mockResolvedValue({
+      data: this.courseByIdSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenGetCourseByIdFails() {
+    this.coursesByIdSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'course by id failed' },
+    });
+  }
+
+  whenGetCourseValidatedQuestionsSucceeds() {
+    this.coursesByIdSingleMock.mockResolvedValue({
+      data: { validated_questions: true },
+      error: null,
+    });
+  }
+
+  whenGetCourseValidatedQuestionsFails() {
+    this.coursesByIdSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'validated questions failed' },
+    });
+  }
+
+  whenGetSessionCoursesBySessionIdSucceeds() {
+    this.coursesSessionOrderMock.mockResolvedValue({
+      data: this.sessionCoursesSupabaseRows,
+      error: null,
+    });
+  }
+
+  whenGetSessionCoursesBySessionIdReturnsNullData() {
+    this.coursesSessionOrderMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+  }
+
+  whenGetSessionCoursesBySessionIdFails() {
+    this.coursesSessionOrderMock.mockResolvedValue({
+      data: null,
+      error: { message: 'session courses failed' },
+    });
+  }
+
+  whenGetCourseFilesSucceeds() {
+    this.courseFilesEqMock.mockResolvedValue({
+      data: [this.insertedCourseFileSupabaseRow],
+      error: null,
+    });
+  }
+
+  whenGetCourseFilesFails() {
+    this.courseFilesEqMock.mockResolvedValue({
+      data: null,
+      error: { message: 'course files failed' },
+    });
   }
 
   whenGetCoursesSucceeds() {
@@ -503,5 +736,44 @@ class Fixtures {
 
   thenRemoveCalledAfterInsertFailure() {
     expect(this.removeMock).toHaveBeenCalledWith([this.storagePath]);
+  }
+
+  thenGetCourseByIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('courses');
+    expect(this.coursesSelectMock).toHaveBeenCalledWith('id, session_id');
+    expect(this.coursesByIdEqMock).toHaveBeenCalledWith(
+      'id',
+      this.courseDetailId,
+    );
+  }
+
+  thenGetCourseValidatedQuestionsQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('courses');
+    expect(this.coursesSelectMock).toHaveBeenCalledWith('validated_questions');
+    expect(this.coursesByIdEqMock).toHaveBeenCalledWith(
+      'id',
+      this.courseDetailId,
+    );
+  }
+
+  thenGetSessionCoursesBySessionIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('courses');
+    expect(this.coursesSelectMock).toHaveBeenCalledWith('*');
+    expect(this.coursesSessionCoursesEqMock).toHaveBeenCalledWith(
+      'session_id',
+      this.sessionId,
+    );
+    expect(this.coursesSessionOrderMock).toHaveBeenCalledWith('created_at', {
+      ascending: false,
+    });
+  }
+
+  thenGetCourseFilesQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('course_files');
+    expect(this.courseFilesSelectMock).toHaveBeenCalledWith('*');
+    expect(this.courseFilesEqMock).toHaveBeenCalledWith(
+      'course_id',
+      this.courseId,
+    );
   }
 }

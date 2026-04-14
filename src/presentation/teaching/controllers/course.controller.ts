@@ -2,8 +2,10 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Param,
   Post,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -13,6 +15,7 @@ import {
   CourseFile,
   CourseFileUpload,
   Course,
+  CourseRanking,
 } from 'src/domain/teaching/types/course.type';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -21,12 +24,19 @@ import { Roles } from '../../auth/decorator/role.decorator';
 import { CreateCourseUseCase } from 'src/application/course/create-course.use-case';
 import { CreateCourseBodyDto } from '../dto/course/create-course-body.dto';
 import { UploadCourseFileUseCase } from 'src/application/course/upload-course-file.use-case';
+import { GetCourseValidatedQuestionsUseCase } from 'src/application/course/get-course-validated-questions';
+import { GetCourseFilesUseCase } from 'src/application/course/get-course-files.use-case';
+import { GetCourseRankingUseCase } from 'src/application/course/get-course-ranking.use-case';
+import { AuthUser } from 'src/domain/auth/types/auth.type';
 
 @Controller('course')
 export class CourseController {
   constructor(
     private readonly createCourseUseCase: CreateCourseUseCase,
     private readonly uploadCourseFileUseCase: UploadCourseFileUseCase,
+    private readonly getCourseValidatedQuestionsUseCase: GetCourseValidatedQuestionsUseCase,
+    private readonly getCoursesFilesUseCase: GetCourseFilesUseCase,
+    private readonly getCourseRankingUseCase: GetCourseRankingUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
@@ -64,5 +74,36 @@ export class CourseController {
     );
 
     return { coursesCount };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('teacher')
+  @Get(':courseId/validated-questions')
+  async getCourseValidatedQuestions(
+    @Param('courseId') courseId: string,
+  ): Promise<{ validatedQuestions: boolean | null }> {
+    return await this.getCourseValidatedQuestionsUseCase.execute(courseId);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('teacher')
+  @Get(':courseId/files')
+  async getCoursesFiles(
+    @Param('courseId') courseId: string,
+  ): Promise<CourseFile[]> {
+    return (await this.getCoursesFilesUseCase.execute(courseId)) || [];
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('teacher')
+  @Get('/:courseId/ranking')
+  async getCourseRanking(
+    @Param('courseId') courseId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<CourseRanking[]> {
+    const { user } = req;
+    const ranking =
+      (await this.getCourseRankingUseCase.execute(courseId, user)) || [];
+    return ranking || [];
   }
 }

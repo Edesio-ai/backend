@@ -2,6 +2,8 @@ import { Inject } from '@nestjs/common';
 import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import { QuestionServerError } from 'src/domain/teaching/error';
+import { Question } from 'src/domain/teaching/types/question.type';
+import { supabaseQuestionToQuestion } from '../mappers/question.mapper';
 
 export class QuestionSupabaseRepository implements QuestionsRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
@@ -39,5 +41,24 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
     }
 
     return count ?? 0;
+  }
+
+  async getCourseQuestions(courseId: string): Promise<Question[]> {
+    const { data, error } = await this.supabase
+      .from('questions')
+      .select('*')
+      .eq('course_id', courseId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error(
+        'error getting course questions for course id',
+        courseId,
+        error,
+      );
+      throw new QuestionServerError(error.message);
+    }
+
+    return data?.map(supabaseQuestionToQuestion) ?? [];
   }
 }

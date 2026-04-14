@@ -48,3 +48,30 @@ export type Course = {
   validatedQuestions?: boolean;
   positionOrder?: number;
 };
+
+export type SupabaseCourseWithSession = {
+  id: string;
+  session: {
+    teacher_id: string;
+  };
+};
+
+export type CourseWithSession = {
+  id: string;
+  session: {
+    teacherId: string;
+  };
+};
+
+export type CourseRanking = {
+  studentId: string;
+  name: string;
+  photoUrl: string | null;
+  attemptedQuestions: number;
+  correctAnswers: number;
+  successRate: number;
+  rank: number;
+  lastAttempt: string;
+};
+
+export type CourseRankingWithRate = Omit<CourseRanking, 'rank'>;

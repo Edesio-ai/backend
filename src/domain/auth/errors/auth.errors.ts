@@ -114,3 +114,12 @@ export class InvitationTokenBadRequestError extends AuthError {
     super(message || 'Invitation token bad request');
   }
 }
+
+// Session errors
+export class SessionNotFoundError extends AuthError {
+  readonly code = 'SESSION_NOT_FOUND';
+  readonly httpStatus = 404;
+  constructor(message?: string) {
+    super(message || 'Session not found');
+  }
+}

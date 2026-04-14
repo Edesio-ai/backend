@@ -3,6 +3,7 @@ import {
   mapFilesUrl,
   supabaseCourseFileToCourseFile,
   supabaseCourseToCourse,
+  supabaseValidatedQuestionsToValidatedQuestions,
 } from './course.mapper';
 import {
   SupabaseCourse,
@@ -76,6 +77,24 @@ describe('course.mapper', () => {
 
     it('returns empty array for empty input', () => {
       expect(mapFilesUrl([])).toEqual([]);
+    });
+  });
+
+  describe('supabaseValidatedQuestionsToValidatedQuestions', () => {
+    it('maps validated_questions column to domain shape', () => {
+      expect(
+        supabaseValidatedQuestionsToValidatedQuestions({
+          validated_questions: true,
+        }),
+      ).toEqual({ validatedQuestions: true });
+    });
+
+    it('maps false validated_questions', () => {
+      expect(
+        supabaseValidatedQuestionsToValidatedQuestions({
+          validated_questions: false,
+        }),
+      ).toEqual({ validatedQuestions: false });
     });
   });
 

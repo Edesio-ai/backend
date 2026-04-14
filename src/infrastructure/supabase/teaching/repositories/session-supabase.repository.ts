@@ -99,4 +99,18 @@ export class SupabaseSessionRepository implements SessionRepository {
       throw new SessionServerError(error.message);
     }
   }
+
+  async getSessionById(sessionId: string): Promise<Session | null> {
+    const { data, error } = await this.supabase
+      .from('sessions')
+      .select('id, teacher_id')
+      .eq('id', sessionId)
+      .single();
+
+    if (error) {
+      throw new SessionServerError(error.message);
+    }
+
+    return data ? supabaseSessionToSession(data) : null;
+  }
 }
