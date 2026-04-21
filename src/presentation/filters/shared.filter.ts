@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
-import { GlobalError } from 'src/domain/shared/errors/global.errors';
+import { GlobalError } from 'src/domain/shared/global/errors/global.errors';
 
 @Catch(GlobalError)
 export class GlobalErrorFilter implements ExceptionFilter {

@@ -49,8 +49,18 @@ export function supabaseCourseWithSessionToCourseWithSession(
 ): CourseWithSession {
   return {
     id: row.id,
+    title: row.title,
+    description: row.description,
+    contentText: row.content_text,
+    validatedQuestions: row.validated_questions,
+    positionOrder: row.position_order,
     session: {
-      teacherId: row.session.teacher_id,
+      id: row.session?.id ?? '',
+      teacherId: row.session?.teacher_id ?? '',
+      name: row.session?.name ?? '',
+      code: row.session?.code ?? '',
+      language: row.session?.language ?? 'francais',
+      createdAt: row.session?.created_at ?? '',
     },
   };
 }

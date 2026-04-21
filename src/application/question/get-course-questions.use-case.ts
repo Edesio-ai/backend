@@ -17,7 +17,7 @@ import {
   COURSE_REPOSITORY,
   type CourseRepository,
 } from 'src/domain/teaching/interface/course.repository';
-import { ForbiddenError } from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError } from 'src/domain/shared/global/errors/global.errors';
 
 export class GetCourseQuestionsUseCase {
   constructor(
@@ -35,8 +35,17 @@ export class GetCourseQuestionsUseCase {
       throw new TeacherNotFoundError();
     }
 
-    const course =
-      await this.coursesRepository.getCourseWithSessionById(courseId);
+    const select = `
+      id,
+      session:sessions!inner (
+        teacher_id,
+        language
+      )`;
+
+    const course = await this.coursesRepository.getCourseWithSessionById(
+      courseId,
+      select,
+    );
     if (!course) {
       throw new CourseNotFoundError();
     }

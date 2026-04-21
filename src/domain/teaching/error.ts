@@ -62,6 +62,15 @@ export class QuestionServerError extends TeachingError {
     super(message || 'Question server error');
   }
 }
+
+export class QuestionBadRequestError extends TeachingError {
+  readonly code = 'QUESTION_BAD_REQUEST';
+  readonly httpStatus = 400;
+  constructor(message?: string) {
+    super(message || 'Question bad request');
+  }
+}
+
 // COURSE ERRORS
 export class CourseNotFoundError extends TeachingError {
   readonly code = 'COURSE_NOT_FOUND';

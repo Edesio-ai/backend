@@ -11,7 +11,10 @@ export const COURSE_REPOSITORY = Symbol('COURSE_REPOSITORY');
 
 export interface CourseRepository {
   getCourseById(courseId: string): Promise<Course>;
-  getCourseWithSessionById(courseId: string): Promise<CourseWithSession>;
+  getCourseWithSessionById(
+    courseId: string,
+    select: string,
+  ): Promise<CourseWithSession>;
   getSessionCoursesBySessionId(sessionId: string): Promise<Course[]>;
   getCoursesBySessionId(sessionId: string): Promise<SupabaseCourse[]>;
   deleteCoursesFilesByCourseIds(courseIds: string[]): Promise<void>;
@@ -28,4 +31,5 @@ export interface CourseRepository {
     courseId: string,
   ): Promise<{ validatedQuestions: boolean }>;
   getCourseFilesByCourseId(courseId: string): Promise<CourseFile[]>;
+  getFileBufferFromStorage(filePath: string): Promise<Buffer>;
 }

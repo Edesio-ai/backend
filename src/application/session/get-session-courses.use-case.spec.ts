@@ -1,7 +1,7 @@
 import { GetSessionCoursesUseCase } from './get-session-courses.use-case';
 import { SessionNotFoundError } from '../../domain/auth/errors/auth.errors';
 import { AuthUser } from '../../domain/auth/types/auth.type';
-import { ForbiddenError } from '../../domain/shared/errors/global.errors';
+import { ForbiddenError } from '../../domain/shared/global/errors/global.errors';
 import { TeacherNotFoundError } from '../../domain/teaching/error';
 import { CourseRepository } from '../../domain/teaching/interface/course.repository';
 import { SessionRepository } from '../../domain/teaching/interface/session.repository';
