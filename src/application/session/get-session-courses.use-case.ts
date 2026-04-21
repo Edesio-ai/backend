@@ -1,11 +1,8 @@
 import { Inject } from '@nestjs/common';
 import { SessionNotFoundError } from 'src/domain/auth/errors/auth.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { ForbiddenError } from 'src/domain/shared/errors/global.errors';
-import {
-  CourseNotFoundError,
-  TeacherNotFoundError,
-} from 'src/domain/teaching/error';
+import { ForbiddenError } from 'src/domain/shared/global/errors/global.errors';
+import { TeacherNotFoundError } from 'src/domain/teaching/error';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,

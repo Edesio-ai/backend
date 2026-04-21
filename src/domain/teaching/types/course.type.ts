@@ -1,3 +1,5 @@
+import { Session, SupabaseSession } from './session.type';
+
 export type SupabaseCourse = {
   id: string;
   session_id: string;
@@ -49,18 +51,20 @@ export type Course = {
   positionOrder?: number;
 };
 
+export type Language = 'francais' | 'anglais' | 'espagnol' | 'allemand';
+
 export type SupabaseCourseWithSession = {
   id: string;
-  session: {
-    teacher_id: string;
-  };
+  title: string;
+  description: string | null;
+  content_text: string | null;
+  validated_questions?: boolean;
+  position_order?: number;
+  session: Partial<SupabaseSession>;
 };
 
-export type CourseWithSession = {
-  id: string;
-  session: {
-    teacherId: string;
-  };
+export type CourseWithSession = Partial<Course> & {
+  session: Partial<Session>;
 };
 
 export type CourseRanking = {

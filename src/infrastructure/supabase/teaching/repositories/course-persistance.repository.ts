@@ -211,17 +211,11 @@ export class CourseSupabaseRepository implements CourseRepository {
 
   public async getCourseWithSessionById(
     courseId: string,
+    select: string,
   ): Promise<CourseWithSession> {
     const { data, error } = await this.supabase
       .from('courses')
-      .select(
-        `
-        id,
-        session:sessions!inner (
-          teacher_id
-        )
-      `,
-      )
+      .select(select)
       .eq('id', courseId)
       .single();
 
@@ -256,5 +250,18 @@ export class CourseSupabaseRepository implements CourseRepository {
     }
 
     return data ? data.map(supabaseCourseToCourse) : [];
+  }
+
+  public async getFileBufferFromStorage(filePath: string): Promise<Buffer> {
+    const { data: fileData, error } = await this.supabase.storage
+      .from('courses-pdf')
+      .download(filePath);
+
+    if (error) {
+      console.error(`Error downloading file from storage: ${filePath}`, error);
+      throw new CourseServerError(error.message);
+    }
+
+    return Buffer.from(await fileData.arrayBuffer());
   }
 }

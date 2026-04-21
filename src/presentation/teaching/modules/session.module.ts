@@ -6,7 +6,7 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/m
 import { CreateSessionUseCase } from 'src/application/session/create-session.use-case';
 import { UpdateSessionNameUseCase } from 'src/application/session/update-session-name.use-case';
 import { GetSessionByCodeUseCase } from 'src/application/session/get-session-by-code.use-case';
-import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/repositories/course-persistence.module';
+import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/course-persistence.module';
 import { DeleteSessionUseCase } from 'src/application/session/delete-session.use-case';
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';

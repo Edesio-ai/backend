@@ -2,8 +2,14 @@ import { Inject } from '@nestjs/common';
 import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import { QuestionServerError } from 'src/domain/teaching/error';
-import { Question } from 'src/domain/teaching/types/question.type';
-import { supabaseQuestionToQuestion } from '../mappers/question.mapper';
+import {
+  GeneratedQuestion,
+  Question,
+} from 'src/domain/teaching/types/question.type';
+import {
+  generatedQuestionsToSupabaseQuestions,
+  supabaseQuestionToQuestion,
+} from '../mappers/question.mapper';
 
 export class QuestionSupabaseRepository implements QuestionsRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
@@ -60,5 +66,38 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
     }
 
     return data?.map(supabaseQuestionToQuestion) ?? [];
+  }
+
+  async insertQuestions(
+    questions: GeneratedQuestion[],
+    courseId: string,
+  ): Promise<Question[]> {
+    const { data, error } = await this.supabase
+      .from('questions')
+      .insert(generatedQuestionsToSupabaseQuestions(questions, courseId))
+      .select();
+
+    if (error) {
+      console.error('error inserting questions for course id', courseId, error);
+      throw new QuestionServerError(error.message);
+    }
+
+    return data?.map(supabaseQuestionToQuestion) ?? [];
+  }
+
+  async deleteCourseQuestions(courseId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('questions')
+      .delete()
+      .eq('course_id', courseId);
+
+    if (error) {
+      console.error(
+        'error deleting course questions for course id',
+        courseId,
+        error,
+      );
+      throw new QuestionServerError(error.message);
+    }
   }
 }

@@ -26,7 +26,7 @@ export class StudentSupabaseRepository implements StudentRepository {
       );
 
     if (error) {
-      console.log(
+      console.error(
         'An error occurred while getting students sessions by ids',
         sessionIds,
         error,
@@ -45,7 +45,7 @@ export class StudentSupabaseRepository implements StudentRepository {
       .eq('session_id', sessionId);
 
     if (error) {
-      console.log(
+      console.error(
         'An error occurred while deleting student sessions by session id',
         sessionId,
         error,
@@ -74,7 +74,7 @@ export class StudentSupabaseRepository implements StudentRepository {
       .eq('course_id', courseId);
 
     if (error) {
-      console.log(
+      console.error(
         'An error occurred while getting student stats by course id',
         courseId,
         error,
