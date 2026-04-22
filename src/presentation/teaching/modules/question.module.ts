@@ -9,7 +9,8 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/m
 import { GenerateQuestionUseCase } from 'src/application/question/generate-question-use-case';
 import { PdfModule } from 'src/infrastructure/pdf/pdf.module';
 import { OpenaiModule } from 'src/infrastructure/llm/openai/openai.module';
-import { OpenaiRepository } from 'src/infrastructure/llm/openai/openai.repository';
+import { CreateQuestionUseCase } from 'src/application/question/create-question.use-case';
+
 @Module({
   imports: [
     AuthPersistenceModule,
@@ -24,6 +25,7 @@ import { OpenaiRepository } from 'src/infrastructure/llm/openai/openai.repositor
     GetPendingQuestionCountUseCase,
     GetCourseQuestionsUseCase,
     GenerateQuestionUseCase,
+    CreateQuestionUseCase,
   ],
 })
 export class QuestionModule {}
