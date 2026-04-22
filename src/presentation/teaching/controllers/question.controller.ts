@@ -24,6 +24,8 @@ import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { GenerateQuestionDto } from '../dto/question/generate-question.dto';
 import { GenerateQuestionUseCase } from 'src/application/question/generate-question-use-case';
 import { OpenAiErrorFilter } from 'src/presentation/filters/openai.filter';
+import { CreateQuestionDto } from '../dto/question/create-question.dto';
+import { CreateQuestionUseCase } from 'src/application/question/create-question.use-case';
 
 @Controller('question')
 export class QuestionController {
@@ -31,6 +33,7 @@ export class QuestionController {
     private readonly getPendingQuestionCountUseCase: GetPendingQuestionCountUseCase,
     private readonly getCourseQuestionsUseCase: GetCourseQuestionsUseCase,
     private readonly generateQuestionUseCase: GenerateQuestionUseCase,
+    private readonly createQuestionUseCase: CreateQuestionUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -51,6 +54,19 @@ export class QuestionController {
   ): Promise<Question[]> {
     const { user } = req;
     return (await this.getCourseQuestionsUseCase.execute(courseId, user)) || [];
+  }
+
+  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+  @UseFilters(GlobalErrorFilter, TeacherErrorFilter)
+  @Roles('teacher')
+  @Post()
+  async createQuestion(
+    @Body() body: CreateQuestionDto,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<{ data: Question }> {
+    const { user } = req;
+    const question = await this.createQuestionUseCase.execute(body, user);
+    return { data: question };
   }
 
   @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)

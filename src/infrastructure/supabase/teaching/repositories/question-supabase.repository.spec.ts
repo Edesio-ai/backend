@@ -1,6 +1,7 @@
 import { QuestionServerError } from 'src/domain/teaching/error';
 import { QuestionSupabaseRepository } from './question-supabase.repository';
 import {
+  CreateQuestionBody,
   GeneratedQuestion,
   Question,
 } from 'src/domain/teaching/types/question.type';
@@ -103,6 +104,25 @@ describe('QuestionSupabaseRepository', () => {
     );
   });
 
+  // --- insertQuestion (single) ---
+
+  it('should insert a single question and return the mapped result', async () => {
+    fixtures.whenInsertQuestionSucceeds();
+
+    const result = await fixtures.whenInsertQuestion();
+
+    expect(result).toEqual(fixtures.expectedQuestions[0]);
+    fixtures.thenInsertQuestionQueryBuilt();
+  });
+
+  it('should throw QuestionServerError when insertQuestion fails', async () => {
+    fixtures.whenInsertQuestionFails();
+
+    await expect(fixtures.whenInsertQuestion()).rejects.toBeInstanceOf(
+      QuestionServerError,
+    );
+  });
+
   // --- deleteCourseQuestions ---
 
   it('should delete questions for a course', async () => {
@@ -161,6 +181,15 @@ class Fixtures {
     explanation: 'Parce que A',
   };
 
+  public readonly createQuestionBody: CreateQuestionBody = {
+    courseId: this.courseId,
+    type: 'multiple',
+    questionText: 'Quelle est la réponse ?',
+    proposals: ['A', 'B', 'C', 'D'],
+    correctAnswers: ['a'],
+    explanation: 'Parce que A',
+  };
+
   // --- mocks ---
 
   private readonly inMock = jest.fn();
@@ -175,7 +204,10 @@ class Fixtures {
     order: this.questionsOrderMock,
   }));
 
-  private readonly insertSelectMock = jest.fn();
+  private readonly insertSingleMock = jest.fn();
+  private readonly insertSelectMock = jest.fn(() => ({
+    single: this.insertSingleMock,
+  }));
   private readonly insertMock = jest.fn(() => ({
     select: this.insertSelectMock,
   }));
@@ -238,6 +270,10 @@ class Fixtures {
     return this.repository.deleteCourseQuestions(this.courseId);
   }
 
+  whenInsertQuestion() {
+    return this.repository.insertQuestion(this.createQuestionBody);
+  }
+
   // --- setup ---
 
   whenDeleteByCourseIdsSucceeds() {
@@ -292,6 +328,20 @@ class Fixtures {
     this.insertSelectMock.mockResolvedValue({
       data: null,
       error: { message: 'insert failed' },
+    });
+  }
+
+  whenInsertQuestionSucceeds() {
+    this.insertSingleMock.mockResolvedValue({
+      data: this.supabaseRow,
+      error: null,
+    });
+  }
+
+  whenInsertQuestionFails() {
+    this.insertSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'insert single failed' },
     });
   }
 
@@ -360,5 +410,18 @@ class Fixtures {
   thenDeleteCourseQuestionsQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('questions');
     expect(this.deleteEqMock).toHaveBeenCalledWith('course_id', this.courseId);
+  }
+
+  thenInsertQuestionQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('questions');
+    expect(this.insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        course_id: this.courseId,
+        type: 'multiple',
+        question_text: 'Quelle est la réponse ?',
+      }),
+    );
+    expect(this.insertSelectMock).toHaveBeenCalledTimes(1);
+    expect(this.insertSingleMock).toHaveBeenCalledTimes(1);
   }
 }

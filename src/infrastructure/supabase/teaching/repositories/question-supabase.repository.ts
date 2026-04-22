@@ -3,10 +3,12 @@ import { QuestionsRepository } from 'src/domain/teaching/interface/questions.rep
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import { QuestionServerError } from 'src/domain/teaching/error';
 import {
+  CreateQuestionBody,
   GeneratedQuestion,
   Question,
 } from 'src/domain/teaching/types/question.type';
 import {
+  createQuestionBodyToSupabaseQuestionInsert,
   generatedQuestionsToSupabaseQuestions,
   supabaseQuestionToQuestion,
 } from '../mappers/question.mapper';
@@ -99,5 +101,20 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
       );
       throw new QuestionServerError(error.message);
     }
+  }
+
+  async insertQuestion(question: CreateQuestionBody): Promise<Question> {
+    const { data, error } = await this.supabase
+      .from('questions')
+      .insert(createQuestionBodyToSupabaseQuestionInsert(question))
+      .select()
+      .single();
+
+    if (error) {
+      console.error('error inserting question', question, error);
+      throw new QuestionServerError(error.message);
+    }
+
+    return supabaseQuestionToQuestion(data);
   }
 }
