@@ -10,6 +10,7 @@ import { GenerateQuestionUseCase } from 'src/application/question/generate-quest
 import { PdfModule } from 'src/infrastructure/pdf/pdf.module';
 import { OpenaiModule } from 'src/infrastructure/llm/openai/openai.module';
 import { CreateQuestionUseCase } from 'src/application/question/create-question.use-case';
+import { DeleteQuestionByIdUseCase } from 'src/application/question/delete-question-by-id.use-case';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CreateQuestionUseCase } from 'src/application/question/create-question.
     GetCourseQuestionsUseCase,
     GenerateQuestionUseCase,
     CreateQuestionUseCase,
+    DeleteQuestionByIdUseCase,
   ],
 })
 export class QuestionModule {}

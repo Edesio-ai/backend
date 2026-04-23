@@ -130,10 +130,13 @@ class Fixtures {
 
   constructor() {
     this.questionsRepository = {
+      getQuestionById: jest.fn(),
+      deleteQuestionById: jest.fn(),
       deleteQuestionsByCourseIds: jest.fn(),
       getPendingQuestionCount: jest.fn(),
       getCourseQuestions: jest.fn(),
       insertQuestions: jest.fn(),
+      insertQuestion: jest.fn(),
       deleteCourseQuestions: jest.fn(),
     };
     this.teachersRepository = {

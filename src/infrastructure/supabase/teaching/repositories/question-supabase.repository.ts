@@ -117,4 +117,31 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
 
     return supabaseQuestionToQuestion(data);
   }
+
+  public async getQuestionById(questionId: string): Promise<Question> {
+    const { data, error } = await this.supabase
+      .from('questions')
+      .select('*')
+      .eq('id', questionId)
+      .single();
+
+    if (error) {
+      console.error('error getting question by id', questionId, error);
+      throw new QuestionServerError(error.message);
+    }
+
+    return supabaseQuestionToQuestion(data);
+  }
+
+  async deleteQuestionById(questionId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('questions')
+      .delete()
+      .eq('id', questionId);
+
+    if (error) {
+      console.error('error deleting question by id', questionId, error);
+      throw new QuestionServerError(error.message);
+    }
+  }
 }
