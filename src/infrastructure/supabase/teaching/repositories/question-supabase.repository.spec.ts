@@ -140,6 +140,43 @@ describe('QuestionSupabaseRepository', () => {
       QuestionServerError,
     );
   });
+
+  // --- getQuestionById ---
+
+  it('should return a mapped question by id', async () => {
+    fixtures.whenGetQuestionByIdSucceeds();
+
+    const result = await fixtures.whenGetQuestionById();
+
+    expect(result).toEqual(fixtures.expectedQuestions[0]);
+    fixtures.thenGetQuestionByIdQueryBuilt();
+  });
+
+  it('should throw QuestionServerError when getQuestionById fails', async () => {
+    fixtures.whenGetQuestionByIdFails();
+
+    await expect(fixtures.whenGetQuestionById()).rejects.toBeInstanceOf(
+      QuestionServerError,
+    );
+  });
+
+  // --- deleteQuestionById ---
+
+  it('should delete a question by id', async () => {
+    fixtures.whenDeleteQuestionByIdSucceeds();
+
+    await fixtures.whenDeleteQuestionById();
+
+    fixtures.thenDeleteQuestionByIdQueryBuilt();
+  });
+
+  it('should throw QuestionServerError when deleteQuestionById fails', async () => {
+    fixtures.whenDeleteQuestionByIdFails();
+
+    await expect(fixtures.whenDeleteQuestionById()).rejects.toBeInstanceOf(
+      QuestionServerError,
+    );
+  });
 });
 
 class Fixtures {
@@ -192,32 +229,31 @@ class Fixtures {
 
   // --- mocks ---
 
-  private readonly inMock = jest.fn();
-  private readonly deleteMock = jest.fn(() => ({ in: this.inMock }));
+  private readonly inMock: jest.Mock = jest.fn();
+  private readonly deleteMock: jest.Mock = jest.fn(() => ({ in: this.inMock }));
 
-  private readonly countSelectMock = jest.fn();
-  private readonly countInMock = jest.fn();
-  private readonly countIsMock = jest.fn();
+  private readonly countSelectMock: jest.Mock = jest.fn();
+  private readonly countInMock: jest.Mock = jest.fn();
+  private readonly countIsMock: jest.Mock = jest.fn();
 
-  private readonly questionsOrderMock = jest.fn();
-  private readonly questionsEqMock = jest.fn(() => ({
+  private readonly questionsOrderMock: jest.Mock = jest.fn();
+  private readonly getByIdSingleMock: jest.Mock = jest.fn();
+  private readonly questionsEqMock: jest.Mock = jest.fn(() => ({
     order: this.questionsOrderMock,
+    single: this.getByIdSingleMock,
   }));
 
-  private readonly insertSingleMock = jest.fn();
-  private readonly insertSelectMock = jest.fn(() => ({
+  private readonly insertSingleMock: jest.Mock = jest.fn();
+  private readonly insertSelectMock: jest.Mock = jest.fn(() => ({
     single: this.insertSingleMock,
   }));
-  private readonly insertMock = jest.fn(() => ({
+  private readonly insertMock: jest.Mock = jest.fn(() => ({
     select: this.insertSelectMock,
   }));
 
-  private readonly deleteEqMock = jest.fn();
-  private readonly deleteCourseQMock = jest.fn(() => ({
-    eq: this.deleteEqMock,
-  }));
+  private readonly deleteEqMock: jest.Mock = jest.fn();
 
-  private readonly questionsSelectMock = jest.fn(() => ({
+  private readonly questionsSelectMock: jest.Mock = jest.fn(() => ({
     eq: this.questionsEqMock,
   }));
 
@@ -272,6 +308,14 @@ class Fixtures {
 
   whenInsertQuestion() {
     return this.repository.insertQuestion(this.createQuestionBody);
+  }
+
+  whenGetQuestionById() {
+    return this.repository.getQuestionById('q-1');
+  }
+
+  whenDeleteQuestionById() {
+    return this.repository.deleteQuestionById('q-1');
   }
 
   // --- setup ---
@@ -342,6 +386,38 @@ class Fixtures {
     this.insertSingleMock.mockResolvedValue({
       data: null,
       error: { message: 'insert single failed' },
+    });
+  }
+
+  whenGetQuestionByIdSucceeds() {
+    this.getByIdSingleMock.mockResolvedValue({
+      data: this.supabaseRow,
+      error: null,
+    });
+  }
+
+  whenGetQuestionByIdFails() {
+    this.getByIdSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'question not found' },
+    });
+  }
+
+  whenDeleteQuestionByIdSucceeds() {
+    this.deleteEqMock.mockResolvedValue({ error: null });
+    this.deleteMock.mockReturnValue({
+      in: this.inMock,
+      eq: this.deleteEqMock,
+    });
+  }
+
+  whenDeleteQuestionByIdFails() {
+    this.deleteEqMock.mockResolvedValue({
+      error: { message: 'delete by id failed' },
+    });
+    this.deleteMock.mockReturnValue({
+      in: this.inMock,
+      eq: this.deleteEqMock,
     });
   }
 
@@ -423,5 +499,17 @@ class Fixtures {
     );
     expect(this.insertSelectMock).toHaveBeenCalledTimes(1);
     expect(this.insertSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenGetQuestionByIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('questions');
+    expect(this.questionsSelectMock).toHaveBeenCalledWith('*');
+    expect(this.questionsEqMock).toHaveBeenCalledWith('id', 'q-1');
+    expect(this.getByIdSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenDeleteQuestionByIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('questions');
+    expect(this.deleteEqMock).toHaveBeenCalledWith('id', 'q-1');
   }
 }

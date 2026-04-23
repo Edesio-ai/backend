@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -26,6 +27,7 @@ import { GenerateQuestionUseCase } from 'src/application/question/generate-quest
 import { OpenAiErrorFilter } from 'src/presentation/filters/openai.filter';
 import { CreateQuestionDto } from '../dto/question/create-question.dto';
 import { CreateQuestionUseCase } from 'src/application/question/create-question.use-case';
+import { DeleteQuestionByIdUseCase } from 'src/application/question/delete-question-by-id.use-case';
 
 @Controller('question')
 export class QuestionController {
@@ -34,6 +36,7 @@ export class QuestionController {
     private readonly getCourseQuestionsUseCase: GetCourseQuestionsUseCase,
     private readonly generateQuestionUseCase: GenerateQuestionUseCase,
     private readonly createQuestionUseCase: CreateQuestionUseCase,
+    private readonly deleteQuestionByIdUseCase: DeleteQuestionByIdUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -83,5 +86,21 @@ export class QuestionController {
       questions,
       questionCount: questions.length,
     };
+  }
+
+  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+  @UseFilters(GlobalErrorFilter, TeacherErrorFilter)
+  @Roles('teacher')
+  @Delete(':questionId')
+  async deleteQuestionById(
+    @Param('questionId') questionId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<{ success: boolean }> {
+    const { user } = req;
+    const success = await this.deleteQuestionByIdUseCase.execute(
+      questionId,
+      user,
+    );
+    return { success };
   }
 }

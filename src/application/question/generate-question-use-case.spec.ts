@@ -226,7 +226,10 @@ class Fixtures {
     this.pdfExtractor = { extractTextFromPdf: jest.fn() };
     this.openaiRepository = { generateQuestions: jest.fn() };
     this.questionRepository = {
+      getQuestionById: jest.fn(),
+      deleteQuestionById: jest.fn(),
       insertQuestions: jest.fn(),
+      insertQuestion: jest.fn(),
       deleteQuestionsByCourseIds: jest.fn(),
       getPendingQuestionCount: jest.fn(),
       getCourseQuestions: jest.fn(),

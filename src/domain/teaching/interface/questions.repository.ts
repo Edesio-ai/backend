@@ -7,6 +7,8 @@ import {
 export const QUESTIONS_REPOSITORY = 'QUESTIONS_REPOSITORY';
 
 export interface QuestionsRepository {
+  getQuestionById(questionId: string): Promise<Question>;
+  deleteQuestionById(questionId: string): Promise<void>;
   insertQuestions(
     questions: GeneratedQuestion[],
     courseId: string,
