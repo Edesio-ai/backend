@@ -6,4 +6,5 @@ export interface StudentRepository {
   getStudentsSessionsByIds(sessionIds: string[]): Promise<StudentSession[]>;
   deleteStudentSessionsBySessionId(sessionId: string): Promise<void>;
   getStudentStatsByCourseId(courseId: string): Promise<StudentCourseStats[]>;
+  deleteStudentCourseStatsByCourseId(courseId: string): Promise<void>;
 }

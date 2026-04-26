@@ -49,6 +49,7 @@ export type Course = {
   contentText?: string | null;
   validatedQuestions?: boolean;
   positionOrder?: number;
+  createdAt?: string;
 };
 
 export type Language = 'francais' | 'anglais' | 'espagnol' | 'allemand';

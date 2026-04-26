@@ -10,6 +10,8 @@ import { GetCourseRankingUseCase } from 'src/application/course/get-course-ranki
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
+import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';
+import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/m
     SessionsPersistenceModule,
     TeacherPersistenceModule,
     StudentPersistenceModule,
+    QuestionPersistenceModule,
   ],
   controllers: [CourseController],
   providers: [
@@ -26,6 +29,7 @@ import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/m
     GetCourseValidatedQuestionsUseCase,
     GetCourseFilesUseCase,
     GetCourseRankingUseCase,
+    DeleteCourseUseCase,
   ],
 })
 export class CourseModule {}

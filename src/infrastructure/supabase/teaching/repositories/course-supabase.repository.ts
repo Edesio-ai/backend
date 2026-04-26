@@ -60,7 +60,24 @@ export class CourseSupabaseRepository implements CourseRepository {
       if (files && files.length > 0) {
         const filePaths = files.map((file) => file.fileUrl);
         await this.deleteCoursesFilesFromStorage(filePaths);
+        await this.deleteCourseFileFromDatabase(courseId);
       }
+    }
+  }
+
+  private async deleteCourseFileFromDatabase(courseId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('course_files')
+      .delete()
+      .eq('course_id', courseId);
+
+    if (error) {
+      console.error(
+        'Error deleting course files for course id: ',
+        courseId,
+        error,
+      );
+      throw new CourseServerError(error.message);
     }
   }
 
@@ -263,5 +280,17 @@ export class CourseSupabaseRepository implements CourseRepository {
     }
 
     return Buffer.from(await fileData.arrayBuffer());
+  }
+
+  public async deleteCourseById(courseId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('courses')
+      .delete()
+      .eq('id', courseId);
+
+    if (error) {
+      console.error('Error deleting course by id: ', courseId, error);
+      throw new CourseServerError(error.message);
+    }
   }
 }

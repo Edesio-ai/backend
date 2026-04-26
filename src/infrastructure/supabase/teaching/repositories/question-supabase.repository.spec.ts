@@ -123,7 +123,7 @@ describe('QuestionSupabaseRepository', () => {
     );
   });
 
-  // --- deleteCourseQuestions ---
+  // --- deleteCourseQuizQuestions ---
 
   it('should delete questions for a course', async () => {
     fixtures.whenDeleteCourseQuestionsSucceeds();
@@ -133,7 +133,7 @@ describe('QuestionSupabaseRepository', () => {
     fixtures.thenDeleteCourseQuestionsQueryBuilt();
   });
 
-  it('should throw QuestionServerError when deleteCourseQuestions fails', async () => {
+  it('should throw QuestionServerError when deleteCourseQuizQuestions fails', async () => {
     fixtures.whenDeleteCourseQuestionsFails();
 
     await expect(fixtures.whenDeleteCourseQuestions()).rejects.toBeInstanceOf(
@@ -195,6 +195,24 @@ describe('QuestionSupabaseRepository', () => {
     await expect(fixtures.whenUpdateQuestionById()).rejects.toBeInstanceOf(
       QuestionServerError,
     );
+  });
+
+  // --- deleteCourseQuestionsByCourseId ---
+
+  it('should delete course_questions by course id', async () => {
+    fixtures.whenDeleteCourseQuestionsByCourseIdSucceeds();
+
+    await fixtures.whenDeleteCourseQuestionsByCourseId();
+
+    fixtures.thenDeleteCourseQuestionsByCourseIdQueryBuilt();
+  });
+
+  it('should throw QuestionServerError when deleteCourseQuestionsByCourseId fails', async () => {
+    fixtures.whenDeleteCourseQuestionsByCourseIdFails();
+
+    await expect(
+      fixtures.whenDeleteCourseQuestionsByCourseId(),
+    ).rejects.toBeInstanceOf(QuestionServerError);
   });
 });
 
@@ -283,6 +301,11 @@ class Fixtures {
     eq: this.updateEqMock,
   }));
 
+  private readonly courseQuestionsDeleteEqMock: jest.Mock = jest.fn();
+  private readonly courseQuestionsDeleteMock: jest.Mock = jest.fn(() => ({
+    eq: this.courseQuestionsDeleteEqMock,
+  }));
+
   private readonly questionsSelectMock: jest.Mock = jest.fn(() => ({
     eq: this.questionsEqMock,
   }));
@@ -297,7 +320,10 @@ class Fixtures {
       };
     }
     if (table === 'course_questions') {
-      return { select: this.countSelectMock };
+      return {
+        select: this.countSelectMock,
+        delete: this.courseQuestionsDeleteMock,
+      };
     }
     return {};
   });
@@ -334,7 +360,7 @@ class Fixtures {
   }
 
   whenDeleteCourseQuestions() {
-    return this.repository.deleteCourseQuestions(this.courseId);
+    return this.repository.deleteCourseQuizQuestions(this.courseId);
   }
 
   whenInsertQuestion() {
@@ -572,5 +598,28 @@ class Fixtures {
     expect(this.updateEqMock).toHaveBeenCalledWith('id', 'q-1');
     expect(this.updateSelectMock).toHaveBeenCalledTimes(1);
     expect(this.updateSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  whenDeleteCourseQuestionsByCourseId() {
+    return this.repository.deleteCourseQuestionsByCourseId(this.courseId);
+  }
+
+  whenDeleteCourseQuestionsByCourseIdSucceeds() {
+    this.courseQuestionsDeleteEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenDeleteCourseQuestionsByCourseIdFails() {
+    this.courseQuestionsDeleteEqMock.mockResolvedValue({
+      error: { message: 'delete course_questions failed' },
+    });
+  }
+
+  thenDeleteCourseQuestionsByCourseIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('course_questions');
+    expect(this.courseQuestionsDeleteMock).toHaveBeenCalledTimes(1);
+    expect(this.courseQuestionsDeleteEqMock).toHaveBeenCalledWith(
+      'course_id',
+      this.courseId,
+    );
   }
 }

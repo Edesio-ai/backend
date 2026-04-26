@@ -95,7 +95,7 @@ export class GenerateQuestionUseCase {
       throw new QuestionBadRequestError('Échec de la génération des questions');
     }
 
-    await this.questionRepository.deleteCourseQuestions(courseId);
+    await this.questionRepository.deleteCourseQuizQuestions(courseId);
 
     const multipleQuestions = questions.filter((q) => q.type === 'multiple');
     const openQuestions = questions.filter((q) => q.type === 'open');

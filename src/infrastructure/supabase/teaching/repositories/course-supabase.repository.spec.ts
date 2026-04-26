@@ -1,5 +1,5 @@
 import { CourseServerError } from 'src/domain/teaching/error';
-import { CourseSupabaseRepository } from './course-persistance.repository';
+import { CourseSupabaseRepository } from './course-supabase.repository';
 import { CreateCourseBody } from 'src/domain/teaching/types/course.type';
 
 describe('CourseSupabaseRepository', () => {
@@ -219,6 +219,56 @@ describe('CourseSupabaseRepository', () => {
 
     await fixtures.thenThrowCourseServerError(promise);
   });
+
+  it('should return course with session by id', async () => {
+    fixtures.whenGetCourseWithSessionByIdSucceeds();
+
+    const result = await fixtures.whenGetCourseWithSessionById();
+
+    fixtures.thenGetCourseWithSessionByIdQueryBuilt();
+    expect(result).toEqual(fixtures.expectedCourseWithSession);
+  });
+
+  it('should throw CourseServerError when getCourseWithSessionById fails', async () => {
+    fixtures.whenGetCourseWithSessionByIdFails();
+
+    const promise = fixtures.whenGetCourseWithSessionById();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
+
+  it('should delete course by id', async () => {
+    fixtures.whenDeleteCourseByIdSucceeds();
+
+    await fixtures.whenDeleteCourseById();
+
+    fixtures.thenDeleteCourseByIdQueryBuilt();
+  });
+
+  it('should throw CourseServerError when deleteCourseById fails', async () => {
+    fixtures.whenDeleteCourseByIdFails();
+
+    const promise = fixtures.whenDeleteCourseById();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
+
+  it('should return buffer from storage', async () => {
+    fixtures.whenGetFileBufferSucceeds();
+
+    const result = await fixtures.whenGetFileBufferFromStorage();
+
+    expect(result).toBeInstanceOf(Buffer);
+    fixtures.thenDownloadCalledWithPath();
+  });
+
+  it('should throw CourseServerError when getFileBufferFromStorage fails', async () => {
+    fixtures.whenGetFileBufferFails();
+
+    const promise = fixtures.whenGetFileBufferFromStorage();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
 });
 
 class Fixtures {
@@ -250,6 +300,7 @@ class Fixtures {
     contentText: this.createBody.contentText,
     validatedQuestions: undefined,
     positionOrder: undefined,
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   public readonly courseId = 'course-1';
@@ -294,6 +345,7 @@ class Fixtures {
     contentText: null,
     validatedQuestions: undefined,
     positionOrder: undefined,
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   public readonly sessionCoursesSupabaseRows = [
@@ -323,6 +375,7 @@ class Fixtures {
       contentText: null,
       validatedQuestions: undefined,
       positionOrder: undefined,
+      createdAt: '2026-01-02T00:00:00.000Z',
     },
     {
       id: 'c-b',
@@ -332,6 +385,7 @@ class Fixtures {
       contentText: null,
       validatedQuestions: undefined,
       positionOrder: undefined,
+      createdAt: '2026-01-01T00:00:00.000Z',
     },
   ];
 
@@ -362,13 +416,26 @@ class Fixtures {
       if (first === '*') {
         return { eq: this.coursesSessionCoursesEqMock };
       }
-      return { eq: this.coursesListEqMock };
+      return { eq: this.courseWithSessionEqMock };
     },
   );
 
   private readonly coursesDeleteEqMock = jest.fn();
   private readonly coursesDeleteMock = jest.fn(() => ({
     eq: this.coursesDeleteEqMock,
+  }));
+
+  private readonly coursesByIdDeleteEqMock = jest.fn();
+  private readonly coursesByIdDeleteMock = jest.fn(() => ({
+    eq: this.coursesByIdDeleteEqMock,
+  }));
+
+  private readonly courseWithSessionSingleMock = jest.fn();
+  private readonly courseWithSessionEqMock = jest.fn(() => ({
+    single: this.courseWithSessionSingleMock,
+  }));
+  private readonly courseWithSessionSelectMock = jest.fn(() => ({
+    eq: this.courseWithSessionEqMock,
   }));
 
   private readonly coursesInsertSingleMock = jest.fn();
@@ -392,11 +459,18 @@ class Fixtures {
     select: this.courseFilesInsertSelectMock,
   }));
 
+  private readonly courseFilesDeleteEqMock = jest.fn();
+  private readonly courseFilesDeleteMock = jest.fn(() => ({
+    eq: this.courseFilesDeleteEqMock,
+  }));
+
   public readonly removeMock = jest.fn();
   public readonly uploadMock = jest.fn();
+  public readonly downloadMock = jest.fn();
   private readonly storageFromMock = jest.fn(() => ({
     remove: this.removeMock,
     upload: this.uploadMock,
+    download: this.downloadMock,
   }));
 
   private readonly fromMock = jest.fn((table: string) => {
@@ -411,6 +485,7 @@ class Fixtures {
       return {
         select: this.courseFilesSelectMock,
         insert: this.courseFilesInsertMock,
+        delete: this.courseFilesDeleteMock,
       };
     }
     throw new Error(`unexpected table: ${table}`);
@@ -571,6 +646,7 @@ class Fixtures {
         error: null,
       })
       .mockResolvedValueOnce({ data: [], error: null });
+    this.courseFilesDeleteEqMock.mockResolvedValue({ error: null });
   }
 
   whenCourseFilesAlwaysEmpty() {
@@ -775,5 +851,123 @@ class Fixtures {
       'course_id',
       this.courseId,
     );
+  }
+
+  // --- getCourseWithSessionById ---
+
+  public readonly courseWithSessionSupabaseRow = {
+    id: this.courseDetailId,
+    title: 'Titre cours',
+    description: null,
+    content_text: null,
+    validated_questions: false,
+    position_order: undefined,
+    session: { teacher_id: 'teacher-1', language: 'francais' },
+  };
+
+  public readonly expectedCourseWithSession = {
+    id: this.courseDetailId,
+    title: 'Titre cours',
+    description: null,
+    contentText: null,
+    validatedQuestions: false,
+    positionOrder: undefined,
+    session: {
+      id: '',
+      teacherId: 'teacher-1',
+      name: '',
+      code: '',
+      language: 'francais',
+      createdAt: '',
+    },
+  };
+
+  whenGetCourseWithSessionById() {
+    return this.repository.getCourseWithSessionById(
+      this.courseDetailId,
+      'id, title',
+    );
+  }
+
+  whenGetCourseWithSessionByIdSucceeds() {
+    this.courseWithSessionSingleMock.mockResolvedValue({
+      data: this.courseWithSessionSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenGetCourseWithSessionByIdFails() {
+    this.courseWithSessionSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'course with session failed' },
+    });
+  }
+
+  thenGetCourseWithSessionByIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('courses');
+    expect(this.coursesSelectMock).toHaveBeenCalledWith('id, title');
+    expect(this.courseWithSessionEqMock).toHaveBeenCalledWith(
+      'id',
+      this.courseDetailId,
+    );
+    expect(this.courseWithSessionSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  // --- deleteCourseById ---
+
+  whenDeleteCourseById() {
+    return this.repository.deleteCourseById(this.courseDetailId);
+  }
+
+  whenDeleteCourseByIdSucceeds() {
+    this.coursesByIdDeleteEqMock.mockResolvedValue({ error: null });
+    this.coursesDeleteMock.mockReturnValue({
+      eq: this.coursesByIdDeleteEqMock,
+    });
+  }
+
+  whenDeleteCourseByIdFails() {
+    this.coursesByIdDeleteEqMock.mockResolvedValue({
+      error: { message: 'delete course failed' },
+    });
+    this.coursesDeleteMock.mockReturnValue({
+      eq: this.coursesByIdDeleteEqMock,
+    });
+  }
+
+  thenDeleteCourseByIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('courses');
+    expect(this.coursesByIdDeleteEqMock).toHaveBeenCalledWith(
+      'id',
+      this.courseDetailId,
+    );
+  }
+
+  // --- getFileBufferFromStorage ---
+
+  public readonly filePath = 'course-1/doc.pdf';
+
+  whenGetFileBufferFromStorage() {
+    return this.repository.getFileBufferFromStorage(this.filePath);
+  }
+
+  whenGetFileBufferSucceeds() {
+    const arrayBuffer = new ArrayBuffer(8);
+    this.downloadMock.mockResolvedValue({
+      data: { arrayBuffer: async () => arrayBuffer },
+      error: null,
+    });
+  }
+
+  whenGetFileBufferFails() {
+    this.downloadMock.mockResolvedValue({
+      data: null,
+      error: { message: 'download failed' },
+    });
+  }
+
+  thenDownloadCalledWithPath() {
+    expect(this.storageFromMock).toHaveBeenCalledWith('courses-pdf');
+    expect(this.downloadMock).toHaveBeenCalledWith(this.filePath);
   }
 }

@@ -137,7 +137,7 @@ class Fixtures {
       getCourseQuestions: jest.fn(),
       insertQuestions: jest.fn(),
       insertQuestion: jest.fn(),
-      deleteCourseQuestions: jest.fn(),
+      deleteCourseQuizQuestions: jest.fn(),
       updateQuestionById: jest.fn(),
     };
     this.teachersRepository = {

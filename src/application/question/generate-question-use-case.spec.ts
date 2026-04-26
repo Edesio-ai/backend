@@ -79,7 +79,7 @@ describe('GenerateQuestionUseCase', () => {
     const result = await fixtures.whenExecute();
 
     expect(
-      fixtures.questionRepository.deleteCourseQuestions,
+      fixtures.questionRepository.deleteCourseQuizQuestions,
     ).toHaveBeenCalledWith(fixtures.body.courseId);
     expect(fixtures.questionRepository.insertQuestions).toHaveBeenCalledWith(
       expect.any(Array),
@@ -222,6 +222,7 @@ class Fixtures {
       getCourseValidatedQuestions: jest.fn(),
       getCourseFilesByCourseId: jest.fn(),
       getFileBufferFromStorage: jest.fn(),
+      deleteCourseById: jest.fn(),
     };
     this.pdfExtractor = { extractTextFromPdf: jest.fn() };
     this.openaiRepository = { generateQuestions: jest.fn() };
@@ -233,8 +234,9 @@ class Fixtures {
       deleteQuestionsByCourseIds: jest.fn(),
       getPendingQuestionCount: jest.fn(),
       getCourseQuestions: jest.fn(),
-      deleteCourseQuestions: jest.fn(),
+      deleteCourseQuizQuestions: jest.fn(),
       updateQuestionById: jest.fn(),
+      deleteCourseQuestionsByCourseId: jest.fn(),
     };
     this.teacherRepository = {
       linkTeacherToEstablishment: jest.fn(),
@@ -328,7 +330,9 @@ class Fixtures {
   }
 
   whenInsertSucceeds() {
-    this.questionRepository.deleteCourseQuestions.mockResolvedValue(undefined);
+    this.questionRepository.deleteCourseQuizQuestions.mockResolvedValue(
+      undefined,
+    );
     this.questionRepository.insertQuestions.mockResolvedValue(
       this.insertedQuestions,
     );

@@ -89,7 +89,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
     return data?.map(supabaseQuestionToQuestion) ?? [];
   }
 
-  async deleteCourseQuestions(courseId: string): Promise<void> {
+  async deleteCourseQuizQuestions(courseId: string): Promise<void> {
     const { error } = await this.supabase
       .from('questions')
       .delete()
@@ -168,5 +168,23 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
     }
 
     return supabaseQuestionToQuestion(data);
+  }
+
+  public async deleteCourseQuestionsByCourseId(
+    courseId: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('course_questions')
+      .delete()
+      .eq('course_id', courseId);
+
+    if (error) {
+      console.error(
+        'error deleting course questions by course id',
+        courseId,
+        error,
+      );
+      throw new QuestionServerError(error.message);
+    }
   }
 }

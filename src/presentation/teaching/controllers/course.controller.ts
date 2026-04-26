@@ -2,11 +2,13 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
   Req,
   UploadedFile,
+  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -28,6 +30,9 @@ import { GetCourseValidatedQuestionsUseCase } from 'src/application/course/get-c
 import { GetCourseFilesUseCase } from 'src/application/course/get-course-files.use-case';
 import { GetCourseRankingUseCase } from 'src/application/course/get-course-ranking.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
+import { GlobalErrorFilter } from 'src/presentation/filters/shared.filter';
+import { TeacherErrorFilter } from 'src/presentation/filters/teacher.filter';
+import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';
 
 @Controller('course')
 export class CourseController {
@@ -37,6 +42,7 @@ export class CourseController {
     private readonly getCourseValidatedQuestionsUseCase: GetCourseValidatedQuestionsUseCase,
     private readonly getCoursesFilesUseCase: GetCourseFilesUseCase,
     private readonly getCourseRankingUseCase: GetCourseRankingUseCase,
+    private readonly deleteCourseUseCase: DeleteCourseUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
@@ -95,6 +101,7 @@ export class CourseController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseFilters(TeacherErrorFilter, GlobalErrorFilter)
   @Roles('teacher')
   @Get('/:courseId/ranking')
   async getCourseRanking(
@@ -105,5 +112,19 @@ export class CourseController {
     const ranking =
       (await this.getCourseRankingUseCase.execute(courseId, user)) || [];
     return ranking || [];
+  }
+
+  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+  @Roles('teacher')
+  @UseFilters(GlobalErrorFilter)
+  @Delete(':courseId')
+  async deleteCourse(
+    @Param('courseId') courseId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<{ success: boolean }> {
+    const { user } = req;
+    await this.deleteCourseUseCase.execute(courseId, user);
+
+    return { success: true };
   }
 }

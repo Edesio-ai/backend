@@ -34,6 +34,7 @@ export function supabaseCourseToCourse(course: SupabaseCourse): Course {
     contentText: course.text_content,
     validatedQuestions: course.validated_questions,
     positionOrder: course.position_order,
+    createdAt: course.created_at,
   };
 }
 
