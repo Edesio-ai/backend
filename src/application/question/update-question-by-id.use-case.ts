@@ -28,6 +28,7 @@ interface UpdateQuestionBody {
   explanation?: string | undefined;
   type?: QuestionType | undefined;
   proposals?: string[] | undefined;
+  positionOrder?: number | undefined;
 }
 
 export class UpdateQuestionByIdUseCase {
@@ -45,7 +46,14 @@ export class UpdateQuestionByIdUseCase {
     body: UpdateQuestionBody,
     user: AuthUser,
   ): Promise<Question> {
-    const { questionText, correctAnswers, explanation, type, proposals } = body;
+    const {
+      questionText,
+      correctAnswers,
+      explanation,
+      type,
+      proposals,
+      positionOrder,
+    } = body;
     const question = await this.questionsRepository.getQuestionById(questionId);
     if (!question) {
       throw new NotFoundError('Question not found');
@@ -102,7 +110,7 @@ export class UpdateQuestionByIdUseCase {
     if (proposals !== undefined) updates.proposals = proposals;
     if (correctAnswers !== undefined) updates.correctAnswers = correctAnswers;
     if (explanation !== undefined) updates.explanation = explanation;
-
+    if (positionOrder !== undefined) updates.positionOrder = positionOrder;
     const updatedQuestion = await this.questionsRepository.updateQuestionById(
       questionId,
       updates,

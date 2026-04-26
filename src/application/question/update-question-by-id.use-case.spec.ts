@@ -164,6 +164,19 @@ describe('UpdateQuestionByIdUseCase', () => {
     ).toHaveBeenCalledWith(fixtures.questionId, { explanation: 'Parce que' });
   });
 
+  it('should include positionOrder in updates when provided', async () => {
+    fixtures.whenQuestionFound();
+    fixtures.whenTeacherFound();
+    fixtures.whenCourseSessionMatchesTeacher();
+    fixtures.whenUpdateSucceeds();
+
+    await fixtures.whenExecute({ positionOrder: 3 });
+
+    expect(
+      fixtures.questionsRepository.updateQuestionById,
+    ).toHaveBeenCalledWith(fixtures.questionId, { positionOrder: 3 });
+  });
+
   it('should propagate errors thrown by updateQuestionById', async () => {
     fixtures.whenQuestionFound();
     fixtures.whenTeacherFound();
