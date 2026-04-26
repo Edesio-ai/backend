@@ -131,7 +131,7 @@ class Fixtures {
       deleteQuestionsByCourseIds: jest.fn(),
       getPendingQuestionCount: jest.fn(),
       getCourseQuestions: jest.fn(),
-      deleteCourseQuestions: jest.fn(),
+      deleteCourseQuizQuestions: jest.fn(),
       updateQuestionById: jest.fn(),
     };
     this.teachersRepository = {

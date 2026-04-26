@@ -83,4 +83,22 @@ export class StudentSupabaseRepository implements StudentRepository {
     }
     return supabaseStudentCourseStatsToStudentCourseStats(data ?? []);
   }
+
+  public async deleteStudentCourseStatsByCourseId(
+    courseId: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('student_course_stats')
+      .delete()
+      .eq('course_id', courseId);
+
+    if (error) {
+      console.error(
+        'Error deleting student course stats for course id: ',
+        courseId,
+        error,
+      );
+      throw new StudentServerError(error.message);
+    }
+  }
 }

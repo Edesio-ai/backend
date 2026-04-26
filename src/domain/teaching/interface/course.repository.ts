@@ -32,4 +32,5 @@ export interface CourseRepository {
   ): Promise<{ validatedQuestions: boolean }>;
   getCourseFilesByCourseId(courseId: string): Promise<CourseFile[]>;
   getFileBufferFromStorage(filePath: string): Promise<Buffer>;
+  deleteCourseById(courseId: string): Promise<void>;
 }

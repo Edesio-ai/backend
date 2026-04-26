@@ -67,6 +67,22 @@ describe('StudentSupabaseRepository', () => {
 
     await fixtures.thenThrowStudentServerError(promise);
   });
+
+  it('should delete student course stats by course id', async () => {
+    fixtures.whenDeleteStudentCourseStatsByIdSucceeds();
+
+    await fixtures.whenDeleteStudentCourseStatsByCourseId();
+
+    fixtures.thenDeleteStudentCourseStatsQueryBuilt();
+  });
+
+  it('should throw StudentServerError when deleteStudentCourseStatsByCourseId fails', async () => {
+    fixtures.whenDeleteStudentCourseStatsByIdFails();
+
+    const promise = fixtures.whenDeleteStudentCourseStatsByCourseId();
+
+    await fixtures.thenThrowStudentServerError(promise);
+  });
 });
 
 class Fixtures {
@@ -106,12 +122,20 @@ class Fixtures {
   private readonly statsEqMock = jest.fn();
   private readonly statsSelectMock = jest.fn(() => ({ eq: this.statsEqMock }));
 
+  private readonly statsDeleteEqMock = jest.fn();
+  private readonly statsDeleteMock = jest.fn(() => ({
+    eq: this.statsDeleteEqMock,
+  }));
+
   private readonly deleteEqMock = jest.fn();
   private readonly deleteMock = jest.fn(() => ({ eq: this.deleteEqMock }));
 
-  private mode: 'select' | 'delete' | 'stats' = 'select';
+  private mode: 'select' | 'delete' | 'stats' | 'stats-delete' = 'select';
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'student_course_stats') {
+      if (this.mode === 'stats-delete') {
+        return { delete: this.statsDeleteMock };
+      }
       return { select: this.statsSelectMock };
     }
     if (this.mode === 'delete') {
@@ -217,6 +241,32 @@ class Fixtures {
     expect(this.deleteEqMock).toHaveBeenCalledWith(
       'session_id',
       this.sessionIdToDelete,
+    );
+  }
+
+  whenDeleteStudentCourseStatsByCourseId() {
+    this.mode = 'stats-delete';
+    return this.repository.deleteStudentCourseStatsByCourseId(
+      this.courseIdForStats,
+    );
+  }
+
+  whenDeleteStudentCourseStatsByIdSucceeds() {
+    this.statsDeleteEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenDeleteStudentCourseStatsByIdFails() {
+    this.statsDeleteEqMock.mockResolvedValue({
+      error: { message: 'delete stats failed' },
+    });
+  }
+
+  thenDeleteStudentCourseStatsQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_course_stats');
+    expect(this.statsDeleteMock).toHaveBeenCalledTimes(1);
+    expect(this.statsDeleteEqMock).toHaveBeenCalledWith(
+      'course_id',
+      this.courseIdForStats,
     );
   }
 }
