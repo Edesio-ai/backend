@@ -31,6 +31,7 @@ import { CreateQuestionUseCase } from 'src/application/question/create-question.
 import { DeleteQuestionByIdUseCase } from 'src/application/question/delete-question-by-id.use-case';
 import { UpdateQuestionDto } from '../dto/question/update-question.dto';
 import { UpdateQuestionByIdUseCase } from 'src/application/question/update-question-by-id.use-case';
+import { AuthErrorFilter } from 'src/presentation/filters/auth.filter';
 
 @Controller('question')
 export class QuestionController {
@@ -44,6 +45,7 @@ export class QuestionController {
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseFilters(AuthErrorFilter)
   @Roles('teacher')
   @Get('pending/:sessionId')
   async getPendingQuestionsCount(@Param('sessionId') sessionId: string) {
