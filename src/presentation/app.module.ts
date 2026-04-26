@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { BillingModule } from './billing/billing.module';
 import { TeachingModule } from './teaching/teaching.module';
+import { ExportModule } from './export/modules/export.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TeachingModule } from './teaching/teaching.module';
     AuthModule,
     BillingModule,
     TeachingModule,
+    ExportModule,
   ],
   controllers: [],
   providers: [],
