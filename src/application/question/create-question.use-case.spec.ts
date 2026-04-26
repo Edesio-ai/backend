@@ -116,6 +116,7 @@ class Fixtures {
       getPendingQuestionCount: jest.fn(),
       getCourseQuestions: jest.fn(),
       deleteCourseQuestions: jest.fn(),
+      updateQuestionById: jest.fn(),
     };
     this.teachersRepository = {
       linkTeacherToEstablishment: jest.fn(),

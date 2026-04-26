@@ -6,10 +6,12 @@ import {
   CreateQuestionBody,
   GeneratedQuestion,
   Question,
+  QuestionUpdate,
 } from 'src/domain/teaching/types/question.type';
 import {
   createQuestionBodyToSupabaseQuestionInsert,
   generatedQuestionsToSupabaseQuestions,
+  questionUpdatesToSupabaseQuestionUpdate,
   supabaseQuestionToQuestion,
 } from '../mappers/question.mapper';
 
@@ -143,5 +145,28 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
       console.error('error deleting question by id', questionId, error);
       throw new QuestionServerError(error.message);
     }
+  }
+  async updateQuestionById(
+    questionId: string,
+    updates: QuestionUpdate,
+  ): Promise<Question> {
+    const { data, error } = await this.supabase
+      .from('questions')
+      .update(questionUpdatesToSupabaseQuestionUpdate(updates))
+      .eq('id', questionId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(
+        'error updating question by id',
+        questionId,
+        updates,
+        error,
+      );
+      throw new QuestionServerError(error.message);
+    }
+
+    return supabaseQuestionToQuestion(data);
   }
 }

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UseFilters,
@@ -28,6 +29,8 @@ import { OpenAiErrorFilter } from 'src/presentation/filters/openai.filter';
 import { CreateQuestionDto } from '../dto/question/create-question.dto';
 import { CreateQuestionUseCase } from 'src/application/question/create-question.use-case';
 import { DeleteQuestionByIdUseCase } from 'src/application/question/delete-question-by-id.use-case';
+import { UpdateQuestionDto } from '../dto/question/update-question.dto';
+import { UpdateQuestionByIdUseCase } from 'src/application/question/update-question-by-id.use-case';
 
 @Controller('question')
 export class QuestionController {
@@ -37,6 +40,7 @@ export class QuestionController {
     private readonly generateQuestionUseCase: GenerateQuestionUseCase,
     private readonly createQuestionUseCase: CreateQuestionUseCase,
     private readonly deleteQuestionByIdUseCase: DeleteQuestionByIdUseCase,
+    private readonly updateQuestionUseCase: UpdateQuestionByIdUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -102,5 +106,24 @@ export class QuestionController {
       user,
     );
     return { success };
+  }
+
+  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+  @UseFilters(GlobalErrorFilter, TeacherErrorFilter)
+  @Roles('teacher')
+  @Patch(':courseId')
+  async updateQuestionById(
+    @Param('courseId') courseId: string,
+    @Body() body: UpdateQuestionDto,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<{ question: Question }> {
+    const { user } = req;
+    const question = await this.updateQuestionUseCase.execute(
+      courseId,
+      body,
+      user,
+    );
+
+    return { question };
   }
 }

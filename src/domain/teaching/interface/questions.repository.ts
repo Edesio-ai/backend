@@ -2,6 +2,7 @@ import {
   CreateQuestionBody,
   GeneratedQuestion,
   Question,
+  QuestionUpdate,
 } from '../types/question.type';
 
 export const QUESTIONS_REPOSITORY = 'QUESTIONS_REPOSITORY';
@@ -18,4 +19,8 @@ export interface QuestionsRepository {
   getCourseQuestions(courseId: string): Promise<Question[]>;
   deleteCourseQuestions(courseId: string): Promise<void>;
   insertQuestion(question: CreateQuestionBody): Promise<Question>;
+  updateQuestionById(
+    questionId: string,
+    updates: QuestionUpdate,
+  ): Promise<Question>;
 }

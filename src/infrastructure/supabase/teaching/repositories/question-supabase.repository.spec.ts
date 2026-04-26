@@ -177,6 +177,25 @@ describe('QuestionSupabaseRepository', () => {
       QuestionServerError,
     );
   });
+
+  // --- updateQuestionById ---
+
+  it('should update a question by id and return the mapped result', async () => {
+    fixtures.whenUpdateQuestionByIdSucceeds();
+
+    const result = await fixtures.whenUpdateQuestionById();
+
+    expect(result).toEqual(fixtures.expectedQuestions[0]);
+    fixtures.thenUpdateQuestionByIdQueryBuilt();
+  });
+
+  it('should throw QuestionServerError when updateQuestionById fails', async () => {
+    fixtures.whenUpdateQuestionByIdFails();
+
+    await expect(fixtures.whenUpdateQuestionById()).rejects.toBeInstanceOf(
+      QuestionServerError,
+    );
+  });
 });
 
 class Fixtures {
@@ -253,6 +272,17 @@ class Fixtures {
 
   private readonly deleteEqMock: jest.Mock = jest.fn();
 
+  private readonly updateSingleMock: jest.Mock = jest.fn();
+  private readonly updateSelectMock: jest.Mock = jest.fn(() => ({
+    single: this.updateSingleMock,
+  }));
+  private readonly updateEqMock: jest.Mock = jest.fn(() => ({
+    select: this.updateSelectMock,
+  }));
+  private readonly updateMock: jest.Mock = jest.fn(() => ({
+    eq: this.updateEqMock,
+  }));
+
   private readonly questionsSelectMock: jest.Mock = jest.fn(() => ({
     eq: this.questionsEqMock,
   }));
@@ -263,6 +293,7 @@ class Fixtures {
         delete: this.deleteMock,
         select: this.questionsSelectMock,
         insert: this.insertMock,
+        update: this.updateMock,
       };
     }
     if (table === 'course_questions') {
@@ -316,6 +347,12 @@ class Fixtures {
 
   whenDeleteQuestionById() {
     return this.repository.deleteQuestionById('q-1');
+  }
+
+  whenUpdateQuestionById() {
+    return this.repository.updateQuestionById('q-1', {
+      questionText: 'Mise à jour',
+    });
   }
 
   // --- setup ---
@@ -439,6 +476,20 @@ class Fixtures {
     });
   }
 
+  whenUpdateQuestionByIdSucceeds() {
+    this.updateSingleMock.mockResolvedValue({
+      data: this.supabaseRow,
+      error: null,
+    });
+  }
+
+  whenUpdateQuestionByIdFails() {
+    this.updateSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'update failed' },
+    });
+  }
+
   // --- assertions ---
 
   thenDeleteByCourseIdsQueryBuilt() {
@@ -511,5 +562,15 @@ class Fixtures {
   thenDeleteQuestionByIdQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('questions');
     expect(this.deleteEqMock).toHaveBeenCalledWith('id', 'q-1');
+  }
+
+  thenUpdateQuestionByIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('questions');
+    expect(this.updateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ question_text: 'Mise à jour' }),
+    );
+    expect(this.updateEqMock).toHaveBeenCalledWith('id', 'q-1');
+    expect(this.updateSelectMock).toHaveBeenCalledTimes(1);
+    expect(this.updateSingleMock).toHaveBeenCalledTimes(1);
   }
 }
