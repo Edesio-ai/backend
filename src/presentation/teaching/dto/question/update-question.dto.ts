@@ -1,4 +1,4 @@
-import { IsArray, IsIn, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import { type QuestionType } from 'src/domain/teaching/types/question.type';
 
 export class UpdateQuestionDto {
@@ -21,4 +21,8 @@ export class UpdateQuestionDto {
   @IsArray()
   @IsOptional()
   proposals?: string[] | undefined;
+
+  @IsNumber()
+  @IsOptional()
+  positionOrder?: number | undefined;
 }
