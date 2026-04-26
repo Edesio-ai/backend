@@ -1,5 +1,6 @@
 import {
   createQuestionBodyToSupabaseQuestionInsert,
+  questionUpdatesToSupabaseQuestionUpdate,
   supabaseQuestionToQuestion,
 } from './question.mapper';
 import { SupabaseQuestion } from 'src/domain/teaching/types/question.type';
@@ -71,6 +72,68 @@ describe('question.mapper', () => {
         correct_answers: null,
         explanation: null,
         position_order: null,
+      });
+    });
+  });
+
+  describe('questionUpdatesToSupabaseQuestionUpdate', () => {
+    it('maps only provided camelCase keys to snake_case', () => {
+      expect(
+        questionUpdatesToSupabaseQuestionUpdate({
+          questionText: 'Nouveau libellé',
+          correctAnswers: ['a'],
+        }),
+      ).toEqual({
+        question_text: 'Nouveau libellé',
+        correct_answers: ['a'],
+      });
+    });
+
+    it('returns empty object when no fields are set', () => {
+      expect(questionUpdatesToSupabaseQuestionUpdate({})).toEqual({});
+    });
+
+    it('maps all fields correctly when all are provided', () => {
+      expect(
+        questionUpdatesToSupabaseQuestionUpdate({
+          type: 'multiple',
+          questionText: 'Quel est 2+2 ?',
+          proposals: ['2', '4', '6', '8'],
+          correctAnswers: ['4'],
+          explanation: 'Simple addition',
+          positionOrder: 3,
+        }),
+      ).toEqual({
+        type: 'multiple',
+        question_text: 'Quel est 2+2 ?',
+        proposals: ['2', '4', '6', '8'],
+        correct_answers: ['4'],
+        explanation: 'Simple addition',
+        position_order: 3,
+      });
+    });
+
+    it('maps only type when only type is provided', () => {
+      expect(questionUpdatesToSupabaseQuestionUpdate({ type: 'open' })).toEqual(
+        { type: 'open' },
+      );
+    });
+
+    it('maps only positionOrder when only positionOrder is provided', () => {
+      expect(
+        questionUpdatesToSupabaseQuestionUpdate({ positionOrder: 5 }),
+      ).toEqual({ position_order: 5 });
+    });
+
+    it('maps null values for proposals and correctAnswers', () => {
+      expect(
+        questionUpdatesToSupabaseQuestionUpdate({
+          proposals: null,
+          correctAnswers: null,
+        }),
+      ).toEqual({
+        proposals: null,
+        correct_answers: null,
       });
     });
   });

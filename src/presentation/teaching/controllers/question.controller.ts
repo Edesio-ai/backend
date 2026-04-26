@@ -116,9 +116,14 @@ export class QuestionController {
     @Param('courseId') courseId: string,
     @Body() body: UpdateQuestionDto,
     @Req() req: Request & { user: AuthUser },
-  ): Promise<{ success: boolean }> {
+  ): Promise<{ question: Question }> {
     const { user } = req;
-    const success = await this.updateQuestionUseCase.execute(courseId, body, user);
-    return { success: true };
+    const question = await this.updateQuestionUseCase.execute(
+      courseId,
+      body,
+      user,
+    );
+
+    return { question };
   }
 }

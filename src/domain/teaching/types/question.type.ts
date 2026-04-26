@@ -45,6 +45,32 @@ export type CreateQuestionBody = {
   positionOrder?: number | null;
 };
 
+/** Champs modifiables côté domaine (camelCase), tous optionnels pour un PATCH. */
+export type QuestionUpdate = Partial<
+  Pick<
+    Question,
+    | 'type'
+    | 'questionText'
+    | 'proposals'
+    | 'correctAnswers'
+    | 'explanation'
+    | 'positionOrder'
+  >
+>;
+
+/** Ligne envoyée à Supabase `.update()` — colonnes snake_case uniquement. */
+export type SupabaseQuestionUpdate = Partial<
+  Pick<
+    SupabaseQuestion,
+    | 'type'
+    | 'question_text'
+    | 'proposals'
+    | 'correct_answers'
+    | 'explanation'
+    | 'position_order'
+  >
+>;
+
 export type QuestionGenerationConfig = {
   totalQuestions?: number;
   multipleChoiceCount?: number;
