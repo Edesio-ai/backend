@@ -1,9 +1,4 @@
-import {
-  IsArray,
-  IsIn,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsArray, IsIn, IsOptional, IsString } from 'class-validator';
 import { type QuestionType } from 'src/domain/teaching/types/question.type';
 
 export class UpdateQuestionDto {
