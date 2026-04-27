@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateCourseBodyDto {
   @IsString()
@@ -12,4 +12,8 @@ export class UpdateCourseBodyDto {
   @IsString()
   @IsOptional()
   contentText?: string | null;
+
+  @IsNumber()
+  @IsOptional()
+  positionOrder?: number | null;
 }

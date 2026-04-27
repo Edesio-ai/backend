@@ -73,5 +73,7 @@ export function updatesToSupabaseCourseUpdate(
   if (updates.title !== undefined) row.title = updates.title;
   if (updates.description !== undefined) row.description = updates.description;
   if (updates.contentText !== undefined) row.text_content = updates.contentText;
+  if (updates.positionOrder !== undefined)
+    row.position_order = updates.positionOrder;
   return row;
 }
