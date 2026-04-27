@@ -65,3 +65,13 @@ export function supabaseValidatedQuestionsToValidatedQuestions(data: {
     validatedQuestions: data.validated_questions,
   };
 }
+
+export function updatesToSupabaseCourseUpdate(
+  updates: Record<string, unknown>,
+): Record<string, unknown> {
+  const row: Record<string, unknown> = {};
+  if (updates.title !== undefined) row.title = updates.title;
+  if (updates.description !== undefined) row.description = updates.description;
+  if (updates.contentText !== undefined) row.text_content = updates.contentText;
+  return row;
+}
