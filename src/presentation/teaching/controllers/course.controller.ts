@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UploadedFile,
@@ -33,6 +34,8 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GlobalErrorFilter } from 'src/presentation/filters/shared.filter';
 import { TeacherErrorFilter } from 'src/presentation/filters/teacher.filter';
 import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';
+import { UpdateCourseBodyDto } from '../dto/course/UpdateCourseUseCase.dto';
+import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';
 
 @Controller('course')
 export class CourseController {
@@ -43,6 +46,7 @@ export class CourseController {
     private readonly getCoursesFilesUseCase: GetCourseFilesUseCase,
     private readonly getCourseRankingUseCase: GetCourseRankingUseCase,
     private readonly deleteCourseUseCase: DeleteCourseUseCase,
+    private readonly updateCourseUseCase: UpdateCourseUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
@@ -126,5 +130,20 @@ export class CourseController {
     await this.deleteCourseUseCase.execute(courseId, user);
 
     return { success: true };
+  }
+
+  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+  @Roles('teacher')
+  @UseFilters(GlobalErrorFilter)
+  @Patch(':courseId')
+  async deleteCourseFiles(
+    @Param('courseId') courseId: string,
+    @Req() req: Request & { user: AuthUser },
+    @Body() body: UpdateCourseBodyDto,
+  ): Promise<{ data: Course }> {
+    const { user } = req;
+    const course = await this.updateCourseUseCase.execute(courseId, body, user);
+
+    return { data: course };
   }
 }

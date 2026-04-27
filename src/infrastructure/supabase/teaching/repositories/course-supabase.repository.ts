@@ -16,6 +16,7 @@ import {
   supabaseCourseFileToCourseFile,
   supabaseCourseToCourse,
   supabaseValidatedQuestionsToValidatedQuestions,
+  updatesToSupabaseCourseUpdate,
 } from '../mappers/course.mapper';
 import { supabaseCourseWithSessionToCourseWithSession } from '../mappers/session.mapper';
 
@@ -292,5 +293,23 @@ export class CourseSupabaseRepository implements CourseRepository {
       console.error('Error deleting course by id: ', courseId, error);
       throw new CourseServerError(error.message);
     }
+  }
+
+  public async updateCourse(
+    courseId: string,
+    updates: Record<string, unknown>,
+  ): Promise<Course> {
+    const { data, error } = await this.supabase
+      .from('courses')
+      .update(updatesToSupabaseCourseUpdate(updates))
+      .eq('id', courseId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new CourseServerError(error.message);
+    }
+
+    return supabaseCourseToCourse(data);
   }
 }

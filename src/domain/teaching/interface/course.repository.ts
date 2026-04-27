@@ -33,4 +33,8 @@ export interface CourseRepository {
   getCourseFilesByCourseId(courseId: string): Promise<CourseFile[]>;
   getFileBufferFromStorage(filePath: string): Promise<Buffer>;
   deleteCourseById(courseId: string): Promise<void>;
+  updateCourse(
+    courseId: string,
+    updates: Record<string, unknown>,
+  ): Promise<Course>;
 }

@@ -4,6 +4,7 @@ import {
   supabaseCourseFileToCourseFile,
   supabaseCourseToCourse,
   supabaseValidatedQuestionsToValidatedQuestions,
+  updatesToSupabaseCourseUpdate,
 } from './course.mapper';
 import {
   SupabaseCourse,
@@ -116,6 +117,50 @@ describe('course.mapper', () => {
         fileName: 'doc.pdf',
         createdAt: '2026-01-01T00:00:00.000Z',
       });
+    });
+  });
+
+  describe('updatesToSupabaseCourseUpdate', () => {
+    it('maps all provided fields to Supabase column names', () => {
+      expect(
+        updatesToSupabaseCourseUpdate({
+          title: 'Nouveau titre',
+          description: 'Nouvelle description',
+          contentText: 'Nouveau contenu',
+        }),
+      ).toEqual({
+        title: 'Nouveau titre',
+        description: 'Nouvelle description',
+        text_content: 'Nouveau contenu',
+      });
+    });
+
+    it('maps only title when description and contentText are absent', () => {
+      expect(updatesToSupabaseCourseUpdate({ title: 'T' })).toEqual({
+        title: 'T',
+      });
+    });
+
+    it('maps null values for description and contentText', () => {
+      expect(
+        updatesToSupabaseCourseUpdate({
+          description: null,
+          contentText: null,
+        }),
+      ).toEqual({
+        description: null,
+        text_content: null,
+      });
+    });
+
+    it('returns empty object when no known fields are provided', () => {
+      expect(updatesToSupabaseCourseUpdate({})).toEqual({});
+    });
+
+    it('ignores unknown fields', () => {
+      expect(
+        updatesToSupabaseCourseUpdate({ unknownField: 'x', title: 'T' }),
+      ).toEqual({ title: 'T' });
     });
   });
 });

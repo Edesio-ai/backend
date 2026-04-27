@@ -12,6 +12,7 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/m
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
 import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
+import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/
     GetCourseFilesUseCase,
     GetCourseRankingUseCase,
     DeleteCourseUseCase,
+    UpdateCourseUseCase,
   ],
 })
 export class CourseModule {}

@@ -253,6 +253,23 @@ describe('CourseSupabaseRepository', () => {
     await fixtures.thenThrowCourseServerError(promise);
   });
 
+  it('should update course and return mapped domain object', async () => {
+    fixtures.whenUpdateCourseSucceeds();
+
+    const result = await fixtures.whenUpdateCourse();
+
+    fixtures.thenUpdateCourseQueryBuilt();
+    expect(result).toEqual(fixtures.expectedUpdatedCourse);
+  });
+
+  it('should throw CourseServerError when updateCourse fails', async () => {
+    fixtures.whenUpdateCourseFails();
+
+    const promise = fixtures.whenUpdateCourse();
+
+    await fixtures.thenThrowCourseServerError(promise);
+  });
+
   it('should return buffer from storage', async () => {
     fixtures.whenGetFileBufferSucceeds();
 
@@ -430,6 +447,17 @@ class Fixtures {
     eq: this.coursesByIdDeleteEqMock,
   }));
 
+  private readonly coursesUpdateSingleMock = jest.fn();
+  private readonly coursesUpdateSelectMock = jest.fn(() => ({
+    single: this.coursesUpdateSingleMock,
+  }));
+  private readonly coursesUpdateEqMock = jest.fn(() => ({
+    select: this.coursesUpdateSelectMock,
+  }));
+  private readonly coursesUpdateMock = jest.fn(() => ({
+    eq: this.coursesUpdateEqMock,
+  }));
+
   private readonly courseWithSessionSingleMock = jest.fn();
   private readonly courseWithSessionEqMock = jest.fn(() => ({
     single: this.courseWithSessionSingleMock,
@@ -479,6 +507,7 @@ class Fixtures {
         select: this.coursesSelectMock,
         delete: this.coursesDeleteMock,
         insert: this.coursesInsertMock,
+        update: this.coursesUpdateMock,
       };
     }
     if (table === 'course_files') {
@@ -941,6 +970,70 @@ class Fixtures {
       'id',
       this.courseDetailId,
     );
+  }
+
+  // --- updateCourse ---
+
+  public readonly updatePayload = {
+    title: 'Titre mis à jour',
+    contentText: 'Contenu mis à jour',
+  };
+
+  public readonly updatedCourseSupabaseRow = {
+    id: this.courseDetailId,
+    session_id: 'session-99',
+    title: 'Titre mis à jour',
+    description: null,
+    text_content: 'Contenu mis à jour',
+    validated_questions: false,
+    position_order: 1,
+    created_at: '2026-01-01T00:00:00.000Z',
+  };
+
+  public readonly expectedUpdatedCourse = {
+    id: this.courseDetailId,
+    sessionId: 'session-99',
+    title: 'Titre mis à jour',
+    description: null,
+    contentText: 'Contenu mis à jour',
+    validatedQuestions: false,
+    positionOrder: 1,
+    createdAt: '2026-01-01T00:00:00.000Z',
+  };
+
+  whenUpdateCourse() {
+    return this.repository.updateCourse(
+      this.courseDetailId,
+      this.updatePayload,
+    );
+  }
+
+  whenUpdateCourseSucceeds() {
+    this.coursesUpdateSingleMock.mockResolvedValue({
+      data: this.updatedCourseSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenUpdateCourseFails() {
+    this.coursesUpdateSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'update course failed' },
+    });
+  }
+
+  thenUpdateCourseQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('courses');
+    expect(this.coursesUpdateMock).toHaveBeenCalledWith({
+      title: 'Titre mis à jour',
+      text_content: 'Contenu mis à jour',
+    });
+    expect(this.coursesUpdateEqMock).toHaveBeenCalledWith(
+      'id',
+      this.courseDetailId,
+    );
+    expect(this.coursesUpdateSelectMock).toHaveBeenCalledTimes(1);
+    expect(this.coursesUpdateSingleMock).toHaveBeenCalledTimes(1);
   }
 
   // --- getFileBufferFromStorage ---
