@@ -18,6 +18,7 @@ export type UpdateCourseBody = {
   title?: string | null;
   description?: string | null;
   contentText?: string | null;
+  positionOrder?: number | null;
 };
 export class UpdateCourseUseCase {
   constructor(

@@ -256,6 +256,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       .from('courses')
       .select('*')
       .eq('session_id', sessionId)
+      .order('position_order', { ascending: true })
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -307,6 +308,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       .single();
 
     if (error) {
+      console.error('Error updating course: ', courseId, updates, error);
       throw new CourseServerError(error.message);
     }
 

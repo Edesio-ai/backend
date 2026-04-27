@@ -72,6 +72,19 @@ describe('UpdateCourseUseCase', () => {
     );
   });
 
+  it('should pass positionOrder to updateCourse', async () => {
+    fixtures.whenCourseFound();
+    fixtures.whenTeacherFound();
+    fixtures.whenUpdateSucceeds();
+
+    await fixtures.whenExecute({ positionOrder: 2 });
+
+    expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(
+      fixtures.courseId,
+      { positionOrder: 2 },
+    );
+  });
+
   it('should propagate errors thrown by updateCourse', async () => {
     fixtures.whenCourseFound();
     fixtures.whenTeacherFound();

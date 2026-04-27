@@ -127,11 +127,13 @@ describe('course.mapper', () => {
           title: 'Nouveau titre',
           description: 'Nouvelle description',
           contentText: 'Nouveau contenu',
+          positionOrder: 3,
         }),
       ).toEqual({
         title: 'Nouveau titre',
         description: 'Nouvelle description',
         text_content: 'Nouveau contenu',
+        position_order: 3,
       });
     });
 
@@ -155,6 +157,18 @@ describe('course.mapper', () => {
 
     it('returns empty object when no known fields are provided', () => {
       expect(updatesToSupabaseCourseUpdate({})).toEqual({});
+    });
+
+    it('maps positionOrder to position_order', () => {
+      expect(updatesToSupabaseCourseUpdate({ positionOrder: 2 })).toEqual({
+        position_order: 2,
+      });
+    });
+
+    it('maps null positionOrder to null position_order', () => {
+      expect(updatesToSupabaseCourseUpdate({ positionOrder: null })).toEqual({
+        position_order: null,
+      });
     });
 
     it('ignores unknown fields', () => {

@@ -414,9 +414,12 @@ class Fixtures {
     single: this.coursesByIdSingleMock,
   }));
 
-  private readonly coursesSessionOrderMock = jest.fn();
+  private readonly coursesSessionSecondOrderMock = jest.fn();
+  private readonly coursesSessionFirstOrderMock = jest.fn(() => ({
+    order: this.coursesSessionSecondOrderMock,
+  }));
   private readonly coursesSessionCoursesEqMock = jest.fn(() => ({
-    order: this.coursesSessionOrderMock,
+    order: this.coursesSessionFirstOrderMock,
   }));
 
   private readonly coursesSelectMock = jest.fn(
@@ -610,21 +613,21 @@ class Fixtures {
   }
 
   whenGetSessionCoursesBySessionIdSucceeds() {
-    this.coursesSessionOrderMock.mockResolvedValue({
+    this.coursesSessionSecondOrderMock.mockResolvedValue({
       data: this.sessionCoursesSupabaseRows,
       error: null,
     });
   }
 
   whenGetSessionCoursesBySessionIdReturnsNullData() {
-    this.coursesSessionOrderMock.mockResolvedValue({
+    this.coursesSessionSecondOrderMock.mockResolvedValue({
       data: null,
       error: null,
     });
   }
 
   whenGetSessionCoursesBySessionIdFails() {
-    this.coursesSessionOrderMock.mockResolvedValue({
+    this.coursesSessionSecondOrderMock.mockResolvedValue({
       data: null,
       error: { message: 'session courses failed' },
     });
@@ -868,9 +871,14 @@ class Fixtures {
       'session_id',
       this.sessionId,
     );
-    expect(this.coursesSessionOrderMock).toHaveBeenCalledWith('created_at', {
-      ascending: false,
-    });
+    expect(this.coursesSessionFirstOrderMock).toHaveBeenCalledWith(
+      'position_order',
+      { ascending: true },
+    );
+    expect(this.coursesSessionSecondOrderMock).toHaveBeenCalledWith(
+      'created_at',
+      { ascending: false },
+    );
   }
 
   thenGetCourseFilesQueryBuilt() {
