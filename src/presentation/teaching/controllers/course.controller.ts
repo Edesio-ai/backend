@@ -78,10 +78,7 @@ export class CourseController {
       byteLength: file.size,
     };
 
-    const data = await this.uploadCourseFileUseCase.execute(
-      courseId,
-      payload,
-    );
+    const data = await this.uploadCourseFileUseCase.execute(courseId, payload);
 
     return { data };
   }
