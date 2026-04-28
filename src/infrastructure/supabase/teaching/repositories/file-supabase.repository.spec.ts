@@ -49,6 +49,23 @@ describe('FileSupabaseRepository', () => {
 
     await fixtures.thenThrowServerError(promise);
   });
+
+  it('should return mapped CourseFile when getCourseFileById succeeds', async () => {
+    fixtures.whenGetCourseFileByIdSucceeds();
+
+    const result = await fixtures.whenGetCourseFileById();
+
+    fixtures.thenGetFileQueryBuilt();
+    expect(result).toEqual(fixtures.expectedCourseFile);
+  });
+
+  it('should throw ServerError when getCourseFileById fails', async () => {
+    fixtures.whenGetCourseFileByIdFails();
+
+    const promise = fixtures.whenGetCourseFileById();
+
+    await fixtures.thenThrowServerError(promise);
+  });
 });
 
 class Fixtures {
@@ -61,6 +78,14 @@ class Fixtures {
     file_url: this.fileUrl,
     file_name: 'doc.pdf',
     created_at: '2026-01-01T00:00:00.000Z',
+  };
+
+  public readonly expectedCourseFile = {
+    id: this.fileId,
+    courseId: 'course-1',
+    fileUrl: this.fileUrl,
+    fileName: 'doc.pdf',
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   private readonly courseFilesSelectSingleMock = jest.fn();
@@ -98,6 +123,10 @@ class Fixtures {
 
   whenDeleteFileById() {
     return this.repository.deleteFileById(this.fileId);
+  }
+
+  whenGetCourseFileById() {
+    return this.repository.getCourseFileById(this.fileId);
   }
 
   whenGetCourseFileByIdSucceeds() {

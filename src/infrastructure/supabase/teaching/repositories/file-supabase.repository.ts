@@ -27,18 +27,7 @@ export class FileSupabaseRepository implements FileRepository {
     }
   }
 
-  private async deleteFileFromStorage(fileUrl: string): Promise<void> {
-    const { error } = await this.supabase.storage
-      .from('courses-pdf')
-      .remove([fileUrl]);
-
-    if (error) {
-      console.error(`Error deleting file from storage: ${fileUrl}`, error);
-      throw new ServerError(error.message);
-    }
-  }
-
-  private async getCourseFileById(fileId: string): Promise<CourseFile> {
+  public async getCourseFileById(fileId: string): Promise<CourseFile> {
     const { data, error } = await this.supabase
       .from('course_files')
       .select('*')
@@ -51,5 +40,16 @@ export class FileSupabaseRepository implements FileRepository {
     }
 
     return supabaseCourseFileToCourseFile(data);
+  }
+
+  private async deleteFileFromStorage(fileUrl: string): Promise<void> {
+    const { error } = await this.supabase.storage
+      .from('courses-pdf')
+      .remove([fileUrl]);
+
+    if (error) {
+      console.error(`Error deleting file from storage: ${fileUrl}`, error);
+      throw new ServerError(error.message);
+    }
   }
 }
