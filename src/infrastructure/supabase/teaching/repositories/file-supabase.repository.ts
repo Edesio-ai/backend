@@ -42,6 +42,25 @@ export class FileSupabaseRepository implements FileRepository {
     return supabaseCourseFileToCourseFile(data);
   }
 
+  public async getCourseFilesByCourseId(
+    courseId: string,
+  ): Promise<CourseFile[]> {
+    const { data, error } = await this.supabase
+      .from('course_files')
+      .select('*')
+      .eq('course_id', courseId);
+
+    if (error) {
+      console.error(
+        `Error getting course files by course id: ${courseId}`,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+
+    return data.map(supabaseCourseFileToCourseFile);
+  }
+
   private async deleteFileFromStorage(fileUrl: string): Promise<void> {
     const { error } = await this.supabase.storage
       .from('courses-pdf')

@@ -2,7 +2,6 @@ import { GetSessionCoursesUseCase } from './get-session-courses.use-case';
 import { SessionNotFoundError } from '../../domain/auth/errors/auth.errors';
 import { AuthUser } from '../../domain/auth/types/auth.type';
 import { Establishment } from '../../domain/establishment/establishment.type';
-import { EstablishmentNotFoundError } from '../../domain/establishment/error';
 import {
   ForbiddenError,
   NotFoundError,
@@ -100,11 +99,11 @@ describe('GetSessionCoursesUseCase', () => {
     ).toHaveBeenCalledWith(fixtures.sessionId);
   });
 
-  it('should throw EstablishmentNotFoundError when establishment is missing', async () => {
+  it('should throw NotFoundError when establishment is missing', async () => {
     fixtures.whenEstablishmentNotFound();
 
     await expect(fixtures.whenExecuteAsEstablishment()).rejects.toBeInstanceOf(
-      EstablishmentNotFoundError,
+      NotFoundError,
     );
     expect(fixtures.sessionRepository.getSessionById).not.toHaveBeenCalled();
   });

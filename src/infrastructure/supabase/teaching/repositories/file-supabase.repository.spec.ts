@@ -66,15 +66,33 @@ describe('FileSupabaseRepository', () => {
 
     await fixtures.thenThrowServerError(promise);
   });
+
+  it('should return mapped CourseFiles when getCourseFilesByCourseId succeeds', async () => {
+    fixtures.whenGetCourseFilesByCourseIdSucceeds();
+
+    const result = await fixtures.whenGetCourseFilesByCourseId();
+
+    fixtures.thenGetFilesByCourseIdQueryBuilt();
+    expect(result).toEqual([fixtures.expectedCourseFile]);
+  });
+
+  it('should throw ServerError when getCourseFilesByCourseId fails', async () => {
+    fixtures.whenGetCourseFilesByCourseIdFails();
+
+    const promise = fixtures.whenGetCourseFilesByCourseId();
+
+    await fixtures.thenThrowServerError(promise);
+  });
 });
 
 class Fixtures {
   public readonly fileId = 'file-1';
+  public readonly courseId = 'course-1';
   public readonly fileUrl = 'course-1/doc.pdf';
 
   public readonly supabaseCourseFileRow = {
     id: this.fileId,
-    course_id: 'course-1',
+    course_id: this.courseId,
     file_url: this.fileUrl,
     file_name: 'doc.pdf',
     created_at: '2026-01-01T00:00:00.000Z',
@@ -82,16 +100,22 @@ class Fixtures {
 
   public readonly expectedCourseFile = {
     id: this.fileId,
-    courseId: 'course-1',
+    courseId: this.courseId,
     fileUrl: this.fileUrl,
     fileName: 'doc.pdf',
     createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   private readonly courseFilesSelectSingleMock = jest.fn();
-  private readonly courseFilesSelectEqMock = jest.fn(() => ({
-    single: this.courseFilesSelectSingleMock,
-  }));
+  private readonly courseFilesListEqMock = jest.fn();
+
+  private readonly courseFilesSelectEqMock = jest.fn((col: string) => {
+    if (col === 'course_id') {
+      return this.courseFilesListEqMock();
+    }
+    return { single: this.courseFilesSelectSingleMock };
+  });
+
   private readonly courseFilesSelectMock = jest.fn(() => ({
     eq: this.courseFilesSelectEqMock,
   }));
@@ -129,6 +153,10 @@ class Fixtures {
     return this.repository.getCourseFileById(this.fileId);
   }
 
+  whenGetCourseFilesByCourseId() {
+    return this.repository.getCourseFilesByCourseId(this.courseId);
+  }
+
   whenGetCourseFileByIdSucceeds() {
     this.courseFilesSelectSingleMock.mockResolvedValue({
       data: this.supabaseCourseFileRow,
@@ -141,6 +169,18 @@ class Fixtures {
       data: null,
       error: { message: 'file not found' },
     });
+  }
+
+  whenGetCourseFilesByCourseIdSucceeds() {
+    this.courseFilesListEqMock.mockReturnValue(
+      Promise.resolve({ data: [this.supabaseCourseFileRow], error: null }),
+    );
+  }
+
+  whenGetCourseFilesByCourseIdFails() {
+    this.courseFilesListEqMock.mockReturnValue(
+      Promise.resolve({ data: null, error: { message: 'list query failed' } }),
+    );
   }
 
   whenRemoveFromStorageSucceeds() {
@@ -175,6 +215,15 @@ class Fixtures {
       this.fileId,
     );
     expect(this.courseFilesSelectSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenGetFilesByCourseIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('course_files');
+    expect(this.courseFilesSelectMock).toHaveBeenCalledWith('*');
+    expect(this.courseFilesSelectEqMock).toHaveBeenCalledWith(
+      'course_id',
+      this.courseId,
+    );
   }
 
   thenStorageRemoveCalledWithFileUrl() {

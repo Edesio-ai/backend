@@ -12,9 +12,9 @@ import {
   InvitationTokenAlreadyUsedError,
   InvitationTokenEmailMismatchError,
   InvitationTokenExpiredError,
-  InvitationTokenNotFoundError,
 } from 'src/domain/auth/errors/auth.errors';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
+import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 @Injectable()
 export class ValidateTeacherInvitationUseCase {
@@ -41,7 +41,7 @@ export class ValidateTeacherInvitationUseCase {
     const invitation = await this.tokenRepository.getInvitationByToken(token);
 
     if (!invitation) {
-      throw new InvitationTokenNotFoundError('Invitation token not found');
+      throw new NotFoundError('Invitation token not found');
     }
 
     if (new Date(invitation.expiresAt) < new Date()) {

@@ -60,7 +60,7 @@ describe('session.mapper', () => {
   });
 
   describe('supabaseCourseWithSessionToCourseWithSession', () => {
-    it('maps a full row to a CourseWithSession domain object', () => {
+    it('maps a full row (with nested teachers) to a CourseWithSession domain object', () => {
       const row: SupabaseCourseWithSession = {
         id: 'c-1',
         title: 'Cours',
@@ -68,13 +68,21 @@ describe('session.mapper', () => {
         content_text: 'Contenu',
         validated_questions: true,
         position_order: 2,
-        session: {
+        sessions: {
           id: 's-1',
           teacher_id: 't-1',
           name: 'Session',
           code: 'ABCD',
           language: 'francais',
           created_at: '2026-01-01T00:00:00.000Z',
+          teachers: {
+            id: 'teacher-1',
+            name: 'Prof Martin',
+            email: 'martin@school.com',
+            created_at: '2026-01-01T00:00:00.000Z',
+            establishment_id: 'est-1',
+            available_chatbots: 2,
+          },
         },
       };
 
@@ -93,23 +101,32 @@ describe('session.mapper', () => {
           language: 'francais',
           createdAt: '2026-01-01T00:00:00.000Z',
         },
+        teachers: {
+          id: 'teacher-1',
+          name: 'Prof Martin',
+          email: 'martin@school.com',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          establishmentId: 'est-1',
+        },
       });
     });
 
-    it('uses fallbacks when session fields are missing', () => {
+    it('uses fallbacks when sessions fields are missing', () => {
       const row: SupabaseCourseWithSession = {
         id: 'c-2',
         title: 'Cours',
         description: null,
         content_text: null,
-        session: {},
+        sessions: {},
       };
 
       const result = supabaseCourseWithSessionToCourseWithSession(row);
 
+      expect(result.session.id).toBe('');
       expect(result.session.teacherId).toBe('');
       expect(result.session.language).toBe('francais');
-      expect(result.session.id).toBe('');
+      expect(result.teachers.id).toBe('');
+      expect(result.teachers.establishmentId).toBe('');
     });
   });
 });

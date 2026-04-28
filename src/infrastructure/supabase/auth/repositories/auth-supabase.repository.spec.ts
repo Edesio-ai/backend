@@ -7,7 +7,6 @@ import {
   InvitationTokenCreationError,
   InvitationTokenAlreadyUsedError,
   InvitationTokenExpiredError,
-  InvitationTokenNotFoundError,
   LogoutError,
   UserAlereadyExistsError,
   UserCreationError,
@@ -16,6 +15,7 @@ import {
   TokenUpdateError,
   UserLoginError,
 } from '../../../../domain/auth/errors/auth.errors';
+import { ServerError } from '../../../../domain/shared/global/errors/global.errors';
 import {
   AuthUserWithSession,
   Session,
@@ -38,7 +38,7 @@ describe('AuthSupabaseRepository', () => {
       fixtures.thenReturnExpectedPreview(result);
     });
 
-    it('should throw InvitationTokenNotFoundError when supabase returns error', async () => {
+    it('should throw ServerError when supabase returns error', async () => {
       fixtures.whenSupabaseReturnsError();
 
       const promise = fixtures.whenGetInvitationPreview();
@@ -289,7 +289,7 @@ class GetInvitationPreviewFixtures {
   }
 
   async thenThrowNotFound(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(InvitationTokenNotFoundError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   async thenThrowAlreadyUsed(promise: Promise<unknown>) {

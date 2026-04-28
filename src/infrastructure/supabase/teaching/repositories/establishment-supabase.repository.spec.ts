@@ -1,9 +1,5 @@
 import { EstablishmentSupabaseRepository } from './establishment-supabase.repository';
-import {
-  EstablishmentCreationFailedError,
-  EstablishmentNotFoundError,
-} from '../../../../domain/establishment/error';
-import { InvitationTokenNotFoundError } from '../../../../domain/auth/errors/auth.errors';
+import { ServerError } from '../../../../domain/shared/global/errors/global.errors';
 
 describe('EstablishmentSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -30,7 +26,7 @@ describe('EstablishmentSupabaseRepository', () => {
     fixtures.thenReturnExpectedEstablishment(result);
   });
 
-  it('should throw EstablishmentNotFoundError when query fails', async () => {
+  it('should throw ServerError when getEstablishmentByUserId query fails', async () => {
     fixtures.whenSupabaseReturnsError();
 
     const promise = fixtures.whenGetEstablishmentByUserId();
@@ -39,7 +35,7 @@ describe('EstablishmentSupabaseRepository', () => {
     fixtures.thenQueryBuiltWithExpectedArguments();
   });
 
-  it('should throw EstablishmentNotFoundError when get by id query fails', async () => {
+  it('should throw ServerError when getEstablishmentById query fails', async () => {
     fixtures.whenSupabaseReturnsError();
 
     const promise = fixtures.whenGetEstablishmentById();
@@ -57,7 +53,7 @@ describe('EstablishmentSupabaseRepository', () => {
     fixtures.thenReturnExpectedCreatedEstablishment(result);
   });
 
-  it('should throw EstablishmentCreationFailedError when insert fails', async () => {
+  it('should throw ServerError when createEstablishment insert fails', async () => {
     fixtures.whenCreateSupabaseReturnsError();
 
     const promise = fixtures.whenCreateEstablishment();
@@ -75,7 +71,7 @@ describe('EstablishmentSupabaseRepository', () => {
     fixtures.thenReturnExpectedInvitationTokens(result);
   });
 
-  it('should throw InvitationTokenNotFoundError when invitation tokens query fails', async () => {
+  it('should throw ServerError when getInvitationTokenByEstablishmentId query fails', async () => {
     fixtures.whenInvitationTokensQueryReturnsError();
 
     const promise = fixtures.whenGetInvitationTokenByEstablishmentId();
@@ -261,17 +257,15 @@ class Fixtures {
   }
 
   async thenThrowNotFound(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(EstablishmentNotFoundError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   async thenThrowCreationFailed(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(
-      EstablishmentCreationFailedError,
-    );
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   async thenThrowInvitationTokenNotFound(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(InvitationTokenNotFoundError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   thenQueryBuiltWithExpectedArguments() {

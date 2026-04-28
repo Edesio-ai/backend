@@ -1,7 +1,7 @@
 import { GetInvitationPreviewUseCase } from './get-invitation-preview.use-case';
 import { AuthRepository } from '../../domain/auth/contract/auth.repository';
 import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
-import { InvitationTokenNotFoundError } from '../../domain/auth/errors/auth.errors';
+import { NotFoundError } from '../../domain/shared/global/errors/global.errors';
 
 describe('GetInvitationPreviewUseCase', () => {
   let fixtures: Fixtures;
@@ -10,7 +10,7 @@ describe('GetInvitationPreviewUseCase', () => {
     fixtures = new Fixtures();
   });
 
-  it('should throw InvitationTokenNotFoundError when token is empty', async () => {
+  it('should throw NotFoundError when token is empty', async () => {
     const promise = fixtures.whenExecuteWith('');
 
     await fixtures.thenThrowBadRequest(promise);
@@ -81,7 +81,7 @@ class Fixtures {
   }
 
   async thenThrowBadRequest(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(InvitationTokenNotFoundError);
+    await expect(promise).rejects.toBeInstanceOf(NotFoundError);
   }
 
   async thenThrowRepositoryError(promise: Promise<unknown>) {

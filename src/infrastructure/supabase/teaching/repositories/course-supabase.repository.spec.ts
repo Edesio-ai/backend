@@ -899,7 +899,11 @@ class Fixtures {
     content_text: null,
     validated_questions: false,
     position_order: undefined,
-    session: { teacher_id: 'teacher-1', language: 'francais' },
+    sessions: {
+      teacher_id: 'teacher-1',
+      language: 'francais',
+      teachers: { establishment_id: 'est-1' },
+    },
   };
 
   public readonly expectedCourseWithSession = {
@@ -916,6 +920,13 @@ class Fixtures {
       code: '',
       language: 'francais',
       createdAt: '',
+    },
+    teachers: {
+      id: '',
+      name: '',
+      email: '',
+      createdAt: '',
+      establishmentId: 'est-1',
     },
   };
 

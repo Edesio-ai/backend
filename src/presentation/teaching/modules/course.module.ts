@@ -14,6 +14,9 @@ import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-ca
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
 import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';
 import { ValidateCourseQuestionsUseCase } from 'src/application/course/validate-course-questions.use-case';
+import { GetCourseDetailsUseCase } from 'src/application/course/get-course-details.use-case';
+import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
+import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/file-persistence.module';
 
 @Module({
   imports: [
@@ -23,6 +26,8 @@ import { ValidateCourseQuestionsUseCase } from 'src/application/course/validate-
     TeacherPersistenceModule,
     StudentPersistenceModule,
     QuestionPersistenceModule,
+    EstablishmentPersistenceModule,
+    FilePersistenceModule,
   ],
   controllers: [CourseController],
   providers: [
@@ -34,6 +39,7 @@ import { ValidateCourseQuestionsUseCase } from 'src/application/course/validate-
     DeleteCourseUseCase,
     UpdateCourseUseCase,
     ValidateCourseQuestionsUseCase,
+    GetCourseDetailsUseCase,
   ],
 })
 export class CourseModule {}

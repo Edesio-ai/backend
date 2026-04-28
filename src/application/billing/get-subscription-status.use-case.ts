@@ -13,7 +13,7 @@ import {
   type EstablishmentRepository,
 } from '../../domain/teaching/interface/establishment.repository';
 import { TeacherNotFoundError } from 'src/domain/teaching/error';
-import { EstablishmentNotFoundError } from 'src/domain/establishment/error';
+import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 @Injectable()
 export class GetSubscriptionStatusUseCase {
@@ -52,7 +52,7 @@ export class GetSubscriptionStatusUseCase {
           );
 
         if (!establishment) {
-          throw new EstablishmentNotFoundError('Establishment not found');
+          throw new NotFoundError('Establishment not found');
         }
 
         return await this.handleSubscriptionFormat(

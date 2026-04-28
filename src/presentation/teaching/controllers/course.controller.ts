@@ -19,6 +19,7 @@ import {
   CourseFileUpload,
   Course,
   CourseRanking,
+  CourseDetails,
 } from 'src/domain/teaching/types/course.type';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -37,8 +38,10 @@ import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-ca
 import { UpdateCourseBodyDto } from '../dto/course/UpdateCourseUseCase.dto';
 import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';
 import { ValidateCourseQuestionsUseCase } from 'src/application/course/validate-course-questions.use-case';
+import { GetCourseDetailsUseCase } from 'src/application/course/get-course-details.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+@UseFilters(GlobalErrorFilter)
 @Roles('teacher')
 @Controller('course')
 export class CourseController {
@@ -51,6 +54,7 @@ export class CourseController {
     private readonly deleteCourseUseCase: DeleteCourseUseCase,
     private readonly updateCourseUseCase: UpdateCourseUseCase,
     private readonly validateCourseQuestionsUseCase: ValidateCourseQuestionsUseCase,
+    private readonly getCourseDetailsUseCase: GetCourseDetailsUseCase,
   ) {}
 
   @Post()
@@ -109,7 +113,6 @@ export class CourseController {
     return ranking || [];
   }
 
-  @UseFilters(GlobalErrorFilter)
   @Delete(':courseId')
   async deleteCourse(
     @Param('courseId') courseId: string,
@@ -121,7 +124,6 @@ export class CourseController {
     return { success: true };
   }
 
-  @UseFilters(GlobalErrorFilter)
   @Patch(':courseId')
   async deleteCourseFiles(
     @Param('courseId') courseId: string,
@@ -134,7 +136,6 @@ export class CourseController {
     return { data: course };
   }
 
-  @UseFilters(GlobalErrorFilter)
   @Post(':courseId/validate-questions')
   async validateQuestions(
     @Param('courseId') courseId: string,
@@ -147,5 +148,19 @@ export class CourseController {
     );
 
     return { data: course };
+  }
+
+  @Roles('establishment')
+  @Get(':courseId/details')
+  async getCourseDetails(
+    @Param('courseId') courseId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<{ data: CourseDetails }> {
+    const { user } = req;
+    const courseDetail = await this.getCourseDetailsUseCase.execute(
+      courseId,
+      user,
+    );
+    return { data: courseDetail };
   }
 }

@@ -66,7 +66,9 @@ export class StudentSupabaseRepository implements StudentRepository {
         correct_answers,
         last_attempt_at,
         students (
+          id,
           name,
+          email,
           photo_url
         )
       `,

@@ -1,4 +1,6 @@
+import { Question } from './question.type';
 import { Session, SupabaseSession } from './session.type';
+import { SupabaseTeacher, Teacher } from './teacher.type';
 
 export type SupabaseCourse = {
   id: string;
@@ -61,11 +63,12 @@ export type SupabaseCourseWithSession = {
   content_text: string | null;
   validated_questions?: boolean;
   position_order?: number;
-  session: Partial<SupabaseSession>;
+  sessions: Partial<SupabaseSession & { teachers: Partial<SupabaseTeacher> }>;
 };
 
 export type CourseWithSession = Partial<Course> & {
   session: Partial<Session>;
+  teachers: Partial<Teacher>;
 };
 
 export type CourseRanking = {
@@ -80,3 +83,10 @@ export type CourseRanking = {
 };
 
 export type CourseRankingWithRate = Omit<CourseRanking, 'rank'>;
+
+export type CourseDetails = {
+  course: Partial<CourseWithSession>;
+  questions: Partial<Question>[];
+  students: Partial<CourseRanking>[];
+  files: Partial<CourseFile>[];
+};
