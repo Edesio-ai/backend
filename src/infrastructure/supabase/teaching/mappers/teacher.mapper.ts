@@ -77,3 +77,14 @@ export function supabaseTeacherSessionsToTeacherSessions(
 ): TeacherSession[] {
   return rows.map(supabaseTeacherSessionToTeacherSession);
 }
+
+export function conditionToSupabaseCondition(
+  conditions: Partial<Record<'id' | 'establishmentId' | 'teacherId', string>>,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(conditions).map(([key, value]) => [
+      key.replace(/([A-Z])/g, '_$1').toLowerCase(),
+      value,
+    ]),
+  );
+}

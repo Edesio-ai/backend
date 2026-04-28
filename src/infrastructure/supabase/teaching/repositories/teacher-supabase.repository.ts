@@ -7,11 +7,13 @@ import {
   TeacherSession,
 } from '../../../../domain/teaching/types/teacher.type';
 import {
+  conditionToSupabaseCondition,
   createTeacherInsertPayload,
   linkTeacherEstablishmentUpdatePayload,
   supabaseTeacherSessionsToTeacherSessions,
   supabaseTeacherToTeacher,
 } from '../mappers/teacher.mapper';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 export class TeacherSupabaseRepository implements TeacherRepository {
   constructor(
@@ -105,5 +107,28 @@ export class TeacherSupabaseRepository implements TeacherRepository {
         .eq('id', invitationTokenId);
       throw new TeacheServerError(error.message);
     }
+  }
+
+  public async getTeacherByConditions(
+    conditions: Partial<Record<'id' | 'establishmentId' | 'teacherId', string>>,
+  ): Promise<Teacher | null> {
+    let query = this.supabase.from('teachers').select('*');
+
+    const formatedConditions = conditionToSupabaseCondition(conditions);
+    for (const [key, value] of Object.entries(formatedConditions)) {
+      query = query.eq(key, value);
+    }
+
+    const { data, error } = await query.maybeSingle();
+
+    if (error) {
+      console.error(
+        `An error occure while getting teacher by conditions:`,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+
+    return data ? supabaseTeacherToTeacher(data) : null;
   }
 }

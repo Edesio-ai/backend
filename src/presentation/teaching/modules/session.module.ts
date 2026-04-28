@@ -13,6 +13,7 @@ import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/m
 import { GetCoursesSessionCountUseCase } from 'src/application/session/get-courses-session-count.use-case';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
 import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
+import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { GetSessionCoursesUseCase } from 'src/application/session/get-session-co
     CoursePersistenceModule,
     QuestionPersistenceModule,
     StudentPersistenceModule,
+    EstablishmentPersistenceModule,
   ],
   controllers: [SessionController],
   providers: [

@@ -1,5 +1,6 @@
 import { TeacherSupabaseRepository } from './teacher-supabase.repository';
 import { TeacheServerError } from '../../../../domain/teaching/error';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 describe('TeacherSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -112,6 +113,31 @@ describe('TeacherSupabaseRepository', () => {
 
     await fixtures.thenThrowTeacherServerError(promise);
     fixtures.thenRollbackInvitationTokenCalled();
+  });
+
+  it('should return mapped teacher when getTeacherByConditions succeeds', async () => {
+    fixtures.whenGetTeacherByConditionsSucceeds();
+
+    const result = await fixtures.whenGetTeacherByConditions();
+
+    fixtures.thenGetTeacherByConditionsQueryBuilt();
+    fixtures.thenReturnExpectedTeacher(result);
+  });
+
+  it('should return null when getTeacherByConditions has no match', async () => {
+    fixtures.whenGetTeacherByConditionsReturnsNull();
+
+    const result = await fixtures.whenGetTeacherByConditions();
+
+    expect(result).toBeNull();
+  });
+
+  it('should throw ServerError when getTeacherByConditions fails', async () => {
+    fixtures.whenGetTeacherByConditionsFails();
+
+    const promise = fixtures.whenGetTeacherByConditions();
+
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   });
 });
 
@@ -239,6 +265,8 @@ class Fixtures {
       if (this.linkModeEnabled) return this.linkFromMock();
       if (this.byUserModeEnabled) return this.byUserFromMock();
       if (this.createModeEnabled) return this.createFromMock();
+      if (this.byConditionsModeEnabled)
+        return { select: this.conditionsSelectMock };
       return this.teacherFromMock();
     }
     if (table === 'sessions') return this.sessionsFromMock();
@@ -250,8 +278,20 @@ class Fixtures {
   private byUserModeEnabled = false;
   private createModeEnabled = false;
   private linkModeEnabled = false;
+  private byConditionsModeEnabled = false;
+
+  private readonly conditionsMaybeSingleMock = jest.fn();
+  private readonly conditionsEqMock = jest.fn();
+  private readonly conditionsSelectMock = jest.fn();
 
   constructor() {
+    const conditionsChain = {
+      eq: this.conditionsEqMock,
+      maybeSingle: this.conditionsMaybeSingleMock,
+    };
+    this.conditionsEqMock.mockReturnValue(conditionsChain);
+    this.conditionsSelectMock.mockReturnValue(conditionsChain);
+
     const supabaseMock = {
       from: this.fromMock,
     };
@@ -452,5 +492,49 @@ class Fixtures {
 
   thenReturnExpectedTeacher(result: any) {
     expect(result).toEqual(this.expectedTeacher);
+  }
+
+  whenGetTeacherByConditions() {
+    this.byConditionsModeEnabled = true;
+    return this.repository.getTeacherByConditions({
+      id: this.teacherSupabaseRow.id,
+      establishmentId: this.establishmentId,
+    });
+  }
+
+  whenGetTeacherByConditionsSucceeds() {
+    this.conditionsMaybeSingleMock.mockResolvedValue({
+      data: this.teacherSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenGetTeacherByConditionsReturnsNull() {
+    this.conditionsMaybeSingleMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+  }
+
+  whenGetTeacherByConditionsFails() {
+    this.conditionsMaybeSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'conditions query failed' },
+    });
+  }
+
+  thenGetTeacherByConditionsQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('teachers');
+    expect(this.conditionsSelectMock).toHaveBeenCalledWith('*');
+    expect(this.conditionsEqMock).toHaveBeenCalledWith(
+      'id',
+      this.teacherSupabaseRow.id,
+    );
+    expect(this.conditionsEqMock).toHaveBeenCalledWith(
+      'establishment_id',
+      this.establishmentId,
+    );
+    expect(this.conditionsEqMock).toHaveBeenCalledTimes(2);
+    expect(this.conditionsMaybeSingleMock).toHaveBeenCalledTimes(1);
   }
 }

@@ -26,6 +26,8 @@ import { UpdateSessionBodyDto } from '../dto/session/uppdate-session-body.dto';
 import { Course, CourseRanking } from 'src/domain/teaching/types/course.type';
 import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
 
+@UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+@Roles('teacher')
 @Controller('session')
 export class SessionController {
   constructor(
@@ -38,8 +40,6 @@ export class SessionController {
     private readonly getSessionCoursesUseCase: GetSessionCoursesUseCase,
   ) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard, CsrfGuard)
-  @Roles('teacher')
   @Delete(':sessionId')
   async deleteSession(
     @Req() req: Request & { user: SupabaseUser },
@@ -51,15 +51,11 @@ export class SessionController {
     return { success: true };
   }
 
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('teacher')
   @Post()
   async createSession(@Body() body: CreateSessionBodyDto): Promise<Session> {
     return await this.createSessionUseCase.execute(body);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('teacher')
   @Get('teacher-sessions')
   async getTeacherSessions(
     @Req() req: Request & { user: SupabaseUser },
@@ -70,8 +66,6 @@ export class SessionController {
     return await this.getTeacherSessionsUseCase.execute(id);
   }
 
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('teacher')
   @Put(':sessionId')
   async updateSessionName(
     @Param('sessionId') sessionId: string,
@@ -84,8 +78,6 @@ export class SessionController {
     return { session };
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('teacher')
   @Get('code/:code')
   async getSessionByCode(
     @Param('code') code: string,
@@ -96,8 +88,6 @@ export class SessionController {
     };
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('teacher')
   @Get('/:sessionId/courses-count')
   async getCoursesSessionCount(
     @Param('sessionId') sessionId: string,
@@ -106,8 +96,7 @@ export class SessionController {
     return { count: count };
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('teacher')
+  @Roles('teacher', 'establishment')
   @Get('/:sessionId/courses')
   async getSessionCourses(
     @Param('sessionId') sessionId: string,
