@@ -128,12 +128,14 @@ describe('course.mapper', () => {
           description: 'Nouvelle description',
           contentText: 'Nouveau contenu',
           positionOrder: 3,
+          validatedQuestions: true,
         }),
       ).toEqual({
         title: 'Nouveau titre',
         description: 'Nouvelle description',
         text_content: 'Nouveau contenu',
         position_order: 3,
+        validated_questions: true,
       });
     });
 
@@ -169,6 +171,18 @@ describe('course.mapper', () => {
       expect(updatesToSupabaseCourseUpdate({ positionOrder: null })).toEqual({
         position_order: null,
       });
+    });
+
+    it('maps validatedQuestions to validated_questions', () => {
+      expect(
+        updatesToSupabaseCourseUpdate({ validatedQuestions: true }),
+      ).toEqual({ validated_questions: true });
+    });
+
+    it('maps validatedQuestions: false to validated_questions: false', () => {
+      expect(
+        updatesToSupabaseCourseUpdate({ validatedQuestions: false }),
+      ).toEqual({ validated_questions: false });
     });
 
     it('ignores unknown fields', () => {

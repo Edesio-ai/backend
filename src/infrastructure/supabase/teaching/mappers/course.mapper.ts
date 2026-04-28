@@ -75,5 +75,7 @@ export function updatesToSupabaseCourseUpdate(
   if (updates.contentText !== undefined) row.text_content = updates.contentText;
   if (updates.positionOrder !== undefined)
     row.position_order = updates.positionOrder;
+  if (updates.validatedQuestions !== undefined)
+    row.validated_questions = updates.validatedQuestions;
   return row;
 }

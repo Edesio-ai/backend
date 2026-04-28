@@ -36,7 +36,10 @@ import { TeacherErrorFilter } from 'src/presentation/filters/teacher.filter';
 import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';
 import { UpdateCourseBodyDto } from '../dto/course/UpdateCourseUseCase.dto';
 import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';
+import { ValidateCourseQuestionsUseCase } from 'src/application/course/validate-course-questions.use-case';
 
+@UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+@Roles('teacher')
 @Controller('course')
 export class CourseController {
   constructor(
@@ -47,10 +50,9 @@ export class CourseController {
     private readonly getCourseRankingUseCase: GetCourseRankingUseCase,
     private readonly deleteCourseUseCase: DeleteCourseUseCase,
     private readonly updateCourseUseCase: UpdateCourseUseCase,
+    private readonly validateCourseQuestionsUseCase: ValidateCourseQuestionsUseCase,
   ) {}
 
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('teacher')
   @Post()
   async createCourse(
     @Body() body: CreateCourseBodyDto,
@@ -59,8 +61,6 @@ export class CourseController {
     return { data };
   }
 
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('teacher')
   @UseInterceptors(FileInterceptor('file'))
   @Post(':courseId/file')
   async uploadCourseFile(
@@ -86,8 +86,6 @@ export class CourseController {
     return { coursesCount };
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('teacher')
   @Get(':courseId/validated-questions')
   async getCourseValidatedQuestions(
     @Param('courseId') courseId: string,
@@ -95,8 +93,6 @@ export class CourseController {
     return await this.getCourseValidatedQuestionsUseCase.execute(courseId);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('teacher')
   @Get(':courseId/files')
   async getCoursesFiles(
     @Param('courseId') courseId: string,
@@ -104,9 +100,7 @@ export class CourseController {
     return (await this.getCoursesFilesUseCase.execute(courseId)) || [];
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseFilters(TeacherErrorFilter, GlobalErrorFilter)
-  @Roles('teacher')
   @Get('/:courseId/ranking')
   async getCourseRanking(
     @Param('courseId') courseId: string,
@@ -118,8 +112,6 @@ export class CourseController {
     return ranking || [];
   }
 
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('teacher')
   @UseFilters(GlobalErrorFilter)
   @Delete(':courseId')
   async deleteCourse(
@@ -132,8 +124,6 @@ export class CourseController {
     return { success: true };
   }
 
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('teacher')
   @UseFilters(GlobalErrorFilter)
   @Patch(':courseId')
   async deleteCourseFiles(
@@ -143,6 +133,21 @@ export class CourseController {
   ): Promise<{ data: Course }> {
     const { user } = req;
     const course = await this.updateCourseUseCase.execute(courseId, body, user);
+
+    return { data: course };
+  }
+
+  @UseFilters(GlobalErrorFilter)
+  @Post(':courseId/validate-questions')
+  async validateQuestions(
+    @Param('courseId') courseId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<{ data: Course }> {
+    const { user } = req;
+    const course = await this.validateCourseQuestionsUseCase.execute(
+      courseId,
+      user,
+    );
 
     return { data: course };
   }
