@@ -19,4 +19,7 @@ export interface TeacherRepository {
     name: string,
     email: string,
   ): Promise<Teacher | null>;
+  getTeacherByConditions(
+    conditions: Partial<Record<'id' | 'establishmentId' | 'teacherId', string>>,
+  ): Promise<Teacher | null>;
 }

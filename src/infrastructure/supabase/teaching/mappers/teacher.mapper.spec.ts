@@ -1,4 +1,5 @@
 import {
+  conditionToSupabaseCondition,
   createTeacherInsertPayload,
   createTeacherWithEstablishmentInsertPayload,
   linkTeacherEstablishmentUpdatePayload,
@@ -92,6 +93,42 @@ describe('teacher.mapper', () => {
       expect(linkTeacherEstablishmentUpdatePayload('est-2')).toEqual({
         establishment_id: 'est-2',
       });
+    });
+  });
+
+  describe('conditionToSupabaseCondition', () => {
+    it('converts establishmentId to establishment_id', () => {
+      expect(
+        conditionToSupabaseCondition({ establishmentId: 'est-1' }),
+      ).toEqual({ establishment_id: 'est-1' });
+    });
+
+    it('converts teacherId to teacher_id', () => {
+      expect(conditionToSupabaseCondition({ teacherId: 't-1' })).toEqual({
+        teacher_id: 't-1',
+      });
+    });
+
+    it('keeps id unchanged (no uppercase)', () => {
+      expect(conditionToSupabaseCondition({ id: 'teacher-1' })).toEqual({
+        id: 'teacher-1',
+      });
+    });
+
+    it('converts multiple conditions at once', () => {
+      expect(
+        conditionToSupabaseCondition({
+          id: 'teacher-1',
+          establishmentId: 'est-1',
+        }),
+      ).toEqual({
+        id: 'teacher-1',
+        establishment_id: 'est-1',
+      });
+    });
+
+    it('returns empty object when no conditions provided', () => {
+      expect(conditionToSupabaseCondition({})).toEqual({});
     });
   });
 });
