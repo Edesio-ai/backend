@@ -34,3 +34,11 @@ export class NotFoundError extends GlobalError {
     super(message || 'Not Found');
   }
 }
+
+export class ServerError extends GlobalError {
+  readonly code = 'SERVER_ERROR';
+  readonly httpStatus = 500;
+  constructor(message?: string) {
+    super(message || 'Server Error');
+  }
+}
