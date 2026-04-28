@@ -5,7 +5,7 @@ import {
   type AuthRepository,
 } from '../../domain/auth/contract/auth.repository';
 import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
-import { InvitationTokenNotFoundError } from '../../domain/auth/errors/auth.errors';
+import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 @Injectable()
 export class GetInvitationPreviewUseCase {
@@ -16,7 +16,7 @@ export class GetInvitationPreviewUseCase {
 
   async execute(token: string): Promise<InvitationTokenPreview> {
     if (!token) {
-      throw new InvitationTokenNotFoundError();
+      throw new NotFoundError('Invitation token not found');
     }
 
     const invitationTokenPreview =

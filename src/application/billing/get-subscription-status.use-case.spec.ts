@@ -1,6 +1,6 @@
 import { GetSubscriptionStatusUseCase } from './get-subscription-status.use-case';
 import { User } from '../../domain/auth/types/auth.type';
-import { EstablishmentNotFoundError } from '../../domain/establishment/error';
+import { NotFoundError } from '../../domain/shared/global/errors/global.errors';
 import { TeacherNotFoundError } from '../../domain/teaching/error';
 import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
 import { EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
@@ -110,6 +110,7 @@ class Fixtures {
       getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
     this.establishmentRepository = {
       getEstablishmentById: jest.fn(),
@@ -376,12 +377,12 @@ describe('GetSubscriptionStatusUseCase - teacher flow', () => {
     );
   });
 
-  it('should throw EstablishmentNotFoundError when teacher establishment is missing', async () => {
+  it('should throw NotFoundError when teacher establishment is missing', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenEstablishmentNotFound();
 
     const promise = fixtures.whenExecuteWith(fixtures.teacherUser);
 
-    await expect(promise).rejects.toBeInstanceOf(EstablishmentNotFoundError);
+    await expect(promise).rejects.toBeInstanceOf(NotFoundError);
   });
 });

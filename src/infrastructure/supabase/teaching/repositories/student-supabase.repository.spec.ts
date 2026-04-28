@@ -103,7 +103,12 @@ class Fixtures {
       attempted_questions: 10,
       correct_answers: 8,
       last_attempt_at: '2026-01-01T12:00:00.000Z',
-      students: { name: 'Alice', photo_url: 'https://x/a.png' },
+      students: {
+        id: 'stu-1',
+        name: 'Alice',
+        email: 'alice@school.com',
+        photo_url: 'https://x/a.png',
+      },
     },
   ];
   public readonly expectedStudentCourseStats = [
@@ -112,7 +117,12 @@ class Fixtures {
       attemptedQuestions: 10,
       correctAnswers: 8,
       lastAttemptAt: '2026-01-01T12:00:00.000Z',
-      student: { name: 'Alice', photoUrl: 'https://x/a.png' },
+      student: {
+        id: 'stu-1',
+        name: 'Alice',
+        email: 'alice@school.com',
+        photoUrl: 'https://x/a.png',
+      },
     },
   ];
 

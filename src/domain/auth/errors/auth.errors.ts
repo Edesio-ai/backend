@@ -3,14 +3,6 @@ export abstract class AuthError extends Error {
   abstract readonly httpStatus: number;
 }
 
-export class InvitationTokenNotFoundError extends AuthError {
-  readonly code = 'INVITATION_TOKEN_NOT_FOUND';
-  readonly httpStatus = 404;
-  constructor(message?: string) {
-    super(message || 'Invitation token not found');
-  }
-}
-
 export class InvitationTokenCreationError extends AuthError {
   readonly code = 'INVITATION_TOKEN_CREATION_ERROR';
   readonly httpStatus = 400;

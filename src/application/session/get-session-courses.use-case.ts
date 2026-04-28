@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { SessionNotFoundError } from 'src/domain/auth/errors/auth.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { EstablishmentNotFoundError } from 'src/domain/establishment/error';
 import {
   ForbiddenError,
   NotFoundError,
@@ -81,7 +80,7 @@ export class GetSessionCoursesUseCase {
     const establishment =
       await this.establishmentRepository.getEstablishmentByUserId(user.id);
     if (!establishment) {
-      throw new EstablishmentNotFoundError();
+      throw new NotFoundError('Establishment not found');
     }
 
     const session = await this.sessionRepository.getSessionById(sessionId);

@@ -29,8 +29,10 @@ export function supabaseStudentCourseStatsToStudentCourseStats(
     correctAnswers: row.correct_answers,
     lastAttemptAt: row.last_attempt_at,
     student: {
+      id: row.students.id,
       name: row.students.name,
       photoUrl: row.students.photo_url,
+      email: row.students.email,
     },
   }));
 }

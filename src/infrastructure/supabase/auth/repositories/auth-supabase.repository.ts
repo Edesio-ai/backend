@@ -9,7 +9,6 @@ import {
 import {
   InvitationTokenAlreadyUsedError,
   InvitationTokenExpiredError,
-  InvitationTokenNotFoundError,
   UserAlereadyExistsError,
   UserCreationError,
   UserCreationFailedError,
@@ -40,6 +39,7 @@ import {
   supabaseSessionToAuthUser,
   supabaseValidatedTokenUserToUser,
 } from '../mappers/auth.mappers';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 @Injectable()
 export class AuthSupabaseRepository implements AuthRepository {
@@ -123,7 +123,7 @@ export class AuthSupabaseRepository implements AuthRepository {
       .single();
 
     if (!data || error) {
-      throw new InvitationTokenNotFoundError(error?.message);
+      throw new ServerError(error?.message);
     }
 
     if (data.used_at) {

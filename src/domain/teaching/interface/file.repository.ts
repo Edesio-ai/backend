@@ -4,5 +4,6 @@ export const FILE_REPOSITORY = Symbol('FILE_REPOSITORY');
 
 export interface FileRepository {
   deleteFileById(fileId: string): Promise<void>;
-  getCourseFileById(fileId: string): Promise<CourseFile>;
+  getCourseFileById(fileId: string, select?: string): Promise<CourseFile>;
+  getCourseFilesByCourseId(courseId: string): Promise<CourseFile[]>;
 }

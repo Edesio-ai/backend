@@ -15,6 +15,8 @@ export type SupabaseStudentCourseStats = {
   correct_answers: number;
   last_attempt_at: string;
   students: {
+    id: string;
+    email: string;
     name: string;
     photo_url: string;
   };
@@ -26,6 +28,8 @@ export type StudentCourseStats = {
   correctAnswers: number;
   lastAttemptAt: string;
   student: {
+    id: string;
+    email: string;
     name: string;
     photoUrl: string;
   };

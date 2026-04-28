@@ -55,12 +55,19 @@ export function supabaseCourseWithSessionToCourseWithSession(
     validatedQuestions: row.validated_questions,
     positionOrder: row.position_order,
     session: {
-      id: row.session?.id ?? '',
-      teacherId: row.session?.teacher_id ?? '',
-      name: row.session?.name ?? '',
-      code: row.session?.code ?? '',
-      language: row.session?.language ?? 'francais',
-      createdAt: row.session?.created_at ?? '',
+      id: row.sessions?.id ?? '',
+      teacherId: row.sessions?.teacher_id ?? '',
+      name: row.sessions?.name ?? '',
+      code: row.sessions?.code ?? '',
+      language: row.sessions?.language ?? 'francais',
+      createdAt: row.sessions?.created_at ?? '',
+    },
+    teachers: {
+      id: row.sessions?.teachers?.id ?? '',
+      name: row.sessions?.teachers?.name ?? '',
+      email: row.sessions?.teachers?.email ?? '',
+      createdAt: row.sessions?.teachers?.created_at ?? '',
+      establishmentId: row.sessions?.teachers?.establishment_id ?? '',
     },
   };
 }

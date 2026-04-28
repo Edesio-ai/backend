@@ -1,5 +1,5 @@
 import { EstablishmentErrorFilter } from './establishment.filter';
-import { EstablishmentCreationFailedError } from '../../domain/establishment/error';
+import { EstablishmentIdNotFoundError } from '../../domain/establishment/error';
 
 describe('EstablishmentErrorFilter', () => {
   let fixtures: Fixtures;
@@ -31,10 +31,10 @@ class Fixtures {
   }
 
   givenEstablishmentError() {
-    return new EstablishmentCreationFailedError('duplicate key');
+    return new EstablishmentIdNotFoundError('establishment id not found');
   }
 
-  whenCatch(exception: EstablishmentCreationFailedError) {
+  whenCatch(exception: EstablishmentIdNotFoundError) {
     const host = {
       switchToHttp: () => ({
         getResponse: () => ({
