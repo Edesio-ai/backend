@@ -66,7 +66,7 @@ export class CourseController {
   async uploadCourseFile(
     @Param('courseId') courseId: string,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<{ coursesCount: CourseFile }> {
+  ): Promise<{ data: CourseFile }> {
     if (!file?.buffer) {
       throw new BadRequestException('Missing File');
     }
@@ -78,12 +78,12 @@ export class CourseController {
       byteLength: file.size,
     };
 
-    const coursesCount = await this.uploadCourseFileUseCase.execute(
+    const data = await this.uploadCourseFileUseCase.execute(
       courseId,
       payload,
     );
 
-    return { coursesCount };
+    return { data };
   }
 
   @Get(':courseId/validated-questions')
