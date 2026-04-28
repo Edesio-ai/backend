@@ -4,6 +4,7 @@ import { CourseModule } from './modules/course.module';
 import { SessionModule } from './modules/session.module';
 import { EstablishmentModule } from './modules/establishment.module';
 import { QuestionModule } from './modules/question.module';
+import { FileModule } from './modules/file.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { QuestionModule } from './modules/question.module';
     SessionModule,
     CourseModule,
     QuestionModule,
+    FileModule,
   ],
 })
 export class TeachingModule {}
