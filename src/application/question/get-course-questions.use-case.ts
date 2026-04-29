@@ -37,7 +37,7 @@ export class GetCourseQuestionsUseCase {
 
     const select = `
       id,
-      session:sessions!inner (
+      sessions:sessions!inner (
         teacher_id,
         language
       )`;
