@@ -1,5 +1,6 @@
 import { StudentSupabaseRepository } from './student-supabase.repository';
-import { StudentServerError } from '../../../../domain/teaching/error';
+import { ServerError } from '../../../../domain/shared/global/errors/global.errors';
+import { AuthUser } from '../../../../domain/auth/types/auth.type';
 
 describe('StudentSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -7,6 +8,8 @@ describe('StudentSupabaseRepository', () => {
   beforeEach(() => {
     fixtures = new Fixtures();
   });
+
+  // ─── getStudentsSessionsByIds ────────────────────────────────────────────────
 
   it('should return student sessions for session ids', async () => {
     fixtures.whenQueryReturnsData();
@@ -27,13 +30,15 @@ describe('StudentSupabaseRepository', () => {
     fixtures.thenQueryBuiltWithFallbackId();
   });
 
-  it('should throw StudentServerError when getStudentsSessionsByIds query fails', async () => {
+  it('should throw ServerError when getStudentsSessionsByIds query fails', async () => {
     fixtures.whenQueryReturnsError();
 
-    const promise = fixtures.whenGetStudentsSessionsByIds(fixtures.sessionIds);
-
-    await fixtures.thenThrowStudentServerError(promise);
+    await expect(
+      fixtures.whenGetStudentsSessionsByIds(fixtures.sessionIds),
+    ).rejects.toBeInstanceOf(ServerError);
   });
+
+  // ─── deleteStudentSessionsBySessionId ───────────────────────────────────────
 
   it('should delete student_sessions by session id', async () => {
     fixtures.whenDeleteStudentSessionsSucceeds();
@@ -43,13 +48,15 @@ describe('StudentSupabaseRepository', () => {
     fixtures.thenDeleteStudentSessionsQueryBuilt();
   });
 
-  it('should throw StudentServerError when delete student_sessions fails', async () => {
+  it('should throw ServerError when delete student_sessions fails', async () => {
     fixtures.whenDeleteStudentSessionsFails();
 
-    const promise = fixtures.whenDeleteStudentSessionsBySessionId();
-
-    await fixtures.thenThrowStudentServerError(promise);
+    await expect(
+      fixtures.whenDeleteStudentSessionsBySessionId(),
+    ).rejects.toBeInstanceOf(ServerError);
   });
+
+  // ─── getStudentStatsByCourseId ───────────────────────────────────────────────
 
   it('should return student course stats mapped for course id', async () => {
     fixtures.whenStudentStatsQueryReturnsData();
@@ -60,13 +67,15 @@ describe('StudentSupabaseRepository', () => {
     expect(result).toEqual(fixtures.expectedStudentCourseStats);
   });
 
-  it('should throw StudentServerError when getStudentStatsByCourseId fails', async () => {
+  it('should throw ServerError when getStudentStatsByCourseId fails', async () => {
     fixtures.whenStudentStatsQueryFails();
 
-    const promise = fixtures.whenGetStudentStatsByCourseId();
-
-    await fixtures.thenThrowStudentServerError(promise);
+    await expect(
+      fixtures.whenGetStudentStatsByCourseId(),
+    ).rejects.toBeInstanceOf(ServerError);
   });
+
+  // ─── deleteStudentCourseStatsByCourseId ─────────────────────────────────────
 
   it('should delete student course stats by course id', async () => {
     fixtures.whenDeleteStudentCourseStatsByIdSucceeds();
@@ -76,12 +85,94 @@ describe('StudentSupabaseRepository', () => {
     fixtures.thenDeleteStudentCourseStatsQueryBuilt();
   });
 
-  it('should throw StudentServerError when deleteStudentCourseStatsByCourseId fails', async () => {
+  it('should throw ServerError when deleteStudentCourseStatsByCourseId fails', async () => {
     fixtures.whenDeleteStudentCourseStatsByIdFails();
 
-    const promise = fixtures.whenDeleteStudentCourseStatsByCourseId();
+    await expect(
+      fixtures.whenDeleteStudentCourseStatsByCourseId(),
+    ).rejects.toBeInstanceOf(ServerError);
+  });
 
-    await fixtures.thenThrowStudentServerError(promise);
+  // ─── getStudentByUserId ──────────────────────────────────────────────────────
+
+  it('should return a mapped student when found by user id', async () => {
+    fixtures.whenGetStudentByUserIdReturnsData();
+
+    const result = await fixtures.whenGetStudentByUserId();
+
+    expect(result).toEqual(fixtures.expectedStudent);
+    fixtures.thenGetStudentByUserIdQueryBuilt();
+  });
+
+  it('should return null when student is not found by user id', async () => {
+    fixtures.whenGetStudentByUserIdReturnsNull();
+
+    const result = await fixtures.whenGetStudentByUserId();
+
+    expect(result).toBeNull();
+  });
+
+  it('should throw ServerError when getStudentByUserId query fails', async () => {
+    fixtures.whenGetStudentByUserIdFails();
+
+    await expect(fixtures.whenGetStudentByUserId()).rejects.toBeInstanceOf(
+      ServerError,
+    );
+  });
+
+  // ─── createStudent ───────────────────────────────────────────────────────────
+
+  it('should create and return a mapped student', async () => {
+    fixtures.whenCreateStudentSucceeds();
+
+    const result = await fixtures.whenCreateStudent(fixtures.authUser);
+
+    expect(result).toEqual(fixtures.expectedStudent);
+    fixtures.thenCreateStudentQueryBuilt();
+  });
+
+  it('should build the student name from firstname and lastname', async () => {
+    fixtures.whenCreateStudentSucceeds();
+
+    await fixtures.whenCreateStudent(fixtures.authUser);
+
+    expect(fixtures.insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Alice Dupont' }),
+    );
+  });
+
+  it('should use only firstname when lastname is missing', async () => {
+    fixtures.whenCreateStudentSucceeds();
+
+    await fixtures.whenCreateStudent({
+      ...fixtures.authUser,
+      metadata: { firstname: 'Alice' },
+    });
+
+    expect(fixtures.insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Alice' }),
+    );
+  });
+
+  it('should use "Élève" as fallback name when no names are provided', async () => {
+    fixtures.whenCreateStudentSucceeds();
+
+    await fixtures.whenCreateStudent({
+      ...fixtures.authUser,
+      metadata: {},
+    });
+
+    expect(fixtures.insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Élève' }),
+    );
+  });
+
+  it('should throw ServerError when createStudent query fails', async () => {
+    fixtures.whenCreateStudentFails();
+
+    await expect(
+      fixtures.whenCreateStudent(fixtures.authUser),
+    ).rejects.toBeInstanceOf(ServerError);
   });
 });
 
@@ -89,6 +180,33 @@ class Fixtures {
   public readonly sessionIds = ['session-1', 'session-2'];
   public readonly sessionIdToDelete = 'session-1';
   public readonly fallbackId = '00000000-0000-0000-0000-000000000000';
+  public readonly userId = 'user-1';
+
+  public readonly authUser: AuthUser = {
+    id: this.userId,
+    email: 'alice@school.com',
+    emailConfirmedAt: '2026-01-01T00:00:00.000Z',
+    metadata: { firstname: 'Alice', lastname: 'Dupont', role: 'student' },
+  };
+
+  public readonly studentSupabaseRow = {
+    id: 'student-1',
+    supabase_user_id: this.userId,
+    name: 'Alice Dupont',
+    email: 'alice@school.com',
+    created_at: '2026-01-01T00:00:00.000Z',
+    photo_url: 'https://x/a.png',
+  };
+
+  public readonly expectedStudent = {
+    id: 'student-1',
+    supabaseUserId: this.userId,
+    name: 'Alice Dupont',
+    email: 'alice@school.com',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    photoUrl: 'https://x/a.png',
+  };
+
   public readonly studentSessionsSupabaseRows = [
     { session_id: 'session-1', student_id: 'student-1' },
   ];
@@ -126,6 +244,8 @@ class Fixtures {
     },
   ];
 
+  // ─── Supabase chain mocks ────────────────────────────────────────────────────
+
   private readonly inMock = jest.fn();
   private readonly selectMock = jest.fn(() => ({ in: this.inMock }));
 
@@ -140,13 +260,44 @@ class Fixtures {
   private readonly deleteEqMock = jest.fn();
   private readonly deleteMock = jest.fn(() => ({ eq: this.deleteEqMock }));
 
-  private mode: 'select' | 'delete' | 'stats' | 'stats-delete' = 'select';
+  // getStudentByUserId chain: .select('*').eq(...).maybeSingle()
+  private readonly maybeSingleMock = jest.fn();
+  private readonly studentByUserIdEqMock = jest.fn(() => ({
+    maybeSingle: this.maybeSingleMock,
+  }));
+  private readonly studentByUserIdSelectMock = jest.fn(() => ({
+    eq: this.studentByUserIdEqMock,
+  }));
+
+  // createStudent chain: .insert(...).select().single()
+  public readonly insertSelectSingleMock = jest.fn();
+  private readonly insertSelectMock = jest.fn(() => ({
+    single: this.insertSelectSingleMock,
+  }));
+  public readonly insertMock = jest.fn(() => ({
+    select: this.insertSelectMock,
+  }));
+
+  private mode:
+    | 'select'
+    | 'delete'
+    | 'stats'
+    | 'stats-delete'
+    | 'student-by-user-id'
+    | 'create-student' = 'select';
+
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'student_course_stats') {
       if (this.mode === 'stats-delete') {
         return { delete: this.statsDeleteMock };
       }
       return { select: this.statsSelectMock };
+    }
+    if (table === 'students') {
+      if (this.mode === 'create-student') {
+        return { insert: this.insertMock };
+      }
+      return { select: this.studentByUserIdSelectMock };
     }
     if (this.mode === 'delete') {
       return { delete: this.deleteMock };
@@ -157,11 +308,12 @@ class Fixtures {
   public readonly repository: StudentSupabaseRepository;
 
   constructor() {
-    const supabaseMock = {
+    this.repository = new StudentSupabaseRepository({
       from: this.fromMock,
-    };
-    this.repository = new StudentSupabaseRepository(supabaseMock as any);
+    } as any);
   }
+
+  // ─── When helpers ────────────────────────────────────────────────────────────
 
   whenGetStudentsSessionsByIds(sessionIds: string[]) {
     this.mode = 'select';
@@ -179,6 +331,25 @@ class Fixtures {
     this.mode = 'stats';
     return this.repository.getStudentStatsByCourseId(this.courseIdForStats);
   }
+
+  whenDeleteStudentCourseStatsByCourseId() {
+    this.mode = 'stats-delete';
+    return this.repository.deleteStudentCourseStatsByCourseId(
+      this.courseIdForStats,
+    );
+  }
+
+  whenGetStudentByUserId() {
+    this.mode = 'student-by-user-id';
+    return this.repository.getStudentByUserId(this.userId);
+  }
+
+  whenCreateStudent(user: AuthUser) {
+    this.mode = 'create-student';
+    return this.repository.createStudent(user);
+  }
+
+  // ─── Setup helpers ───────────────────────────────────────────────────────────
 
   whenQueryReturnsData() {
     this.inMock.mockResolvedValue({
@@ -218,17 +389,52 @@ class Fixtures {
     });
   }
 
-  async thenThrowStudentServerError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(StudentServerError);
+  whenDeleteStudentCourseStatsByIdSucceeds() {
+    this.statsDeleteEqMock.mockResolvedValue({ error: null });
   }
 
-  thenStudentStatsQueryBuilt() {
-    expect(this.fromMock).toHaveBeenCalledWith('student_course_stats');
-    expect(this.statsSelectMock).toHaveBeenCalled();
-    expect(this.statsEqMock).toHaveBeenCalledWith(
-      'course_id',
-      this.courseIdForStats,
-    );
+  whenDeleteStudentCourseStatsByIdFails() {
+    this.statsDeleteEqMock.mockResolvedValue({
+      error: { message: 'delete stats failed' },
+    });
+  }
+
+  whenGetStudentByUserIdReturnsData() {
+    this.maybeSingleMock.mockResolvedValue({
+      data: this.studentSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenGetStudentByUserIdReturnsNull() {
+    this.maybeSingleMock.mockResolvedValue({ data: null, error: null });
+  }
+
+  whenGetStudentByUserIdFails() {
+    this.maybeSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'student not found error' },
+    });
+  }
+
+  whenCreateStudentSucceeds() {
+    this.insertSelectSingleMock.mockResolvedValue({
+      data: this.studentSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenCreateStudentFails() {
+    this.insertSelectSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'insert failed' },
+    });
+  }
+
+  // ─── Then assertions ─────────────────────────────────────────────────────────
+
+  thenReturnExpectedStudentSessions(result: any) {
+    expect(result).toEqual(this.expectedStudentSessions);
   }
 
   thenQueryBuiltWithSessionIds(sessionIds: string[]) {
@@ -241,10 +447,6 @@ class Fixtures {
     expect(this.inMock).toHaveBeenCalledWith('session_id', [this.fallbackId]);
   }
 
-  thenReturnExpectedStudentSessions(result: any) {
-    expect(result).toEqual(this.expectedStudentSessions);
-  }
-
   thenDeleteStudentSessionsQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('student_sessions');
     expect(this.deleteMock).toHaveBeenCalledTimes(1);
@@ -254,21 +456,13 @@ class Fixtures {
     );
   }
 
-  whenDeleteStudentCourseStatsByCourseId() {
-    this.mode = 'stats-delete';
-    return this.repository.deleteStudentCourseStatsByCourseId(
+  thenStudentStatsQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_course_stats');
+    expect(this.statsSelectMock).toHaveBeenCalled();
+    expect(this.statsEqMock).toHaveBeenCalledWith(
+      'course_id',
       this.courseIdForStats,
     );
-  }
-
-  whenDeleteStudentCourseStatsByIdSucceeds() {
-    this.statsDeleteEqMock.mockResolvedValue({ error: null });
-  }
-
-  whenDeleteStudentCourseStatsByIdFails() {
-    this.statsDeleteEqMock.mockResolvedValue({
-      error: { message: 'delete stats failed' },
-    });
   }
 
   thenDeleteStudentCourseStatsQueryBuilt() {
@@ -278,5 +472,25 @@ class Fixtures {
       'course_id',
       this.courseIdForStats,
     );
+  }
+
+  thenGetStudentByUserIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('students');
+    expect(this.studentByUserIdEqMock).toHaveBeenCalledWith(
+      'supabase_user_id',
+      this.userId,
+    );
+    expect(this.maybeSingleMock).toHaveBeenCalled();
+  }
+
+  thenCreateStudentQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('students');
+    expect(this.insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        supabase_user_id: this.authUser.id,
+        email: this.authUser.email,
+      }),
+    );
+    expect(this.insertSelectSingleMock).toHaveBeenCalled();
   }
 }

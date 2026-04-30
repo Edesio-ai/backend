@@ -1,7 +1,11 @@
 import {
+  InsertStudent,
+  Student,
   StudentCourseStats,
   StudentSession,
+  SupabaseStudent,
   SupabaseStudentCourseStats,
+  SupabaseStudentInsert,
   SupabaseStudentSession,
 } from 'src/domain/teaching/types/student.type';
 
@@ -35,4 +39,25 @@ export function supabaseStudentCourseStatsToStudentCourseStats(
       email: row.students.email,
     },
   }));
+}
+
+export function supabaseStudentToStudent(row: SupabaseStudent): Student {
+  return {
+    id: row.id,
+    supabaseUserId: row.supabase_user_id,
+    name: row.name,
+    email: row.email,
+    createdAt: row.created_at,
+    photoUrl: row.photo_url,
+  };
+}
+
+export function insertStudentToSupabaseStudentInsert(
+  body: InsertStudent,
+): SupabaseStudentInsert {
+  return {
+    supabase_user_id: body.supabaseUserId,
+    name: body.name,
+    email: body.email,
+  };
 }
