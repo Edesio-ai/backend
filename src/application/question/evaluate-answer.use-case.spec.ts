@@ -12,15 +12,16 @@ describe('EvaluateAnswerUseCase', () => {
   });
 
   describe('when answers are identical after normalization', () => {
-    it('should return a perfect score without calling OpenAI', async () => {
+    it('should detect cheating and return score 0 without calling OpenAI', async () => {
       const result = await fixtures.whenExecute({
         ...fixtures.body,
         answer: fixtures.body.correctAnswer,
       });
 
-      expect(result.score).toBe(1);
+      expect(result.score).toBe(0);
+      expect(result.isCheating).toBe(true);
       expect(result.feedback).toBe(
-        "Parfait ! C'est exactement la bonne réponse.",
+        "Bien essayé ! Mais ce n'est pas en trichant que tu vas progresser.",
       );
       expect(result.concepts).toEqual([]);
       expect(result.missingElements).toEqual([]);
@@ -31,53 +32,57 @@ describe('EvaluateAnswerUseCase', () => {
       ).not.toHaveBeenCalled();
     });
 
-    it('should return perfect score when answers differ only in case', async () => {
+    it('should detect cheating when answers differ only in case', async () => {
       const result = await fixtures.whenExecute({
         ...fixtures.body,
         correctAnswer: 'La Révolution Française',
         answer: 'la révolution française',
       });
 
-      expect(result.score).toBe(1);
+      expect(result.isCheating).toBe(true);
+      expect(result.score).toBe(0);
       expect(
         fixtures.openaiRepositoryMock.evaluateAnswer,
       ).not.toHaveBeenCalled();
     });
 
-    it('should return perfect score when answers differ only in accents', async () => {
+    it('should detect cheating when answers differ only in accents', async () => {
       const result = await fixtures.whenExecute({
         ...fixtures.body,
         correctAnswer: 'éléphant',
         answer: 'elephant',
       });
 
-      expect(result.score).toBe(1);
+      expect(result.isCheating).toBe(true);
+      expect(result.score).toBe(0);
       expect(
         fixtures.openaiRepositoryMock.evaluateAnswer,
       ).not.toHaveBeenCalled();
     });
 
-    it('should return perfect score when answers differ only in punctuation', async () => {
+    it('should detect cheating when answers differ only in punctuation', async () => {
       const result = await fixtures.whenExecute({
         ...fixtures.body,
         correctAnswer: 'crise financière, inégalités sociales.',
         answer: 'crise financiere inegalites sociales',
       });
 
-      expect(result.score).toBe(1);
+      expect(result.isCheating).toBe(true);
+      expect(result.score).toBe(0);
       expect(
         fixtures.openaiRepositoryMock.evaluateAnswer,
       ).not.toHaveBeenCalled();
     });
 
-    it('should return perfect score when answers differ only in extra whitespace', async () => {
+    it('should detect cheating when answers differ only in extra whitespace', async () => {
       const result = await fixtures.whenExecute({
         ...fixtures.body,
         correctAnswer: 'la  révolution',
         answer: 'la revolution',
       });
 
-      expect(result.score).toBe(1);
+      expect(result.isCheating).toBe(true);
+      expect(result.score).toBe(0);
       expect(
         fixtures.openaiRepositoryMock.evaluateAnswer,
       ).not.toHaveBeenCalled();

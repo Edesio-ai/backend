@@ -6,4 +6,5 @@ export type EvaluateAnswerResponse = {
   suggestedAction: string | null;
   actionPrompt: string | null;
   correctAnswer?: string;
+  isCheating?: boolean;
 };
