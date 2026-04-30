@@ -23,12 +23,14 @@ export class EvaluateAnswerUseCase {
 
     if (normalizedCorrectAnswers === normalizedStudentAnswer) {
       return {
-        score: 1,
-        feedback: "Parfait ! C'est exactement la bonne réponse.",
+        score: 0,
+        feedback:
+          "Bien essayé ! Mais ce n'est pas en trichant que tu vas progresser.",
         concepts: [],
         missingElements: [],
         suggestedAction: null,
         actionPrompt: null,
+        isCheating: true,
       };
     }
 
