@@ -36,15 +36,6 @@ export class TeacheServerError extends TeachingError {
   }
 }
 
-// STUDENT ERRORS
-export class StudentServerError extends TeachingError {
-  readonly code = 'STUDENT_SERVER_ERROR';
-  readonly httpStatus = 500;
-  constructor(message?: string) {
-    super(message || 'Student server error');
-  }
-}
-
 // SESSION ERRORS
 export class SessionServerError extends TeachingError {
   readonly code = 'SESSION_SERVER_ERROR';
