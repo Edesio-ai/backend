@@ -11,6 +11,13 @@ import {
   getGenerateQuestionUserPrompt,
 } from './prompts/generate-question.prompt';
 import { OpenAiServerError } from 'src/domain/shared/llm/errors/open-ai.error';
+import {
+  getEvaluateAnswerSystemPrompt,
+  getEvaluateAnswerUserPrompt,
+} from './prompts/evaluate-answer.prompt';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { EvaluateAnswerBody } from 'src/application/question/evaluate-answer.use-case';
+import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
 
 @Injectable()
 export class OpenaiRepository implements OpenaiRepositoryContract {
@@ -19,7 +26,7 @@ export class OpenaiRepository implements OpenaiRepositoryContract {
     private readonly openai: OpenAI,
   ) {}
 
-  async generateQuestions(
+  public async generateQuestions(
     courseContent: string,
     config: QuestionGenerationConfig,
     existingQuestions?: string[],
@@ -61,5 +68,41 @@ export class OpenaiRepository implements OpenaiRepositoryContract {
     }
 
     return JSON.parse(content).questions;
+  }
+
+  public async evaluateAnswer(
+    body: EvaluateAnswerBody,
+  ): Promise<EvaluateAnswerResponse> {
+    const systemPrompt = getEvaluateAnswerSystemPrompt();
+    const userPrompt = getEvaluateAnswerUserPrompt(body);
+
+    const response = await this.openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      temperature: 0.3,
+      max_tokens: 500,
+      response_format: { type: 'json_object' },
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
+      throw new ServerError('No response from OpenAI');
+    }
+
+    const cleanedContent = content.replace(/```json\n?|\n?```/g, '').trim();
+    const evaluation = JSON.parse(cleanedContent);
+
+    return {
+      score: evaluation.score,
+      feedback: evaluation.feedback,
+      concepts: evaluation.concepts || [],
+      missingElements: evaluation.missingElements || [],
+      suggestedAction: evaluation.suggestedAction || null,
+      actionPrompt: evaluation.actionPrompt || null,
+      correctAnswer: body.correctAnswer,
+    };
   }
 }

@@ -1,6 +1,8 @@
 import { OpenaiRepository } from './openai.repository';
 import { QuestionGenerationConfig } from 'src/domain/teaching/types/question.type';
 import { OpenAiServerError } from 'src/domain/shared/llm/errors/open-ai.error';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { EvaluateAnswerBody } from 'src/application/question/evaluate-answer.use-case';
 
 describe('OpenaiRepository', () => {
   let fixtures: Fixtures;
@@ -79,6 +81,77 @@ describe('OpenaiRepository', () => {
       .content as string;
     expect(userMessage).not.toContain('QUESTIONS DÉJÀ EXISTANTES');
   });
+
+  describe('evaluateAnswer', () => {
+    it('should return a parsed evaluation from OpenAI response', async () => {
+      fixtures.whenOpenAiReturnsEvaluation();
+
+      const result = await fixtures.whenEvaluateAnswer();
+
+      expect(result.score).toBe(0.8);
+      expect(result.feedback).toBe('Très bien !');
+      expect(result.concepts).toEqual([{ nom: 'crise financière', score: 1 }]);
+      expect(result.missingElements).toEqual([]);
+      expect(result.suggestedAction).toBeNull();
+      expect(result.actionPrompt).toBeNull();
+      expect(result.correctAnswer).toBe(
+        fixtures.evaluateAnswerBody.correctAnswer,
+      );
+    });
+
+    it('should call OpenAI with gpt-4o-mini and json_object format', async () => {
+      fixtures.whenOpenAiReturnsEvaluation();
+
+      await fixtures.whenEvaluateAnswer();
+
+      expect(fixtures.completionsCreateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: 'gpt-4o-mini',
+          temperature: 0.3,
+          max_tokens: 500,
+          response_format: { type: 'json_object' },
+        }),
+      );
+    });
+
+    it('should include a system and a user message', async () => {
+      fixtures.whenOpenAiReturnsEvaluation();
+
+      await fixtures.whenEvaluateAnswer();
+
+      const callArgs = fixtures.completionsCreateMock.mock.calls[0][0];
+      const roles = callArgs.messages.map((m: any) => m.role);
+      expect(roles).toContain('system');
+      expect(roles).toContain('user');
+    });
+
+    it('should throw ServerError when OpenAI returns no content', async () => {
+      fixtures.whenOpenAiReturnsNoEvaluationContent();
+
+      await expect(fixtures.whenEvaluateAnswer()).rejects.toBeInstanceOf(
+        ServerError,
+      );
+    });
+
+    it('should handle response wrapped in json markdown fences', async () => {
+      fixtures.whenOpenAiReturnsEvaluationWrappedInFences();
+
+      const result = await fixtures.whenEvaluateAnswer();
+
+      expect(result.score).toBe(0.5);
+    });
+
+    it('should default concepts to empty array when missing', async () => {
+      fixtures.whenOpenAiReturnsEvaluationWithoutOptionalFields();
+
+      const result = await fixtures.whenEvaluateAnswer();
+
+      expect(result.concepts).toEqual([]);
+      expect(result.missingElements).toEqual([]);
+      expect(result.suggestedAction).toBeNull();
+      expect(result.actionPrompt).toBeNull();
+    });
+  });
 });
 
 class Fixtures {
@@ -99,6 +172,14 @@ class Fixtures {
       explanation: 'Explication',
     },
   ];
+
+  public readonly evaluateAnswerBody: EvaluateAnswerBody = {
+    questionText: 'Quelles sont les causes de la Révolution française ?',
+    correctAnswer:
+      'Crise financière, inégalités sociales, influence des Lumières',
+    answer: "L'argent et les inégalités",
+    explanation: 'La Révolution française a été causée par plusieurs facteurs.',
+  };
 
   public readonly completionsCreateMock = jest.fn();
 
@@ -124,6 +205,10 @@ class Fixtures {
     );
   }
 
+  whenEvaluateAnswer() {
+    return this.repository.evaluateAnswer(this.evaluateAnswerBody);
+  }
+
   whenOpenAiReturnsQuestions() {
     this.completionsCreateMock.mockResolvedValue({
       choices: [
@@ -137,6 +222,68 @@ class Fixtures {
   }
 
   whenOpenAiReturnsNoContent() {
+    this.completionsCreateMock.mockResolvedValue({
+      choices: [{ message: { content: null } }],
+    });
+  }
+
+  whenOpenAiReturnsEvaluation() {
+    this.completionsCreateMock.mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              score: 0.8,
+              feedback: 'Très bien !',
+              concepts: [{ nom: 'crise financière', score: 1 }],
+              missingElements: [],
+              suggestedAction: null,
+              actionPrompt: null,
+            }),
+          },
+        },
+      ],
+    });
+  }
+
+  whenOpenAiReturnsEvaluationWrappedInFences() {
+    this.completionsCreateMock.mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content:
+              '```json\n' +
+              JSON.stringify({
+                score: 0.5,
+                feedback: 'Partiel.',
+                concepts: [],
+                missingElements: ['inégalités sociales'],
+                suggestedAction: 'A',
+                actionPrompt: 'Peux-tu compléter ?',
+              }) +
+              '\n```',
+          },
+        },
+      ],
+    });
+  }
+
+  whenOpenAiReturnsEvaluationWithoutOptionalFields() {
+    this.completionsCreateMock.mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              score: 0.3,
+              feedback: 'À revoir.',
+            }),
+          },
+        },
+      ],
+    });
+  }
+
+  whenOpenAiReturnsNoEvaluationContent() {
     this.completionsCreateMock.mockResolvedValue({
       choices: [{ message: { content: null } }],
     });

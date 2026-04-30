@@ -12,6 +12,7 @@ import { OpenaiModule } from 'src/infrastructure/llm/openai/openai.module';
 import { CreateQuestionUseCase } from 'src/application/question/create-question.use-case';
 import { DeleteQuestionByIdUseCase } from 'src/application/question/delete-question-by-id.use-case';
 import { UpdateQuestionByIdUseCase } from 'src/application/question/update-question-by-id.use-case';
+import { EvaluateAnswerUseCase } from 'src/application/question/evaluate-answer.use-case';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UpdateQuestionByIdUseCase } from 'src/application/question/update-quest
     CreateQuestionUseCase,
     DeleteQuestionByIdUseCase,
     UpdateQuestionByIdUseCase,
+    EvaluateAnswerUseCase,
   ],
 })
 export class QuestionModule {}
