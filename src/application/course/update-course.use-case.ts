@@ -35,15 +35,17 @@ export class UpdateCourseUseCase {
   ): Promise<Course> {
     const course = await this.courseRepository.getCourseWithSessionById(
       courseId,
-      'id, session:sessions!inner(teacher_id)',
+      'id, sessions:sessions!inner(teacher_id)',
     );
     if (!course) {
       throw new NotFoundError('Course not found');
     }
+
     const teacher = await this.teacherRepository.getTeacherByUserId(user.id);
     if (!teacher) {
       throw new NotFoundError('Teacher not found');
     }
+
     if (course.session.teacherId !== teacher.id) {
       throw new UnauthorizedError('You are not allowed to update this course');
     }
