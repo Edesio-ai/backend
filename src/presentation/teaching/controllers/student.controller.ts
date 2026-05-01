@@ -17,6 +17,7 @@ import { GlobalErrorFilter } from 'src/presentation/filters/shared.filter';
 import { CreateStudentUseCase } from 'src/application/student/create-student.use-case';
 import { GetStudentJoinedSessionsUseCase } from 'src/application/student/get-student-joined-sessions.use-case';
 import { StudentJoinedSession } from 'src/domain/teaching/types/student.type';
+import { JoinSessionByCodeUseCase } from 'src/application/student/join-session-by-code.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')
@@ -27,6 +28,7 @@ export class StudentController {
     private readonly getStudentByUserIdUseCase: GetStudentByUserIdUseCase,
     private readonly createStudentUseCase: CreateStudentUseCase,
     private readonly getStudentJoinedSessionsUseCase: GetStudentJoinedSessionsUseCase,
+    private readonly joinSessionByCodeUseCase: JoinSessionByCodeUseCase,
   ) {}
 
   @Get()
@@ -50,5 +52,14 @@ export class StudentController {
     const student =
       await this.getStudentJoinedSessionsUseCase.execute(studentId);
     return student;
+  }
+
+  @Post('join-session/:code')
+  async joinSessionByCode(
+    @Param('code') code: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<void> {
+    const { user } = req;
+    await this.joinSessionByCodeUseCase.execute(code, user.id);
   }
 }

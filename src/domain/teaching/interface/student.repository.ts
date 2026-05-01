@@ -9,6 +9,7 @@ import type {
 export const STUDENT_REPOSITORY = Symbol('STUDENT_REPOSITORY');
 
 export interface StudentRepository {
+  createStudentSession(studentId: string, sessionId: string): Promise<void>;
   getStudentJoinedSessions(studentId: string): Promise<StudentJoinedSession[]>;
   getStudentByUserId(userId: string): Promise<Student | null>;
   getStudentsSessionsByIds(sessionIds: string[]): Promise<StudentSession[]>;

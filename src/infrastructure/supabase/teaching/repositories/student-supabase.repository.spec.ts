@@ -147,6 +147,24 @@ describe('StudentSupabaseRepository', () => {
     ).rejects.toBeInstanceOf(ServerError);
   });
 
+  // ─── createStudentSession ────────────────────────────────────────────────────
+
+  it('should insert a student session row', async () => {
+    fixtures.whenCreateStudentSessionSucceeds();
+
+    await fixtures.whenCreateStudentSession();
+
+    fixtures.thenCreateStudentSessionQueryBuilt();
+  });
+
+  it('should throw ServerError when createStudentSession fails', async () => {
+    fixtures.whenCreateStudentSessionFails();
+
+    await expect(fixtures.whenCreateStudentSession()).rejects.toBeInstanceOf(
+      ServerError,
+    );
+  });
+
   // ─── createStudent ───────────────────────────────────────────────────────────
 
   it('should create and return a mapped student', async () => {
@@ -340,6 +358,9 @@ class Fixtures {
     select: this.insertSelectMock,
   }));
 
+  // createStudentSession chain: .insert(...)
+  public readonly createStudentSessionInsertMock = jest.fn();
+
   private mode:
     | 'select'
     | 'delete'
@@ -347,7 +368,8 @@ class Fixtures {
     | 'stats-delete'
     | 'student-by-user-id'
     | 'create-student'
-    | 'joined-sessions' = 'select';
+    | 'joined-sessions'
+    | 'create-student-session' = 'select';
 
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'student_course_stats') {
@@ -367,6 +389,9 @@ class Fixtures {
     }
     if (this.mode === 'joined-sessions') {
       return { select: this.joinedSessionsSelectMock };
+    }
+    if (this.mode === 'create-student-session') {
+      return { insert: this.createStudentSessionInsertMock };
     }
     return { select: this.selectMock };
   });
@@ -398,6 +423,11 @@ class Fixtures {
     return this.repository.getStudentJoinedSessions(
       this.studentIdForJoinedSessions,
     );
+  }
+
+  whenCreateStudentSession() {
+    this.mode = 'create-student-session';
+    return this.repository.createStudentSession('student-1', 'session-1');
   }
 
   whenGetStudentStatsByCourseId() {
@@ -445,6 +475,16 @@ class Fixtures {
   whenDeleteStudentSessionsFails() {
     this.deleteEqMock.mockResolvedValue({
       error: { message: 'delete failed' },
+    });
+  }
+
+  whenCreateStudentSessionSucceeds() {
+    this.createStudentSessionInsertMock.mockResolvedValue({ error: null });
+  }
+
+  whenCreateStudentSessionFails() {
+    this.createStudentSessionInsertMock.mockResolvedValue({
+      error: { message: 'insert student session failed' },
     });
   }
 
@@ -548,6 +588,14 @@ class Fixtures {
       'session_id',
       this.sessionIdToDelete,
     );
+  }
+
+  thenCreateStudentSessionQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_sessions');
+    expect(this.createStudentSessionInsertMock).toHaveBeenCalledWith({
+      student_id: 'student-1',
+      session_id: 'session-1',
+    });
   }
 
   thenJoinedSessionsQueryBuilt() {
