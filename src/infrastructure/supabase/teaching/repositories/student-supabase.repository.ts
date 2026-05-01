@@ -180,4 +180,22 @@ export class StudentSupabaseRepository implements StudentRepository {
     }
     return studentJoinedSessionsToStudentJoinedSessions(data ?? []);
   }
+
+  public async createStudentSession(
+    studentId: string,
+    sessionId: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('student_sessions')
+      .insert({ student_id: studentId, session_id: sessionId });
+
+    if (error) {
+      console.error(
+        'An error occurred while creating student session',
+        studentId,
+        sessionId,
+      );
+      throw new ServerError(error.message);
+    }
+  }
 }
