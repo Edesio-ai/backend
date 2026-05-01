@@ -4,10 +4,15 @@ import { StudentController } from '../controllers/student.controller';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { GetStudentByUserIdUseCase } from 'src/application/student/get-student-by-user-id.use-case';
 import { CreateStudentUseCase } from 'src/application/student/create-student.use-case';
+import { GetStudentJoinedSessionsUseCase } from 'src/application/student/get-student-joined-sessions.use-case';
 
 @Module({
   imports: [AuthPersistenceModule, StudentPersistenceModule],
   controllers: [StudentController],
-  providers: [GetStudentByUserIdUseCase, CreateStudentUseCase],
+  providers: [
+    GetStudentByUserIdUseCase,
+    CreateStudentUseCase,
+    GetStudentJoinedSessionsUseCase,
+  ],
 })
 export class StudentModule {}

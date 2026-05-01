@@ -2,12 +2,14 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import type {
   Student,
   StudentCourseStats,
+  StudentJoinedSession,
   StudentSession,
 } from '../types/student.type';
 
 export const STUDENT_REPOSITORY = Symbol('STUDENT_REPOSITORY');
 
 export interface StudentRepository {
+  getStudentJoinedSessions(studentId: string): Promise<StudentJoinedSession[]>;
   getStudentByUserId(userId: string): Promise<Student | null>;
   getStudentsSessionsByIds(sessionIds: string[]): Promise<StudentSession[]>;
   deleteStudentSessionsBySessionId(sessionId: string): Promise<void>;

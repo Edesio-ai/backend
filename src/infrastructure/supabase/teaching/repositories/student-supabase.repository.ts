@@ -3,6 +3,7 @@ import { StudentRepository } from '../../../../domain/teaching/interface/student
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import {
   insertStudentToSupabaseStudentInsert,
+  studentJoinedSessionsToStudentJoinedSessions,
   supabaseStudentCourseStatsToStudentCourseStats,
   supabaseStudentSessionsToStudentSessions,
   supabaseStudentToStudent,
@@ -11,6 +12,7 @@ import {
   InsertStudent,
   Student,
   StudentCourseStats,
+  StudentJoinedSession,
 } from 'src/domain/teaching/types/student.type';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
@@ -157,5 +159,25 @@ export class StudentSupabaseRepository implements StudentRepository {
     }
 
     return supabaseStudentToStudent(data);
+  }
+
+  public async getStudentJoinedSessions(
+    studentId: string,
+  ): Promise<StudentJoinedSession[]> {
+    const { data, error } = await this.supabase
+      .from('student_sessions')
+      .select('joined_at, sessions (*)')
+      .eq('student_id', studentId)
+      .order('joined_at', { ascending: false });
+
+    if (error) {
+      console.error(
+        'An error occurred while getting student joined sessions',
+        studentId,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+    return studentJoinedSessionsToStudentJoinedSessions(data ?? []);
   }
 }

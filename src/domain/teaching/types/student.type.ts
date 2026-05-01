@@ -1,3 +1,5 @@
+import { Session, SupabaseSession } from './session.type';
+
 /** Row from Supabase `student_sessions` (junction). */
 export type SupabaseStudentSession = {
   session_id: string;
@@ -58,3 +60,12 @@ export type SupabaseStudentInsert = Omit<
   SupabaseStudent,
   'id' | 'created_at' | 'photo_url'
 >;
+
+export type SupabaseStudentJoinedSession = {
+  joined_at: string;
+  sessions: SupabaseSession;
+};
+
+export type StudentJoinedSession = Session & {
+  joinedAt: string;
+};

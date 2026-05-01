@@ -120,6 +120,33 @@ describe('StudentSupabaseRepository', () => {
     );
   });
 
+  // ─── getStudentJoinedSessions ────────────────────────────────────────────────
+
+  it('should return mapped joined sessions for a student', async () => {
+    fixtures.whenJoinedSessionsQueryReturnsData();
+
+    const result = await fixtures.whenGetStudentJoinedSessions();
+
+    fixtures.thenJoinedSessionsQueryBuilt();
+    expect(result).toEqual(fixtures.expectedJoinedSessions);
+  });
+
+  it('should return empty array when no joined sessions exist', async () => {
+    fixtures.whenJoinedSessionsQueryReturnsEmpty();
+
+    const result = await fixtures.whenGetStudentJoinedSessions();
+
+    expect(result).toEqual([]);
+  });
+
+  it('should throw ServerError when getStudentJoinedSessions query fails', async () => {
+    fixtures.whenJoinedSessionsQueryFails();
+
+    await expect(
+      fixtures.whenGetStudentJoinedSessions(),
+    ).rejects.toBeInstanceOf(ServerError);
+  });
+
   // ─── createStudent ───────────────────────────────────────────────────────────
 
   it('should create and return a mapped student', async () => {
@@ -214,6 +241,32 @@ class Fixtures {
     { sessionId: 'session-1', studentId: 'student-1' },
   ];
 
+  public readonly studentIdForJoinedSessions = 'student-1';
+  public readonly joinedSessionsSupabaseRows = [
+    {
+      joined_at: '2026-01-15T10:00:00.000Z',
+      sessions: {
+        id: 'session-1',
+        teacher_id: 'teacher-1',
+        name: 'Session de maths',
+        code: 'ABC123',
+        language: 'francais',
+        created_at: '2026-01-01T00:00:00.000Z',
+      },
+    },
+  ];
+  public readonly expectedJoinedSessions = [
+    {
+      id: 'session-1',
+      teacherId: 'teacher-1',
+      name: 'Session de maths',
+      code: 'ABC123',
+      language: 'francais',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      joinedAt: '2026-01-15T10:00:00.000Z',
+    },
+  ];
+
   public readonly courseIdForStats = 'course-stats-1';
   public readonly studentStatsSupabaseRows = [
     {
@@ -248,6 +301,15 @@ class Fixtures {
 
   private readonly inMock = jest.fn();
   private readonly selectMock = jest.fn(() => ({ in: this.inMock }));
+
+  // getStudentJoinedSessions chain: .select(...).eq(...).order(...)
+  private readonly joinedSessionsOrderMock = jest.fn();
+  private readonly joinedSessionsEqMock = jest.fn(() => ({
+    order: this.joinedSessionsOrderMock,
+  }));
+  private readonly joinedSessionsSelectMock = jest.fn(() => ({
+    eq: this.joinedSessionsEqMock,
+  }));
 
   private readonly statsEqMock = jest.fn();
   private readonly statsSelectMock = jest.fn(() => ({ eq: this.statsEqMock }));
@@ -284,7 +346,8 @@ class Fixtures {
     | 'stats'
     | 'stats-delete'
     | 'student-by-user-id'
-    | 'create-student' = 'select';
+    | 'create-student'
+    | 'joined-sessions' = 'select';
 
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'student_course_stats') {
@@ -301,6 +364,9 @@ class Fixtures {
     }
     if (this.mode === 'delete') {
       return { delete: this.deleteMock };
+    }
+    if (this.mode === 'joined-sessions') {
+      return { select: this.joinedSessionsSelectMock };
     }
     return { select: this.selectMock };
   });
@@ -324,6 +390,13 @@ class Fixtures {
     this.mode = 'delete';
     return this.repository.deleteStudentSessionsBySessionId(
       this.sessionIdToDelete,
+    );
+  }
+
+  whenGetStudentJoinedSessions() {
+    this.mode = 'joined-sessions';
+    return this.repository.getStudentJoinedSessions(
+      this.studentIdForJoinedSessions,
     );
   }
 
@@ -372,6 +445,27 @@ class Fixtures {
   whenDeleteStudentSessionsFails() {
     this.deleteEqMock.mockResolvedValue({
       error: { message: 'delete failed' },
+    });
+  }
+
+  whenJoinedSessionsQueryReturnsData() {
+    this.joinedSessionsOrderMock.mockResolvedValue({
+      data: this.joinedSessionsSupabaseRows,
+      error: null,
+    });
+  }
+
+  whenJoinedSessionsQueryReturnsEmpty() {
+    this.joinedSessionsOrderMock.mockResolvedValue({
+      data: [],
+      error: null,
+    });
+  }
+
+  whenJoinedSessionsQueryFails() {
+    this.joinedSessionsOrderMock.mockResolvedValue({
+      data: null,
+      error: { message: 'joined sessions query failed' },
     });
   }
 
@@ -454,6 +548,20 @@ class Fixtures {
       'session_id',
       this.sessionIdToDelete,
     );
+  }
+
+  thenJoinedSessionsQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_sessions');
+    expect(this.joinedSessionsSelectMock).toHaveBeenCalledWith(
+      'joined_at, sessions (*)',
+    );
+    expect(this.joinedSessionsEqMock).toHaveBeenCalledWith(
+      'student_id',
+      this.studentIdForJoinedSessions,
+    );
+    expect(this.joinedSessionsOrderMock).toHaveBeenCalledWith('joined_at', {
+      ascending: false,
+    });
   }
 
   thenStudentStatsQueryBuilt() {
