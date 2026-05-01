@@ -2,10 +2,12 @@ import {
   InsertStudent,
   Student,
   StudentCourseStats,
+  StudentJoinedSession,
   StudentSession,
   SupabaseStudent,
   SupabaseStudentCourseStats,
   SupabaseStudentInsert,
+  SupabaseStudentJoinedSession,
   SupabaseStudentSession,
 } from 'src/domain/teaching/types/student.type';
 
@@ -60,4 +62,18 @@ export function insertStudentToSupabaseStudentInsert(
     name: body.name,
     email: body.email,
   };
+}
+
+export function studentJoinedSessionsToStudentJoinedSessions(
+  rows: SupabaseStudentJoinedSession[],
+): StudentJoinedSession[] {
+  return rows.map((row) => ({
+    id: row.sessions.id,
+    teacherId: row.sessions.teacher_id,
+    name: row.sessions.name,
+    code: row.sessions.code,
+    language: row.sessions.language,
+    createdAt: row.sessions.created_at,
+    joinedAt: row.joined_at,
+  }));
 }

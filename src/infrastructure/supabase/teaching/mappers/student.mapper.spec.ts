@@ -2,10 +2,12 @@ import {
   supabaseStudentSessionToStudentSession,
   supabaseStudentSessionsToStudentSessions,
   supabaseStudentCourseStatsToStudentCourseStats,
+  studentJoinedSessionsToStudentJoinedSessions,
 } from './student.mapper';
 import {
   SupabaseStudentSession,
   SupabaseStudentCourseStats,
+  SupabaseStudentJoinedSession,
 } from 'src/domain/teaching/types/student.type';
 
 describe('student.mapper', () => {
@@ -107,6 +109,62 @@ describe('student.mapper', () => {
       expect(result).toHaveLength(2);
       expect(result[0].student.name).toBe('Bob');
       expect(result[1].student.photoUrl).toBe('https://x/e.png');
+    });
+  });
+
+  describe('studentJoinedSessionsToStudentJoinedSessions', () => {
+    const baseRow: SupabaseStudentJoinedSession = {
+      joined_at: '2026-01-15T10:00:00.000Z',
+      sessions: {
+        id: 'session-1',
+        teacher_id: 'teacher-1',
+        name: 'Session de maths',
+        code: 'ABC123',
+        language: 'francais',
+        created_at: '2026-01-01T00:00:00.000Z',
+      },
+    };
+
+    it('maps a row to a flat StudentJoinedSession', () => {
+      expect(studentJoinedSessionsToStudentJoinedSessions([baseRow])).toEqual([
+        {
+          id: 'session-1',
+          teacherId: 'teacher-1',
+          name: 'Session de maths',
+          code: 'ABC123',
+          language: 'francais',
+          createdAt: '2026-01-01T00:00:00.000Z',
+          joinedAt: '2026-01-15T10:00:00.000Z',
+        },
+      ]);
+    });
+
+    it('returns an empty array for empty input', () => {
+      expect(studentJoinedSessionsToStudentJoinedSessions([])).toEqual([]);
+    });
+
+    it('maps multiple rows preserving order', () => {
+      const rows: SupabaseStudentJoinedSession[] = [
+        {
+          joined_at: '2026-02-01T00:00:00.000Z',
+          sessions: {
+            id: 'session-2',
+            teacher_id: 'teacher-1',
+            name: "Session d'anglais",
+            code: 'XYZ789',
+            language: 'anglais',
+            created_at: '2026-01-05T00:00:00.000Z',
+          },
+        },
+        baseRow,
+      ];
+
+      const result = studentJoinedSessionsToStudentJoinedSessions(rows);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('session-2');
+      expect(result[0].joinedAt).toBe('2026-02-01T00:00:00.000Z');
+      expect(result[1].id).toBe('session-1');
     });
   });
 });
