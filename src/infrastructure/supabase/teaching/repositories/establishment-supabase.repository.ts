@@ -4,11 +4,7 @@ import { type EstablishmentRepository } from 'src/domain/teaching/interface/esta
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import { Establishment } from '../../../../domain/establishment/establishment.type';
 import { InvitationToken } from '../../../../domain/auth/invitation.type';
-import {
-  createEstablishmentBodyToSupabaseEstablishmentInsert,
-  supabaseEstablishmentToEstablishment,
-  supabaseInvitationTokenRowToInvitationToken,
-} from '../mappers/establishment.mapper';
+import { EstablishmentMapper } from '../mappers/establishment.mapper';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 export class EstablishmentSupabaseRepository implements EstablishmentRepository {
@@ -32,7 +28,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
         `An error occure while getting establishment by id`,
       );
     }
-    return supabaseEstablishmentToEstablishment(data);
+    return EstablishmentMapper.toDomain(data);
   }
 
   async getEstablishmentByUserId(userId: string): Promise<Establishment> {
@@ -50,7 +46,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
         `An error occure while getting establishment by user id`,
       );
     }
-    return supabaseEstablishmentToEstablishment(data);
+    return EstablishmentMapper.toDomain(data);
   }
 
   async createEstablishment(
@@ -60,13 +56,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
   ): Promise<Establishment> {
     const { data, error } = await this.supabase
       .from('establishment')
-      .insert(
-        createEstablishmentBodyToSupabaseEstablishmentInsert({
-          supabaseUserId,
-          name,
-          email,
-        }),
-      )
+      .insert(EstablishmentMapper.toInsert({ supabaseUserId, name, email }))
       .select()
       .single();
 
@@ -75,7 +65,7 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
       throw new ServerError(`An error occure while creating establishment`);
     }
 
-    return supabaseEstablishmentToEstablishment(data);
+    return EstablishmentMapper.toDomain(data);
   }
 
   async getInvitationTokenByEstablishmentId(
@@ -96,6 +86,6 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
       );
     }
 
-    return (data ?? []).map(supabaseInvitationTokenRowToInvitationToken);
+    return (data ?? []).map(EstablishmentMapper.invitationTokenToDomain);
   }
 }

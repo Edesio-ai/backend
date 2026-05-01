@@ -1,18 +1,11 @@
-import {
-  conditionToSupabaseCondition,
-  createTeacherInsertPayload,
-  createTeacherWithEstablishmentInsertPayload,
-  linkTeacherEstablishmentUpdatePayload,
-  supabaseTeacherSessionToTeacherSession,
-  supabaseTeacherToTeacher,
-} from './teacher.mapper';
+import { TeacherMapper } from './teacher.mapper';
 import {
   SupabaseTeacher,
   SupabaseTeacherSession,
 } from 'src/domain/teaching/types/teacher.type';
 
-describe('teacher.mapper', () => {
-  describe('supabaseTeacherToTeacher', () => {
+describe('TeacherMapper', () => {
+  describe('toDomain', () => {
     it('maps snake_case row to domain Teacher', () => {
       const row: SupabaseTeacher = {
         id: 't-1',
@@ -24,7 +17,7 @@ describe('teacher.mapper', () => {
         supabase_user_id: 'user-1',
       };
 
-      expect(supabaseTeacherToTeacher(row)).toEqual({
+      expect(TeacherMapper.toDomain(row)).toEqual({
         id: 't-1',
         name: 'Prof',
         email: 'p@school.com',
@@ -36,7 +29,7 @@ describe('teacher.mapper', () => {
     });
   });
 
-  describe('supabaseTeacherSessionToTeacherSession', () => {
+  describe('sessionToDomain', () => {
     it('maps sessions row to domain TeacherSession', () => {
       const row: SupabaseTeacherSession = {
         id: 's-1',
@@ -47,7 +40,7 @@ describe('teacher.mapper', () => {
         created_at: '2026-01-01T00:00:00.000Z',
       };
 
-      expect(supabaseTeacherSessionToTeacherSession(row)).toEqual({
+      expect(TeacherMapper.sessionToDomain(row)).toEqual({
         id: 's-1',
         name: 'Cours',
         code: 'ABC',
@@ -58,9 +51,9 @@ describe('teacher.mapper', () => {
     });
   });
 
-  describe('createTeacherInsertPayload', () => {
+  describe('toInsert', () => {
     it('builds insert object', () => {
-      expect(createTeacherInsertPayload('u1', 'N', 'e@x.com')).toEqual({
+      expect(TeacherMapper.toInsert('u1', 'N', 'e@x.com')).toEqual({
         supabase_user_id: 'u1',
         name: 'N',
         email: 'e@x.com',
@@ -68,16 +61,10 @@ describe('teacher.mapper', () => {
     });
   });
 
-  describe('createTeacherWithEstablishmentInsertPayload', () => {
+  describe('toInsertWithEstablishment', () => {
     it('builds insert with establishment', () => {
       expect(
-        createTeacherWithEstablishmentInsertPayload(
-          'u1',
-          'A B',
-          'E@X.COM',
-          'est-1',
-          2,
-        ),
+        TeacherMapper.toInsertWithEstablishment('u1', 'A B', 'E@X.COM', 'est-1', 2),
       ).toEqual({
         supabase_user_id: 'u1',
         name: 'A B',
@@ -88,39 +75,36 @@ describe('teacher.mapper', () => {
     });
   });
 
-  describe('linkTeacherEstablishmentUpdatePayload', () => {
+  describe('toEstablishmentUpdate', () => {
     it('builds update payload', () => {
-      expect(linkTeacherEstablishmentUpdatePayload('est-2')).toEqual({
+      expect(TeacherMapper.toEstablishmentUpdate('est-2')).toEqual({
         establishment_id: 'est-2',
       });
     });
   });
 
-  describe('conditionToSupabaseCondition', () => {
+  describe('toCondition', () => {
     it('converts establishmentId to establishment_id', () => {
-      expect(
-        conditionToSupabaseCondition({ establishmentId: 'est-1' }),
-      ).toEqual({ establishment_id: 'est-1' });
+      expect(TeacherMapper.toCondition({ establishmentId: 'est-1' })).toEqual({
+        establishment_id: 'est-1',
+      });
     });
 
     it('converts teacherId to teacher_id', () => {
-      expect(conditionToSupabaseCondition({ teacherId: 't-1' })).toEqual({
+      expect(TeacherMapper.toCondition({ teacherId: 't-1' })).toEqual({
         teacher_id: 't-1',
       });
     });
 
     it('keeps id unchanged (no uppercase)', () => {
-      expect(conditionToSupabaseCondition({ id: 'teacher-1' })).toEqual({
+      expect(TeacherMapper.toCondition({ id: 'teacher-1' })).toEqual({
         id: 'teacher-1',
       });
     });
 
     it('converts multiple conditions at once', () => {
       expect(
-        conditionToSupabaseCondition({
-          id: 'teacher-1',
-          establishmentId: 'est-1',
-        }),
+        TeacherMapper.toCondition({ id: 'teacher-1', establishmentId: 'est-1' }),
       ).toEqual({
         id: 'teacher-1',
         establishment_id: 'est-1',
@@ -128,7 +112,7 @@ describe('teacher.mapper', () => {
     });
 
     it('returns empty object when no conditions provided', () => {
-      expect(conditionToSupabaseCondition({})).toEqual({});
+      expect(TeacherMapper.toCondition({})).toEqual({});
     });
   });
 });

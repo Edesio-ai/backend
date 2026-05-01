@@ -13,42 +13,8 @@ type SupabaseTeacherInsert = {
   available_chatbots?: number;
 };
 
-export function createTeacherInsertPayload(
-  userId: string,
-  name: string,
-  email: string,
-): SupabaseTeacherInsert {
-  return {
-    supabase_user_id: userId,
-    name,
-    email: email || '',
-  };
-}
-
-export function createTeacherWithEstablishmentInsertPayload(
-  userId: string,
-  name: string,
-  email: string,
-  establishmentId: string,
-  availableChatbots: number,
-): SupabaseTeacherInsert {
-  return {
-    supabase_user_id: userId,
-    name,
-    email: email.toLowerCase().trim(),
-    establishment_id: establishmentId,
-    available_chatbots: availableChatbots,
-  };
-}
-
-export function linkTeacherEstablishmentUpdatePayload(
-  establishmentId: string,
-): { establishment_id: string } {
-  return { establishment_id: establishmentId };
-}
-
-export function supabaseTeacherToTeacher(row: SupabaseTeacher): Teacher {
-  return {
+export const TeacherMapper = {
+  toDomain: (row: SupabaseTeacher): Teacher => ({
     id: row.id,
     name: row.name,
     email: row.email,
@@ -56,35 +22,54 @@ export function supabaseTeacherToTeacher(row: SupabaseTeacher): Teacher {
     establishmentId: row.establishment_id,
     availableChatbots: row.available_chatbots,
     supabaseUserId: row.supabase_user_id ?? undefined,
-  };
-}
+  }),
 
-export function supabaseTeacherSessionToTeacherSession(
-  row: SupabaseTeacherSession,
-): TeacherSession {
-  return {
+  sessionToDomain: (row: SupabaseTeacherSession): TeacherSession => ({
     id: row.id,
     name: row.name,
     code: row.code,
     language: row.language,
     teacherId: row.teacher_id,
     createdAt: row.created_at,
-  };
-}
+  }),
 
-export function supabaseTeacherSessionsToTeacherSessions(
-  rows: SupabaseTeacherSession[],
-): TeacherSession[] {
-  return rows.map(supabaseTeacherSessionToTeacherSession);
-}
+  toInsert: (
+    userId: string,
+    name: string,
+    email: string,
+  ): SupabaseTeacherInsert => ({
+    supabase_user_id: userId,
+    name,
+    email: email || '',
+  }),
 
-export function conditionToSupabaseCondition(
-  conditions: Partial<Record<'id' | 'establishmentId' | 'teacherId', string>>,
-): Record<string, string> {
-  return Object.fromEntries(
-    Object.entries(conditions).map(([key, value]) => [
-      key.replace(/([A-Z])/g, '_$1').toLowerCase(),
-      value,
-    ]),
-  );
-}
+  toInsertWithEstablishment: (
+    userId: string,
+    name: string,
+    email: string,
+    establishmentId: string,
+    availableChatbots: number,
+  ): SupabaseTeacherInsert => ({
+    supabase_user_id: userId,
+    name,
+    email: email.toLowerCase().trim(),
+    establishment_id: establishmentId,
+    available_chatbots: availableChatbots,
+  }),
+
+  toEstablishmentUpdate: (
+    establishmentId: string,
+  ): { establishment_id: string } => ({
+    establishment_id: establishmentId,
+  }),
+
+  toCondition: (
+    conditions: Partial<Record<'id' | 'establishmentId' | 'teacherId', string>>,
+  ): Record<string, string> =>
+    Object.fromEntries(
+      Object.entries(conditions).map(([key, value]) => [
+        key.replace(/([A-Z])/g, '_$1').toLowerCase(),
+        value,
+      ]),
+    ),
+};

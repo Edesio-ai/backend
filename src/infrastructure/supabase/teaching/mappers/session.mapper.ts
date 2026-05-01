@@ -5,8 +5,8 @@ import {
   UpdateSessionNameBody,
 } from 'src/domain/teaching/types/session.type';
 import {
-  SupabaseCourseWithSession,
   CourseWithSession,
+  SupabaseCourseWithSession,
 } from 'src/domain/teaching/types/course.type';
 
 type SupabaseSessionInsert = {
@@ -16,38 +16,28 @@ type SupabaseSessionInsert = {
   language: string;
 };
 
-export function createSessionBodyToSupabaseSessionInsert(
-  body: CreateSessionBody,
-): SupabaseSessionInsert {
-  return {
-    teacher_id: body.teacherId,
-    name: body.name,
-    code: body.code,
-    language: body.language,
-  };
-}
-
-export function updateSessionNameBodyToSupabaseSessionUpdate(
-  body: UpdateSessionNameBody,
-): { name: string } {
-  return { name: body.name };
-}
-
-export function supabaseSessionToSession(row: SupabaseSession): Session {
-  return {
+export const SessionMapper = {
+  toDomain: (row: SupabaseSession): Session => ({
     id: row.id,
     teacherId: row.teacher_id,
     name: row.name,
     code: row.code,
     language: row.language,
     createdAt: row.created_at,
-  };
-}
+  }),
 
-export function supabaseCourseWithSessionToCourseWithSession(
-  row: SupabaseCourseWithSession,
-): CourseWithSession {
-  return {
+  toInsert: (body: CreateSessionBody): SupabaseSessionInsert => ({
+    teacher_id: body.teacherId,
+    name: body.name,
+    code: body.code,
+    language: body.language,
+  }),
+
+  toUpdate: (body: UpdateSessionNameBody): { name: string } => ({
+    name: body.name,
+  }),
+
+  courseWithSessionToDomain: (row: SupabaseCourseWithSession): CourseWithSession => ({
     id: row.id,
     title: row.title,
     description: row.description,
@@ -69,5 +59,5 @@ export function supabaseCourseWithSessionToCourseWithSession(
       createdAt: row.sessions?.teachers?.created_at ?? '',
       establishmentId: row.sessions?.teachers?.establishment_id ?? '',
     },
-  };
-}
+  }),
+};

@@ -11,25 +11,22 @@ import {
   SupabaseStudentSession,
 } from 'src/domain/teaching/types/student.type';
 
-export function supabaseStudentSessionToStudentSession(
-  row: SupabaseStudentSession,
-): StudentSession {
-  return {
+export const StudentMapper = {
+  toDomain: (row: SupabaseStudent): Student => ({
+    id: row.id,
+    supabaseUserId: row.supabase_user_id,
+    name: row.name,
+    email: row.email,
+    createdAt: row.created_at,
+    photoUrl: row.photo_url,
+  }),
+
+  sessionToDomain: (row: SupabaseStudentSession): StudentSession => ({
     sessionId: row.session_id,
     studentId: row.student_id,
-  };
-}
+  }),
 
-export function supabaseStudentSessionsToStudentSessions(
-  rows: SupabaseStudentSession[],
-): StudentSession[] {
-  return rows.map(supabaseStudentSessionToStudentSession);
-}
-
-export function supabaseStudentCourseStatsToStudentCourseStats(
-  rows: SupabaseStudentCourseStats[],
-): StudentCourseStats[] {
-  return rows.map((row) => ({
+  courseStatToDomain: (row: SupabaseStudentCourseStats): StudentCourseStats => ({
     studentId: row.student_id,
     attemptedQuestions: row.attempted_questions,
     correctAnswers: row.correct_answers,
@@ -40,34 +37,9 @@ export function supabaseStudentCourseStatsToStudentCourseStats(
       photoUrl: row.students.photo_url,
       email: row.students.email,
     },
-  }));
-}
+  }),
 
-export function supabaseStudentToStudent(row: SupabaseStudent): Student {
-  return {
-    id: row.id,
-    supabaseUserId: row.supabase_user_id,
-    name: row.name,
-    email: row.email,
-    createdAt: row.created_at,
-    photoUrl: row.photo_url,
-  };
-}
-
-export function insertStudentToSupabaseStudentInsert(
-  body: InsertStudent,
-): SupabaseStudentInsert {
-  return {
-    supabase_user_id: body.supabaseUserId,
-    name: body.name,
-    email: body.email,
-  };
-}
-
-export function studentJoinedSessionsToStudentJoinedSessions(
-  rows: SupabaseStudentJoinedSession[],
-): StudentJoinedSession[] {
-  return rows.map((row) => ({
+  joinedSessionToDomain: (row: SupabaseStudentJoinedSession): StudentJoinedSession => ({
     id: row.sessions.id,
     teacherId: row.sessions.teacher_id,
     name: row.sessions.name,
@@ -75,5 +47,11 @@ export function studentJoinedSessionsToStudentJoinedSessions(
     language: row.sessions.language,
     createdAt: row.sessions.created_at,
     joinedAt: row.joined_at,
-  }));
-}
+  }),
+
+  toInsert: (body: InsertStudent): SupabaseStudentInsert => ({
+    supabase_user_id: body.supabaseUserId,
+    name: body.name,
+    email: body.email,
+  }),
+};

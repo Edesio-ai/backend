@@ -1,10 +1,7 @@
 import {
   Course,
-  CourseFile,
-  CourseFileUpload,
   CreateCourseBody,
   SupabaseCourse,
-  SupabaseCourseFile,
 } from 'src/domain/teaching/types/course.type';
 
 type SupabaseCourseInsert = {
@@ -14,68 +11,42 @@ type SupabaseCourseInsert = {
   text_content?: string | null;
 };
 
-export function courseCourseBodyToSupabaseCourseInsert(
-  course: CreateCourseBody,
-): SupabaseCourseInsert {
-  return {
-    session_id: course.sessionId,
-    title: course.title,
-    description: course.description,
-    text_content: course.contentText,
-  };
-}
+export const CourseMapper = {
+  toDomain: (row: SupabaseCourse): Course => ({
+    id: row.id,
+    sessionId: row.session_id,
+    title: row.title,
+    description: row.description,
+    contentText: row.text_content,
+    validatedQuestions: row.validated_questions,
+    positionOrder: row.position_order,
+    createdAt: row.created_at,
+  }),
 
-export function supabaseCourseToCourse(course: SupabaseCourse): Course {
-  return {
-    id: course.id,
-    sessionId: course.session_id,
-    title: course.title,
-    description: course.description,
-    contentText: course.text_content,
-    validatedQuestions: course.validated_questions,
-    positionOrder: course.position_order,
-    createdAt: course.created_at,
-  };
-}
+  toInsert: (body: CreateCourseBody): SupabaseCourseInsert => ({
+    session_id: body.sessionId,
+    title: body.title,
+    description: body.description,
+    text_content: body.contentText,
+  }),
 
-export function mapFilesUrl(
-  files: { file_url: string }[],
-): { fileUrl: string }[] {
-  return files.map((file) => ({
-    fileUrl: file.file_url,
-  }));
-}
+  toUpdate: (updates: Record<string, unknown>): Record<string, unknown> => {
+    const row: Record<string, unknown> = {};
+    if (updates.title !== undefined) row.title = updates.title;
+    if (updates.description !== undefined) row.description = updates.description;
+    if (updates.contentText !== undefined) row.text_content = updates.contentText;
+    if (updates.positionOrder !== undefined) row.position_order = updates.positionOrder;
+    if (updates.validatedQuestions !== undefined)
+      row.validated_questions = updates.validatedQuestions;
+    return row;
+  },
 
-export function supabaseCourseFileToCourseFile(
-  data: SupabaseCourseFile,
-): CourseFile {
-  return {
-    id: data.id,
-    courseId: data.course_id,
-    fileUrl: data.file_url,
-    fileName: data.file_name,
-    createdAt: data.created_at,
-  };
-}
+  fileUrlsToDomain: (files: { file_url: string }[]): { fileUrl: string }[] =>
+    files.map((f) => ({ fileUrl: f.file_url })),
 
-export function supabaseValidatedQuestionsToValidatedQuestions(data: {
-  validated_questions: boolean;
-}): { validatedQuestions: boolean } {
-  return {
+  validatedQuestionsToDomain: (data: {
+    validated_questions: boolean;
+  }): { validatedQuestions: boolean } => ({
     validatedQuestions: data.validated_questions,
-  };
-}
-
-export function updatesToSupabaseCourseUpdate(
-  updates: Record<string, unknown>,
-): Record<string, unknown> {
-  const row: Record<string, unknown> = {};
-  if (updates.title !== undefined) row.title = updates.title;
-  if (updates.description !== undefined) row.description = updates.description;
-  if (updates.contentText !== undefined) row.text_content = updates.contentText;
-  if (updates.positionOrder !== undefined)
-    row.position_order = updates.positionOrder;
-  if (updates.validatedQuestions !== undefined)
-    row.validated_questions = updates.validatedQuestions;
-  return row;
-}
+  }),
+};

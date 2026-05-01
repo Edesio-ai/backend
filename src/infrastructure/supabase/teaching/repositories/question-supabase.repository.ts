@@ -8,12 +8,7 @@ import {
   Question,
   QuestionUpdate,
 } from 'src/domain/teaching/types/question.type';
-import {
-  createQuestionBodyToSupabaseQuestionInsert,
-  generatedQuestionsToSupabaseQuestions,
-  questionUpdatesToSupabaseQuestionUpdate,
-  supabaseQuestionToQuestion,
-} from '../mappers/question.mapper';
+import { QuestionMapper } from '../mappers/question.mapper';
 
 export class QuestionSupabaseRepository implements QuestionsRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
@@ -69,7 +64,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
       throw new QuestionServerError(error.message);
     }
 
-    return data?.map(supabaseQuestionToQuestion) ?? [];
+    return data?.map(QuestionMapper.toDomain) ?? [];
   }
 
   async insertQuestions(
@@ -78,7 +73,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
   ): Promise<Question[]> {
     const { data, error } = await this.supabase
       .from('questions')
-      .insert(generatedQuestionsToSupabaseQuestions(questions, courseId))
+      .insert(QuestionMapper.generatedToInserts(questions, courseId))
       .select();
 
     if (error) {
@@ -86,7 +81,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
       throw new QuestionServerError(error.message);
     }
 
-    return data?.map(supabaseQuestionToQuestion) ?? [];
+    return data?.map(QuestionMapper.toDomain) ?? [];
   }
 
   async deleteCourseQuizQuestions(courseId: string): Promise<void> {
@@ -108,7 +103,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
   async insertQuestion(question: CreateQuestionBody): Promise<Question> {
     const { data, error } = await this.supabase
       .from('questions')
-      .insert(createQuestionBodyToSupabaseQuestionInsert(question))
+      .insert(QuestionMapper.toInsert(question))
       .select()
       .single();
 
@@ -117,7 +112,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
       throw new QuestionServerError(error.message);
     }
 
-    return supabaseQuestionToQuestion(data);
+    return QuestionMapper.toDomain(data);
   }
 
   public async getQuestionById(questionId: string): Promise<Question> {
@@ -132,7 +127,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
       throw new QuestionServerError(error.message);
     }
 
-    return supabaseQuestionToQuestion(data);
+    return QuestionMapper.toDomain(data);
   }
 
   async deleteQuestionById(questionId: string): Promise<void> {
@@ -146,13 +141,14 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
       throw new QuestionServerError(error.message);
     }
   }
+
   async updateQuestionById(
     questionId: string,
     updates: QuestionUpdate,
   ): Promise<Question> {
     const { data, error } = await this.supabase
       .from('questions')
-      .update(questionUpdatesToSupabaseQuestionUpdate(updates))
+      .update(QuestionMapper.toUpdate(updates))
       .eq('id', questionId)
       .select()
       .single();
@@ -167,7 +163,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
       throw new QuestionServerError(error.message);
     }
 
-    return supabaseQuestionToQuestion(data);
+    return QuestionMapper.toDomain(data);
   }
 
   public async deleteCourseQuestionsByCourseId(

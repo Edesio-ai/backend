@@ -24,10 +24,7 @@ import {
   User,
 } from '../../../../domain/auth/types/auth.type';
 import { Teacher } from '../../../../domain/teaching/types/teacher.type';
-import {
-  createTeacherWithEstablishmentInsertPayload,
-  supabaseTeacherToTeacher,
-} from '../../teaching/mappers/teacher.mapper';
+import { TeacherMapper } from '../../teaching/mappers/teacher.mapper';
 import { UserMetadata } from '../../../../domain/auth/types/auth.type';
 import { SUPABASE_AUTH } from '../../supabase-auth.module';
 import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-toke.use-case';
@@ -192,7 +189,7 @@ export class AuthSupabaseRepository implements AuthRepository {
     const { data, error } = await this.supabaseAdmin
       .from('teachers')
       .insert(
-        createTeacherWithEstablishmentInsertPayload(
+        TeacherMapper.toInsertWithEstablishment(
           adminData.id,
           `${firstname} ${lastname}`,
           email,
@@ -208,7 +205,7 @@ export class AuthSupabaseRepository implements AuthRepository {
       throw new TeacherProfileCreationError(error.message);
     }
 
-    return supabaseTeacherToTeacher(data);
+    return TeacherMapper.toDomain(data);
   }
 
   private async updateTokenUsedAt(
