@@ -10,15 +10,9 @@ import {
   CourseWithSession,
 } from 'src/domain/teaching/types/course.type';
 import { CourseServerError } from 'src/domain/teaching/error';
-import {
-  courseCourseBodyToSupabaseCourseInsert,
-  mapFilesUrl,
-  supabaseCourseFileToCourseFile,
-  supabaseCourseToCourse,
-  supabaseValidatedQuestionsToValidatedQuestions,
-  updatesToSupabaseCourseUpdate,
-} from '../mappers/course.mapper';
-import { supabaseCourseWithSessionToCourseWithSession } from '../mappers/session.mapper';
+import { CourseMapper } from '../mappers/course.mapper';
+import { FileMapper } from '../mappers/file.mapper';
+import { SessionMapper } from '../mappers/session.mapper';
 
 export class CourseSupabaseRepository implements CourseRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
@@ -39,7 +33,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return supabaseCourseToCourse(data);
+    return CourseMapper.toDomain(data);
   }
 
   async getCoursesBySessionId(sessionId: string): Promise<SupabaseCourse[]> {
@@ -96,7 +90,7 @@ export class CourseSupabaseRepository implements CourseRepository {
   async createCourse(body: CreateCourseBody): Promise<Course> {
     const { data, error } = await this.supabase
       .from('courses')
-      .insert(courseCourseBodyToSupabaseCourseInsert(body))
+      .insert(CourseMapper.toInsert(body))
       .select()
       .single();
 
@@ -104,7 +98,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return supabaseCourseToCourse(data);
+    return CourseMapper.toDomain(data);
   }
 
   private async getCoursesFilesByCourseIds(
@@ -119,7 +113,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return mapFilesUrl(data);
+    return CourseMapper.fileUrlsToDomain(data);
   }
 
   private async deleteCoursesFilesFromStorage(files: string[]): Promise<void> {
@@ -183,7 +177,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return supabaseCourseFileToCourseFile(data);
+    return FileMapper.toDomain(data);
   }
 
   public async getCourseValidatedQuestions(
@@ -204,7 +198,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return supabaseValidatedQuestionsToValidatedQuestions(data);
+    return CourseMapper.validatedQuestionsToDomain(data);
   }
 
   public async getCourseFilesByCourseId(
@@ -224,7 +218,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return data.map(supabaseCourseFileToCourseFile);
+    return data.map(FileMapper.toDomain);
   }
 
   public async getCourseWithSessionById(
@@ -246,7 +240,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return supabaseCourseWithSessionToCourseWithSession(data);
+    return SessionMapper.courseWithSessionToDomain(data);
   }
 
   public async getSessionCoursesBySessionId(
@@ -268,7 +262,7 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return data ? data.map(supabaseCourseToCourse) : [];
+    return data ? data.map(CourseMapper.toDomain) : [];
   }
 
   public async getFileBufferFromStorage(filePath: string): Promise<Buffer> {
@@ -302,7 +296,7 @@ export class CourseSupabaseRepository implements CourseRepository {
   ): Promise<Course> {
     const { data, error } = await this.supabase
       .from('courses')
-      .update(updatesToSupabaseCourseUpdate(updates))
+      .update(CourseMapper.toUpdate(updates))
       .eq('id', courseId)
       .select()
       .single();
@@ -312,6 +306,6 @@ export class CourseSupabaseRepository implements CourseRepository {
       throw new CourseServerError(error.message);
     }
 
-    return supabaseCourseToCourse(data);
+    return CourseMapper.toDomain(data);
   }
 }

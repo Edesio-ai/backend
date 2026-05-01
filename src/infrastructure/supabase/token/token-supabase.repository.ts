@@ -5,7 +5,7 @@ import { SUPABASE_ADMIN } from '../supabase.module';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { TokenRepository } from 'src/domain/token/contract/token.repository';
 import { InvitationTokenBadRequestError } from 'src/domain/auth/errors/auth.errors';
-import { supabaseInvitationTokenRowToInvitationToken } from '../teaching/mappers/establishment.mapper';
+import { EstablishmentMapper } from '../teaching/mappers/establishment.mapper';
 
 export class TokenSupabaseRepository implements TokenRepository {
   constructor(
@@ -35,7 +35,7 @@ export class TokenSupabaseRepository implements TokenRepository {
       throw new ServerTokenError(error.message);
     }
 
-    return supabaseInvitationTokenRowToInvitationToken(data);
+    return EstablishmentMapper.invitationTokenToDomain(data);
   }
 
   public async markInvitationTokenAsUsed(

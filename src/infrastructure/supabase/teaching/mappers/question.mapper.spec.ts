@@ -1,12 +1,8 @@
-import {
-  createQuestionBodyToSupabaseQuestionInsert,
-  questionUpdatesToSupabaseQuestionUpdate,
-  supabaseQuestionToQuestion,
-} from './question.mapper';
+import { QuestionMapper } from './question.mapper';
 import { SupabaseQuestion } from 'src/domain/teaching/types/question.type';
 
-describe('question.mapper', () => {
-  describe('supabaseQuestionToQuestion', () => {
+describe('QuestionMapper', () => {
+  describe('toDomain', () => {
     it('maps snake_case row to domain Question', () => {
       const row: SupabaseQuestion = {
         id: 'q-1',
@@ -20,7 +16,7 @@ describe('question.mapper', () => {
         position_order: 1,
       };
 
-      expect(supabaseQuestionToQuestion(row)).toEqual({
+      expect(QuestionMapper.toDomain(row)).toEqual({
         id: 'q-1',
         courseId: 'c-1',
         type: 'single',
@@ -34,10 +30,10 @@ describe('question.mapper', () => {
     });
   });
 
-  describe('createQuestionBodyToSupabaseQuestionInsert', () => {
+  describe('toInsert', () => {
     it('maps create body to Supabase insert columns', () => {
       expect(
-        createQuestionBodyToSupabaseQuestionInsert({
+        QuestionMapper.toInsert({
           courseId: 'c-1',
           type: 'open',
           questionText: 'Votre avis ?',
@@ -59,7 +55,7 @@ describe('question.mapper', () => {
 
     it('defaults omitted optional fields to null', () => {
       expect(
-        createQuestionBodyToSupabaseQuestionInsert({
+        QuestionMapper.toInsert({
           courseId: 'c-1',
           type: 'single',
           questionText: 'OK',
@@ -76,10 +72,10 @@ describe('question.mapper', () => {
     });
   });
 
-  describe('questionUpdatesToSupabaseQuestionUpdate', () => {
+  describe('toUpdate', () => {
     it('maps only provided camelCase keys to snake_case', () => {
       expect(
-        questionUpdatesToSupabaseQuestionUpdate({
+        QuestionMapper.toUpdate({
           questionText: 'Nouveau libellé',
           correctAnswers: ['a'],
         }),
@@ -90,12 +86,12 @@ describe('question.mapper', () => {
     });
 
     it('returns empty object when no fields are set', () => {
-      expect(questionUpdatesToSupabaseQuestionUpdate({})).toEqual({});
+      expect(QuestionMapper.toUpdate({})).toEqual({});
     });
 
     it('maps all fields correctly when all are provided', () => {
       expect(
-        questionUpdatesToSupabaseQuestionUpdate({
+        QuestionMapper.toUpdate({
           type: 'multiple',
           questionText: 'Quel est 2+2 ?',
           proposals: ['2', '4', '6', '8'],
@@ -114,27 +110,21 @@ describe('question.mapper', () => {
     });
 
     it('maps only type when only type is provided', () => {
-      expect(questionUpdatesToSupabaseQuestionUpdate({ type: 'open' })).toEqual(
-        { type: 'open' },
-      );
+      expect(QuestionMapper.toUpdate({ type: 'open' })).toEqual({
+        type: 'open',
+      });
     });
 
     it('maps only positionOrder when only positionOrder is provided', () => {
-      expect(
-        questionUpdatesToSupabaseQuestionUpdate({ positionOrder: 5 }),
-      ).toEqual({ position_order: 5 });
+      expect(QuestionMapper.toUpdate({ positionOrder: 5 })).toEqual({
+        position_order: 5,
+      });
     });
 
     it('maps null values for proposals and correctAnswers', () => {
       expect(
-        questionUpdatesToSupabaseQuestionUpdate({
-          proposals: null,
-          correctAnswers: null,
-        }),
-      ).toEqual({
-        proposals: null,
-        correct_answers: null,
-      });
+        QuestionMapper.toUpdate({ proposals: null, correctAnswers: null }),
+      ).toEqual({ proposals: null, correct_answers: null });
     });
   });
 });

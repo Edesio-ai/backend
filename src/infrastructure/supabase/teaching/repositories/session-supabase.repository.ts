@@ -7,11 +7,7 @@ import {
   UpdateSessionNameBody,
 } from '../../../../domain/teaching/types/session.type';
 import { SessionServerError } from '../../../../domain/teaching/error';
-import {
-  createSessionBodyToSupabaseSessionInsert,
-  supabaseSessionToSession,
-  updateSessionNameBodyToSupabaseSessionUpdate,
-} from '../mappers/session.mapper';
+import { SessionMapper } from '../mappers/session.mapper';
 
 export class SupabaseSessionRepository implements SessionRepository {
   constructor(
@@ -30,7 +26,7 @@ export class SupabaseSessionRepository implements SessionRepository {
       throw new SessionServerError(error.message);
     }
 
-    return (data ?? []).map(supabaseSessionToSession);
+    return (data ?? []).map(SessionMapper.toDomain);
   }
 
   public async getSessionByCode(code: string): Promise<Session | null> {
@@ -45,17 +41,13 @@ export class SupabaseSessionRepository implements SessionRepository {
       throw new SessionServerError(error.message);
     }
 
-    if (!data) {
-      return null;
-    }
-
-    return supabaseSessionToSession(data);
+    return data ? SessionMapper.toDomain(data) : null;
   }
 
   public async createSession(body: CreateSessionBody): Promise<Session> {
     const { data, error } = await this.supabase
       .from('sessions')
-      .insert(createSessionBodyToSupabaseSessionInsert(body))
+      .insert(SessionMapper.toInsert(body))
       .select()
       .single();
 
@@ -63,7 +55,7 @@ export class SupabaseSessionRepository implements SessionRepository {
       throw new SessionServerError(error.message);
     }
 
-    return supabaseSessionToSession(data);
+    return SessionMapper.toDomain(data);
   }
 
   public async updateSessionName(
@@ -72,7 +64,7 @@ export class SupabaseSessionRepository implements SessionRepository {
   ): Promise<Session> {
     const { data, error } = await this.supabase
       .from('sessions')
-      .update(updateSessionNameBodyToSupabaseSessionUpdate(body))
+      .update(SessionMapper.toUpdate(body))
       .eq('id', sessionId)
       .eq('teacher_id', body.teacherId)
       .select()
@@ -82,7 +74,7 @@ export class SupabaseSessionRepository implements SessionRepository {
       throw new SessionServerError(error.message);
     }
 
-    return supabaseSessionToSession(data);
+    return SessionMapper.toDomain(data);
   }
 
   async deleteSessionByTeacherId(
@@ -111,6 +103,6 @@ export class SupabaseSessionRepository implements SessionRepository {
       throw new SessionServerError(error.message);
     }
 
-    return data ? supabaseSessionToSession(data) : null;
+    return data ? SessionMapper.toDomain(data) : null;
   }
 }

@@ -6,13 +6,8 @@ import {
   Teacher,
   TeacherSession,
 } from '../../../../domain/teaching/types/teacher.type';
-import {
-  conditionToSupabaseCondition,
-  createTeacherInsertPayload,
-  linkTeacherEstablishmentUpdatePayload,
-  supabaseTeacherSessionsToTeacherSessions,
-  supabaseTeacherToTeacher,
-} from '../mappers/teacher.mapper';
+import { TeacherMapper } from '../mappers/teacher.mapper';
+import { mapList } from '../../common/mapper.util';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 export class TeacherSupabaseRepository implements TeacherRepository {
@@ -32,7 +27,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
     if (error) {
       throw new TeacheServerError(error.message);
     }
-    return (data ?? []).map(supabaseTeacherToTeacher);
+    return (data ?? []).map(TeacherMapper.toDomain);
   }
 
   public async getTeachersSessionsByIds(
@@ -51,7 +46,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
     if (error) {
       throw new TeacheServerError(error.message);
     }
-    return supabaseTeacherSessionsToTeacherSessions(data ?? []);
+    return mapList(data ?? [], TeacherMapper.sessionToDomain);
   }
 
   public async getTeacherByUserId(userId: string): Promise<Teacher | null> {
@@ -65,11 +60,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       throw new TeacheServerError(error.message);
     }
 
-    if (!data) {
-      return null;
-    }
-
-    return supabaseTeacherToTeacher(data);
+    return data ? TeacherMapper.toDomain(data) : null;
   }
 
   public async createTeacher(
@@ -79,7 +70,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
   ): Promise<Teacher | null> {
     const { data, error } = await this.supabase
       .from('teachers')
-      .insert(createTeacherInsertPayload(userId, name, email))
+      .insert(TeacherMapper.toInsert(userId, name, email))
       .select()
       .single();
 
@@ -87,7 +78,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       throw new TeacheServerError(error.message);
     }
 
-    return supabaseTeacherToTeacher(data);
+    return TeacherMapper.toDomain(data);
   }
 
   public async linkTeacherToEstablishment(
@@ -97,7 +88,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
   ): Promise<void> {
     const { error } = await this.supabase
       .from('teachers')
-      .update(linkTeacherEstablishmentUpdatePayload(establishmentId))
+      .update(TeacherMapper.toEstablishmentUpdate(establishmentId))
       .eq('id', teacherId);
 
     if (error) {
@@ -114,7 +105,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
   ): Promise<Teacher | null> {
     let query = this.supabase.from('teachers').select('*');
 
-    const formatedConditions = conditionToSupabaseCondition(conditions);
+    const formatedConditions = TeacherMapper.toCondition(conditions);
     for (const [key, value] of Object.entries(formatedConditions)) {
       query = query.eq(key, value);
     }
@@ -129,6 +120,6 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       throw new ServerError(error.message);
     }
 
-    return data ? supabaseTeacherToTeacher(data) : null;
+    return data ? TeacherMapper.toDomain(data) : null;
   }
 }

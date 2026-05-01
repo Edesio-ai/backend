@@ -1,13 +1,8 @@
 import { Inject } from '@nestjs/common';
 import { StudentRepository } from '../../../../domain/teaching/interface/student.repository';
 import { SUPABASE_ADMIN } from '../../supabase.module';
-import {
-  insertStudentToSupabaseStudentInsert,
-  studentJoinedSessionsToStudentJoinedSessions,
-  supabaseStudentCourseStatsToStudentCourseStats,
-  supabaseStudentSessionsToStudentSessions,
-  supabaseStudentToStudent,
-} from '../mappers/student.mapper';
+import { StudentMapper } from '../mappers/student.mapper';
+import { mapList } from '../../common/mapper.util';
 import {
   InsertStudent,
   Student,
@@ -42,7 +37,7 @@ export class StudentSupabaseRepository implements StudentRepository {
       );
       throw new ServerError(error.message);
     }
-    return supabaseStudentSessionsToStudentSessions(data ?? []);
+    return mapList(data ?? [], StudentMapper.sessionToDomain);
   }
 
   public async deleteStudentSessionsBySessionId(
@@ -92,7 +87,7 @@ export class StudentSupabaseRepository implements StudentRepository {
       );
       throw new ServerError(error.message);
     }
-    return supabaseStudentCourseStatsToStudentCourseStats(data ?? []);
+    return mapList(data ?? [], StudentMapper.courseStatToDomain);
   }
 
   public async deleteStudentCourseStatsByCourseId(
@@ -128,7 +123,7 @@ export class StudentSupabaseRepository implements StudentRepository {
       );
       throw new ServerError(error.message);
     }
-    return data ? supabaseStudentToStudent(data) : null;
+    return data ? StudentMapper.toDomain(data) : null;
   }
 
   public async createStudent(user: AuthUser): Promise<Student> {
@@ -145,7 +140,7 @@ export class StudentSupabaseRepository implements StudentRepository {
 
     const { data, error } = await this.supabase
       .from('students')
-      .insert(insertStudentToSupabaseStudentInsert(studentDataToInsert))
+      .insert(StudentMapper.toInsert(studentDataToInsert))
       .select()
       .single();
 
@@ -158,7 +153,7 @@ export class StudentSupabaseRepository implements StudentRepository {
       throw new ServerError(error.message);
     }
 
-    return supabaseStudentToStudent(data);
+    return StudentMapper.toDomain(data);
   }
 
   public async getStudentJoinedSessions(
@@ -178,7 +173,7 @@ export class StudentSupabaseRepository implements StudentRepository {
       );
       throw new ServerError(error.message);
     }
-    return studentJoinedSessionsToStudentJoinedSessions(data ?? []);
+    return mapList(data ?? [], StudentMapper.joinedSessionToDomain);
   }
 
   public async createStudentSession(

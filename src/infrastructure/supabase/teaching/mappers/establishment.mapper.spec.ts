@@ -1,13 +1,9 @@
-import {
-  createEstablishmentBodyToSupabaseEstablishmentInsert,
-  supabaseEstablishmentToEstablishment,
-  supabaseInvitationTokenRowToInvitationToken,
-} from './establishment.mapper';
+import { EstablishmentMapper } from './establishment.mapper';
 import { SupabaseInvitationTokenRow } from 'src/domain/auth/invitation.type';
 import { SupabaseEstablishment } from 'src/domain/establishment/establishment.type';
 
-describe('establishment.mapper', () => {
-  describe('supabaseEstablishmentToEstablishment', () => {
+describe('EstablishmentMapper', () => {
+  describe('toDomain', () => {
     it('maps snake_case row to domain Establishment', () => {
       const row: SupabaseEstablishment = {
         id: 'est-1',
@@ -17,7 +13,7 @@ describe('establishment.mapper', () => {
         created_at: '2026-01-01T00:00:00.000Z',
       };
 
-      expect(supabaseEstablishmentToEstablishment(row)).toEqual({
+      expect(EstablishmentMapper.toDomain(row)).toEqual({
         id: 'est-1',
         supabaseUserId: 'user-1',
         name: 'Academy',
@@ -27,10 +23,10 @@ describe('establishment.mapper', () => {
     });
   });
 
-  describe('createEstablishmentBodyToSupabaseEstablishmentInsert', () => {
+  describe('toInsert', () => {
     it('maps create body to Supabase insert columns', () => {
       expect(
-        createEstablishmentBodyToSupabaseEstablishmentInsert({
+        EstablishmentMapper.toInsert({
           supabaseUserId: 'user-2',
           name: 'New',
           email: 'new@edesio.io',
@@ -43,7 +39,7 @@ describe('establishment.mapper', () => {
     });
   });
 
-  describe('supabaseInvitationTokenRowToInvitationToken', () => {
+  describe('invitationTokenToDomain', () => {
     it('maps invitation_tokens row to InvitationToken', () => {
       const row: SupabaseInvitationTokenRow = {
         id: 'token-1',
@@ -57,7 +53,7 @@ describe('establishment.mapper', () => {
         assigned_chatbots: 2,
       };
 
-      expect(supabaseInvitationTokenRowToInvitationToken(row)).toEqual({
+      expect(EstablishmentMapper.invitationTokenToDomain(row)).toEqual({
         id: 'token-1',
         establishmentId: 'est-1',
         token: 'abc',

@@ -1,14 +1,9 @@
-import {
-  createSessionBodyToSupabaseSessionInsert,
-  supabaseCourseWithSessionToCourseWithSession,
-  supabaseSessionToSession,
-  updateSessionNameBodyToSupabaseSessionUpdate,
-} from './session.mapper';
+import { SessionMapper } from './session.mapper';
 import { SupabaseSession } from 'src/domain/teaching/types/session.type';
 import { SupabaseCourseWithSession } from 'src/domain/teaching/types/course.type';
 
-describe('session.mapper', () => {
-  describe('supabaseSessionToSession', () => {
+describe('SessionMapper', () => {
+  describe('toDomain', () => {
     it('maps snake_case row to domain Session', () => {
       const row: SupabaseSession = {
         id: 's-1',
@@ -19,7 +14,7 @@ describe('session.mapper', () => {
         created_at: '2026-01-01T00:00:00.000Z',
       };
 
-      expect(supabaseSessionToSession(row)).toEqual({
+      expect(SessionMapper.toDomain(row)).toEqual({
         id: 's-1',
         teacherId: 't-1',
         name: 'Cours',
@@ -30,10 +25,10 @@ describe('session.mapper', () => {
     });
   });
 
-  describe('createSessionBodyToSupabaseSessionInsert', () => {
+  describe('toInsert', () => {
     it('maps create body to Supabase insert columns', () => {
       expect(
-        createSessionBodyToSupabaseSessionInsert({
+        SessionMapper.toInsert({
           teacherId: 't-1',
           name: 'N',
           code: 'CODE',
@@ -48,10 +43,10 @@ describe('session.mapper', () => {
     });
   });
 
-  describe('updateSessionNameBodyToSupabaseSessionUpdate', () => {
+  describe('toUpdate', () => {
     it('maps update body to patch payload', () => {
       expect(
-        updateSessionNameBodyToSupabaseSessionUpdate({
+        SessionMapper.toUpdate({
           name: 'Renommé',
           teacherId: 't-1',
         }),
@@ -59,7 +54,7 @@ describe('session.mapper', () => {
     });
   });
 
-  describe('supabaseCourseWithSessionToCourseWithSession', () => {
+  describe('courseWithSessionToDomain', () => {
     it('maps a full row (with nested teachers) to a CourseWithSession domain object', () => {
       const row: SupabaseCourseWithSession = {
         id: 'c-1',
@@ -86,7 +81,7 @@ describe('session.mapper', () => {
         },
       };
 
-      expect(supabaseCourseWithSessionToCourseWithSession(row)).toEqual({
+      expect(SessionMapper.courseWithSessionToDomain(row)).toEqual({
         id: 'c-1',
         title: 'Cours',
         description: 'Desc',
@@ -120,7 +115,7 @@ describe('session.mapper', () => {
         sessions: {},
       };
 
-      const result = supabaseCourseWithSessionToCourseWithSession(row);
+      const result = SessionMapper.courseWithSessionToDomain(row);
 
       expect(result.session.id).toBe('');
       expect(result.session.teacherId).toBe('');
