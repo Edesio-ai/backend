@@ -29,7 +29,9 @@ export const EstablishmentMapper = {
     email: body.email,
   }),
 
-  invitationTokenToDomain: (row: SupabaseInvitationTokenRow): InvitationToken => ({
+  invitationTokenToDomain: (
+    row: SupabaseInvitationTokenRow,
+  ): InvitationToken => ({
     id: row.id,
     establishmentId: row.establishment_id,
     token: row.token,

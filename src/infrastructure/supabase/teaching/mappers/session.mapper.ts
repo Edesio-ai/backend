@@ -37,7 +37,9 @@ export const SessionMapper = {
     name: body.name,
   }),
 
-  courseWithSessionToDomain: (row: SupabaseCourseWithSession): CourseWithSession => ({
+  courseWithSessionToDomain: (
+    row: SupabaseCourseWithSession,
+  ): CourseWithSession => ({
     id: row.id,
     title: row.title,
     description: row.description,

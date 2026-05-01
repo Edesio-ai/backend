@@ -64,7 +64,13 @@ describe('TeacherMapper', () => {
   describe('toInsertWithEstablishment', () => {
     it('builds insert with establishment', () => {
       expect(
-        TeacherMapper.toInsertWithEstablishment('u1', 'A B', 'E@X.COM', 'est-1', 2),
+        TeacherMapper.toInsertWithEstablishment(
+          'u1',
+          'A B',
+          'E@X.COM',
+          'est-1',
+          2,
+        ),
       ).toEqual({
         supabase_user_id: 'u1',
         name: 'A B',
@@ -104,7 +110,10 @@ describe('TeacherMapper', () => {
 
     it('converts multiple conditions at once', () => {
       expect(
-        TeacherMapper.toCondition({ id: 'teacher-1', establishmentId: 'est-1' }),
+        TeacherMapper.toCondition({
+          id: 'teacher-1',
+          establishmentId: 'est-1',
+        }),
       ).toEqual({
         id: 'teacher-1',
         establishment_id: 'est-1',

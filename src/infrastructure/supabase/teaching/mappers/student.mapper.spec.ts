@@ -73,14 +73,24 @@ describe('StudentMapper', () => {
           attempted_questions: 5,
           correct_answers: 3,
           last_attempt_at: '2026-01-01T10:00:00.000Z',
-          students: { id: 'stu-1', name: 'Bob', email: 'bob@x.com', photo_url: '' },
+          students: {
+            id: 'stu-1',
+            name: 'Bob',
+            email: 'bob@x.com',
+            photo_url: '',
+          },
         },
         {
           student_id: 'stu-2',
           attempted_questions: 0,
           correct_answers: 0,
           last_attempt_at: '2026-01-02T00:00:00.000Z',
-          students: { id: 'stu-2', name: 'Eve', email: 'eve@x.com', photo_url: 'https://x/e.png' },
+          students: {
+            id: 'stu-2',
+            name: 'Eve',
+            email: 'eve@x.com',
+            photo_url: 'https://x/e.png',
+          },
         },
       ];
 

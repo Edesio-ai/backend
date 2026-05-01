@@ -33,9 +33,12 @@ export const CourseMapper = {
   toUpdate: (updates: Record<string, unknown>): Record<string, unknown> => {
     const row: Record<string, unknown> = {};
     if (updates.title !== undefined) row.title = updates.title;
-    if (updates.description !== undefined) row.description = updates.description;
-    if (updates.contentText !== undefined) row.text_content = updates.contentText;
-    if (updates.positionOrder !== undefined) row.position_order = updates.positionOrder;
+    if (updates.description !== undefined)
+      row.description = updates.description;
+    if (updates.contentText !== undefined)
+      row.text_content = updates.contentText;
+    if (updates.positionOrder !== undefined)
+      row.position_order = updates.positionOrder;
     if (updates.validatedQuestions !== undefined)
       row.validated_questions = updates.validatedQuestions;
     return row;

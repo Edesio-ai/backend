@@ -63,7 +63,10 @@ describe('CourseMapper', () => {
   describe('fileUrlsToDomain', () => {
     it('maps file_url to fileUrl', () => {
       expect(
-        CourseMapper.fileUrlsToDomain([{ file_url: 'a.pdf' }, { file_url: 'b.pdf' }]),
+        CourseMapper.fileUrlsToDomain([
+          { file_url: 'a.pdf' },
+          { file_url: 'b.pdf' },
+        ]),
       ).toEqual([{ fileUrl: 'a.pdf' }, { fileUrl: 'b.pdf' }]);
     });
 
@@ -144,9 +147,9 @@ describe('CourseMapper', () => {
     });
 
     it('ignores unknown fields', () => {
-      expect(
-        CourseMapper.toUpdate({ unknownField: 'x', title: 'T' }),
-      ).toEqual({ title: 'T' });
+      expect(CourseMapper.toUpdate({ unknownField: 'x', title: 'T' })).toEqual({
+        title: 'T',
+      });
     });
   });
 });

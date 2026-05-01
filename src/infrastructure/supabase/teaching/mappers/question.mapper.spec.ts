@@ -110,7 +110,9 @@ describe('QuestionMapper', () => {
     });
 
     it('maps only type when only type is provided', () => {
-      expect(QuestionMapper.toUpdate({ type: 'open' })).toEqual({ type: 'open' });
+      expect(QuestionMapper.toUpdate({ type: 'open' })).toEqual({
+        type: 'open',
+      });
     });
 
     it('maps only positionOrder when only positionOrder is provided', () => {

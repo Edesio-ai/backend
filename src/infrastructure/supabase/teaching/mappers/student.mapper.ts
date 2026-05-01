@@ -26,7 +26,9 @@ export const StudentMapper = {
     studentId: row.student_id,
   }),
 
-  courseStatToDomain: (row: SupabaseStudentCourseStats): StudentCourseStats => ({
+  courseStatToDomain: (
+    row: SupabaseStudentCourseStats,
+  ): StudentCourseStats => ({
     studentId: row.student_id,
     attemptedQuestions: row.attempted_questions,
     correctAnswers: row.correct_answers,
@@ -39,7 +41,9 @@ export const StudentMapper = {
     },
   }),
 
-  joinedSessionToDomain: (row: SupabaseStudentJoinedSession): StudentJoinedSession => ({
+  joinedSessionToDomain: (
+    row: SupabaseStudentJoinedSession,
+  ): StudentJoinedSession => ({
     id: row.sessions.id,
     teacherId: row.sessions.teacher_id,
     name: row.sessions.name,
