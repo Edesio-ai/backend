@@ -1,9 +1,11 @@
 import {
   InsertStudent,
+  SessionStudent,
   Student,
   StudentCourseStats,
   StudentJoinedSession,
   StudentSession,
+  SupabaseSessionStudent,
   SupabaseStudent,
   SupabaseStudentCourseStats,
   SupabaseStudentInsert,
@@ -58,4 +60,14 @@ export const StudentMapper = {
     name: body.name,
     email: body.email,
   }),
+
+  studentSessionToDomain: (row: SupabaseSessionStudent): SessionStudent => {
+    return {
+      id: row.students.id,
+      name: row.students.name,
+      email: row.students.email,
+      photoUrl: row.students.photo_url,
+      joinedAt: row.joined_at,
+    };
+  },
 };

@@ -7,15 +7,19 @@ import { CreateStudentUseCase } from 'src/application/student/create-student.use
 import { GetStudentJoinedSessionsUseCase } from 'src/application/student/get-student-joined-sessions.use-case';
 import { JoinSessionByCodeUseCase } from 'src/application/student/join-session-by-code.use-case';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
+import { GetSessionStudentUseCase } from 'src/application/student/get-session-student.use-case';
+import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
 
 @Module({
   imports: [
     AuthPersistenceModule,
     StudentPersistenceModule,
     SessionsPersistenceModule,
+    TeacherPersistenceModule,
   ],
   controllers: [StudentController],
   providers: [
+    GetSessionStudentUseCase,
     GetStudentByUserIdUseCase,
     CreateStudentUseCase,
     GetStudentJoinedSessionsUseCase,

@@ -16,8 +16,12 @@ import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { GlobalErrorFilter } from 'src/presentation/filters/shared.filter';
 import { CreateStudentUseCase } from 'src/application/student/create-student.use-case';
 import { GetStudentJoinedSessionsUseCase } from 'src/application/student/get-student-joined-sessions.use-case';
-import { StudentJoinedSession } from 'src/domain/teaching/types/student.type';
+import {
+  SessionStudent,
+  StudentJoinedSession,
+} from 'src/domain/teaching/types/student.type';
 import { JoinSessionByCodeUseCase } from 'src/application/student/join-session-by-code.use-case';
+import { GetSessionStudentUseCase } from 'src/application/student/get-session-student.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')
@@ -29,6 +33,7 @@ export class StudentController {
     private readonly createStudentUseCase: CreateStudentUseCase,
     private readonly getStudentJoinedSessionsUseCase: GetStudentJoinedSessionsUseCase,
     private readonly joinSessionByCodeUseCase: JoinSessionByCodeUseCase,
+    private readonly getSessionStudentUseCase: GetSessionStudentUseCase,
   ) {}
 
   @Get()
@@ -61,5 +66,20 @@ export class StudentController {
   ): Promise<void> {
     const { user } = req;
     await this.joinSessionByCodeUseCase.execute(code, user.id);
+  }
+
+  @Roles('teacher')
+  @Get('/session/:sessionId')
+  async getStudentSessions(
+    @Param('sessionId') sessionId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<SessionStudent[]> {
+    const { user } = req;
+
+    const students = await this.getSessionStudentUseCase.execute(
+      sessionId,
+      user.id,
+    );
+    return students ?? [];
   }
 }

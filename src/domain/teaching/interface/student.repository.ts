@@ -4,6 +4,7 @@ import type {
   StudentCourseStats,
   StudentJoinedSession,
   StudentSession,
+  SessionStudent,
 } from '../types/student.type';
 
 export const STUDENT_REPOSITORY = Symbol('STUDENT_REPOSITORY');
@@ -13,6 +14,10 @@ export interface StudentRepository {
   getStudentJoinedSessions(studentId: string): Promise<StudentJoinedSession[]>;
   getStudentByUserId(userId: string): Promise<Student | null>;
   getStudentsSessionsByIds(sessionIds: string[]): Promise<StudentSession[]>;
+  getStudentsSessionsById(
+    sessionId: string,
+    select: string,
+  ): Promise<SessionStudent[]>;
   deleteStudentSessionsBySessionId(sessionId: string): Promise<void>;
   getStudentStatsByCourseId(courseId: string): Promise<StudentCourseStats[]>;
   deleteStudentCourseStatsByCourseId(courseId: string): Promise<void>;
