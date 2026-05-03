@@ -69,3 +69,12 @@ export type SupabaseStudentJoinedSession = {
 export type StudentJoinedSession = Session & {
   joinedAt: string;
 };
+
+export type SupabaseSessionStudent = {
+  joined_at: string;
+  students: Omit<SupabaseStudent, 'supabase_user_id' | 'created_at'>;
+};
+
+export type SessionStudent = Omit<Student, 'supabaseUserId' | 'createdAt'> & {
+  joinedAt: string;
+};

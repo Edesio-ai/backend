@@ -5,6 +5,7 @@ import { StudentMapper } from '../mappers/student.mapper';
 import { mapList } from '../../common/mapper.util';
 import {
   InsertStudent,
+  SessionStudent,
   Student,
   StudentCourseStats,
   StudentJoinedSession,
@@ -192,5 +193,25 @@ export class StudentSupabaseRepository implements StudentRepository {
       );
       throw new ServerError(error.message);
     }
+  }
+
+  public async getStudentsSessionsById(
+    sessionId: string,
+    select: string = '*',
+  ): Promise<SessionStudent[]> {
+    const { data, error } = await this.supabase
+      .from('student_sessions')
+      .select(select)
+      .eq('session_id', sessionId);
+
+    if (error) {
+      console.error(
+        'An error occurred while getting students sessions by id',
+        sessionId,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+    return mapList(data ?? [], StudentMapper.studentSessionToDomain);
   }
 }

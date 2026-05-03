@@ -4,6 +4,7 @@ import {
   SupabaseStudentSession,
   SupabaseStudentCourseStats,
   SupabaseStudentJoinedSession,
+  SupabaseSessionStudent,
 } from 'src/domain/teaching/types/student.type';
 
 describe('StudentMapper', () => {
@@ -156,6 +157,77 @@ describe('StudentMapper', () => {
       expect(result[0].id).toBe('session-2');
       expect(result[0].joinedAt).toBe('2026-02-01T00:00:00.000Z');
       expect(result[1].id).toBe('session-1');
+    });
+  });
+
+  describe('studentSessionToDomain', () => {
+    it('maps a SupabaseSessionStudent row to a flat SessionStudent', () => {
+      const row: SupabaseSessionStudent = {
+        joined_at: '2026-01-15T10:00:00.000Z',
+        students: {
+          id: 'student-1',
+          name: 'Alice',
+          email: 'alice@school.com',
+          photo_url: 'https://x/a.png',
+        },
+      };
+
+      expect(StudentMapper.studentSessionToDomain(row)).toEqual({
+        id: 'student-1',
+        name: 'Alice',
+        email: 'alice@school.com',
+        photoUrl: 'https://x/a.png',
+        joinedAt: '2026-01-15T10:00:00.000Z',
+      });
+    });
+
+    it('returns an empty array for empty input via mapList', () => {
+      expect(mapList([], StudentMapper.studentSessionToDomain)).toEqual([]);
+    });
+
+    it('maps multiple rows preserving order via mapList', () => {
+      const rows: SupabaseSessionStudent[] = [
+        {
+          joined_at: '2026-01-15T10:00:00.000Z',
+          students: {
+            id: 'student-1',
+            name: 'Alice',
+            email: 'alice@school.com',
+            photo_url: 'https://x/a.png',
+          },
+        },
+        {
+          joined_at: '2026-01-16T08:00:00.000Z',
+          students: {
+            id: 'student-2',
+            name: 'Bob',
+            email: 'bob@school.com',
+            photo_url: '',
+          },
+        },
+      ];
+
+      const result = mapList(rows, StudentMapper.studentSessionToDomain);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('student-1');
+      expect(result[0].joinedAt).toBe('2026-01-15T10:00:00.000Z');
+      expect(result[1].id).toBe('student-2');
+      expect(result[1].photoUrl).toBe('');
+    });
+
+    it('handles an empty photo_url correctly', () => {
+      const row: SupabaseSessionStudent = {
+        joined_at: '2026-01-15T10:00:00.000Z',
+        students: {
+          id: 'student-3',
+          name: 'Charlie',
+          email: 'charlie@school.com',
+          photo_url: '',
+        },
+      };
+
+      expect(StudentMapper.studentSessionToDomain(row).photoUrl).toBe('');
     });
   });
 });
