@@ -9,6 +9,8 @@ import { JoinSessionByCodeUseCase } from 'src/application/student/join-session-b
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
 import { GetSessionStudentUseCase } from 'src/application/student/get-session-student.use-case';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
+import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
+import { GetStudentBatchUseCase } from 'src/application/student/get-student-batch.use-case';
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/m
     StudentPersistenceModule,
     SessionsPersistenceModule,
     TeacherPersistenceModule,
+    EstablishmentPersistenceModule,
   ],
   controllers: [StudentController],
   providers: [
@@ -24,6 +27,7 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/m
     CreateStudentUseCase,
     GetStudentJoinedSessionsUseCase,
     JoinSessionByCodeUseCase,
+    GetStudentBatchUseCase,
   ],
 })
 export class StudentModule {}

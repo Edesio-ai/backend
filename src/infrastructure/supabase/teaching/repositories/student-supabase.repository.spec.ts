@@ -220,6 +220,33 @@ describe('StudentSupabaseRepository', () => {
     ).rejects.toBeInstanceOf(ServerError);
   });
 
+  // ─── getStudentsByIds ────────────────────────────────────────────────────────
+
+  it('should return mapped students for given ids', async () => {
+    fixtures.whenStudentsByIdsQueryReturnsData();
+
+    const result = await fixtures.whenGetStudentsByIds();
+
+    fixtures.thenStudentsByIdsQueryBuilt();
+    expect(result).toEqual(fixtures.expectedStudentsBatch);
+  });
+
+  it('should return an empty array when no students match the ids', async () => {
+    fixtures.whenStudentsByIdsQueryReturnsEmpty();
+
+    const result = await fixtures.whenGetStudentsByIds();
+
+    expect(result).toEqual([]);
+  });
+
+  it('should throw ServerError when getStudentsByIds query fails', async () => {
+    fixtures.whenStudentsByIdsQueryFails();
+
+    await expect(fixtures.whenGetStudentsByIds()).rejects.toBeInstanceOf(
+      ServerError,
+    );
+  });
+
   // ─── getStudentsSessionsById ─────────────────────────────────────────────────
 
   it('should return mapped session students for a session id', async () => {
@@ -338,6 +365,44 @@ class Fixtures {
     },
   ];
 
+  public readonly studentBatchIds = ['student-1', 'student-2'];
+  public readonly studentsBatchSupabaseRows = [
+    {
+      id: 'student-1',
+      supabase_user_id: 'user-1',
+      name: 'Alice Dupont',
+      email: 'alice@school.com',
+      created_at: '2026-01-01T00:00:00.000Z',
+      photo_url: 'https://x/a.png',
+    },
+    {
+      id: 'student-2',
+      supabase_user_id: 'user-2',
+      name: 'Bob Martin',
+      email: 'bob@school.com',
+      created_at: '2026-01-02T00:00:00.000Z',
+      photo_url: '',
+    },
+  ];
+  public readonly expectedStudentsBatch = [
+    {
+      id: 'student-1',
+      supabaseUserId: 'user-1',
+      name: 'Alice Dupont',
+      email: 'alice@school.com',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      photoUrl: 'https://x/a.png',
+    },
+    {
+      id: 'student-2',
+      supabaseUserId: 'user-2',
+      name: 'Bob Martin',
+      email: 'bob@school.com',
+      createdAt: '2026-01-02T00:00:00.000Z',
+      photoUrl: '',
+    },
+  ];
+
   public readonly courseIdForStats = 'course-stats-1';
   public readonly studentStatsSupabaseRows = [
     {
@@ -420,6 +485,12 @@ class Fixtures {
   // createStudentSession chain: .insert(...)
   public readonly createStudentSessionInsertMock = jest.fn();
 
+  // getStudentsByIds chain: .select('*').in('id', ids)
+  private readonly studentsByIdsInMock = jest.fn();
+  private readonly studentsByIdsSelectMock = jest.fn(() => ({
+    in: this.studentsByIdsInMock,
+  }));
+
   private mode:
     | 'select'
     | 'delete'
@@ -429,7 +500,8 @@ class Fixtures {
     | 'create-student'
     | 'joined-sessions'
     | 'create-student-session'
-    | 'session-students' = 'select';
+    | 'session-students'
+    | 'get-students-by-ids' = 'select';
 
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'student_course_stats') {
@@ -441,6 +513,9 @@ class Fixtures {
     if (table === 'students') {
       if (this.mode === 'create-student') {
         return { insert: this.insertMock };
+      }
+      if (this.mode === 'get-students-by-ids') {
+        return { select: this.studentsByIdsSelectMock };
       }
       return { select: this.studentByUserIdSelectMock };
     }
@@ -513,6 +588,11 @@ class Fixtures {
   whenCreateStudent(user: AuthUser) {
     this.mode = 'create-student';
     return this.repository.createStudent(user);
+  }
+
+  whenGetStudentsByIds() {
+    this.mode = 'get-students-by-ids';
+    return this.repository.getStudentsByIds(this.studentBatchIds);
   }
 
   whenGetStudentsSessionsById() {
@@ -636,6 +716,24 @@ class Fixtures {
     });
   }
 
+  whenStudentsByIdsQueryReturnsData() {
+    this.studentsByIdsInMock.mockResolvedValue({
+      data: this.studentsBatchSupabaseRows,
+      error: null,
+    });
+  }
+
+  whenStudentsByIdsQueryReturnsEmpty() {
+    this.studentsByIdsInMock.mockResolvedValue({ data: [], error: null });
+  }
+
+  whenStudentsByIdsQueryFails() {
+    this.studentsByIdsInMock.mockResolvedValue({
+      data: null,
+      error: { message: 'students by ids query failed' },
+    });
+  }
+
   whenSessionStudentsQueryReturnsData() {
     this.sessionStudentsEqMock.mockResolvedValue({
       data: this.sessionStudentsSupabaseRows,
@@ -740,6 +838,15 @@ class Fixtures {
       }),
     );
     expect(this.insertSelectSingleMock).toHaveBeenCalled();
+  }
+
+  thenStudentsByIdsQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('students');
+    expect(this.studentsByIdsSelectMock).toHaveBeenCalledWith('*');
+    expect(this.studentsByIdsInMock).toHaveBeenCalledWith(
+      'id',
+      this.studentBatchIds,
+    );
   }
 
   thenSessionStudentsQueryBuilt() {

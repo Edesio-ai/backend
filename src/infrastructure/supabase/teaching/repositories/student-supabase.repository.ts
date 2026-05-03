@@ -214,4 +214,21 @@ export class StudentSupabaseRepository implements StudentRepository {
     }
     return mapList(data ?? [], StudentMapper.studentSessionToDomain);
   }
+
+  public async getStudentsByIds(studentIds: string[]): Promise<Student[]> {
+    const { data, error } = await this.supabase
+      .from('students')
+      .select('*')
+      .in('id', studentIds);
+
+    if (error) {
+      console.error(
+        'An error occurred while getting students by ids',
+        studentIds,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+    return mapList(data ?? [], StudentMapper.toDomain);
+  }
 }

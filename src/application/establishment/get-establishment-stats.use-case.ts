@@ -80,18 +80,18 @@ export class GetEstablishmentsStatsUseCase {
       const teacherSessions = (teachersSessions || []).filter(
         (s) => s.teacherId === teacher.id,
       );
-      const profStudentCount = teacherSessions.reduce(
+      const teacherStudentsCount = teacherSessions.reduce(
         (sum, s) => sum + (studentCountPerSession[s.id] || 0),
         0,
       );
 
       return {
         ...teacher,
-        sessions_count: teacherSessions.length,
-        students_count: profStudentCount,
+        sessionsCount: teacherSessions.length,
+        studentsCount: teacherStudentsCount,
         sessions: teacherSessions.map((s) => ({
           ...s,
-          students_count: studentCountPerSession[s.id] || 0,
+          studentsCount: studentCountPerSession[s.id] || 0,
         })),
       };
     });
