@@ -55,10 +55,19 @@ class Fixtures {
       getTeacherByUserId: jest.fn(),
       linkTeacherToEstablishment: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
     this.studentRepository = {
+      getStudentsByIds: jest.fn(),
+      createStudentSession: jest.fn(),
+      getStudentJoinedSessions: jest.fn(),
+      getStudentByUserId: jest.fn(),
       getStudentsSessionsByIds: jest.fn(),
+      getStudentsSessionsById: jest.fn(),
       deleteStudentSessionsBySessionId: jest.fn(),
+      getStudentStatsByCourseId: jest.fn(),
+      deleteStudentCourseStatsByCourseId: jest.fn(),
+      createStudent: jest.fn(),
     };
 
     this.getEstablishmentsStatsUseCase = new GetEstablishmentsStatsUseCase(
@@ -194,8 +203,8 @@ class Fixtures {
           createdAt: '2026-01-01T00:00:00.000Z',
           establishmentId: 'est-1',
           availableChatbots: 0,
-          sessions_count: 2,
-          students_count: 3,
+          sessionsCount: 2,
+          studentsCount: 3,
           sessions: [
             {
               id: 'session-1',
@@ -204,7 +213,7 @@ class Fixtures {
               language: 'francais',
               teacherId: 'teacher-1',
               createdAt: '2026-01-01T00:00:00.000Z',
-              students_count: 1,
+              studentsCount: 1,
             },
             {
               id: 'session-2',
@@ -213,7 +222,7 @@ class Fixtures {
               language: 'francais',
               teacherId: 'teacher-1',
               createdAt: '2026-01-01T00:00:00.000Z',
-              students_count: 2,
+              studentsCount: 2,
             },
           ],
         },
@@ -224,8 +233,8 @@ class Fixtures {
           createdAt: '2026-01-01T00:00:00.000Z',
           establishmentId: 'est-1',
           availableChatbots: 0,
-          sessions_count: 1,
-          students_count: 0,
+          sessionsCount: 1,
+          studentsCount: 0,
           sessions: [
             {
               id: 'session-3',
@@ -234,7 +243,7 @@ class Fixtures {
               language: 'francais',
               teacherId: 'teacher-2',
               createdAt: '2026-01-01T00:00:00.000Z',
-              students_count: 0,
+              studentsCount: 0,
             },
           ],
         },

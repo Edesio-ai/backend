@@ -20,8 +20,8 @@ export type Teacher = {
 };
 
 export type TeacherWithStats = Teacher & {
-  sessions_count: number;
-  students_count: number;
+  sessionsCount: number;
+  studentsCount: number;
   sessions: TeacherSession[];
 };
 

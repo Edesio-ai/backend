@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -18,10 +19,13 @@ import { CreateStudentUseCase } from 'src/application/student/create-student.use
 import { GetStudentJoinedSessionsUseCase } from 'src/application/student/get-student-joined-sessions.use-case';
 import {
   SessionStudent,
+  Student,
   StudentJoinedSession,
 } from 'src/domain/teaching/types/student.type';
 import { JoinSessionByCodeUseCase } from 'src/application/student/join-session-by-code.use-case';
 import { GetSessionStudentUseCase } from 'src/application/student/get-session-student.use-case';
+import { GetStudentBatchBodyDto } from '../dto/student/get-student-batch.dto';
+import { GetStudentBatchUseCase } from 'src/application/student/get-student-batch.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')
@@ -34,6 +38,7 @@ export class StudentController {
     private readonly getStudentJoinedSessionsUseCase: GetStudentJoinedSessionsUseCase,
     private readonly joinSessionByCodeUseCase: JoinSessionByCodeUseCase,
     private readonly getSessionStudentUseCase: GetSessionStudentUseCase,
+    private readonly getStudentBatchUseCase: GetStudentBatchUseCase,
   ) {}
 
   @Get()
@@ -68,7 +73,7 @@ export class StudentController {
     await this.joinSessionByCodeUseCase.execute(code, user.id);
   }
 
-  @Roles('teacher')
+  @Roles('teacher', 'establishment')
   @Get('/session/:sessionId')
   async getStudentSessions(
     @Param('sessionId') sessionId: string,
@@ -78,8 +83,18 @@ export class StudentController {
 
     const students = await this.getSessionStudentUseCase.execute(
       sessionId,
-      user.id,
+      user,
     );
+    return students ?? [];
+  }
+
+  @Roles('establishment')
+  @Post('batch')
+  async getStudentBatch(
+    @Body() body: GetStudentBatchBodyDto,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<Student[]> {
+    const students = await this.getStudentBatchUseCase.execute(body);
     return students ?? [];
   }
 }
