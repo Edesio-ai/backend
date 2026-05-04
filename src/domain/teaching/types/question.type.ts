@@ -73,7 +73,7 @@ export type SupabaseQuestionUpdate = Partial<
 
 export type QuestionGenerationConfig = {
   totalQuestions?: number;
-  multipleChoiceCount?: number;
+  singleCount?: number;
   openedCount?: number;
   language: Language;
 };

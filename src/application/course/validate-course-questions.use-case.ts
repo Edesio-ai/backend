@@ -37,7 +37,7 @@ export class ValidateCourseQuestionsUseCase {
 
     const select = `
       id,
-      session:sessions!inner (
+      sessions:sessions!inner (
         teacher_id
       )
     `;

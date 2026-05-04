@@ -63,7 +63,7 @@ describe('CreateQuestionUseCase', () => {
 class Fixtures {
   public readonly body: CreateQuestionBody = {
     courseId: 'course-1',
-    type: 'multiple',
+    type: 'single',
     questionText: 'Quelle est la bonne réponse ?',
     proposals: ['A', 'B', 'C', 'D'],
     correctAnswers: ['A'],
@@ -90,7 +90,7 @@ class Fixtures {
   public readonly createdQuestion: Question = {
     id: 'q-1',
     courseId: this.body.courseId,
-    type: 'multiple',
+    type: 'single',
     questionText: 'Quelle est la bonne réponse ?',
     proposals: ['A', 'B', 'C', 'D'],
     correctAnswers: ['A'],

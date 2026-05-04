@@ -35,7 +35,7 @@ import {
 export type GenerateQuestionBody = {
   courseId: string;
   totalQuestions?: number;
-  multipleChoiceCount?: number;
+  singleCount?: number;
   openedCount?: number;
 };
 
@@ -64,7 +64,7 @@ export class GenerateQuestionUseCase {
       throw new NotFoundError(`Teacher with id ${user.id} not found`);
     }
 
-    const select = '*, session:sessions!inner(language, teacher_id)';
+    const select = '*, sessions:sessions!inner(language, teacher_id)';
 
     const courseWithSession =
       await this.courseRepository.getCourseWithSessionById(courseId, select);
@@ -82,7 +82,7 @@ export class GenerateQuestionUseCase {
 
     const config: QuestionGenerationConfig = {
       totalQuestions: body.totalQuestions,
-      multipleChoiceCount: body.multipleChoiceCount,
+      singleCount: body.singleCount,
       openedCount: body.openedCount,
       language,
     };
@@ -97,7 +97,7 @@ export class GenerateQuestionUseCase {
 
     await this.questionRepository.deleteCourseQuizQuestions(courseId);
 
-    const multipleQuestions = questions.filter((q) => q.type === 'multiple');
+    const multipleQuestions = questions.filter((q) => q.type === 'single');
     const openQuestions = questions.filter((q) => q.type === 'open');
 
     const alternatedQuestions: GeneratedQuestion[] = [];

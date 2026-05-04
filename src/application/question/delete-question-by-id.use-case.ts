@@ -43,7 +43,7 @@ export class DeleteQuestionByIdUseCase {
 
     const select = `
       id,
-      session:sessions!inner (
+      sessions:sessions!inner (
         teacher_id
       )
     `;

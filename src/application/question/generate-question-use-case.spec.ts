@@ -112,7 +112,7 @@ describe('GenerateQuestionUseCase', () => {
     await expect(fixtures.whenExecute()).resolves.toBeDefined();
   });
 
-  it('should alternate multiple and open questions', async () => {
+  it('should alternate single (QCM) and open questions', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseWithSessionMatchesTeacher();
     fixtures.whenNoFiles();
@@ -124,9 +124,9 @@ describe('GenerateQuestionUseCase', () => {
     const insertCall = (
       fixtures.questionRepository.insertQuestions as jest.Mock
     ).mock.calls[0][0] as GeneratedQuestion[];
-    expect(insertCall[0].type).toBe('multiple');
+    expect(insertCall[0].type).toBe('single');
     expect(insertCall[1].type).toBe('open');
-    expect(insertCall[2].type).toBe('multiple');
+    expect(insertCall[2].type).toBe('single');
     expect(insertCall[3].type).toBe('open');
   });
 });
@@ -135,7 +135,7 @@ class Fixtures {
   public readonly body: GenerateQuestionBody = {
     courseId: 'course-1',
     totalQuestions: 4,
-    multipleChoiceCount: 2,
+    singleCount: 2,
     openedCount: 2,
   };
 
@@ -160,7 +160,7 @@ class Fixtures {
     {
       id: 'q-1',
       courseId: this.body.courseId,
-      type: 'multiple',
+      type: 'single',
       questionText: 'Q1 ?',
       proposals: ['A', 'B'],
       correctAnswers: ['A'],
@@ -170,8 +170,8 @@ class Fixtures {
     },
   ];
 
-  private readonly generatedMultiple: GeneratedQuestion = {
-    type: 'multiple',
+  private readonly generatedSingle: GeneratedQuestion = {
+    type: 'single',
     questionText: 'QCM ?',
     keyConcepts: [],
     proposals: ['A', 'B', 'C', 'D'],
@@ -318,15 +318,15 @@ class Fixtures {
 
   whenOpenAiReturnsQuestions() {
     this.openaiRepository.generateQuestions.mockResolvedValue([
-      this.generatedMultiple,
+      this.generatedSingle,
       this.generatedOpen,
     ]);
   }
 
   whenOpenAiReturnsMixedQuestions() {
     this.openaiRepository.generateQuestions.mockResolvedValue([
-      { ...this.generatedMultiple },
-      { ...this.generatedMultiple },
+      { ...this.generatedSingle },
+      { ...this.generatedSingle },
       { ...this.generatedOpen },
       { ...this.generatedOpen },
     ]);

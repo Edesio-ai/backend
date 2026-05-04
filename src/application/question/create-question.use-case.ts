@@ -44,7 +44,7 @@ export class CreateQuestionUseCase {
 
     const select = `
             id,
-            session:sessions!inner (
+            sessions:sessions!inner (
                 teacher_id
             )
         `;

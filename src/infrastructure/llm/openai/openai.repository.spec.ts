@@ -157,14 +157,14 @@ describe('OpenaiRepository', () => {
 class Fixtures {
   public readonly config: QuestionGenerationConfig = {
     totalQuestions: 4,
-    multipleChoiceCount: 2,
+    singleCount: 2,
     openedCount: 2,
     language: 'francais',
   };
 
   public readonly generatedQuestions = [
     {
-      type: 'multiple',
+      type: 'single',
       questionText: 'Q1 ?',
       keyConcepts: [],
       proposals: ['A', 'B', 'C', 'D'],

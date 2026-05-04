@@ -18,7 +18,7 @@ export class GenerateQuestionDto {
 
   @IsOptional()
   @IsNumber()
-  multipleChoiceCount?: number;
+  singleCount?: number;
 
   @IsOptional()
   @IsNumber()

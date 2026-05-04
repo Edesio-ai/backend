@@ -41,7 +41,7 @@ export class DeleteCourseUseCase {
 
     const select = `
             id,
-            session:sessions!inner (
+            sessions:sessions!inner (
                 teacher_id
             )
         `;

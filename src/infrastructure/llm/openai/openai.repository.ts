@@ -31,6 +31,7 @@ export class OpenaiRepository implements OpenaiRepositoryContract {
     config: QuestionGenerationConfig,
     existingQuestions?: string[],
   ): Promise<GeneratedQuestion[]> {
+    console.log('🚀 ~ OpenaiRepository ~ generateQuestions ~ config:', config);
     const maxChars = 15000;
     const truncatedContent =
       courseContent.length > maxChars

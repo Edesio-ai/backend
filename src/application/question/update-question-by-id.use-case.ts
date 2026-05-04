@@ -64,7 +64,7 @@ export class UpdateQuestionByIdUseCase {
       throw new NotFoundError('Teacher not found');
     }
 
-    const select = 'id, session:sessions!inner(teacher_id)';
+    const select = 'id, sessions:sessions!inner(teacher_id)';
     const courseWithSession =
       await this.coursesRepository.getCourseWithSessionById(
         question.courseId,

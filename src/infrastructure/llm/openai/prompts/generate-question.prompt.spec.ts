@@ -7,7 +7,7 @@ import { QuestionGenerationConfig } from 'src/domain/teaching/types/question.typ
 describe('generate-question.prompt', () => {
   const config: QuestionGenerationConfig = {
     totalQuestions: 6,
-    multipleChoiceCount: 4,
+    singleCount: 4,
     openedCount: 2,
     language: 'francais',
   };
@@ -42,7 +42,7 @@ describe('generate-question.prompt', () => {
       expect(prompt).toContain('6');
     });
 
-    it('should include multipleChoiceCount in the user prompt', () => {
+    it('should include singleCount in the user prompt', () => {
       const prompt = getGenerateQuestionUserPrompt(
         config,
         courseContent,
@@ -100,13 +100,13 @@ describe('generate-question.prompt', () => {
       expect(prompt).toContain('explanation');
     });
 
-    it('should specify both question types in the JSON schema', () => {
+    it('should specify both question types in the JSON schema (single + open)', () => {
       const prompt = getGenerateQuestionUserPrompt(
         config,
         courseContent,
         existingContext,
       );
-      expect(prompt).toContain('"multiple"');
+      expect(prompt).toContain('"single"');
       expect(prompt).toContain('"open"');
     });
   });

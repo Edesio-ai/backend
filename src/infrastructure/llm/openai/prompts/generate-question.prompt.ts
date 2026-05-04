@@ -14,7 +14,7 @@ export const getGenerateQuestionUserPrompt = (
   truncatedContent: string,
   existingQuestionsContext: string,
 ): string => {
-  const { totalQuestions, multipleChoiceCount, openedCount, language } = config;
+  const { totalQuestions, singleCount, openedCount, language } = config;
 
   return `À partir de ce contenu de cours, génère exactement ${totalQuestions} questions pédagogiques en ${language}.
 
@@ -42,7 +42,7 @@ export const getGenerateQuestionUserPrompt = (
     - Varie les formulations, les angles d'approche et les niveaux de difficulté
     
     RÉPARTITION :
-    - ${multipleChoiceCount} questions de type "multiple"
+    - ${singleCount} questions de type "single"
     - ${openedCount} questions de type "open" (réponse courte)
     
     RÈGLES SPÉCIFIQUES QCM :
@@ -63,7 +63,7 @@ export const getGenerateQuestionUserPrompt = (
     {
       "questions": [
         {
-          "type": "multiple",
+          "type": "single",
           "questionText": "Intitulé de la question",
           "keyConcepts": ["Concept 1", "Concept 2", "Concept 3"],
           "proposals": ["Réponse A", "Réponse B", "Réponse C", "Réponse D"],
