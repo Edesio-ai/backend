@@ -3,7 +3,6 @@ import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
 } from 'src/domain/teaching/interface/teacher.repository';
-import { TeacherNotFoundError } from 'src/domain/teaching/error';
 import {
   TOKEN_REPOSITORY,
   type TokenRepository,
@@ -31,7 +30,7 @@ export class ValidateTeacherInvitationUseCase {
   ): Promise<InvitationToken | null> {
     const teacher = await this.teacherRepository.getTeacherByUserId(userId);
     if (!teacher) {
-      throw new TeacherNotFoundError();
+      throw new NotFoundError(`Teacher with id ${userId} not found`);
     }
 
     if (teacher.establishmentId) {

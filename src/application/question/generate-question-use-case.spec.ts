@@ -4,10 +4,7 @@ import {
 } from './generate-question-use-case';
 import { AuthUser } from '../../domain/auth/types/auth.type';
 import { ForbiddenError } from '../../domain/shared/global/errors/global.errors';
-import {
-  QuestionBadRequestError,
-  TeacherNotFoundError,
-} from '../../domain/teaching/error';
+import { QuestionBadRequestError } from '../../domain/teaching/error';
 import { OpenaiRepository } from '../../domain/shared/llm/openai/contracts/opena-ai.repository';
 import { PdfExtractor } from '../../domain/pdf/contracts/pdf-extractor.interface';
 import { CourseRepository } from '../../domain/teaching/interface/course.repository';
@@ -21,6 +18,7 @@ import {
   GeneratedQuestion,
   Question,
 } from '../../domain/teaching/types/question.type';
+import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 describe('GenerateQuestionUseCase', () => {
   let fixtures: Fixtures;
@@ -29,12 +27,10 @@ describe('GenerateQuestionUseCase', () => {
     fixtures = new Fixtures();
   });
 
-  it('should throw TeacherNotFoundError when teacher is missing', async () => {
+  it('should throw NotFoundError when teacher is missing', async () => {
     fixtures.whenTeacherNotFound();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      TeacherNotFoundError,
-    );
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
     expect(
       fixtures.courseRepository.getCourseWithSessionById,
     ).not.toHaveBeenCalled();

@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import { TeacherRepository } from '../../../../domain/teaching/interface/teacher.repository';
-import { TeacheServerError } from '../../../../domain/teaching/error';
 import {
   Teacher,
   TeacherSession,
@@ -25,7 +24,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       .eq('establishment_id', establishmentId);
 
     if (error) {
-      throw new TeacheServerError(error.message);
+      throw new ServerError(error.message);
     }
     return (data ?? []).map(TeacherMapper.toDomain);
   }
@@ -44,7 +43,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       );
 
     if (error) {
-      throw new TeacheServerError(error.message);
+      throw new ServerError(error.message);
     }
     return mapList(data ?? [], TeacherMapper.sessionToDomain);
   }
@@ -57,7 +56,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       .maybeSingle();
 
     if (error) {
-      throw new TeacheServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return data ? TeacherMapper.toDomain(data) : null;
@@ -75,7 +74,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       .single();
 
     if (error) {
-      throw new TeacheServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return TeacherMapper.toDomain(data);
@@ -96,7 +95,7 @@ export class TeacherSupabaseRepository implements TeacherRepository {
         .from('invitation_tokens')
         .update({ used_at: null, used_by: null })
         .eq('id', invitationTokenId);
-      throw new TeacheServerError(error.message);
+      throw new ServerError(error.message);
     }
   }
 

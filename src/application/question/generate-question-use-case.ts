@@ -14,10 +14,7 @@ import {
   PDF_EXTRACTOR,
   type PdfExtractor,
 } from 'src/domain/pdf/contracts/pdf-extractor.interface';
-import {
-  QuestionBadRequestError,
-  TeacherNotFoundError,
-} from 'src/domain/teaching/error';
+import { QuestionBadRequestError } from 'src/domain/teaching/error';
 import {
   OPENAI_REPOSITORY,
   type OpenaiRepository,
@@ -30,7 +27,10 @@ import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
 } from 'src/domain/teaching/interface/teacher.repository';
-import { ForbiddenError } from 'src/domain/shared/global/errors/global.errors';
+import {
+  ForbiddenError,
+  NotFoundError,
+} from 'src/domain/shared/global/errors/global.errors';
 
 export type GenerateQuestionBody = {
   courseId: string;
@@ -61,7 +61,7 @@ export class GenerateQuestionUseCase {
 
     const teacher = await this.teacherRepository.getTeacherByUserId(user.id);
     if (!teacher) {
-      throw new TeacherNotFoundError();
+      throw new NotFoundError(`Teacher with id ${user.id} not found`);
     }
 
     const select = '*, session:sessions!inner(language, teacher_id)';

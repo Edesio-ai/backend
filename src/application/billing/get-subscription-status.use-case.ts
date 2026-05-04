@@ -12,7 +12,6 @@ import {
   ESTABLISHMENT_REPOSITORY,
   type EstablishmentRepository,
 } from '../../domain/teaching/interface/establishment.repository';
-import { TeacherNotFoundError } from 'src/domain/teaching/error';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 @Injectable()
@@ -40,7 +39,7 @@ export class GetSubscriptionStatusUseCase {
       case 'teacher': {
         const teacher = await this.teacherRepository.getTeacherByUserId(id);
         if (!teacher) {
-          throw new TeacherNotFoundError();
+          throw new NotFoundError(`Teacher with id ${id} not found`);
         }
         const establishmentId = teacher.establishmentId;
         if (establishmentId === null) {
@@ -52,7 +51,9 @@ export class GetSubscriptionStatusUseCase {
           );
 
         if (!establishment) {
-          throw new NotFoundError('Establishment not found');
+          throw new NotFoundError(
+            `Establishment with id ${establishmentId} not found`,
+          );
         }
 
         return await this.handleSubscriptionFormat(

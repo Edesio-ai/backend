@@ -1,7 +1,6 @@
 import { GetSubscriptionStatusUseCase } from './get-subscription-status.use-case';
 import { User } from '../../domain/auth/types/auth.type';
 import { NotFoundError } from '../../domain/shared/global/errors/global.errors';
-import { TeacherNotFoundError } from '../../domain/teaching/error';
 import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
 import { EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
 import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
@@ -332,12 +331,12 @@ describe('GetSubscriptionStatusUseCase - teacher flow', () => {
     fixtures = new Fixtures();
   });
 
-  it('should throw TeacherNotFoundError when teacher does not exist', async () => {
+  it('should throw NotFoundError when teacher does not exist', async () => {
     fixtures.whenTeacherNotFound();
 
     const promise = fixtures.whenExecuteWith(fixtures.teacherUser);
 
-    await expect(promise).rejects.toBeInstanceOf(TeacherNotFoundError);
+    await expect(promise).rejects.toBeInstanceOf(NotFoundError);
     expect(fixtures.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
       fixtures.teacherUser.id,
     );

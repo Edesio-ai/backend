@@ -8,7 +8,7 @@ import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
 } from '../../domain/teaching/interface/teacher.repository';
-import { TeacherNotFoundError } from '../../domain/teaching/error';
+import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 export class GetTeacherSessionsUseCase {
   constructor(
@@ -22,7 +22,7 @@ export class GetTeacherSessionsUseCase {
     const teacher = await this.teacherRepository.getTeacherByUserId(userId);
 
     if (!teacher?.id) {
-      throw new TeacherNotFoundError('Teacher not found');
+      throw new NotFoundError(`Teacher with id ${userId} not found`);
     }
 
     return this.sessionRepository.getSessionsByTeacherId(teacher.id);

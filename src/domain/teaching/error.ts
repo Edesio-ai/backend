@@ -12,27 +12,11 @@ export class TeacherSessionsNotFoundError extends TeachingError {
   }
 }
 
-export class TeacherNotFoundError extends TeachingError {
-  readonly code = 'TEACHER_NOT_FOUND';
-  readonly httpStatus = 404;
-  constructor(message?: string) {
-    super(message || 'Teacher not found');
-  }
-}
-
 export class TeacherBadRequestError extends TeachingError {
   readonly code = 'TEACHER_BAD_REQUEST';
   readonly httpStatus = 400;
   constructor(message?: string) {
     super(message || 'Teacher bad request');
-  }
-}
-
-export class TeacheServerError extends TeachingError {
-  readonly code = 'TEACHER_SERVER_ERROR';
-  readonly httpStatus = 500;
-  constructor(message?: string) {
-    super(message || 'Teacher server error');
   }
 }
 
@@ -63,14 +47,6 @@ export class QuestionBadRequestError extends TeachingError {
 }
 
 // COURSE ERRORS
-export class CourseNotFoundError extends TeachingError {
-  readonly code = 'COURSE_NOT_FOUND';
-  readonly httpStatus = 404;
-  constructor(message?: string) {
-    super(message || 'Course not found');
-  }
-}
-
 export class CourseServerError extends TeachingError {
   readonly code = 'COURSE_SERVER_ERROR';
   readonly httpStatus = 500;

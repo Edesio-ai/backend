@@ -1,4 +1,4 @@
-import { TeacherNotFoundError } from '../../domain/teaching/error';
+import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 import { SessionRepository } from '../../domain/teaching/interface/session.repository';
 import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
 import { GetTeacherSessionsUseCase } from './get-teacher-sessions.use-case';
@@ -21,12 +21,12 @@ describe('GetTeacherSessionsUseCase', () => {
     fixtures.thenReturnExpectedSessions(result);
   });
 
-  it('should throw TeacherNotFoundError when teacher does not exist', async () => {
+  it('should throw NotFoundError when teacher does not exist', async () => {
     fixtures.whenTeacherNotFound();
 
     const promise = fixtures.whenExecute();
 
-    await fixtures.thenThrowTeacherNotFoundError(promise);
+    await expect(promise).rejects.toBeInstanceOf(NotFoundError);
     fixtures.thenSessionsLookupNotCalled();
   });
 
@@ -115,7 +115,7 @@ class Fixtures {
   }
 
   async thenThrowTeacherNotFoundError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(TeacherNotFoundError);
+    await expect(promise).rejects.toBeInstanceOf(NotFoundError);
   }
 
   async thenThrowSessionRepositoryError(promise: Promise<unknown>) {
