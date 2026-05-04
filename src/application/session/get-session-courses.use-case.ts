@@ -18,6 +18,10 @@ import {
   type SessionRepository,
 } from 'src/domain/teaching/interface/session.repository';
 import {
+  STUDENT_REPOSITORY,
+  type StudentRepository,
+} from 'src/domain/teaching/interface/student.repository';
+import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
 } from 'src/domain/teaching/interface/teacher.repository';
@@ -33,15 +37,22 @@ export class GetSessionCoursesUseCase {
     private readonly sessionRepository: SessionRepository,
     @Inject(ESTABLISHMENT_REPOSITORY)
     private readonly establishmentRepository: EstablishmentRepository,
+    @Inject(STUDENT_REPOSITORY)
+    private readonly studentRepository: StudentRepository,
   ) {}
 
   async execute(sessionId: string, user: AuthUser): Promise<Course[]> {
-    switch (user.metadata.role) {
+    const { role } = user.metadata;
+
+    switch (role) {
       case 'teacher':
         await this.checkTeacherOwnership(sessionId, user);
         break;
       case 'establishment':
         await this.checkEstablishmentOwnership(sessionId, user);
+        break;
+      case 'student':
+        await this.checkStudentOwnership(sessionId, user);
         break;
       default:
         throw new ForbiddenError(
@@ -104,6 +115,26 @@ export class GetSessionCoursesUseCase {
       console.error(
         `Teacher id ${teacher.id} does not match the session teacher id ${session.teacherId}`,
       );
+      throw new ForbiddenError('You are not authorized to access this session');
+    }
+  }
+
+  private async checkStudentOwnership(
+    sessionId: string,
+    user: AuthUser,
+  ): Promise<void> {
+    const student = await this.studentRepository.getStudentByUserId(user.id);
+    if (!student) {
+      throw new NotFoundError('Student not found');
+    }
+
+    const studentSession =
+      await this.studentRepository.getStudentSessionBySessionId(sessionId);
+    if (!studentSession) {
+      throw new NotFoundError(`Session not found for id ${sessionId}`);
+    }
+
+    if (studentSession.studentId !== student.id) {
       throw new ForbiddenError('You are not authorized to access this session');
     }
   }

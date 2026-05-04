@@ -90,6 +90,8 @@ class Fixtures {
     };
     this.studentRepository = {
       getStudentsSessionsByIds: jest.fn(),
+      getStudentSessionsBySessionId: jest.fn(),
+      getStudentSessionBySessionId: jest.fn(),
       deleteStudentSessionsBySessionId: jest.fn(),
     };
     this.useCase = new DeleteSessionUseCase(

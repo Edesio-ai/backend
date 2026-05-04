@@ -56,7 +56,10 @@ export class GetSessionStudentUseCase {
             students (id, name, email, photo_url)
         `;
     const studentsSessions =
-      await this.studentRepository.getStudentsSessionsById(sessionId, select);
+      await this.studentRepository.getStudentSessionsBySessionId(
+        sessionId,
+        select,
+      );
     return studentsSessions;
   }
 

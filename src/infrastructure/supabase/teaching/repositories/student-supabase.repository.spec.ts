@@ -284,12 +284,12 @@ describe('StudentSupabaseRepository', () => {
     );
   });
 
-  // ─── getStudentsSessionsById ─────────────────────────────────────────────────
+  // ─── getStudentSessionsBySessionId ──────────────────────────────────────────
 
   it('should return mapped session students for a session id', async () => {
     fixtures.whenSessionStudentsQueryReturnsData();
 
-    const result = await fixtures.whenGetStudentsSessionsById();
+    const result = await fixtures.whenGetStudentSessionsBySessionId();
 
     fixtures.thenSessionStudentsQueryBuilt();
     expect(result).toEqual(fixtures.expectedSessionStudents);
@@ -298,17 +298,44 @@ describe('StudentSupabaseRepository', () => {
   it('should return an empty array when no students are in the session', async () => {
     fixtures.whenSessionStudentsQueryReturnsEmpty();
 
-    const result = await fixtures.whenGetStudentsSessionsById();
+    const result = await fixtures.whenGetStudentSessionsBySessionId();
 
     expect(result).toEqual([]);
   });
 
-  it('should throw ServerError when getStudentsSessionsById query fails', async () => {
+  it('should throw ServerError when getStudentSessionsBySessionId query fails', async () => {
     fixtures.whenSessionStudentsQueryFails();
 
-    await expect(fixtures.whenGetStudentsSessionsById()).rejects.toBeInstanceOf(
-      ServerError,
-    );
+    await expect(
+      fixtures.whenGetStudentSessionsBySessionId(),
+    ).rejects.toBeInstanceOf(ServerError);
+  });
+
+  // ─── getStudentSessionBySessionId ───────────────────────────────────────────
+
+  it('should return a mapped student session when found', async () => {
+    fixtures.whenStudentSessionBySessionIdReturnsData();
+
+    const result = await fixtures.whenGetStudentSessionBySessionId();
+
+    fixtures.thenStudentSessionBySessionIdQueryBuilt();
+    expect(result).toEqual(fixtures.expectedStudentSessions[0]);
+  });
+
+  it('should return null when no student session found', async () => {
+    fixtures.whenStudentSessionBySessionIdReturnsNull();
+
+    const result = await fixtures.whenGetStudentSessionBySessionId();
+
+    expect(result).toBeNull();
+  });
+
+  it('should throw ServerError when getStudentSessionBySessionId query fails', async () => {
+    fixtures.whenStudentSessionBySessionIdFails();
+
+    await expect(
+      fixtures.whenGetStudentSessionBySessionId(),
+    ).rejects.toBeInstanceOf(ServerError);
   });
 });
 
@@ -480,10 +507,19 @@ class Fixtures {
   private readonly inMock = jest.fn();
   private readonly selectMock = jest.fn(() => ({ in: this.inMock }));
 
-  // getStudentsSessionsById chain: .select(select).eq(...)
+  // getStudentSessionsBySessionId chain: .select(select).eq(...)
   private readonly sessionStudentsEqMock = jest.fn();
   private readonly sessionStudentsSelectMock = jest.fn(() => ({
     eq: this.sessionStudentsEqMock,
+  }));
+
+  // getStudentSessionBySessionId chain: .select('*').eq(...).maybeSingle()
+  private readonly studentSessionBySessionIdMaybeSingleMock = jest.fn();
+  private readonly studentSessionBySessionIdEqMock = jest.fn(() => ({
+    maybeSingle: this.studentSessionBySessionIdMaybeSingleMock,
+  }));
+  private readonly studentSessionBySessionIdSelectMock = jest.fn(() => ({
+    eq: this.studentSessionBySessionIdEqMock,
   }));
 
   // getStudentJoinedSessions chain: .select(...).eq(...).order(...)
@@ -557,6 +593,7 @@ class Fixtures {
     | 'joined-sessions'
     | 'create-student-session'
     | 'session-students'
+    | 'student-session-by-session-id'
     | 'get-students-by-ids'
     | 'update-student-photo' = 'select';
 
@@ -590,6 +627,9 @@ class Fixtures {
     }
     if (this.mode === 'session-students') {
       return { select: this.sessionStudentsSelectMock };
+    }
+    if (this.mode === 'student-session-by-session-id') {
+      return { select: this.studentSessionBySessionIdSelectMock };
     }
     return { select: this.selectMock };
   });
@@ -671,11 +711,18 @@ class Fixtures {
     return this.repository.getStudentsByIds(this.studentBatchIds);
   }
 
-  whenGetStudentsSessionsById() {
+  whenGetStudentSessionsBySessionId() {
     this.mode = 'session-students';
-    return this.repository.getStudentsSessionsById(
+    return this.repository.getStudentSessionsBySessionId(
       this.sessionIdForStudents,
       this.sessionStudentsSelect,
+    );
+  }
+
+  whenGetStudentSessionBySessionId() {
+    this.mode = 'student-session-by-session-id';
+    return this.repository.getStudentSessionBySessionId(
+      this.sessionIdForStudents,
     );
   }
 
@@ -854,6 +901,27 @@ class Fixtures {
     });
   }
 
+  whenStudentSessionBySessionIdReturnsData() {
+    this.studentSessionBySessionIdMaybeSingleMock.mockResolvedValue({
+      data: this.studentSessionsSupabaseRows[0],
+      error: null,
+    });
+  }
+
+  whenStudentSessionBySessionIdReturnsNull() {
+    this.studentSessionBySessionIdMaybeSingleMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+  }
+
+  whenStudentSessionBySessionIdFails() {
+    this.studentSessionBySessionIdMaybeSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'student session by session id query failed' },
+    });
+  }
+
   // ─── Then assertions ─────────────────────────────────────────────────────────
 
   thenReturnExpectedStudentSessions(result: any) {
@@ -980,5 +1048,15 @@ class Fixtures {
       'session_id',
       this.sessionIdForStudents,
     );
+  }
+
+  thenStudentSessionBySessionIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_sessions');
+    expect(this.studentSessionBySessionIdSelectMock).toHaveBeenCalledWith('*');
+    expect(this.studentSessionBySessionIdEqMock).toHaveBeenCalledWith(
+      'session_id',
+      this.sessionIdForStudents,
+    );
+    expect(this.studentSessionBySessionIdMaybeSingleMock).toHaveBeenCalled();
   }
 }

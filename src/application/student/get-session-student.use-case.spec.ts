@@ -29,7 +29,7 @@ describe('GetSessionStudentUseCase', () => {
     expect(result).toEqual(fixtures.sessionStudents);
   });
 
-  it('should call getStudentsSessionsById with the correct sessionId and select fields', async () => {
+  it('should call getStudentSessionsBySessionId with the correct sessionId and select fields', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenSessionFound();
     fixtures.whenStudentsSessionsFound();
@@ -37,13 +37,13 @@ describe('GetSessionStudentUseCase', () => {
     await fixtures.whenExecuteAsTeacher();
 
     expect(
-      fixtures.studentRepository.getStudentsSessionsById,
+      fixtures.studentRepository.getStudentSessionsBySessionId,
     ).toHaveBeenCalledWith(
       fixtures.sessionId,
       expect.stringContaining('joined_at'),
     );
     expect(
-      fixtures.studentRepository.getStudentsSessionsById,
+      fixtures.studentRepository.getStudentSessionsBySessionId,
     ).toHaveBeenCalledWith(
       fixtures.sessionId,
       expect.stringContaining('students'),
@@ -65,7 +65,7 @@ describe('GetSessionStudentUseCase', () => {
 
     expect(fixtures.sessionRepository.getSessionById).not.toHaveBeenCalled();
     expect(
-      fixtures.studentRepository.getStudentsSessionsById,
+      fixtures.studentRepository.getStudentSessionsBySessionId,
     ).not.toHaveBeenCalled();
   });
 
@@ -222,7 +222,8 @@ class Fixtures {
       getStudentJoinedSessions: jest.fn(),
       getStudentByUserId: jest.fn(),
       getStudentsSessionsByIds: jest.fn(),
-      getStudentsSessionsById: jest.fn(),
+      getStudentSessionsBySessionId: jest.fn(),
+      getStudentSessionBySessionId: jest.fn(),
       deleteStudentSessionsBySessionId: jest.fn(),
       getStudentStatsByCourseId: jest.fn(),
       deleteStudentCourseStatsByCourseId: jest.fn(),
@@ -314,16 +315,18 @@ class Fixtures {
   }
 
   whenStudentsSessionsFound() {
-    this.studentRepository.getStudentsSessionsById.mockResolvedValue(
+    this.studentRepository.getStudentSessionsBySessionId.mockResolvedValue(
       this.sessionStudents,
     );
   }
 
   whenNoStudentsInSession() {
-    this.studentRepository.getStudentsSessionsById.mockResolvedValue([]);
+    this.studentRepository.getStudentSessionsBySessionId.mockResolvedValue([]);
   }
 
   whenStudentRepositoryThrows(error: Error) {
-    this.studentRepository.getStudentsSessionsById.mockRejectedValue(error);
+    this.studentRepository.getStudentSessionsBySessionId.mockRejectedValue(
+      error,
+    );
   }
 }
