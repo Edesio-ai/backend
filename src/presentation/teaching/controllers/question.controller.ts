@@ -118,6 +118,7 @@ export class QuestionController {
     return { question };
   }
 
+  @Roles('student', 'teacher')
   @Post('evaluate-answer')
   async evaluateAnswer(
     @Body() body: EvaluateAnswerDto,
