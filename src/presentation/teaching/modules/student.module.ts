@@ -11,6 +11,7 @@ import { GetSessionStudentUseCase } from 'src/application/student/get-session-st
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
 import { GetStudentBatchUseCase } from 'src/application/student/get-student-batch.use-case';
+import { UploadStudentPhotoUseCase } from 'src/application/student/upload-student-photo.use-case';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { GetStudentBatchUseCase } from 'src/application/student/get-student-batc
     GetStudentJoinedSessionsUseCase,
     JoinSessionByCodeUseCase,
     GetStudentBatchUseCase,
+    UploadStudentPhotoUseCase,
   ],
 })
 export class StudentModule {}

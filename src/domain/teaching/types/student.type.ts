@@ -78,3 +78,10 @@ export type SupabaseSessionStudent = {
 export type SessionStudent = Omit<Student, 'supabaseUserId' | 'createdAt'> & {
   joinedAt: string;
 };
+
+export type StudentPhotoUpload = {
+  buffer: Buffer;
+  originalFileName: string;
+  mimeType: string;
+  byteLength: number;
+};

@@ -247,6 +247,43 @@ describe('StudentSupabaseRepository', () => {
     );
   });
 
+  // ─── storeStudentPhoto ───────────────────────────────────────────────────────
+
+  it('should upload the photo and return the public url', async () => {
+    fixtures.whenStorageUploadSucceeds();
+
+    const result = await fixtures.whenStoreStudentPhoto();
+
+    fixtures.thenStorageUploadCalledWith();
+    expect(result).toBe(fixtures.expectedPhotoUrl);
+  });
+
+  it('should throw ServerError when the storage upload fails', async () => {
+    fixtures.whenStorageUploadFails();
+
+    await expect(fixtures.whenStoreStudentPhoto()).rejects.toBeInstanceOf(
+      ServerError,
+    );
+  });
+
+  // ─── updateStudentPhoto ──────────────────────────────────────────────────────
+
+  it('should update the student photo url', async () => {
+    fixtures.whenUpdateStudentPhotoSucceeds();
+
+    await fixtures.whenUpdateStudentPhoto();
+
+    fixtures.thenUpdateStudentPhotoQueryBuilt();
+  });
+
+  it('should throw ServerError when updateStudentPhoto query fails', async () => {
+    fixtures.whenUpdateStudentPhotoFails();
+
+    await expect(fixtures.whenUpdateStudentPhoto()).rejects.toBeInstanceOf(
+      ServerError,
+    );
+  });
+
   // ─── getStudentsSessionsById ─────────────────────────────────────────────────
 
   it('should return mapped session students for a session id', async () => {
@@ -364,6 +401,11 @@ class Fixtures {
       joinedAt: '2026-01-15T10:00:00.000Z',
     },
   ];
+
+  public readonly photoStoragePath = 'student-1/1234567890.jpg';
+  public readonly photoBuffer = Buffer.from('fake-image');
+  public readonly expectedPhotoUrl =
+    'https://storage.example.com/profile-photos/student-1/1234567890.jpg';
 
   public readonly studentBatchIds = ['student-1', 'student-2'];
   public readonly studentsBatchSupabaseRows = [
@@ -485,6 +527,20 @@ class Fixtures {
   // createStudentSession chain: .insert(...)
   public readonly createStudentSessionInsertMock = jest.fn();
 
+  // storeStudentPhoto chain: supabase.storage.from(...).upload(...) then .getPublicUrl(...)
+  private readonly storageUploadMock = jest.fn();
+  private readonly storageGetPublicUrlMock = jest.fn();
+  private readonly storageFromMock = jest.fn(() => ({
+    upload: this.storageUploadMock,
+    getPublicUrl: this.storageGetPublicUrlMock,
+  }));
+
+  // updateStudentPhoto chain: .from('students').update(...).eq(...)
+  private readonly updateStudentPhotoEqMock = jest.fn();
+  private readonly updateStudentPhotoUpdateMock = jest.fn(() => ({
+    eq: this.updateStudentPhotoEqMock,
+  }));
+
   // getStudentsByIds chain: .select('*').in('id', ids)
   private readonly studentsByIdsInMock = jest.fn();
   private readonly studentsByIdsSelectMock = jest.fn(() => ({
@@ -501,7 +557,8 @@ class Fixtures {
     | 'joined-sessions'
     | 'create-student-session'
     | 'session-students'
-    | 'get-students-by-ids' = 'select';
+    | 'get-students-by-ids'
+    | 'update-student-photo' = 'select';
 
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'student_course_stats') {
@@ -516,6 +573,9 @@ class Fixtures {
       }
       if (this.mode === 'get-students-by-ids') {
         return { select: this.studentsByIdsSelectMock };
+      }
+      if (this.mode === 'update-student-photo') {
+        return { update: this.updateStudentPhotoUpdateMock };
       }
       return { select: this.studentByUserIdSelectMock };
     }
@@ -539,6 +599,7 @@ class Fixtures {
   constructor() {
     this.repository = new StudentSupabaseRepository({
       from: this.fromMock,
+      storage: { from: this.storageFromMock },
     } as any);
   }
 
@@ -588,6 +649,21 @@ class Fixtures {
   whenCreateStudent(user: AuthUser) {
     this.mode = 'create-student';
     return this.repository.createStudent(user);
+  }
+
+  whenStoreStudentPhoto() {
+    return this.repository.storeStudentPhoto(
+      this.photoBuffer,
+      this.photoStoragePath,
+    );
+  }
+
+  whenUpdateStudentPhoto() {
+    this.mode = 'update-student-photo';
+    return this.repository.updateStudentPhoto(
+      'student-1',
+      this.expectedPhotoUrl,
+    );
   }
 
   whenGetStudentsByIds() {
@@ -716,6 +792,29 @@ class Fixtures {
     });
   }
 
+  whenStorageUploadSucceeds() {
+    this.storageUploadMock.mockResolvedValue({ error: null });
+    this.storageGetPublicUrlMock.mockReturnValue({
+      data: { publicUrl: this.expectedPhotoUrl },
+    });
+  }
+
+  whenStorageUploadFails() {
+    this.storageUploadMock.mockResolvedValue({
+      error: { message: 'storage upload failed' },
+    });
+  }
+
+  whenUpdateStudentPhotoSucceeds() {
+    this.updateStudentPhotoEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenUpdateStudentPhotoFails() {
+    this.updateStudentPhotoEqMock.mockResolvedValue({
+      error: { message: 'update photo failed' },
+    });
+  }
+
   whenStudentsByIdsQueryReturnsData() {
     this.studentsByIdsInMock.mockResolvedValue({
       data: this.studentsBatchSupabaseRows,
@@ -838,6 +937,29 @@ class Fixtures {
       }),
     );
     expect(this.insertSelectSingleMock).toHaveBeenCalled();
+  }
+
+  thenStorageUploadCalledWith() {
+    expect(this.storageFromMock).toHaveBeenCalledWith('profile-photos');
+    expect(this.storageUploadMock).toHaveBeenCalledWith(
+      this.photoStoragePath,
+      this.photoBuffer,
+      { upsert: true },
+    );
+    expect(this.storageGetPublicUrlMock).toHaveBeenCalledWith(
+      this.photoStoragePath,
+    );
+  }
+
+  thenUpdateStudentPhotoQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('students');
+    expect(this.updateStudentPhotoUpdateMock).toHaveBeenCalledWith({
+      photo_url: this.expectedPhotoUrl,
+    });
+    expect(this.updateStudentPhotoEqMock).toHaveBeenCalledWith(
+      'id',
+      'student-1',
+    );
   }
 
   thenStudentsByIdsQueryBuilt() {

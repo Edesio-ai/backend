@@ -227,6 +227,8 @@ class Fixtures {
       getStudentStatsByCourseId: jest.fn(),
       deleteStudentCourseStatsByCourseId: jest.fn(),
       createStudent: jest.fn(),
+      storeStudentPhoto: jest.fn(),
+      updateStudentPhoto: jest.fn(),
     };
     this.teacherRepository = {
       linkTeacherToEstablishment: jest.fn(),

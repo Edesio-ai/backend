@@ -231,4 +231,44 @@ export class StudentSupabaseRepository implements StudentRepository {
     }
     return mapList(data ?? [], StudentMapper.toDomain);
   }
+
+  public async storeStudentPhoto(
+    buffer: Buffer,
+    storagePath: string,
+  ): Promise<string> {
+    const { error } = await this.supabase.storage
+      .from('profile-photos')
+      .upload(storagePath, buffer, { upsert: true });
+
+    if (error) {
+      console.error('Error uploading photo:', error);
+      throw new ServerError(error.message);
+    }
+
+    const { data } = await this.supabase.storage
+      .from('profile-photos')
+      .getPublicUrl(storagePath);
+
+    return data.publicUrl ?? '';
+  }
+
+  public async updateStudentPhoto(
+    studentId: string,
+    photoUrl: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('students')
+      .update({ photo_url: photoUrl })
+      .eq('id', studentId);
+
+    if (error) {
+      console.error(
+        'An error occurred while updating student photo',
+        studentId,
+        photoUrl,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+  }
 }
