@@ -84,6 +84,8 @@ class Fixtures {
       getStudentStatsByCourseId: jest.fn(),
       deleteStudentCourseStatsByCourseId: jest.fn(),
       createStudent: jest.fn(),
+      storeStudentPhoto: jest.fn(),
+      updateStudentPhoto: jest.fn(),
     };
     this.useCase = new GetStudentBatchUseCase(this.studentRepository);
   }

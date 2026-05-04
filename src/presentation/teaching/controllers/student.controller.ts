@@ -1,12 +1,15 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   Param,
   Post,
   Req,
+  UploadedFile,
   UseFilters,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetStudentByUserIdUseCase } from 'src/application/student/get-student-by-user-id.use-case';
@@ -21,11 +24,14 @@ import {
   SessionStudent,
   Student,
   StudentJoinedSession,
+  StudentPhotoUpload,
 } from 'src/domain/teaching/types/student.type';
 import { JoinSessionByCodeUseCase } from 'src/application/student/join-session-by-code.use-case';
 import { GetSessionStudentUseCase } from 'src/application/student/get-session-student.use-case';
 import { GetStudentBatchBodyDto } from '../dto/student/get-student-batch.dto';
 import { GetStudentBatchUseCase } from 'src/application/student/get-student-batch.use-case';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadStudentPhotoUseCase } from 'src/application/student/upload-student-photo.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')
@@ -39,6 +45,7 @@ export class StudentController {
     private readonly joinSessionByCodeUseCase: JoinSessionByCodeUseCase,
     private readonly getSessionStudentUseCase: GetSessionStudentUseCase,
     private readonly getStudentBatchUseCase: GetStudentBatchUseCase,
+    private readonly uploadStudentPhotoUseCase: UploadStudentPhotoUseCase,
   ) {}
 
   @Get()
@@ -96,5 +103,31 @@ export class StudentController {
   ): Promise<Student[]> {
     const students = await this.getStudentBatchUseCase.execute(body);
     return students ?? [];
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('photo')
+  async uploadStudentPhoto(
+    @Req() req: Request & { user: AuthUser },
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<{ photoUrl: string }> {
+    const { user } = req;
+
+    if (!file?.buffer) {
+      throw new BadRequestException('Missing File');
+    }
+
+    const payload: StudentPhotoUpload = {
+      buffer: file.buffer,
+      originalFileName: file.originalname,
+      mimeType: file.mimetype,
+      byteLength: file.size,
+    };
+
+    const photoUrl = await this.uploadStudentPhotoUseCase.execute(
+      user,
+      payload,
+    );
+    return { photoUrl };
   }
 }

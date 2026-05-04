@@ -23,4 +23,6 @@ export interface StudentRepository {
   getStudentStatsByCourseId(courseId: string): Promise<StudentCourseStats[]>;
   deleteStudentCourseStatsByCourseId(courseId: string): Promise<void>;
   createStudent(user: AuthUser): Promise<Student>;
+  storeStudentPhoto(buffer: Buffer, storagePath: string): Promise<string>;
+  updateStudentPhoto(studentId: string, photoUrl: string): Promise<void>;
 }
