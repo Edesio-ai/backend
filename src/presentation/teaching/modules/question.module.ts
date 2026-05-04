@@ -13,6 +13,8 @@ import { CreateQuestionUseCase } from 'src/application/question/create-question.
 import { DeleteQuestionByIdUseCase } from 'src/application/question/delete-question-by-id.use-case';
 import { UpdateQuestionByIdUseCase } from 'src/application/question/update-question-by-id.use-case';
 import { EvaluateAnswerUseCase } from 'src/application/question/evaluate-answer.use-case';
+import { GetAnsweredQuestionCountUseCase } from 'src/application/question/get-answered-question-count.use-case';
+import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { EvaluateAnswerUseCase } from 'src/application/question/evaluate-answer.
     QuestionPersistenceModule,
     CoursePersistenceModule,
     TeacherPersistenceModule,
+    StudentPersistenceModule,
     PdfModule,
     OpenaiModule,
   ],
@@ -32,6 +35,7 @@ import { EvaluateAnswerUseCase } from 'src/application/question/evaluate-answer.
     DeleteQuestionByIdUseCase,
     UpdateQuestionByIdUseCase,
     EvaluateAnswerUseCase,
+    GetAnsweredQuestionCountUseCase,
   ],
 })
 export class QuestionModule {}

@@ -24,4 +24,5 @@ export interface QuestionsRepository {
     updates: QuestionUpdate,
   ): Promise<Question>;
   deleteCourseQuestionsByCourseId(courseId: string): Promise<void>;
+  getAnsweredQuestionCount(userId: string): Promise<number>;
 }

@@ -183,4 +183,22 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
       throw new QuestionServerError(error.message);
     }
   }
+  async getAnsweredQuestionCount(studentId: string): Promise<number> {
+    const { count, error } = await this.supabase
+      .from('course_questions')
+      .select('*', { count: 'exact', head: true })
+      .eq('student_id', studentId)
+      .not('answer', 'is', null);
+
+    if (error) {
+      console.error(
+        'error getting answered question count for student id',
+        studentId,
+        error,
+      );
+      throw new QuestionServerError(error.message);
+    }
+
+    return count ?? 0;
+  }
 }
