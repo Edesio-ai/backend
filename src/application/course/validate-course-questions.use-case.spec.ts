@@ -170,6 +170,7 @@ class Fixtures {
       getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
     this.questionsRepository = {
       getQuestionById: jest.fn(),
@@ -182,6 +183,7 @@ class Fixtures {
       insertQuestion: jest.fn(),
       updateQuestionById: jest.fn(),
       deleteCourseQuestionsByCourseId: jest.fn(),
+      getAnsweredQuestionCount: jest.fn(),
     };
     this.useCase = new ValidateCourseQuestionsUseCase(
       this.courseRepository,

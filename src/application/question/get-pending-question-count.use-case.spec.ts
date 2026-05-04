@@ -88,10 +88,27 @@ class Fixtures {
       createCourse: jest.fn(),
       storeCourseFile: jest.fn(),
       insertCourseFile: jest.fn(),
+      getCourseById: jest.fn(),
+      getCourseWithSessionById: jest.fn(),
+      getSessionCoursesBySessionId: jest.fn(),
+      getCourseValidatedQuestions: jest.fn(),
+      getCourseFilesByCourseId: jest.fn(),
+      getFileBufferFromStorage: jest.fn(),
+      deleteCourseById: jest.fn(),
+      updateCourse: jest.fn(),
     };
     this.questionsRepository = {
+      getQuestionById: jest.fn(),
+      deleteQuestionById: jest.fn(),
+      insertQuestions: jest.fn(),
       deleteQuestionsByCourseIds: jest.fn(),
       getPendingQuestionCount: jest.fn(),
+      getCourseQuestions: jest.fn(),
+      deleteCourseQuizQuestions: jest.fn(),
+      insertQuestion: jest.fn(),
+      updateQuestionById: jest.fn(),
+      deleteCourseQuestionsByCourseId: jest.fn(),
+      getAnsweredQuestionCount: jest.fn(),
     };
 
     this.useCase = new GetPendingQuestionCountUseCase(

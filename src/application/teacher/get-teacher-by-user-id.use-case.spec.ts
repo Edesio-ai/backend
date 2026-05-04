@@ -58,6 +58,7 @@ class Fixtures {
       getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
     this.useCase = new GetTeacherByUserIdUseCase(this.teacherRepository);
   }

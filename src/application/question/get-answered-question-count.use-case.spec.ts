@@ -101,6 +101,7 @@ class Fixtures {
       getStudentsSessionsByIds: jest.fn(),
       getStudentSessionsBySessionId: jest.fn(),
       deleteStudentSessionsBySessionId: jest.fn(),
+      deleteStudentSession: jest.fn(),
       getStudentStatsByCourseId: jest.fn(),
       deleteStudentCourseStatsByCourseId: jest.fn(),
       createStudent: jest.fn(),

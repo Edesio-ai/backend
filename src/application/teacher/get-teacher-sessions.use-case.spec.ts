@@ -74,6 +74,7 @@ class Fixtures {
       getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
     this.sessionRepository = {
       getSessionsByTeacherId: jest.fn(),
@@ -81,6 +82,7 @@ class Fixtures {
       createSession: jest.fn(),
       updateSessionName: jest.fn(),
       deleteSessionByTeacherId: jest.fn(),
+      getSessionById: jest.fn(),
     };
     this.useCase = new GetTeacherSessionsUseCase(
       this.sessionRepository,

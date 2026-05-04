@@ -1,0 +1,166 @@
+import { DeleteStudentSessionUseCase } from './delete-student-session.use-case';
+import { StudentRepository } from '../../domain/teaching/interface/student.repository';
+import {
+  ForbiddenError,
+  NotFoundError,
+} from '../../domain/shared/global/errors/global.errors';
+import { AuthUser } from '../../domain/auth/types/auth.type';
+import {
+  Student,
+  StudentSession,
+} from '../../domain/teaching/types/student.type';
+
+describe('DeleteStudentSessionUseCase', () => {
+  let fixtures: Fixtures;
+
+  beforeEach(() => {
+    fixtures = new Fixtures();
+  });
+
+  it('should delete the student session when student owns it', async () => {
+    fixtures.whenStudentFound();
+    fixtures.whenStudentSessionFound();
+
+    await fixtures.whenExecute();
+
+    expect(
+      fixtures.studentRepository.deleteStudentSession,
+    ).toHaveBeenCalledWith(fixtures.sessionId, fixtures.student.id);
+  });
+
+  it('should throw NotFoundError when student is not found', async () => {
+    fixtures.whenStudentNotFound();
+
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
+    expect(
+      fixtures.studentRepository.getStudentSessionBySessionId,
+    ).not.toHaveBeenCalled();
+    expect(
+      fixtures.studentRepository.deleteStudentSession,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should throw NotFoundError when student session is not found', async () => {
+    fixtures.whenStudentFound();
+    fixtures.whenStudentSessionNotFound();
+
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
+    expect(
+      fixtures.studentRepository.deleteStudentSession,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should throw ForbiddenError when student does not own the session', async () => {
+    fixtures.whenStudentFound();
+    fixtures.whenStudentSessionOwnedByAnother();
+
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
+    expect(
+      fixtures.studentRepository.deleteStudentSession,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should propagate errors from the student repository (getStudentByUserId)', async () => {
+    fixtures.whenStudentRepositoryFails();
+
+    await expect(fixtures.whenExecute()).rejects.toThrow('student repo failed');
+  });
+
+  it('should propagate errors from the student repository (deleteStudentSession)', async () => {
+    fixtures.whenStudentFound();
+    fixtures.whenStudentSessionFound();
+    fixtures.whenDeleteFails();
+
+    await expect(fixtures.whenExecute()).rejects.toThrow('delete failed');
+  });
+});
+
+class Fixtures {
+  public readonly sessionId = 'session-1';
+  public readonly userId = 'user-1';
+
+  public readonly user: AuthUser = {
+    id: this.userId,
+    email: 'alice@school.com',
+    emailConfirmedAt: '2026-01-01T00:00:00.000Z',
+    metadata: { role: 'student' },
+  };
+
+  public readonly student: Student = {
+    id: 'student-1',
+    supabaseUserId: this.userId,
+    name: 'Alice Dupont',
+    email: 'alice@school.com',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    photoUrl: '',
+  };
+
+  public readonly studentSession: StudentSession = {
+    sessionId: this.sessionId,
+    studentId: this.student.id,
+  };
+
+  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly useCase: DeleteStudentSessionUseCase;
+
+  constructor() {
+    this.studentRepository = {
+      getStudentsByIds: jest.fn(),
+      createStudentSession: jest.fn(),
+      getStudentJoinedSessions: jest.fn(),
+      getStudentByUserId: jest.fn(),
+      getStudentsSessionsByIds: jest.fn(),
+      getStudentSessionsBySessionId: jest.fn(),
+      deleteStudentSessionsBySessionId: jest.fn(),
+      getStudentStatsByCourseId: jest.fn(),
+      deleteStudentCourseStatsByCourseId: jest.fn(),
+      createStudent: jest.fn(),
+      storeStudentPhoto: jest.fn(),
+      updateStudentPhoto: jest.fn(),
+      getStudentSessionBySessionId: jest.fn(),
+      deleteStudentSession: jest.fn(),
+    };
+    this.useCase = new DeleteStudentSessionUseCase(this.studentRepository);
+  }
+
+  whenExecute() {
+    return this.useCase.execute(this.sessionId, this.user);
+  }
+
+  whenStudentFound() {
+    this.studentRepository.getStudentByUserId.mockResolvedValue(this.student);
+  }
+
+  whenStudentNotFound() {
+    this.studentRepository.getStudentByUserId.mockResolvedValue(null);
+  }
+
+  whenStudentRepositoryFails() {
+    this.studentRepository.getStudentByUserId.mockRejectedValue(
+      new Error('student repo failed'),
+    );
+  }
+
+  whenStudentSessionFound() {
+    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue(
+      this.studentSession,
+    );
+  }
+
+  whenStudentSessionNotFound() {
+    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue(null);
+  }
+
+  whenStudentSessionOwnedByAnother() {
+    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue({
+      sessionId: this.sessionId,
+      studentId: 'another-student-99',
+    });
+  }
+
+  whenDeleteFails() {
+    this.studentRepository.deleteStudentSession.mockRejectedValue(
+      new Error('delete failed'),
+    );
+  }
+}

@@ -63,6 +63,9 @@ class Fixtures {
       insertCourseFile: jest.fn(),
       getCourseValidatedQuestions: jest.fn(),
       getCourseFilesByCourseId: jest.fn(),
+      getFileBufferFromStorage: jest.fn(),
+      deleteCourseById: jest.fn(),
+      updateCourse: jest.fn(),
     };
 
     this.useCase = new GetCourseFilesUseCase(this.courseRepository);

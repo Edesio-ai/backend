@@ -1,6 +1,6 @@
 import { GetUserSessionUseCase } from './get-user-session.use-case';
 import { AuthRepository } from '../../domain/auth/contract/auth.repository';
-import { SupabaseUser } from '../../domain/auth/types/auth.type';
+import { User } from '../../domain/auth/types/auth.type';
 
 describe('GetUserSessionUseCase', () => {
   let fixtures: Fixtures;
@@ -34,7 +34,7 @@ class Fixtures {
 
   public readonly token: string;
   public readonly repositoryError: Error;
-  public readonly user: SupabaseUser;
+  public readonly user: User;
 
   constructor() {
     this.authRepository = {
@@ -52,21 +52,12 @@ class Fixtures {
     this.repositoryError = new Error('Invalid token');
     this.user = {
       id: 'user-1',
-      aud: 'authenticated',
-      role: 'authenticated',
       email: 'user@school.com',
-      email_confirmed_at: '2026-01-01T00:00:00.000Z',
-      phone: '',
-      app_metadata: { provider: 'email', providers: ['email'] },
-      user_metadata: {
+      metadata: {
         role: 'establishment',
         firstname: 'John',
         lastname: 'Doe',
       },
-      identities: [],
-      created_at: '2026-01-01T00:00:00.000Z',
-      updated_at: '2026-01-01T00:00:00.000Z',
-      is_anonymous: false,
     };
   }
 
@@ -91,7 +82,7 @@ class Fixtures {
     expect(this.authRepository.validateToken).toHaveBeenCalledTimes(1);
   }
 
-  thenReturnsExpectedUser(result: SupabaseUser) {
+  thenReturnsExpectedUser(result: User) {
     expect(result).toEqual(this.user);
   }
 }

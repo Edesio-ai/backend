@@ -119,28 +119,48 @@ class Fixtures {
       attemptedQuestions: 10,
       correctAnswers: 5,
       lastAttemptAt: '2026-01-03T00:00:00.000Z',
-      student: { name: 'Low', photoUrl: '' },
+      student: {
+        id: 's-low',
+        email: 'low@school.com',
+        name: 'Low',
+        photoUrl: '',
+      },
     },
     {
       studentId: 's-perfect',
       attemptedQuestions: 4,
       correctAnswers: 4,
       lastAttemptAt: '2026-01-01T00:00:00.000Z',
-      student: { name: 'Perfect', photoUrl: '' },
+      student: {
+        id: 's-perfect',
+        email: 'perfect@school.com',
+        name: 'Perfect',
+        photoUrl: '',
+      },
     },
     {
       studentId: 's-tie-a',
       attemptedQuestions: 10,
       correctAnswers: 8,
       lastAttemptAt: '2026-01-02T00:00:00.000Z',
-      student: { name: 'TieA', photoUrl: '' },
+      student: {
+        id: 's-tie-a',
+        email: 'tiea@school.com',
+        name: 'TieA',
+        photoUrl: '',
+      },
     },
     {
       studentId: 's-tie-b',
       attemptedQuestions: 10,
       correctAnswers: 9,
       lastAttemptAt: '2026-01-02T12:00:00.000Z',
-      student: { name: 'TieB', photoUrl: '' },
+      student: {
+        id: 's-tie-b',
+        email: 'tieb@school.com',
+        name: 'TieB',
+        photoUrl: '',
+      },
     },
   ];
 
@@ -164,6 +184,9 @@ class Fixtures {
       insertCourseFile: jest.fn(),
       getCourseValidatedQuestions: jest.fn(),
       getCourseFilesByCourseId: jest.fn(),
+      getFileBufferFromStorage: jest.fn(),
+      deleteCourseById: jest.fn(),
+      updateCourse: jest.fn(),
     };
     this.teacherRepository = {
       linkTeacherToEstablishment: jest.fn(),
@@ -171,6 +194,7 @@ class Fixtures {
       getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
     this.sessionRepository = {
       getSessionsByTeacherId: jest.fn(),
@@ -181,9 +205,20 @@ class Fixtures {
       getSessionById: jest.fn(),
     };
     this.studentRepository = {
+      getStudentsByIds: jest.fn(),
+      createStudentSession: jest.fn(),
+      getStudentJoinedSessions: jest.fn(),
+      getStudentByUserId: jest.fn(),
       getStudentsSessionsByIds: jest.fn(),
+      getStudentSessionsBySessionId: jest.fn(),
       deleteStudentSessionsBySessionId: jest.fn(),
       getStudentStatsByCourseId: jest.fn(),
+      deleteStudentCourseStatsByCourseId: jest.fn(),
+      createStudent: jest.fn(),
+      storeStudentPhoto: jest.fn(),
+      updateStudentPhoto: jest.fn(),
+      getStudentSessionBySessionId: jest.fn(),
+      deleteStudentSession: jest.fn(),
     };
 
     this.useCase = new GetCourseRankingUseCase(

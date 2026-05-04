@@ -36,6 +36,8 @@ class Fixtures {
   constructor() {
     this.fileRepository = {
       deleteFileById: jest.fn(),
+      getCourseFileById: jest.fn(),
+      getCourseFilesByCourseId: jest.fn(),
     };
     this.useCase = new DeleteCourseFileUseCase(this.fileRepository);
   }

@@ -68,6 +68,7 @@ class Fixtures {
       storeStudentPhoto: jest.fn(),
       updateStudentPhoto: jest.fn(),
       deleteStudentSessionsBySessionId: jest.fn(),
+      deleteStudentSession: jest.fn(),
       getStudentStatsByCourseId: jest.fn(),
       deleteStudentCourseStatsByCourseId: jest.fn(),
       createStudent: jest.fn(),

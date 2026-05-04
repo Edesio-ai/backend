@@ -337,6 +337,24 @@ describe('StudentSupabaseRepository', () => {
       fixtures.whenGetStudentSessionBySessionId(),
     ).rejects.toBeInstanceOf(ServerError);
   });
+
+  // ─── deleteStudentSession ────────────────────────────────────────────────────
+
+  it('should delete a student session successfully', async () => {
+    fixtures.whenDeleteStudentSessionSucceeds();
+
+    await fixtures.whenDeleteStudentSession();
+
+    fixtures.thenDeleteStudentSessionQueryBuilt();
+  });
+
+  it('should throw ServerError when deleteStudentSession query fails', async () => {
+    fixtures.whenDeleteStudentSessionFails();
+
+    await expect(fixtures.whenDeleteStudentSession()).rejects.toBeInstanceOf(
+      ServerError,
+    );
+  });
 });
 
 class Fixtures {
@@ -583,6 +601,15 @@ class Fixtures {
     in: this.studentsByIdsInMock,
   }));
 
+  // deleteStudentSession chain: .delete().eq('session_id', ...).eq('student_id', ...)
+  private readonly deleteStudentSessionSecondEqMock = jest.fn();
+  private readonly deleteStudentSessionFirstEqMock = jest.fn(() => ({
+    eq: this.deleteStudentSessionSecondEqMock,
+  }));
+  private readonly deleteStudentSessionDeleteMock = jest.fn(() => ({
+    eq: this.deleteStudentSessionFirstEqMock,
+  }));
+
   private mode:
     | 'select'
     | 'delete'
@@ -595,7 +622,8 @@ class Fixtures {
     | 'session-students'
     | 'student-session-by-session-id'
     | 'get-students-by-ids'
-    | 'update-student-photo' = 'select';
+    | 'update-student-photo'
+    | 'delete-student-session' = 'select';
 
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'student_course_stats') {
@@ -618,6 +646,9 @@ class Fixtures {
     }
     if (this.mode === 'delete') {
       return { delete: this.deleteMock };
+    }
+    if (this.mode === 'delete-student-session') {
+      return { delete: this.deleteStudentSessionDeleteMock };
     }
     if (this.mode === 'joined-sessions') {
       return { select: this.joinedSessionsSelectMock };
@@ -723,6 +754,14 @@ class Fixtures {
     this.mode = 'student-session-by-session-id';
     return this.repository.getStudentSessionBySessionId(
       this.sessionIdForStudents,
+    );
+  }
+
+  whenDeleteStudentSession() {
+    this.mode = 'delete-student-session';
+    return this.repository.deleteStudentSession(
+      this.sessionIdToDelete,
+      'student-1',
     );
   }
 
@@ -922,6 +961,16 @@ class Fixtures {
     });
   }
 
+  whenDeleteStudentSessionSucceeds() {
+    this.deleteStudentSessionSecondEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenDeleteStudentSessionFails() {
+    this.deleteStudentSessionSecondEqMock.mockResolvedValue({
+      error: { message: 'delete student session failed' },
+    });
+  }
+
   // ─── Then assertions ─────────────────────────────────────────────────────────
 
   thenReturnExpectedStudentSessions(result: any) {
@@ -1058,5 +1107,18 @@ class Fixtures {
       this.sessionIdForStudents,
     );
     expect(this.studentSessionBySessionIdMaybeSingleMock).toHaveBeenCalled();
+  }
+
+  thenDeleteStudentSessionQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_sessions');
+    expect(this.deleteStudentSessionDeleteMock).toHaveBeenCalledTimes(1);
+    expect(this.deleteStudentSessionFirstEqMock).toHaveBeenCalledWith(
+      'session_id',
+      this.sessionIdToDelete,
+    );
+    expect(this.deleteStudentSessionSecondEqMock).toHaveBeenCalledWith(
+      'student_id',
+      'student-1',
+    );
   }
 }

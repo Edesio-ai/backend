@@ -1,7 +1,7 @@
 import { CreateCheckoutSessionsUseCase } from './create-checkout-session.use-case';
 import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
 import { SubscriptionRepository } from '../../domain/teaching/interface/subscription.repository';
-import { SupabaseUser } from '../../domain/auth/types/auth.type';
+import { User } from '../../domain/auth/types/auth.type';
 import { TokenUserNotFoundError } from '../../domain/auth/errors/auth.errors';
 
 describe('CreateCheckoutSessionsUseCase', () => {
@@ -15,7 +15,7 @@ describe('CreateCheckoutSessionsUseCase', () => {
     const promise = fixtures.whenExecuteWith(
       fixtures.priceId,
       fixtures.planType,
-      null as unknown as SupabaseUser,
+      null as unknown as User,
     );
 
     await fixtures.thenThrowTokenUserNotFound(promise);
@@ -70,7 +70,7 @@ class Fixtures {
   public readonly paymentClient: jest.Mocked<StripeClientInterface>;
   public readonly createCheckoutSessionsUseCase: CreateCheckoutSessionsUseCase;
 
-  public readonly user: SupabaseUser;
+  public readonly user: User;
   public readonly priceId: string;
   public readonly planType: string;
   public readonly existingSubscription: { checkout_url: string };
@@ -96,17 +96,8 @@ class Fixtures {
 
     this.user = {
       id: 'user-1',
-      aud: 'authenticated',
-      role: 'authenticated',
       email: 'owner@school.com',
-      email_confirmed_at: '2026-01-01T00:00:00.000Z',
-      phone: '',
-      app_metadata: { provider: 'email', providers: ['email'] },
-      user_metadata: { role: 'establishment' },
-      identities: [],
-      created_at: '2026-01-01T00:00:00.000Z',
-      updated_at: '2026-01-01T00:00:00.000Z',
-      is_anonymous: false,
+      metadata: { role: 'establishment' },
     };
     this.priceId = 'price_123';
     this.planType = 'pro';
@@ -118,7 +109,7 @@ class Fixtures {
   whenExecuteWith(
     priceId: string,
     planType: string,
-    user: SupabaseUser,
+    user: User,
   ): Promise<unknown> {
     return this.createCheckoutSessionsUseCase.execute(priceId, planType, user);
   }

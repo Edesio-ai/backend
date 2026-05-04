@@ -70,9 +70,27 @@ class Fixtures {
       createCourse: jest.fn(),
       storeCourseFile: jest.fn(),
       insertCourseFile: jest.fn(),
+      getCourseById: jest.fn(),
+      getCourseWithSessionById: jest.fn(),
+      getSessionCoursesBySessionId: jest.fn(),
+      getCourseValidatedQuestions: jest.fn(),
+      getCourseFilesByCourseId: jest.fn(),
+      getFileBufferFromStorage: jest.fn(),
+      deleteCourseById: jest.fn(),
+      updateCourse: jest.fn(),
     };
     this.questionsRepository = {
+      getQuestionById: jest.fn(),
+      deleteQuestionById: jest.fn(),
+      insertQuestions: jest.fn(),
       deleteQuestionsByCourseIds: jest.fn(),
+      getPendingQuestionCount: jest.fn(),
+      getCourseQuestions: jest.fn(),
+      deleteCourseQuizQuestions: jest.fn(),
+      insertQuestion: jest.fn(),
+      updateQuestionById: jest.fn(),
+      deleteCourseQuestionsByCourseId: jest.fn(),
+      getAnsweredQuestionCount: jest.fn(),
     };
     this.sessionRepository = {
       getSessionsByTeacherId: jest.fn(),
@@ -80,6 +98,7 @@ class Fixtures {
       createSession: jest.fn(),
       updateSessionName: jest.fn(),
       deleteSessionByTeacherId: jest.fn(),
+      getSessionById: jest.fn(),
     };
     this.teacherRepository = {
       linkTeacherToEstablishment: jest.fn(),
@@ -87,12 +106,23 @@ class Fixtures {
       getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
     this.studentRepository = {
+      getStudentsByIds: jest.fn(),
+      createStudentSession: jest.fn(),
+      getStudentJoinedSessions: jest.fn(),
+      getStudentByUserId: jest.fn(),
       getStudentsSessionsByIds: jest.fn(),
       getStudentSessionsBySessionId: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
       deleteStudentSessionsBySessionId: jest.fn(),
+      getStudentStatsByCourseId: jest.fn(),
+      deleteStudentCourseStatsByCourseId: jest.fn(),
+      createStudent: jest.fn(),
+      storeStudentPhoto: jest.fn(),
+      updateStudentPhoto: jest.fn(),
+      getStudentSessionBySessionId: jest.fn(),
+      deleteStudentSession: jest.fn(),
     };
     this.useCase = new DeleteSessionUseCase(
       this.courseRepository,
