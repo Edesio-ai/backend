@@ -9,6 +9,7 @@ import {
 import { CourseRepository } from '../../domain/teaching/interface/course.repository';
 import { EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
 import { SessionRepository } from '../../domain/teaching/interface/session.repository';
+import { StudentRepository } from '../../domain/teaching/interface/student.repository';
 import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
 import { Course } from '../../domain/teaching/types/course.type';
 
@@ -133,6 +134,56 @@ describe('GetSessionCoursesUseCase', () => {
     ).not.toHaveBeenCalled();
   });
 
+  // --- role student ---
+
+  it('should return session courses when student is enrolled in the session', async () => {
+    fixtures.whenStudentFound();
+    fixtures.whenStudentEnrolledInSession();
+    fixtures.whenCoursesReturned();
+
+    const result = await fixtures.whenExecuteAsStudent();
+
+    expect(result).toEqual(fixtures.courses);
+    expect(
+      fixtures.courseRepository.getSessionCoursesBySessionId,
+    ).toHaveBeenCalledWith(fixtures.sessionId);
+  });
+
+  it('should throw NotFoundError when student is not found', async () => {
+    fixtures.whenStudentNotFound();
+
+    await expect(fixtures.whenExecuteAsStudent()).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
+    expect(
+      fixtures.studentRepository.getStudentSessionBySessionId,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should throw NotFoundError when student session is not found', async () => {
+    fixtures.whenStudentFound();
+    fixtures.whenStudentSessionNotFound();
+
+    await expect(fixtures.whenExecuteAsStudent()).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
+    expect(
+      fixtures.courseRepository.getSessionCoursesBySessionId,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should throw ForbiddenError when student is not enrolled in the session', async () => {
+    fixtures.whenStudentFound();
+    fixtures.whenStudentEnrolledInOtherSession();
+
+    await expect(fixtures.whenExecuteAsStudent()).rejects.toBeInstanceOf(
+      ForbiddenError,
+    );
+    expect(
+      fixtures.courseRepository.getSessionCoursesBySessionId,
+    ).not.toHaveBeenCalled();
+  });
+
   // --- unknown role ---
 
   it('should throw ForbiddenError for unknown role', async () => {
@@ -162,6 +213,13 @@ class Fixtures {
     metadata: { role: 'establishment' },
   };
 
+  public readonly studentUser: AuthUser = {
+    id: 'user-3',
+    email: 'student@school.com',
+    emailConfirmedAt: '2026-01-01T00:00:00.000Z',
+    metadata: { role: 'student' },
+  };
+
   public readonly teacher = {
     id: 'teacher-1',
     name: 'Prof',
@@ -170,6 +228,20 @@ class Fixtures {
     establishmentId: 'est-1' as string | null,
     availableChatbots: 0,
     supabaseUserId: 'user-1',
+  };
+
+  public readonly student = {
+    id: 'student-1',
+    supabaseUserId: 'user-3',
+    name: 'Alice',
+    email: 'student@school.com',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    photoUrl: '',
+  };
+
+  public readonly studentSession = {
+    sessionId: this.sessionId,
+    studentId: 'student-1',
   };
 
   public readonly establishment: Establishment = {
@@ -205,6 +277,7 @@ class Fixtures {
   public readonly teachersRepository: jest.Mocked<TeacherRepository>;
   public readonly sessionRepository: jest.Mocked<SessionRepository>;
   public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
+  public readonly studentRepository: jest.Mocked<StudentRepository>;
   public readonly useCase: GetSessionCoursesUseCase;
 
   constructor() {
@@ -247,11 +320,27 @@ class Fixtures {
       createEstablishment: jest.fn(),
       getInvitationTokenByEstablishmentId: jest.fn(),
     };
+    this.studentRepository = {
+      getStudentsByIds: jest.fn(),
+      createStudentSession: jest.fn(),
+      getStudentJoinedSessions: jest.fn(),
+      getStudentByUserId: jest.fn(),
+      getStudentsSessionsByIds: jest.fn(),
+      getStudentSessionsBySessionId: jest.fn(),
+      deleteStudentSessionsBySessionId: jest.fn(),
+      getStudentStatsByCourseId: jest.fn(),
+      deleteStudentCourseStatsByCourseId: jest.fn(),
+      createStudent: jest.fn(),
+      storeStudentPhoto: jest.fn(),
+      updateStudentPhoto: jest.fn(),
+      getStudentSessionBySessionId: jest.fn(),
+    };
     this.useCase = new GetSessionCoursesUseCase(
       this.courseRepository,
       this.teachersRepository,
       this.sessionRepository,
       this.establishmentRepository,
+      this.studentRepository,
     );
   }
 
@@ -263,10 +352,14 @@ class Fixtures {
     return this.useCase.execute(this.sessionId, this.establishmentUser);
   }
 
+  whenExecuteAsStudent() {
+    return this.useCase.execute(this.sessionId, this.studentUser);
+  }
+
   whenExecuteWithUnknownRole() {
     const unknownUser: AuthUser = {
       ...this.teacherUser,
-      metadata: { role: 'student' },
+      metadata: { role: 'unknown' as any },
     };
     return this.useCase.execute(this.sessionId, unknownUser);
   }
@@ -326,5 +419,30 @@ class Fixtures {
     this.courseRepository.getSessionCoursesBySessionId.mockRejectedValue(
       this.coursesError,
     );
+  }
+
+  whenStudentFound() {
+    this.studentRepository.getStudentByUserId.mockResolvedValue(this.student);
+  }
+
+  whenStudentNotFound() {
+    this.studentRepository.getStudentByUserId.mockResolvedValue(null);
+  }
+
+  whenStudentEnrolledInSession() {
+    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue(
+      this.studentSession,
+    );
+  }
+
+  whenStudentSessionNotFound() {
+    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue(null);
+  }
+
+  whenStudentEnrolledInOtherSession() {
+    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue({
+      sessionId: this.sessionId,
+      studentId: 'other-student-99',
+    });
   }
 }

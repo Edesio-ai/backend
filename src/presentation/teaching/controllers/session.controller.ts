@@ -96,7 +96,7 @@ export class SessionController {
     return { count: count };
   }
 
-  @Roles('teacher', 'establishment')
+  @Roles('teacher', 'establishment', 'student')
   @Get('/:sessionId/courses')
   async getSessionCourses(
     @Param('sessionId') sessionId: string,

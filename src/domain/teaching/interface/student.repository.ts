@@ -15,7 +15,7 @@ export interface StudentRepository {
   getStudentJoinedSessions(studentId: string): Promise<StudentJoinedSession[]>;
   getStudentByUserId(userId: string): Promise<Student | null>;
   getStudentsSessionsByIds(sessionIds: string[]): Promise<StudentSession[]>;
-  getStudentsSessionsById(
+  getStudentSessionsBySessionId(
     sessionId: string,
     select: string,
   ): Promise<SessionStudent[]>;
@@ -25,4 +25,7 @@ export interface StudentRepository {
   createStudent(user: AuthUser): Promise<Student>;
   storeStudentPhoto(buffer: Buffer, storagePath: string): Promise<string>;
   updateStudentPhoto(studentId: string, photoUrl: string): Promise<void>;
+  getStudentSessionBySessionId(
+    sessionId: string,
+  ): Promise<StudentSession | null>;
 }

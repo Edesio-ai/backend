@@ -9,6 +9,7 @@ import {
   Student,
   StudentCourseStats,
   StudentJoinedSession,
+  StudentSession,
 } from 'src/domain/teaching/types/student.type';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
@@ -195,7 +196,7 @@ export class StudentSupabaseRepository implements StudentRepository {
     }
   }
 
-  public async getStudentsSessionsById(
+  public async getStudentSessionsBySessionId(
     sessionId: string,
     select: string = '*',
   ): Promise<SessionStudent[]> {
@@ -270,5 +271,25 @@ export class StudentSupabaseRepository implements StudentRepository {
       );
       throw new ServerError(error.message);
     }
+  }
+
+  public async getStudentSessionBySessionId(
+    sessionId: string,
+  ): Promise<StudentSession | null> {
+    const { data, error } = await this.supabase
+      .from('student_sessions')
+      .select('*')
+      .eq('session_id', sessionId)
+      .maybeSingle();
+
+    if (error) {
+      console.error(
+        'An error occurred while getting student session by session id',
+        sessionId,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+    return data ? StudentMapper.sessionToDomain(data) : null;
   }
 }
