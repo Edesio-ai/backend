@@ -214,11 +214,39 @@ describe('QuestionSupabaseRepository', () => {
       fixtures.whenDeleteCourseQuestionsByCourseId(),
     ).rejects.toBeInstanceOf(QuestionServerError);
   });
+
+  // --- getAnsweredQuestionCount ---
+
+  it('should return the answered question count for a student', async () => {
+    fixtures.whenGetAnsweredCountSucceeds(17);
+
+    const result = await fixtures.whenGetAnsweredQuestionCount();
+
+    expect(result).toBe(17);
+    fixtures.thenGetAnsweredCountQueryBuilt();
+  });
+
+  it('should return 0 when count is null', async () => {
+    fixtures.whenGetAnsweredCountReturnsNull();
+
+    const result = await fixtures.whenGetAnsweredQuestionCount();
+
+    expect(result).toBe(0);
+  });
+
+  it('should throw QuestionServerError when getAnsweredQuestionCount fails', async () => {
+    fixtures.whenGetAnsweredCountFails();
+
+    await expect(
+      fixtures.whenGetAnsweredQuestionCount(),
+    ).rejects.toBeInstanceOf(QuestionServerError);
+  });
 });
 
 class Fixtures {
   public readonly courseId = 'course-1';
   public readonly courseIds = ['course-1', 'course-2'];
+  public readonly studentId = 'student-1';
 
   public readonly supabaseRow = {
     id: 'q-1',
@@ -272,6 +300,12 @@ class Fixtures {
   private readonly countSelectMock: jest.Mock = jest.fn();
   private readonly countInMock: jest.Mock = jest.fn();
   private readonly countIsMock: jest.Mock = jest.fn();
+
+  // getAnsweredQuestionCount chain: .select().eq().not()
+  private readonly countNotMock: jest.Mock = jest.fn();
+  private readonly countEqMock: jest.Mock = jest.fn(() => ({
+    not: this.countNotMock,
+  }));
 
   private readonly questionsOrderMock: jest.Mock = jest.fn();
   private readonly getByIdSingleMock: jest.Mock = jest.fn();
@@ -331,7 +365,10 @@ class Fixtures {
   public readonly repository: QuestionSupabaseRepository;
 
   constructor() {
-    this.countSelectMock.mockReturnValue({ in: this.countInMock });
+    this.countSelectMock.mockReturnValue({
+      in: this.countInMock,
+      eq: this.countEqMock,
+    });
     this.countInMock.mockReturnValue({ is: this.countIsMock });
 
     const supabaseMock = { from: this.fromMock };
@@ -604,6 +641,10 @@ class Fixtures {
     return this.repository.deleteCourseQuestionsByCourseId(this.courseId);
   }
 
+  whenGetAnsweredQuestionCount() {
+    return this.repository.getAnsweredQuestionCount(this.studentId);
+  }
+
   whenDeleteCourseQuestionsByCourseIdSucceeds() {
     this.courseQuestionsDeleteEqMock.mockResolvedValue({ error: null });
   }
@@ -621,5 +662,30 @@ class Fixtures {
       'course_id',
       this.courseId,
     );
+  }
+
+  whenGetAnsweredCountSucceeds(count: number) {
+    this.countNotMock.mockResolvedValue({ count, error: null });
+  }
+
+  whenGetAnsweredCountReturnsNull() {
+    this.countNotMock.mockResolvedValue({ count: null, error: null });
+  }
+
+  whenGetAnsweredCountFails() {
+    this.countNotMock.mockResolvedValue({
+      count: null,
+      error: { message: 'answered count failed' },
+    });
+  }
+
+  thenGetAnsweredCountQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('course_questions');
+    expect(this.countSelectMock).toHaveBeenCalledWith('*', {
+      count: 'exact',
+      head: true,
+    });
+    expect(this.countEqMock).toHaveBeenCalledWith('student_id', this.studentId);
+    expect(this.countNotMock).toHaveBeenCalledWith('answer', 'is', null);
   }
 }

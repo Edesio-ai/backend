@@ -31,6 +31,7 @@ import { AuthErrorFilter } from 'src/presentation/filters/auth.filter';
 import { EvaluateAnswerDto } from '../dto/question/evaluate-answer.dto';
 import { EvaluateAnswerUseCase } from 'src/application/question/evaluate-answer.use-case';
 import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
+import { GetAnsweredQuestionCountUseCase } from 'src/application/question/get-answered-question-count.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('teacher')
@@ -45,6 +46,7 @@ export class QuestionController {
     private readonly deleteQuestionByIdUseCase: DeleteQuestionByIdUseCase,
     private readonly updateQuestionUseCase: UpdateQuestionByIdUseCase,
     private readonly evaluateAnswerUseCase: EvaluateAnswerUseCase,
+    private readonly getAnsweredQuestionsCountUseCase: GetAnsweredQuestionCountUseCase,
   ) {}
 
   @UseFilters(AuthErrorFilter)
@@ -120,5 +122,16 @@ export class QuestionController {
     @Body() body: EvaluateAnswerDto,
   ): Promise<EvaluateAnswerResponse> {
     return await this.evaluateAnswerUseCase.execute(body);
+  }
+
+  @Roles()
+  @Get('answered')
+  async getAnsweredQuestionsCount(
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<{ answeredQuestionsCount: number }> {
+    const { user } = req;
+    const answeredQuestionsCount =
+      await this.getAnsweredQuestionsCountUseCase.execute(user);
+    return { answeredQuestionsCount };
   }
 }
