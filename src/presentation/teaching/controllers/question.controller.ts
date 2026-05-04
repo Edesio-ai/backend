@@ -56,6 +56,7 @@ export class QuestionController {
     return { count: count ?? 0 };
   }
 
+  @Roles('student', 'teacher')
   @Get('course/:courseId')
   async getCourseQuestions(
     @Req() req: Request & { user: AuthUser },

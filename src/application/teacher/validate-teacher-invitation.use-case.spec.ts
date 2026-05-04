@@ -5,7 +5,6 @@ import {
   InvitationTokenExpiredError,
 } from 'src/domain/auth/errors/auth.errors';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
-import { TeacherNotFoundError } from 'src/domain/teaching/error';
 import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
 import { TokenRepository } from 'src/domain/token/contract/token.repository';
 import { ValidateTeacherInvitationUseCase } from './validate-teacher-invitation.use-case';
@@ -22,7 +21,7 @@ describe('ValidateTeacherInvitationUseCase', () => {
 
     const promise = fixtures.whenExecute();
 
-    await expect(promise).rejects.toBeInstanceOf(TeacherNotFoundError);
+    await expect(promise).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('should return null when teacher is already attached to an establishment', async () => {

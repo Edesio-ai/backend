@@ -9,10 +9,6 @@ import {
 } from 'src/domain/teaching/types/course.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
-  CourseNotFoundError,
-  TeacherNotFoundError,
-} from 'src/domain/teaching/error';
-import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
 } from 'src/domain/teaching/interface/teacher.repository';
@@ -25,6 +21,7 @@ import {
   type StudentRepository,
 } from 'src/domain/teaching/interface/student.repository';
 import { StudentCourseStats } from 'src/domain/teaching/types/student.type';
+import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 @Injectable()
 export class GetCourseRankingUseCase {
@@ -42,13 +39,13 @@ export class GetCourseRankingUseCase {
   async execute(courseId: string, user: AuthUser): Promise<CourseRanking[]> {
     const course = await this.courseRepository.getCourseById(courseId);
     if (!course) {
-      throw new CourseNotFoundError(`Course with id ${courseId} not found`);
+      throw new NotFoundError(`Course with id ${courseId} not found`);
     }
 
     // We ony handle teacher role for now but in the future we will handle students too
     const teacher = await this.teacherRepository.getTeacherByUserId(user.id);
     if (!teacher) {
-      throw new TeacherNotFoundError(`Teacher with id ${user.id} not found`);
+      throw new NotFoundError(`Teacher with id ${user.id} not found`);
     }
 
     const session = await this.sessionRepository.getSessionById(

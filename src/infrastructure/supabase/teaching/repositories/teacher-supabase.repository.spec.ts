@@ -1,5 +1,4 @@
 import { TeacherSupabaseRepository } from './teacher-supabase.repository';
-import { TeacheServerError } from '../../../../domain/teaching/error';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 describe('TeacherSupabaseRepository', () => {
@@ -18,12 +17,12 @@ describe('TeacherSupabaseRepository', () => {
     fixtures.thenReturnExpectedTeachers(result);
   });
 
-  it('should throw TeacherNotFoundError when teacher query fails', async () => {
+  it('should throw ServerError when establishment teachers query fails', async () => {
     fixtures.whenTeacherQueryReturnsError();
 
     const promise = fixtures.whenGetTeacherByEstablishmentId();
 
-    await fixtures.thenThrowTeacherServerError(promise);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   });
 
   it('should return sessions for teacher ids', async () => {
@@ -62,7 +61,7 @@ describe('TeacherSupabaseRepository', () => {
     fixtures.thenReturnExpectedTeacher(result);
   });
 
-  it('should throw TeacheServerError when getTeacherByUserId fails', async () => {
+  it('should throw ServerError when getTeacherByUserId fails', async () => {
     fixtures.whenGetTeacherByUserIdReturnsError();
 
     const promise = fixtures.whenGetTeacherByUserId();
@@ -88,7 +87,7 @@ describe('TeacherSupabaseRepository', () => {
     fixtures.thenReturnExpectedTeacher(result);
   });
 
-  it('should throw TeacheServerError when createTeacher fails', async () => {
+  it('should throw ServerError when createTeacher fails', async () => {
     fixtures.whenCreateTeacherReturnsError();
 
     const promise = fixtures.whenCreateTeacher();
@@ -111,7 +110,7 @@ describe('TeacherSupabaseRepository', () => {
 
     const promise = fixtures.whenLinkTeacherToEstablishment();
 
-    await fixtures.thenThrowTeacherServerError(promise);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
     fixtures.thenRollbackInvitationTokenCalled();
   });
 
@@ -407,7 +406,7 @@ class Fixtures {
   }
 
   async thenThrowTeacherServerError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(TeacheServerError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   thenTeacherQueryBuiltWithExpectedArguments() {

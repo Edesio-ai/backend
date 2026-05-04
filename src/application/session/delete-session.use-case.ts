@@ -19,7 +19,7 @@ import {
   STUDENT_REPOSITORY,
   type StudentRepository,
 } from 'src/domain/teaching/interface/student.repository';
-import { TeacherNotFoundError } from 'src/domain/teaching/error';
+import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 export class DeleteSessionUseCase {
   constructor(
@@ -57,7 +57,7 @@ export class DeleteSessionUseCase {
 
     const teacher = await this.teacherRepository.getTeacherByUserId(userId);
     if (!teacher) {
-      throw new TeacherNotFoundError();
+      throw new NotFoundError(`Teacher with id ${userId} not found`);
     }
     const teahcerId = teacher.id;
 

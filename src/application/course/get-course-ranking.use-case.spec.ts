@@ -1,10 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { GetCourseRankingUseCase } from './get-course-ranking.use-case';
 import { AuthUser } from '../../domain/auth/types/auth.type';
-import {
-  CourseNotFoundError,
-  TeacherNotFoundError,
-} from '../../domain/teaching/error';
 import { CourseRepository } from '../../domain/teaching/interface/course.repository';
 import { SessionRepository } from '../../domain/teaching/interface/session.repository';
 import { StudentRepository } from '../../domain/teaching/interface/student.repository';
@@ -12,6 +8,7 @@ import { TeacherRepository } from '../../domain/teaching/interface/teacher.repos
 import { Course } from '../../domain/teaching/types/course.type';
 import { Session } from '../../domain/teaching/types/session.type';
 import { StudentCourseStats } from '../../domain/teaching/types/student.type';
+import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 describe('GetCourseRankingUseCase', () => {
   let fixtures: Fixtures;
@@ -20,21 +17,21 @@ describe('GetCourseRankingUseCase', () => {
     fixtures = new Fixtures();
   });
 
-  it('should throw CourseNotFoundError when course is missing', async () => {
+  it('should throw NotFoundError when course is missing', async () => {
     fixtures.whenCourseNotFound();
 
     const promise = fixtures.whenExecute();
 
-    await expect(promise).rejects.toBeInstanceOf(CourseNotFoundError);
+    await expect(promise).rejects.toBeInstanceOf(NotFoundError);
   });
 
-  it('should throw TeacherNotFoundError when teacher is missing', async () => {
+  it('should throw NotFoundError when teacher is missing', async () => {
     fixtures.whenCourseFound();
     fixtures.whenTeacherNotFound();
 
     const promise = fixtures.whenExecute();
 
-    await expect(promise).rejects.toBeInstanceOf(TeacherNotFoundError);
+    await expect(promise).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('should throw ForbiddenException when session teacher does not match', async () => {
