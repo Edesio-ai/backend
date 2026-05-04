@@ -156,6 +156,7 @@ class Fixtures {
       getCourseFilesByCourseId: jest.fn(),
       getFileBufferFromStorage: jest.fn(),
       deleteCourseById: jest.fn(),
+      updateCourse: jest.fn(),
     };
 
     this.teacherRepository = {
@@ -164,6 +165,7 @@ class Fixtures {
       getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
 
     this.questionsRepository = {
@@ -177,13 +179,24 @@ class Fixtures {
       deleteCourseQuizQuestions: jest.fn(),
       updateQuestionById: jest.fn(),
       deleteCourseQuestionsByCourseId: jest.fn(),
+      getAnsweredQuestionCount: jest.fn(),
     };
 
     this.studentRepository = {
+      getStudentsByIds: jest.fn(),
+      createStudentSession: jest.fn(),
+      getStudentJoinedSessions: jest.fn(),
+      getStudentByUserId: jest.fn(),
       getStudentsSessionsByIds: jest.fn(),
+      getStudentSessionsBySessionId: jest.fn(),
       deleteStudentSessionsBySessionId: jest.fn(),
       getStudentStatsByCourseId: jest.fn(),
       deleteStudentCourseStatsByCourseId: jest.fn(),
+      createStudent: jest.fn(),
+      storeStudentPhoto: jest.fn(),
+      updateStudentPhoto: jest.fn(),
+      getStudentSessionBySessionId: jest.fn(),
+      deleteStudentSession: jest.fn(),
     };
 
     this.useCase = new DeleteCourseUseCase(
@@ -216,6 +229,7 @@ class Fixtures {
     this.courseRepository.getCourseWithSessionById.mockResolvedValue({
       id: this.courseId,
       session: { teacherId: this.teacher.id },
+      teachers: {},
     });
   }
 
@@ -223,6 +237,7 @@ class Fixtures {
     this.courseRepository.getCourseWithSessionById.mockResolvedValue({
       id: this.courseId,
       session: { teacherId: 'other-teacher' },
+      teachers: {},
     });
   }
 

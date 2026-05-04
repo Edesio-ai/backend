@@ -90,6 +90,7 @@ class Fixtures {
     this.fileRepository = {
       deleteFileById: jest.fn(),
       getCourseFileById: jest.fn(),
+      getCourseFilesByCourseId: jest.fn(),
     };
     this.courseRepository = {
       getCourseById: jest.fn(),

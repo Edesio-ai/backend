@@ -245,6 +245,8 @@ class Fixtures {
       getCourseQuestions: jest.fn(),
       deleteCourseQuizQuestions: jest.fn(),
       updateQuestionById: jest.fn(),
+      deleteCourseQuestionsByCourseId: jest.fn(),
+      getAnsweredQuestionCount: jest.fn(),
     };
     this.teachersRepository = {
       linkTeacherToEstablishment: jest.fn(),
@@ -252,6 +254,7 @@ class Fixtures {
       getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
     this.coursesRepository = {
       getCourseById: jest.fn(),
@@ -267,6 +270,8 @@ class Fixtures {
       getCourseValidatedQuestions: jest.fn(),
       getCourseFilesByCourseId: jest.fn(),
       getFileBufferFromStorage: jest.fn(),
+      deleteCourseById: jest.fn(),
+      updateCourse: jest.fn(),
     };
 
     this.useCase = new UpdateQuestionByIdUseCase(

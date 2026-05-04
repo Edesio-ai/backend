@@ -12,6 +12,7 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/m
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
 import { GetStudentBatchUseCase } from 'src/application/student/get-student-batch.use-case';
 import { UploadStudentPhotoUseCase } from 'src/application/student/upload-student-photo.use-case';
+import { DeleteStudentSessionUseCase } from 'src/application/student/delete-student-session.use-case';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UploadStudentPhotoUseCase } from 'src/application/student/upload-studen
     JoinSessionByCodeUseCase,
     GetStudentBatchUseCase,
     UploadStudentPhotoUseCase,
+    DeleteStudentSessionUseCase,
   ],
 })
 export class StudentModule {}

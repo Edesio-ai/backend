@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -32,6 +33,7 @@ import { GetStudentBatchBodyDto } from '../dto/student/get-student-batch.dto';
 import { GetStudentBatchUseCase } from 'src/application/student/get-student-batch.use-case';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadStudentPhotoUseCase } from 'src/application/student/upload-student-photo.use-case';
+import { DeleteStudentSessionUseCase } from 'src/application/student/delete-student-session.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')
@@ -46,6 +48,7 @@ export class StudentController {
     private readonly getSessionStudentUseCase: GetSessionStudentUseCase,
     private readonly getStudentBatchUseCase: GetStudentBatchUseCase,
     private readonly uploadStudentPhotoUseCase: UploadStudentPhotoUseCase,
+    private readonly deleteStudentSessionUseCase: DeleteStudentSessionUseCase,
   ) {}
 
   @Get()
@@ -129,5 +132,14 @@ export class StudentController {
       payload,
     );
     return { photoUrl };
+  }
+
+  @Delete('session/:sessionId')
+  async deleteStudentSession(
+    @Param('sessionId') sessionId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<void> {
+    const { user } = req;
+    await this.deleteStudentSessionUseCase.execute(sessionId, user);
   }
 }

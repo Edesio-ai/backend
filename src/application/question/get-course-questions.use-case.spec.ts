@@ -105,6 +105,7 @@ class Fixtures {
   public readonly courseWithSession: CourseWithSession = {
     id: this.courseId,
     session: { teacherId: this.teacher.id },
+    teachers: {},
   };
 
   public readonly questions: Question[] = [
@@ -139,6 +140,8 @@ class Fixtures {
       insertQuestion: jest.fn(),
       deleteCourseQuizQuestions: jest.fn(),
       updateQuestionById: jest.fn(),
+      deleteCourseQuestionsByCourseId: jest.fn(),
+      getAnsweredQuestionCount: jest.fn(),
     };
     this.teachersRepository = {
       linkTeacherToEstablishment: jest.fn(),
@@ -146,9 +149,12 @@ class Fixtures {
       getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
     this.coursesRepository = {
       getFileBufferFromStorage: jest.fn(),
+      deleteCourseById: jest.fn(),
+      updateCourse: jest.fn(),
       getCourseById: jest.fn(),
       getCourseWithSessionById: jest.fn(),
       getSessionCoursesBySessionId: jest.fn(),
@@ -198,6 +204,7 @@ class Fixtures {
     this.coursesRepository.getCourseWithSessionById.mockResolvedValue({
       id: this.courseId,
       session: { teacherId: 'other-teacher' },
+      teachers: {},
     });
   }
 

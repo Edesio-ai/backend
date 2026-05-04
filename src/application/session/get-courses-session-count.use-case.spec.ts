@@ -42,6 +42,14 @@ class Fixtures {
       createCourse: jest.fn(),
       storeCourseFile: jest.fn(),
       insertCourseFile: jest.fn(),
+      getCourseById: jest.fn(),
+      getCourseWithSessionById: jest.fn(),
+      getSessionCoursesBySessionId: jest.fn(),
+      getCourseValidatedQuestions: jest.fn(),
+      getCourseFilesByCourseId: jest.fn(),
+      getFileBufferFromStorage: jest.fn(),
+      deleteCourseById: jest.fn(),
+      updateCourse: jest.fn(),
     };
     this.useCase = new GetCoursesSessionCountUseCase(this.courseRepository);
   }

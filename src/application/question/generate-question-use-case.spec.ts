@@ -223,9 +223,16 @@ class Fixtures {
       getCourseFilesByCourseId: jest.fn(),
       getFileBufferFromStorage: jest.fn(),
       deleteCourseById: jest.fn(),
+      updateCourse: jest.fn(),
     };
-    this.pdfExtractor = { extractTextFromPdf: jest.fn() };
-    this.openaiRepository = { generateQuestions: jest.fn() };
+    this.pdfExtractor = {
+      extractTextFromPdf: jest.fn(),
+      extractQuestionsToPdf: jest.fn(),
+    };
+    this.openaiRepository = {
+      generateQuestions: jest.fn(),
+      evaluateAnswer: jest.fn(),
+    };
     this.questionRepository = {
       getQuestionById: jest.fn(),
       deleteQuestionById: jest.fn(),
@@ -237,6 +244,7 @@ class Fixtures {
       deleteCourseQuizQuestions: jest.fn(),
       updateQuestionById: jest.fn(),
       deleteCourseQuestionsByCourseId: jest.fn(),
+      getAnsweredQuestionCount: jest.fn(),
     };
     this.teacherRepository = {
       linkTeacherToEstablishment: jest.fn(),
@@ -244,6 +252,7 @@ class Fixtures {
       getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       createTeacher: jest.fn(),
+      getTeacherByConditions: jest.fn(),
     };
 
     this.useCase = new GenerateQuestionUseCase(
@@ -274,6 +283,7 @@ class Fixtures {
       id: this.body.courseId,
       contentText: 'Contenu du cours',
       session: { teacherId: this.teacher.id, language: 'francais' },
+      teachers: {},
       ...overrides,
     });
   }
@@ -283,6 +293,7 @@ class Fixtures {
       id: this.body.courseId,
       contentText: 'Contenu',
       session: { teacherId: 'other-teacher', language: 'francais' },
+      teachers: {},
     });
   }
 

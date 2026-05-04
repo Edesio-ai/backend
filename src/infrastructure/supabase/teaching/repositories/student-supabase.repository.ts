@@ -292,4 +292,23 @@ export class StudentSupabaseRepository implements StudentRepository {
     }
     return data ? StudentMapper.sessionToDomain(data) : null;
   }
+
+  public async deleteStudentSession(
+    sessionId: string,
+    studentId: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('student_sessions')
+      .delete()
+      .eq('session_id', sessionId)
+      .eq('student_id', studentId);
+
+    if (error) {
+      console.error(
+        `Error deleting student session for session id: ${sessionId} and student id: ${studentId}`,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+  }
 }

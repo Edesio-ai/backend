@@ -28,4 +28,5 @@ export interface StudentRepository {
   getStudentSessionBySessionId(
     sessionId: string,
   ): Promise<StudentSession | null>;
+  deleteStudentSession(sessionId: string, studentId: string): Promise<void>;
 }
