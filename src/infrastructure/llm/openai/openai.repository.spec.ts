@@ -3,6 +3,7 @@ import { QuestionGenerationConfig } from 'src/domain/teaching/types/question.typ
 import { OpenAiServerError } from 'src/domain/shared/llm/errors/open-ai.error';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { EvaluateAnswerBody } from 'src/application/question/evaluate-answer.use-case';
+import { GenerateCompletionFeedbackBody } from 'src/application/llm/generate-completion-feedback.use-case';
 
 describe('OpenaiRepository', () => {
   let fixtures: Fixtures;
@@ -152,6 +153,102 @@ describe('OpenaiRepository', () => {
       expect(result.actionPrompt).toBeNull();
     });
   });
+
+  describe('generateCompletionFeedback', () => {
+    it('should return trimmed feedback from OpenAI', async () => {
+      fixtures.whenOpenAiReturnsCompletionMessage('  Très bien !  ');
+
+      const result = await fixtures.whenGenerateCompletionFeedback(
+        fixtures.completionBodyHighScore,
+      );
+
+      expect(result).toBe('Très bien !');
+    });
+
+    it('should call OpenAI with gpt-4o-mini and completion settings', async () => {
+      fixtures.whenOpenAiReturnsCompletionMessage('OK');
+
+      await fixtures.whenGenerateCompletionFeedback(
+        fixtures.completionBodyHighScore,
+      );
+
+      expect(fixtures.completionsCreateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: 'gpt-4o-mini',
+          temperature: 0.7,
+          max_tokens: 150,
+        }),
+      );
+      expect(
+        fixtures.completionsCreateMock.mock.calls[0][0],
+      ).not.toHaveProperty('response_format');
+    });
+
+    it('should inject high-score context when percent >= 70', async () => {
+      fixtures.whenOpenAiReturnsCompletionMessage('msg');
+
+      await fixtures.whenGenerateCompletionFeedback(
+        fixtures.completionBodyHighScore,
+      );
+
+      const userContent = fixtures.getLastCompletionUserContent();
+      expect(userContent).toContain('Félicite-le chaleureusement');
+    });
+
+    it('should inject medium-score context when percent between 50 and 69', async () => {
+      fixtures.whenOpenAiReturnsCompletionMessage('msg');
+
+      await fixtures.whenGenerateCompletionFeedback(
+        fixtures.completionBodyMediumScore,
+      );
+
+      const userContent = fixtures.getLastCompletionUserContent();
+      expect(userContent).toContain('résultat moyen');
+    });
+
+    it('should inject low-score context when percent < 50', async () => {
+      fixtures.whenOpenAiReturnsCompletionMessage('msg');
+
+      await fixtures.whenGenerateCompletionFeedback(
+        fixtures.completionBodyLowScore,
+      );
+
+      const userContent = fixtures.getLastCompletionUserContent();
+      expect(userContent).toContain('difficultés');
+    });
+
+    it('should use 0% when total is zero', async () => {
+      fixtures.whenOpenAiReturnsCompletionMessage('msg');
+
+      await fixtures.whenGenerateCompletionFeedback(
+        fixtures.completionBodyZeroTotal,
+      );
+
+      const userContent = fixtures.getLastCompletionUserContent();
+      expect(userContent).toContain('0/0');
+      expect(userContent).toContain('0%');
+    });
+
+    it('should return default message when OpenAI content is empty', async () => {
+      fixtures.whenOpenAiReturnsCompletionNoContent();
+
+      const result = await fixtures.whenGenerateCompletionFeedback(
+        fixtures.completionBodyHighScore,
+      );
+
+      expect(result).toBe('Bravo pour avoir terminé ce quiz !');
+    });
+
+    it('should throw ServerError when OpenAI client throws', async () => {
+      fixtures.whenOpenAiCompletionThrows();
+
+      await expect(
+        fixtures.whenGenerateCompletionFeedback(
+          fixtures.completionBodyHighScore,
+        ),
+      ).rejects.toBeInstanceOf(ServerError);
+    });
+  });
 });
 
 class Fixtures {
@@ -181,6 +278,34 @@ class Fixtures {
     explanation: 'La Révolution française a été causée par plusieurs facteurs.',
   };
 
+  public readonly completionBodyHighScore: GenerateCompletionFeedbackBody = {
+    total: 10,
+    score: 8,
+    courseTitle: 'Sciences',
+    studentName: 'Léa',
+  };
+
+  public readonly completionBodyMediumScore: GenerateCompletionFeedbackBody = {
+    total: 10,
+    score: 6,
+    courseTitle: 'Sciences',
+    studentName: 'Léa',
+  };
+
+  public readonly completionBodyLowScore: GenerateCompletionFeedbackBody = {
+    total: 10,
+    score: 4,
+    courseTitle: 'Sciences',
+    studentName: 'Léa',
+  };
+
+  public readonly completionBodyZeroTotal: GenerateCompletionFeedbackBody = {
+    total: 0,
+    score: 0,
+    courseTitle: 'Sciences',
+    studentName: 'Léa',
+  };
+
   public readonly completionsCreateMock = jest.fn();
 
   private readonly openaiClientMock = {
@@ -207,6 +332,16 @@ class Fixtures {
 
   whenEvaluateAnswer() {
     return this.repository.evaluateAnswer(this.evaluateAnswerBody);
+  }
+
+  whenGenerateCompletionFeedback(body: GenerateCompletionFeedbackBody) {
+    return this.repository.generateCompletionFeedback(body);
+  }
+
+  getLastCompletionUserContent(): string {
+    const callArgs = this.completionsCreateMock.mock.calls.at(-1)?.[0];
+    const userMessage = callArgs?.messages?.find((m: any) => m.role === 'user');
+    return userMessage?.content as string;
   }
 
   whenOpenAiReturnsQuestions() {
@@ -287,5 +422,21 @@ class Fixtures {
     this.completionsCreateMock.mockResolvedValue({
       choices: [{ message: { content: null } }],
     });
+  }
+
+  whenOpenAiReturnsCompletionMessage(content: string) {
+    this.completionsCreateMock.mockResolvedValue({
+      choices: [{ message: { content } }],
+    });
+  }
+
+  whenOpenAiReturnsCompletionNoContent() {
+    this.completionsCreateMock.mockResolvedValue({
+      choices: [{ message: { content: null } }],
+    });
+  }
+
+  whenOpenAiCompletionThrows() {
+    this.completionsCreateMock.mockRejectedValue(new Error('network'));
   }
 }
