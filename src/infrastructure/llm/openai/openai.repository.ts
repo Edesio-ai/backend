@@ -18,6 +18,9 @@ import {
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { EvaluateAnswerBody } from 'src/application/question/evaluate-answer.use-case';
 import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
+import { GenerateCompletionFeedbackBody } from 'src/application/llm/generate-completion-feedback.use-case';
+import { getGenerateCompletionFeedbackSystemPrompt } from './prompts/generate-completion-feedback.prompt';
+import { getGenerateCompletionFeedbackUserPrompt } from './prompts/generate-completion-feedback.prompt';
 
 @Injectable()
 export class OpenaiRepository implements OpenaiRepositoryContract {
@@ -104,5 +107,46 @@ export class OpenaiRepository implements OpenaiRepositoryContract {
       actionPrompt: evaluation.actionPrompt || null,
       correctAnswer: body.correctAnswer,
     };
+  }
+
+  public async generateCompletionFeedback(
+    body: GenerateCompletionFeedbackBody,
+  ): Promise<string> {
+    try {
+      const { total, score } = body;
+
+      const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+
+      const feedbackContext =
+        percent >= 70
+          ? "L'élève a bien réussi. Félicite-le chaleureusement et souligne sa réussite."
+          : percent >= 50
+            ? "L'élève a un résultat moyen. Encourage-le à continuer ses efforts."
+            : "L'élève a eu des difficultés. Motive-le positivement sans le décourager.";
+
+      const systemPrompt = getGenerateCompletionFeedbackSystemPrompt();
+      const userPrompt = getGenerateCompletionFeedbackUserPrompt(
+        body,
+        feedbackContext,
+        percent,
+      );
+
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 150,
+      });
+
+      const feedback =
+        response.choices[0]?.message?.content?.trim() ||
+        'Bravo pour avoir terminé ce quiz !';
+      return feedback;
+    } catch (error) {
+      throw new ServerError('No response from OpenAI');
+    }
   }
 }
