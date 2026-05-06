@@ -1,6 +1,5 @@
 import { OpenaiRepository } from './openai.repository';
 import { QuestionGenerationConfig } from 'src/domain/teaching/types/question.type';
-import { OpenAiServerError } from 'src/domain/shared/llm/errors/open-ai.error';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { EvaluateAnswerBody } from 'src/application/question/evaluate-answer.use-case';
 import { GenerateCompletionFeedbackBody } from 'src/application/llm/generate-completion-feedback.use-case';
@@ -26,12 +25,12 @@ describe('OpenaiRepository', () => {
     );
   });
 
-  it('should throw OpenAiServerError when response has no content', async () => {
+  it('should throw ServerError when response has no content', async () => {
     fixtures.whenOpenAiReturnsNoContent();
 
     await expect(
       fixtures.whenGenerateQuestions('Contenu'),
-    ).rejects.toBeInstanceOf(OpenAiServerError);
+    ).rejects.toBeInstanceOf(ServerError);
   });
 
   it('should truncate content longer than 15000 characters', async () => {

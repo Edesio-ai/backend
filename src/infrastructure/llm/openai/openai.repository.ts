@@ -10,7 +10,6 @@ import {
   getGenerateQuestionSystemPrompt,
   getGenerateQuestionUserPrompt,
 } from './prompts/generate-question.prompt';
-import { OpenAiServerError } from 'src/domain/shared/llm/errors/open-ai.error';
 import {
   getEvaluateAnswerSystemPrompt,
   getEvaluateAnswerUserPrompt,
@@ -67,7 +66,7 @@ export class OpenaiRepository implements OpenaiRepositoryContract {
     const content = response.choices[0]?.message?.content;
 
     if (!content) {
-      throw new OpenAiServerError('No response from OpenAI');
+      throw new ServerError('No response from OpenAI');
     }
 
     return JSON.parse(content).questions;

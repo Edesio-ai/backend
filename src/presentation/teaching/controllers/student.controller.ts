@@ -18,7 +18,6 @@ import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
-import { GlobalErrorFilter } from 'src/presentation/filters/shared.filter';
 import { CreateStudentUseCase } from 'src/application/student/create-student.use-case';
 import { GetStudentJoinedSessionsUseCase } from 'src/application/student/get-student-joined-sessions.use-case';
 import {
@@ -38,6 +37,7 @@ import { UpdateOrCreateStudentCourseStatsBodyDto } from '../dto/student/update-o
 import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/student/update-or-create-student-course-stats.use-case';
 import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
 import { GetStudentCourseQuestionsUseCase } from 'src/application/student/get-student-course-questions.use-case';
+import { GlobalErrorFilter } from 'src/presentation/filters/global';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')

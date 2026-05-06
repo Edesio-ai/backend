@@ -1,6 +1,8 @@
 import { TokenSupabaseRepository } from './token-supabase.repository';
-import { ServerTokenError } from '../../../domain/token/token.error';
-import { BadRequestError } from 'src/domain/shared/global/errors/global.errors';
+import {
+  BadRequestError,
+  ServerError,
+} from 'src/domain/shared/global/errors/global.errors';
 
 describe('TokenSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -17,12 +19,12 @@ describe('TokenSupabaseRepository', () => {
     fixtures.thenQueryBuiltWithExpectedArguments();
   });
 
-  it('should throw ServerTokenError when query fails', async () => {
+  it('should throw ServerError when query fails', async () => {
     fixtures.whenSupabaseDeleteFails();
 
     const promise = fixtures.whenDeleteInvitationToken();
 
-    await fixtures.thenThrowServerTokenError(promise);
+    await fixtures.thenThrowServerError(promise);
     fixtures.thenQueryBuiltWithExpectedArguments();
   });
 
@@ -35,12 +37,12 @@ describe('TokenSupabaseRepository', () => {
     fixtures.thenReturnExpectedInvitation(result);
   });
 
-  it('should throw ServerTokenError when get invitation by token fails', async () => {
+  it('should throw ServerError when get invitation by token fails', async () => {
     fixtures.whenGetInvitationByTokenFails();
 
     const promise = fixtures.whenGetInvitationByToken();
 
-    await fixtures.thenThrowServerTokenError(promise);
+    await fixtures.thenThrowServerError(promise);
     fixtures.thenGetInvitationByTokenQueryBuiltWithExpectedArguments();
   });
 
@@ -183,8 +185,8 @@ class Fixtures {
     });
   }
 
-  async thenThrowServerTokenError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(ServerTokenError);
+  async thenThrowServerError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   async thenThrowBadRequestError(promise: Promise<unknown>) {

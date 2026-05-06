@@ -10,7 +10,6 @@ import {
 import { GetTeacherByUserIdUseCase } from 'src/application/teacher/get-teacher-by-user-id.use-case';
 import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
-import { TokenErrorFilter } from 'src/presentation/filters/token.filter';
 import { SupabaseUser } from 'src/domain/auth/types/auth.type';
 import { CreateTeacherBodyDto } from 'src/presentation/teaching/dto/teacher/create-teacher-body.dto';
 import { CreateTeacherUseCase } from 'src/application/teacher/create-teacher.use-case';
@@ -19,6 +18,7 @@ import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { ValidateTeacherInvitationBodyDto } from 'src/presentation/teaching/dto/teacher/validate-teacher-invitation-body.dto';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/validate-teacher-invitation.use-case';
 import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
+import { GlobalErrorFilter } from 'src/presentation/filters/global';
 
 @Controller('teacher')
 export class TeacherController {
@@ -31,7 +31,7 @@ export class TeacherController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('teacher')
   @Get()
-  @UseFilters(TokenErrorFilter)
+  @UseFilters(GlobalErrorFilter)
   async getTeacherByUserId(
     @Req() req: Request & { user: SupabaseUser },
   ): Promise<any> {
@@ -43,7 +43,7 @@ export class TeacherController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('teacher')
   @Post()
-  @UseFilters(TokenErrorFilter)
+  @UseFilters(GlobalErrorFilter)
   async createTeacher(
     @Req() req: Request & { user: SupabaseUser },
     @Body() body: CreateTeacherBodyDto,
@@ -57,7 +57,7 @@ export class TeacherController {
   @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
   @Roles('teacher')
   @Post('validate-invitation')
-  @UseFilters(TokenErrorFilter)
+  @UseFilters(GlobalErrorFilter)
   async validateTeacherInvitation(
     @Req() req: Request & { user: SupabaseUser },
     @Body() body: ValidateTeacherInvitationBodyDto,

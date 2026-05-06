@@ -23,7 +23,6 @@ import {
   GetUserSessionResponse,
 } from '../../domain/auth/types/auth.type';
 import { AuthErrorFilter } from '../filters/auth.filter';
-import { EmailErrorFilter } from '../filters/email.filter';
 import { Roles } from './decorator/role.decorator';
 import { GetInvitationPreviewParamsDto } from './dto/get-invitation-preview.dto';
 import { RegisterBody } from './dto/register-body.dto';
@@ -35,9 +34,10 @@ import { RolesGuard } from './guards/roles.guard';
 import { LogoutUseCase } from '../../application/auth/logout.use-case';
 import { CreateInvitationTokenBodyDto } from './dto/create-invitation-token.dto';
 import { CreateInvitationTokenUseCase } from '../../application/auth/create-invitation-toke.use-case';
+import { GlobalErrorFilter } from '../filters/global';
 
 @Controller('auth')
-@UseFilters(AuthErrorFilter, EmailErrorFilter)
+@UseFilters(AuthErrorFilter, GlobalErrorFilter)
 export class AuthController {
   constructor(
     private readonly getInvitationPreviewUseCase: GetInvitationPreviewUseCase,

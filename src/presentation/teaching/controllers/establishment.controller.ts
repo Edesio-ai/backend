@@ -25,8 +25,7 @@ import { GetInvitationTokenUseCase } from '../../../application/establishment/ge
 import { InvitationToken } from '../../../domain/auth/invitation.type';
 import { CsrfGuard } from '../../auth/guards/csrf.guard';
 import { DeleteInvitationTokenUseCase } from 'src/application/establishment/delete-invitation-token.use-case';
-import { TokenErrorFilter } from '../../filters/token.filter';
-import { GlobalErrorFilter } from 'src/presentation/filters/shared.filter';
+import { GlobalErrorFilter } from 'src/presentation/filters/global';
 
 @Controller('establishment')
 export class EstablishmentController {
@@ -70,7 +69,7 @@ export class EstablishmentController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, CsrfGuard)
-  @UseFilters(TokenErrorFilter)
+  @UseFilters(GlobalErrorFilter)
   @Roles('establishment')
   @Delete('invitation-token/:token')
   async deleteInvitationToken(

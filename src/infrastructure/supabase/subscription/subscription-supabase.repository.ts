@@ -1,8 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { SUPABASE_ADMIN } from '../supabase.module';
-import { FetchSubscriptionError } from '../../../domain/subscription/subscription.error';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { SubscriptionRepository } from 'src/domain/teaching/interface/subscription.repository';
 
-export class SubscriptionSupabaseRepository implements SubscriptionSupabaseRepository {
+export class SubscriptionSupabaseRepository implements SubscriptionRepository {
   constructor(
     @Inject(SUPABASE_ADMIN)
     private readonly supabase: any,
@@ -16,7 +17,7 @@ export class SubscriptionSupabaseRepository implements SubscriptionSupabaseRepos
 
     if (error) {
       const message = error instanceof Error ? error.message : '';
-      throw new FetchSubscriptionError(message);
+      throw new ServerError(`Error fetching subscription: ${message}`);
     }
     return data[0] || null;
   }

@@ -32,7 +32,7 @@ import { GetCourseValidatedQuestionsUseCase } from 'src/application/course/get-c
 import { GetCourseFilesUseCase } from 'src/application/course/get-course-files.use-case';
 import { GetCourseRankingUseCase } from 'src/application/course/get-course-ranking.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { GlobalErrorFilter } from 'src/presentation/filters/shared.filter';
+import { GlobalErrorFilter } from 'src/presentation/filters/global';
 import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';
 import { UpdateCourseBodyDto } from '../dto/course/UpdateCourseUseCase.dto';
 import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';

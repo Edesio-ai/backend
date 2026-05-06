@@ -1,11 +1,13 @@
 import { Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { ServerTokenError } from '../../../domain/token/token.error';
 import { SUPABASE_ADMIN } from '../supabase.module';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { TokenRepository } from 'src/domain/token/contract/token.repository';
 import { EstablishmentMapper } from '../teaching/mappers/establishment.mapper';
-import { BadRequestError } from 'src/domain/shared/global/errors/global.errors';
+import {
+  BadRequestError,
+  ServerError,
+} from 'src/domain/shared/global/errors/global.errors';
 
 export class TokenSupabaseRepository implements TokenRepository {
   constructor(
@@ -20,7 +22,9 @@ export class TokenSupabaseRepository implements TokenRepository {
       .eq('id', token);
 
     if (deleteError) {
-      throw new ServerTokenError(deleteError.message);
+      throw new ServerError(
+        `Error deleting invitation token: ${deleteError.message}`,
+      );
     }
   }
 
@@ -32,7 +36,9 @@ export class TokenSupabaseRepository implements TokenRepository {
       .single();
 
     if (error) {
-      throw new ServerTokenError(error.message);
+      throw new ServerError(
+        `Error getting invitation by token: ${error.message}`,
+      );
     }
 
     return EstablishmentMapper.invitationTokenToDomain(data);

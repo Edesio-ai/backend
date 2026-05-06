@@ -1,5 +1,5 @@
 import { ResendEmailProvider } from './resend-email.provider';
-import { EmailSendingError } from '../../domain/email/error/email.errors';
+import { ServerError } from '../../domain/shared/global/errors/global.errors';
 
 describe('ResendEmailProvider', () => {
   let fixtures: Fixtures;
@@ -21,7 +21,7 @@ describe('ResendEmailProvider', () => {
     fixtures.thenResendCalledWithWelcomePayload();
   });
 
-  it('should throw EmailSendingError when resend returns error', async () => {
+  it('should throw ServerError when resend returns error', async () => {
     fixtures.whenResendSendResolvesWithError();
 
     const promise = fixtures.whenSendWelcomeEmail('teacher');
@@ -29,7 +29,7 @@ describe('ResendEmailProvider', () => {
     await fixtures.thenThrowEmailSendingError(promise);
   });
 
-  it('should throw EmailSendingError when resend.emails.send rejects', async () => {
+  it('should throw ServerError when resend.emails.send rejects', async () => {
     fixtures.whenResendSendThrows();
 
     const promise = fixtures.whenSendWelcomeEmail('teacher');
@@ -45,7 +45,7 @@ describe('ResendEmailProvider', () => {
     fixtures.thenResendCalledWithInvitationPayload();
   });
 
-  it('should throw EmailSendingError when invitation send returns error', async () => {
+  it('should throw ServerError when invitation send returns error', async () => {
     fixtures.whenResendSendResolvesWithError();
 
     const promise = fixtures.whenSendProfesseurInvitation();
@@ -53,7 +53,7 @@ describe('ResendEmailProvider', () => {
     await fixtures.thenThrowEmailSendingError(promise);
   });
 
-  it('should throw EmailSendingError when invitation send rejects', async () => {
+  it('should throw ServerError when invitation send rejects', async () => {
     fixtures.whenResendSendThrows();
 
     const promise = fixtures.whenSendProfesseurInvitation();
@@ -70,7 +70,7 @@ describe('ResendEmailProvider', () => {
     fixtures.thenInvitationHtmlContainsFrontendUrl('https://app.edesio.test');
   });
 
-  it('should wrap non Error thrown value in EmailSendingError', async () => {
+  it('should wrap non Error thrown value in ServerError', async () => {
     fixtures.whenResendSendThrowsString();
 
     const promise = fixtures.whenSendWelcomeEmail('teacher');
@@ -186,16 +186,22 @@ class Fixtures {
   }
 
   async thenThrowEmailSendingError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(EmailSendingError);
-    await expect(promise).rejects.toThrow(this.resendErrorMessage);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
+    await expect(promise).rejects.toThrow(
+      new RegExp(
+        this.resendErrorMessage.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+      ),
+    );
   }
 
   async thenThrowEmailSendingErrorWithMessage(
     promise: Promise<unknown>,
     message: string,
   ) {
-    await expect(promise).rejects.toBeInstanceOf(EmailSendingError);
-    await expect(promise).rejects.toThrow(message);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
+    await expect(promise).rejects.toThrow(
+      new RegExp(message.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
+    );
   }
 
   thenInvitationHtmlContainsFrontendUrl(url: string) {

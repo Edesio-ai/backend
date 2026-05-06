@@ -1,5 +1,5 @@
 import { SubscriptionSupabaseRepository } from './subscription-supabase.repository';
-import { FetchSubscriptionError } from '../../../domain/subscription/subscription.error';
+import { ServerError } from '../../../domain/shared/global/errors/global.errors';
 
 describe('SubscriptionSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -26,12 +26,12 @@ describe('SubscriptionSupabaseRepository', () => {
     expect(result).toBeNull();
   });
 
-  it('should throw FetchSubscriptionError when query fails', async () => {
+  it('should throw ServerError when query fails', async () => {
     fixtures.whenSupabaseReturnsError();
 
     const promise = fixtures.whenGetUserSubscription();
 
-    await fixtures.thenThrowFetchSubscriptionError(promise);
+    await fixtures.thenThrowServerError(promise);
     fixtures.thenQueryBuiltWithExpectedArguments();
   });
 });
@@ -84,9 +84,11 @@ class Fixtures {
     });
   }
 
-  async thenThrowFetchSubscriptionError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(FetchSubscriptionError);
-    await expect(promise).rejects.toThrow('query failed');
+  async thenThrowServerError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
+    await expect(promise).rejects.toThrow(
+      'Error fetching subscription: query failed',
+    );
   }
 
   thenQueryBuiltWithExpectedArguments() {
