@@ -19,17 +19,13 @@ import { Question } from 'src/domain/teaching/types/question.type';
 import { GetCourseQuestionsUseCase } from 'src/application/question/get-course-questions.use-case';
 import { GlobalErrorFilter } from 'src/presentation/filters/global';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
-import { GenerateQuestionDto } from '../dto/question/generate-question.dto';
 import { GenerateQuestionUseCase } from 'src/application/question/generate-question-use-case';
-import { CreateQuestionDto } from '../dto/question/create-question.dto';
+import { CreateQuestionDto } from './dtos/create-question.dto';
 import { CreateQuestionUseCase } from 'src/application/question/create-question.use-case';
 import { DeleteQuestionByIdUseCase } from 'src/application/question/delete-question-by-id.use-case';
-import { UpdateQuestionDto } from '../dto/question/update-question.dto';
+import { UpdateQuestionDto } from './dtos/update-question.dto';
 import { UpdateQuestionByIdUseCase } from 'src/application/question/update-question-by-id.use-case';
-import { AuthErrorFilter } from 'src/presentation/filters/auth.filter';
-import { EvaluateAnswerDto } from '../dto/question/evaluate-answer.dto';
 import { EvaluateAnswerUseCase } from 'src/application/question/evaluate-answer.use-case';
-import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
 import { GetAnsweredQuestionCountUseCase } from 'src/application/question/get-answered-question-count.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
@@ -38,22 +34,11 @@ import { GetAnsweredQuestionCountUseCase } from 'src/application/question/get-an
 @Controller('question')
 export class QuestionController {
   constructor(
-    private readonly getPendingQuestionCountUseCase: GetPendingQuestionCountUseCase,
     private readonly getCourseQuestionsUseCase: GetCourseQuestionsUseCase,
-    private readonly generateQuestionUseCase: GenerateQuestionUseCase,
     private readonly createQuestionUseCase: CreateQuestionUseCase,
     private readonly deleteQuestionByIdUseCase: DeleteQuestionByIdUseCase,
     private readonly updateQuestionUseCase: UpdateQuestionByIdUseCase,
-    private readonly evaluateAnswerUseCase: EvaluateAnswerUseCase,
-    private readonly getAnsweredQuestionsCountUseCase: GetAnsweredQuestionCountUseCase,
   ) {}
-
-  @UseFilters(AuthErrorFilter)
-  @Get('pending/:sessionId')
-  async getPendingQuestionsCount(@Param('sessionId') sessionId: string) {
-    const count = await this.getPendingQuestionCountUseCase.execute(sessionId);
-    return { count: count ?? 0 };
-  }
 
   @Roles('student', 'teacher')
   @Get('course/:courseId')
@@ -73,19 +58,6 @@ export class QuestionController {
     const { user } = req;
     const question = await this.createQuestionUseCase.execute(body, user);
     return { data: question };
-  }
-
-  @Post('generate')
-  async generateQuestion(
-    @Req() req: Request & { user: AuthUser },
-    @Body() body: GenerateQuestionDto,
-  ): Promise<{ questions: Question[]; questionCount: number }> {
-    const { user } = req;
-    const questions = await this.generateQuestionUseCase.execute(body, user);
-    return {
-      questions,
-      questionCount: questions.length,
-    };
   }
 
   @Delete(':questionId')
@@ -115,24 +87,5 @@ export class QuestionController {
     );
 
     return { question };
-  }
-
-  @Roles('student', 'teacher')
-  @Post('evaluate-answer')
-  async evaluateAnswer(
-    @Body() body: EvaluateAnswerDto,
-  ): Promise<EvaluateAnswerResponse> {
-    return await this.evaluateAnswerUseCase.execute(body);
-  }
-
-  @Roles()
-  @Get('answered')
-  async getAnsweredQuestionsCount(
-    @Req() req: Request & { user: AuthUser },
-  ): Promise<{ answeredQuestionsCount: number }> {
-    const { user } = req;
-    const answeredQuestionsCount =
-      await this.getAnsweredQuestionsCountUseCase.execute(user);
-    return { answeredQuestionsCount };
   }
 }

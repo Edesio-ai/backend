@@ -4,7 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { BillingModule } from './billing/billing.module';
 import { TeachingModule } from './teaching/teaching.module';
 import { ExportModule } from './export/modules/export.module';
-import { LlmModule } from './llm/modules/llm.module';
+import { LlmModule } from './llm/llm.module';
 
 @Module({
   imports: [
