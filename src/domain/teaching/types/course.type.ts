@@ -60,7 +60,7 @@ export type SupabaseCourseWithSession = {
   id: string;
   title: string;
   description: string | null;
-  content_text: string | null;
+  text_content: string | null;
   validated_questions?: boolean;
   position_order?: number;
   sessions: Partial<SupabaseSession & { teachers: Partial<SupabaseTeacher> }>;

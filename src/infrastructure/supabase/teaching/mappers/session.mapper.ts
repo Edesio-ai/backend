@@ -43,7 +43,7 @@ export const SessionMapper = {
     id: row.id,
     title: row.title,
     description: row.description,
-    contentText: row.content_text,
+    contentText: row.text_content,
     validatedQuestions: row.validated_questions,
     positionOrder: row.position_order,
     session: {
