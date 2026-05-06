@@ -896,7 +896,7 @@ class Fixtures {
     id: this.courseDetailId,
     title: 'Titre cours',
     description: null,
-    content_text: null,
+    text_content: null,
     validated_questions: false,
     position_order: undefined,
     sessions: {

@@ -60,7 +60,7 @@ describe('SessionMapper', () => {
         id: 'c-1',
         title: 'Cours',
         description: 'Desc',
-        content_text: 'Contenu',
+        text_content: 'Contenu',
         validated_questions: true,
         position_order: 2,
         sessions: {
@@ -111,7 +111,7 @@ describe('SessionMapper', () => {
         id: 'c-2',
         title: 'Cours',
         description: null,
-        content_text: null,
+        text_content: null,
         sessions: {},
       };
 
