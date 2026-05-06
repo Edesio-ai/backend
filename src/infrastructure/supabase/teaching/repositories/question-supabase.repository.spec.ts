@@ -1,5 +1,6 @@
 import { QuestionServerError } from 'src/domain/teaching/error';
 import { QuestionSupabaseRepository } from './question-supabase.repository';
+import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
 import {
   CreateQuestionBody,
   GeneratedQuestion,
@@ -241,6 +242,33 @@ describe('QuestionSupabaseRepository', () => {
       fixtures.whenGetAnsweredQuestionCount(),
     ).rejects.toBeInstanceOf(QuestionServerError);
   });
+
+  // --- getStudentCourseQuestions ---
+
+  it('should return mapped course_questions rows for a course', async () => {
+    fixtures.whenGetStudentCourseQuestionsSucceeds();
+
+    const result = await fixtures.whenGetStudentCourseQuestions();
+
+    expect(result).toEqual(fixtures.expectedCourseQuestions);
+    fixtures.thenGetStudentCourseQuestionsQueryBuilt();
+  });
+
+  it('should return empty array when getStudentCourseQuestions data is null', async () => {
+    fixtures.whenGetStudentCourseQuestionsReturnsNull();
+
+    const result = await fixtures.whenGetStudentCourseQuestions();
+
+    expect(result).toEqual([]);
+  });
+
+  it('should throw QuestionServerError when getStudentCourseQuestions fails', async () => {
+    fixtures.whenGetStudentCourseQuestionsFails();
+
+    await expect(
+      fixtures.whenGetStudentCourseQuestions(),
+    ).rejects.toBeInstanceOf(QuestionServerError);
+  });
 });
 
 class Fixtures {
@@ -271,6 +299,28 @@ class Fixtures {
       explanation: 'Parce que A',
       createdAt: '2026-01-01T00:00:00.000Z',
       positionOrder: 1,
+    },
+  ];
+
+  public readonly courseQuestionSupabaseRow = {
+    id: 'cq-1',
+    course_id: this.courseId,
+    student_id: this.studentId,
+    question_text: 'Question élève ?',
+    answer: 'Ma réponse',
+    created_at: '2026-01-01T00:00:00.000Z',
+    answered_at: '2026-01-02T00:00:00.000Z',
+  };
+
+  public readonly expectedCourseQuestions: CourseQuestion[] = [
+    {
+      id: 'cq-1',
+      courseId: this.courseId,
+      studentId: this.studentId,
+      questionText: 'Question élève ?',
+      answer: 'Ma réponse',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      answeredAt: '2026-01-02T00:00:00.000Z',
     },
   ];
 
@@ -340,6 +390,9 @@ class Fixtures {
     eq: this.courseQuestionsDeleteEqMock,
   }));
 
+  /** `.select('*').eq('course_id', …)` for getStudentCourseQuestions (not head count). */
+  private readonly studentCourseQuestionsEqMock: jest.Mock = jest.fn();
+
   private readonly questionsSelectMock: jest.Mock = jest.fn(() => ({
     eq: this.questionsEqMock,
   }));
@@ -355,7 +408,13 @@ class Fixtures {
     }
     if (table === 'course_questions') {
       return {
-        select: this.countSelectMock,
+        select: (...selectArgs: unknown[]) => {
+          const options = selectArgs[1] as { head?: boolean } | undefined;
+          if (options?.head === true) {
+            return this.countSelectMock(...selectArgs);
+          }
+          return { eq: this.studentCourseQuestionsEqMock };
+        },
         delete: this.courseQuestionsDeleteMock,
       };
     }
@@ -645,6 +704,10 @@ class Fixtures {
     return this.repository.getAnsweredQuestionCount(this.studentId);
   }
 
+  whenGetStudentCourseQuestions() {
+    return this.repository.getStudentCourseQuestions(this.courseId);
+  }
+
   whenDeleteCourseQuestionsByCourseIdSucceeds() {
     this.courseQuestionsDeleteEqMock.mockResolvedValue({ error: null });
   }
@@ -687,5 +750,34 @@ class Fixtures {
     });
     expect(this.countEqMock).toHaveBeenCalledWith('student_id', this.studentId);
     expect(this.countNotMock).toHaveBeenCalledWith('answer', 'is', null);
+  }
+
+  whenGetStudentCourseQuestionsSucceeds() {
+    this.studentCourseQuestionsEqMock.mockResolvedValue({
+      data: [this.courseQuestionSupabaseRow],
+      error: null,
+    });
+  }
+
+  whenGetStudentCourseQuestionsReturnsNull() {
+    this.studentCourseQuestionsEqMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+  }
+
+  whenGetStudentCourseQuestionsFails() {
+    this.studentCourseQuestionsEqMock.mockResolvedValue({
+      data: null,
+      error: { message: 'student course questions failed' },
+    });
+  }
+
+  thenGetStudentCourseQuestionsQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('course_questions');
+    expect(this.studentCourseQuestionsEqMock).toHaveBeenCalledWith(
+      'course_id',
+      this.courseId,
+    );
   }
 }

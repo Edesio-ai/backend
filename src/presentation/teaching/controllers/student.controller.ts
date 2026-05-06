@@ -36,6 +36,8 @@ import { UploadStudentPhotoUseCase } from 'src/application/student/upload-studen
 import { DeleteStudentSessionUseCase } from 'src/application/student/delete-student-session.use-case';
 import { UpdateOrCreateStudentCourseStatsBodyDto } from '../dto/student/update-or-create-student-course-stats.dto';
 import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/student/update-or-create-student-course-stats.use-case';
+import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
+import { GetStudentCourseQuestionsUseCase } from 'src/application/student/get-student-course-questions.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')
@@ -52,6 +54,7 @@ export class StudentController {
     private readonly uploadStudentPhotoUseCase: UploadStudentPhotoUseCase,
     private readonly deleteStudentSessionUseCase: DeleteStudentSessionUseCase,
     private readonly updateOrCreateStudentCourseStatsUseCase: UpdateOrCreateStudentCourseStatsUseCase,
+    private readonly getStudentCourseQuestionsUseCase: GetStudentCourseQuestionsUseCase,
   ) {}
 
   @Get()
@@ -159,5 +162,18 @@ export class StudentController {
       user,
       body,
     );
+  }
+
+  @Get('course/:courseId/questions')
+  async getStudentCourseQuestions(
+    @Param('courseId') courseId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<CourseQuestion[]> {
+    const { user } = req;
+    const questions = await this.getStudentCourseQuestionsUseCase.execute(
+      courseId,
+      user,
+    );
+    return questions;
   }
 }

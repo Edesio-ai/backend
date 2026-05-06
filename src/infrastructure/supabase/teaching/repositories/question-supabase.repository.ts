@@ -9,6 +9,8 @@ import {
   QuestionUpdate,
 } from 'src/domain/teaching/types/question.type';
 import { QuestionMapper } from '../mappers/question.mapper';
+import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
+import { CourseQuestionMapper } from '../mappers/course-question.mapper';
 
 export class QuestionSupabaseRepository implements QuestionsRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
@@ -200,5 +202,23 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
     }
 
     return count ?? 0;
+  }
+
+  async getStudentCourseQuestions(courseId: string): Promise<CourseQuestion[]> {
+    const { data, error } = await this.supabase
+      .from('course_questions')
+      .select('*')
+      .eq('course_id', courseId);
+
+    if (error) {
+      console.error(
+        'error getting student course questions for course id',
+        courseId,
+        error,
+      );
+      throw new QuestionServerError(error.message);
+    }
+
+    return data?.map(CourseQuestionMapper.toDomain) ?? [];
   }
 }

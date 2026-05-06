@@ -15,7 +15,8 @@ import { UploadStudentPhotoUseCase } from 'src/application/student/upload-studen
 import { DeleteStudentSessionUseCase } from 'src/application/student/delete-student-session.use-case';
 import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/student/update-or-create-student-course-stats.use-case';
 import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/course-persistence.module';
-
+import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
+import { GetStudentCourseQuestionsUseCase } from 'src/application/student/get-student-course-questions.use-case';
 @Module({
   imports: [
     AuthPersistenceModule,
@@ -24,6 +25,7 @@ import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/mo
     TeacherPersistenceModule,
     EstablishmentPersistenceModule,
     CoursePersistenceModule,
+    QuestionPersistenceModule,
   ],
   controllers: [StudentController],
   providers: [
@@ -36,6 +38,7 @@ import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/mo
     UploadStudentPhotoUseCase,
     DeleteStudentSessionUseCase,
     UpdateOrCreateStudentCourseStatsUseCase,
+    GetStudentCourseQuestionsUseCase,
   ],
 })
 export class StudentModule {}
