@@ -8,6 +8,7 @@ import {
   SessionStudent,
   Student,
   StudentCourseStats,
+  StudentCourseStatsWithStudent,
   StudentJoinedSession,
   StudentSession,
 } from 'src/domain/teaching/types/student.type';
@@ -62,7 +63,7 @@ export class StudentSupabaseRepository implements StudentRepository {
 
   public async getStudentStatsByCourseId(
     courseId: string,
-  ): Promise<StudentCourseStats[]> {
+  ): Promise<StudentCourseStatsWithStudent[]> {
     const { data, error } = await this.supabase
       .from('student_course_stats')
       .select(
@@ -308,6 +309,55 @@ export class StudentSupabaseRepository implements StudentRepository {
         `Error deleting student session for session id: ${sessionId} and student id: ${studentId}`,
         error,
       );
+      throw new ServerError(error.message);
+    }
+  }
+
+  public async getStudentCourseStatsByStudentIdAndCourseId(
+    studentId: string,
+    courseId: string,
+  ): Promise<StudentCourseStats | null> {
+    const { data, error } = await this.supabase
+      .from('student_course_stats')
+      .select('*')
+      .eq('student_id', studentId)
+      .eq('course_id', courseId)
+      .maybeSingle();
+
+    if (error) {
+      console.error(
+        `Error getting student course stats by student id and course id: ${studentId} and ${courseId}`,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+    return data ? StudentMapper.studentCourseStatToDomain(data) : null;
+  }
+
+  public async createStudentCourseStats(
+    statToInsert: Omit<StudentCourseStats, 'id'>,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('student_course_stats')
+      .insert(StudentMapper.studentCourseStatToInsert(statToInsert));
+
+    if (error) {
+      console.error('Error creating student course stats', statToInsert, error);
+      throw new ServerError(error.message);
+    }
+  }
+
+  public async updateStudentCourseStats(
+    statId: string,
+    statToUpdate: Omit<StudentCourseStats, 'id'>,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('student_course_stats')
+      .update(StudentMapper.studentCourseStatToUpdate(statToUpdate))
+      .eq('id', statId);
+
+    if (error) {
+      console.error('Error updating student course stats', statToUpdate, error);
       throw new ServerError(error.message);
     }
   }

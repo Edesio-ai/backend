@@ -8,6 +8,7 @@ import { CourseRepository } from '../../domain/teaching/interface/course.reposit
 import { QuestionsRepository } from '../../domain/teaching/interface/questions.repository';
 import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
 import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
+import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import {
   Course,
   CourseWithSession,
@@ -304,22 +305,7 @@ class Fixtures {
       getCourseValidatedQuestions: jest.fn(),
       getCourseFilesByCourseId: jest.fn(),
     };
-    this.studentRepository = {
-      getStudentsByIds: jest.fn(),
-      createStudentSession: jest.fn(),
-      getStudentJoinedSessions: jest.fn(),
-      getStudentByUserId: jest.fn(),
-      getStudentsSessionsByIds: jest.fn(),
-      getStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSessionsBySessionId: jest.fn(),
-      getStudentStatsByCourseId: jest.fn(),
-      deleteStudentCourseStatsByCourseId: jest.fn(),
-      createStudent: jest.fn(),
-      storeStudentPhoto: jest.fn(),
-      updateStudentPhoto: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
-      deleteStudentSession: jest.fn(),
-    };
+    this.studentRepository = createMockStudentRepository();
 
     this.useCase = new GetCourseQuestionsUseCase(
       this.questionsRepository,

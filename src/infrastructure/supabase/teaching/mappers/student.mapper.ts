@@ -1,16 +1,22 @@
 import {
   InsertStudent,
+  insertStudentCourseStats,
+  supabaseInsertStudentCourseStats,
   SessionStudent,
   Student,
   StudentCourseStats,
+  StudentCourseStatsWithStudent,
   StudentJoinedSession,
   StudentSession,
   SupabaseSessionStudent,
   SupabaseStudent,
   SupabaseStudentCourseStats,
+  SupabaseStudentCourseStatsWithStudent,
   SupabaseStudentInsert,
   SupabaseStudentJoinedSession,
   SupabaseStudentSession,
+  UpdateStudentCourseStats,
+  supabaseUpdateStudentCourseStats,
 } from 'src/domain/teaching/types/student.type';
 
 export const StudentMapper = {
@@ -29,8 +35,8 @@ export const StudentMapper = {
   }),
 
   courseStatToDomain: (
-    row: SupabaseStudentCourseStats,
-  ): StudentCourseStats => ({
+    row: SupabaseStudentCourseStatsWithStudent,
+  ): StudentCourseStatsWithStudent => ({
     studentId: row.student_id,
     attemptedQuestions: row.attempted_questions,
     correctAnswers: row.correct_answers,
@@ -70,4 +76,33 @@ export const StudentMapper = {
       joinedAt: row.joined_at,
     };
   },
+
+  studentCourseStatToDomain: (
+    row: SupabaseStudentCourseStats,
+  ): StudentCourseStats => ({
+    id: row.id,
+    studentId: row.student_id,
+    courseId: row.course_id,
+    attemptedQuestions: row.attempted_questions,
+    correctAnswers: row.correct_answers,
+    lastAttemptAt: row.last_attempt_at,
+  }),
+
+  studentCourseStatToInsert: (
+    body: insertStudentCourseStats,
+  ): supabaseInsertStudentCourseStats => ({
+    course_id: body.courseId,
+    student_id: body.studentId,
+    attempted_questions: body.attemptedQuestions,
+    correct_answers: body.correctAnswers,
+    last_attempt_at: body.lastAttemptAt,
+  }),
+
+  studentCourseStatToUpdate: (
+    body: UpdateStudentCourseStats,
+  ): supabaseUpdateStudentCourseStats => ({
+    attempted_questions: body.attemptedQuestions,
+    correct_answers: body.correctAnswers,
+    last_attempt_at: new Date().toISOString(),
+  }),
 };

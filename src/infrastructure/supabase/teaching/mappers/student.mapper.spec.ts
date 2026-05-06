@@ -3,6 +3,7 @@ import { mapList } from 'src/infrastructure/supabase/common/mapper.util';
 import {
   SupabaseStudentSession,
   SupabaseStudentCourseStats,
+  SupabaseStudentCourseStatsWithStudent,
   SupabaseStudentJoinedSession,
   SupabaseSessionStudent,
 } from 'src/domain/teaching/types/student.type';
@@ -36,7 +37,7 @@ describe('StudentMapper', () => {
 
   describe('courseStatToDomain', () => {
     it('maps a student course stats row', () => {
-      const row: SupabaseStudentCourseStats = {
+      const row: SupabaseStudentCourseStatsWithStudent = {
         student_id: 'stu-1',
         attempted_questions: 10,
         correct_answers: 8,
@@ -68,7 +69,7 @@ describe('StudentMapper', () => {
     });
 
     it('maps multiple rows correctly via mapList', () => {
-      const rows: SupabaseStudentCourseStats[] = [
+      const rows: SupabaseStudentCourseStatsWithStudent[] = [
         {
           student_id: 'stu-1',
           attempted_questions: 5,
@@ -101,6 +102,68 @@ describe('StudentMapper', () => {
       expect(result[0].student.name).toBe('Bob');
       expect(result[0].student.photoUrl).toBe('');
       expect(result[1].student.photoUrl).toBe('https://x/e.png');
+    });
+  });
+
+  describe('studentCourseStatToDomain', () => {
+    it('maps a full student_course_stats row', () => {
+      const row: SupabaseStudentCourseStats = {
+        id: 'stat-1',
+        course_id: 'course-1',
+        student_id: 'stu-1',
+        attempted_questions: 10,
+        correct_answers: 7,
+        last_attempt_at: '2026-03-01T08:00:00.000Z',
+      };
+
+      expect(StudentMapper.studentCourseStatToDomain(row)).toEqual({
+        id: 'stat-1',
+        courseId: 'course-1',
+        studentId: 'stu-1',
+        attemptedQuestions: 10,
+        correctAnswers: 7,
+        lastAttemptAt: '2026-03-01T08:00:00.000Z',
+      });
+    });
+  });
+
+  describe('studentCourseStatToInsert', () => {
+    it('maps domain insert payload to snake_case columns', () => {
+      expect(
+        StudentMapper.studentCourseStatToInsert({
+          studentId: 's-1',
+          courseId: 'c-1',
+          attemptedQuestions: 5,
+          correctAnswers: 4,
+          lastAttemptAt: '2026-04-01T00:00:00.000Z',
+        }),
+      ).toEqual({
+        student_id: 's-1',
+        course_id: 'c-1',
+        attempted_questions: 5,
+        correct_answers: 4,
+        last_attempt_at: '2026-04-01T00:00:00.000Z',
+      });
+    });
+  });
+
+  describe('studentCourseStatToUpdate', () => {
+    it('maps update fields and sets last_attempt_at from current time', () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2026-05-05T12:30:00.000Z'));
+
+      expect(
+        StudentMapper.studentCourseStatToUpdate({
+          attemptedQuestions: 20,
+          correctAnswers: 18,
+        }),
+      ).toEqual({
+        attempted_questions: 20,
+        correct_answers: 18,
+        last_attempt_at: '2026-05-05T12:30:00.000Z',
+      });
+
+      jest.useRealTimers();
     });
   });
 

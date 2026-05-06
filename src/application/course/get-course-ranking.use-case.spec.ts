@@ -7,8 +7,9 @@ import { StudentRepository } from '../../domain/teaching/interface/student.repos
 import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
 import { Course } from '../../domain/teaching/types/course.type';
 import { Session } from '../../domain/teaching/types/session.type';
-import { StudentCourseStats } from '../../domain/teaching/types/student.type';
+import { StudentCourseStatsWithStudent } from '../../domain/teaching/types/student.type';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('GetCourseRankingUseCase', () => {
   let fixtures: Fixtures;
@@ -110,7 +111,7 @@ class Fixtures {
   };
 
   /** Order volontairement mélangé : le use case trie par taux puis bonnes réponses. */
-  public readonly studentStatsUnsorted: StudentCourseStats[] = [
+  public readonly studentStatsUnsorted: StudentCourseStatsWithStudent[] = [
     {
       studentId: 's-low',
       attemptedQuestions: 10,
@@ -201,22 +202,7 @@ class Fixtures {
       deleteSessionByTeacherId: jest.fn(),
       getSessionById: jest.fn(),
     };
-    this.studentRepository = {
-      getStudentsByIds: jest.fn(),
-      createStudentSession: jest.fn(),
-      getStudentJoinedSessions: jest.fn(),
-      getStudentByUserId: jest.fn(),
-      getStudentsSessionsByIds: jest.fn(),
-      getStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSessionsBySessionId: jest.fn(),
-      getStudentStatsByCourseId: jest.fn(),
-      deleteStudentCourseStatsByCourseId: jest.fn(),
-      createStudent: jest.fn(),
-      storeStudentPhoto: jest.fn(),
-      updateStudentPhoto: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
-      deleteStudentSession: jest.fn(),
-    };
+    this.studentRepository = createMockStudentRepository();
 
     this.useCase = new GetCourseRankingUseCase(
       this.courseRepository,

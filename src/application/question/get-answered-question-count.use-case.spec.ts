@@ -4,6 +4,7 @@ import { StudentRepository } from '../../domain/teaching/interface/student.repos
 import { NotFoundError } from '../../domain/shared/global/errors/global.errors';
 import { AuthUser } from '../../domain/auth/types/auth.type';
 import { Student } from '../../domain/teaching/types/student.type';
+import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('GetAnsweredQuestionCountUseCase', () => {
   let fixtures: Fixtures;
@@ -93,22 +94,7 @@ class Fixtures {
       deleteCourseQuestionsByCourseId: jest.fn(),
       getAnsweredQuestionCount: jest.fn(),
     };
-    this.studentRepository = {
-      getStudentsByIds: jest.fn(),
-      createStudentSession: jest.fn(),
-      getStudentJoinedSessions: jest.fn(),
-      getStudentByUserId: jest.fn(),
-      getStudentsSessionsByIds: jest.fn(),
-      getStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSession: jest.fn(),
-      getStudentStatsByCourseId: jest.fn(),
-      deleteStudentCourseStatsByCourseId: jest.fn(),
-      createStudent: jest.fn(),
-      storeStudentPhoto: jest.fn(),
-      updateStudentPhoto: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
-    };
+    this.studentRepository = createMockStudentRepository();
     this.useCase = new GetAnsweredQuestionCountUseCase(
       this.questionsRepository,
       this.studentRepository,

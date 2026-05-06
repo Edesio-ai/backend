@@ -2,6 +2,7 @@ import { CreateStudentUseCase } from './create-student.use-case';
 import { StudentRepository } from '../../domain/teaching/interface/student.repository';
 import { AuthUser } from '../../domain/auth/types/auth.type';
 import { Student } from '../../domain/teaching/types/student.type';
+import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('CreateStudentUseCase', () => {
   let fixtures: Fixtures;
@@ -56,22 +57,7 @@ class Fixtures {
   public readonly useCase: CreateStudentUseCase;
 
   constructor() {
-    this.studentRepository = {
-      createStudent: jest.fn(),
-      getStudentByUserId: jest.fn(),
-      getStudentsSessionsByIds: jest.fn(),
-      getStudentSessionsBySessionId: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
-      getStudentsByIds: jest.fn(),
-      deleteStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSession: jest.fn(),
-      getStudentStatsByCourseId: jest.fn(),
-      deleteStudentCourseStatsByCourseId: jest.fn(),
-      getStudentJoinedSessions: jest.fn(),
-      createStudentSession: jest.fn(),
-      storeStudentPhoto: jest.fn(),
-      updateStudentPhoto: jest.fn(),
-    };
+    this.studentRepository = createMockStudentRepository();
     this.useCase = new CreateStudentUseCase(this.studentRepository);
   }
 

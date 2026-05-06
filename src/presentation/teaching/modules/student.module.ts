@@ -13,6 +13,8 @@ import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teac
 import { GetStudentBatchUseCase } from 'src/application/student/get-student-batch.use-case';
 import { UploadStudentPhotoUseCase } from 'src/application/student/upload-student-photo.use-case';
 import { DeleteStudentSessionUseCase } from 'src/application/student/delete-student-session.use-case';
+import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/student/update-or-create-student-course-stats.use-case';
+import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/course-persistence.module';
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import { DeleteStudentSessionUseCase } from 'src/application/student/delete-stud
     SessionsPersistenceModule,
     TeacherPersistenceModule,
     EstablishmentPersistenceModule,
+    CoursePersistenceModule,
   ],
   controllers: [StudentController],
   providers: [
@@ -32,6 +35,7 @@ import { DeleteStudentSessionUseCase } from 'src/application/student/delete-stud
     GetStudentBatchUseCase,
     UploadStudentPhotoUseCase,
     DeleteStudentSessionUseCase,
+    UpdateOrCreateStudentCourseStatsUseCase,
   ],
 })
 export class StudentModule {}
