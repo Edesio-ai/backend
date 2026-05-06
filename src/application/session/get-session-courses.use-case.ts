@@ -1,5 +1,4 @@
 import { Inject } from '@nestjs/common';
-import { SessionNotFoundError } from 'src/domain/auth/errors/auth.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ForbiddenError,
@@ -74,7 +73,7 @@ export class GetSessionCoursesUseCase {
 
     const session = await this.sessionRepository.getSessionById(sessionId);
     if (!session) {
-      throw new SessionNotFoundError(`Session not found for id ${sessionId}`);
+      throw new NotFoundError(`Session not found for id ${sessionId}`);
     }
 
     if (session.teacherId !== teacher.id) {
@@ -97,7 +96,7 @@ export class GetSessionCoursesUseCase {
     const session = await this.sessionRepository.getSessionById(sessionId);
     if (!session) {
       console.error(`Session not found for id ${sessionId}`);
-      throw new SessionNotFoundError(`Session not found`);
+      throw new NotFoundError(`Session not found`);
     }
 
     const teacher = await this.teachersRepository.getTeacherByConditions({

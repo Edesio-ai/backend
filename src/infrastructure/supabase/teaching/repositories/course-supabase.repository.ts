@@ -9,10 +9,10 @@ import {
   CourseFile,
   CourseWithSession,
 } from 'src/domain/teaching/types/course.type';
-import { CourseServerError } from 'src/domain/teaching/error';
 import { CourseMapper } from '../mappers/course.mapper';
 import { FileMapper } from '../mappers/file.mapper';
 import { SessionMapper } from '../mappers/session.mapper';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 export class CourseSupabaseRepository implements CourseRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
@@ -30,7 +30,7 @@ export class CourseSupabaseRepository implements CourseRepository {
         courseId,
         error,
       );
-      throw new CourseServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return CourseMapper.toDomain(data);
@@ -43,7 +43,12 @@ export class CourseSupabaseRepository implements CourseRepository {
       .eq('session_id', sessionId);
 
     if (error) {
-      throw new CourseServerError(error.message);
+      console.error(
+        'An error occurred while getting the courses by session id: ',
+        sessionId,
+        error,
+      );
+      throw new ServerError(error.message);
     }
 
     return data;
@@ -72,7 +77,7 @@ export class CourseSupabaseRepository implements CourseRepository {
         courseId,
         error,
       );
-      throw new CourseServerError(error.message);
+      throw new ServerError(error.message);
     }
   }
 
@@ -83,7 +88,12 @@ export class CourseSupabaseRepository implements CourseRepository {
       .eq('session_id', sessionId);
 
     if (error) {
-      throw new CourseServerError(error.message);
+      console.error(
+        'An error occurred while deleting the courses by session id: ',
+        sessionId,
+        error,
+      );
+      throw new ServerError(error.message);
     }
   }
 
@@ -95,7 +105,12 @@ export class CourseSupabaseRepository implements CourseRepository {
       .single();
 
     if (error) {
-      throw new CourseServerError(error.message);
+      console.error(
+        'An error occurred while creating the course: ',
+        body,
+        error,
+      );
+      throw new ServerError(error.message);
     }
 
     return CourseMapper.toDomain(data);
@@ -110,7 +125,12 @@ export class CourseSupabaseRepository implements CourseRepository {
       .eq('course_id', courseId);
 
     if (error) {
-      throw new CourseServerError(error.message);
+      console.error(
+        'An error occurred while getting the courses files by course id: ',
+        courseId,
+        error,
+      );
+      throw new ServerError(error.message);
     }
 
     return CourseMapper.fileUrlsToDomain(data);
@@ -122,7 +142,12 @@ export class CourseSupabaseRepository implements CourseRepository {
       .remove(files);
 
     if (error) {
-      throw new CourseServerError(error.message);
+      console.error(
+        'An error occurred while deleting the courses files from storage: ',
+        files,
+        error,
+      );
+      throw new ServerError(error.message);
     }
   }
 
@@ -133,7 +158,12 @@ export class CourseSupabaseRepository implements CourseRepository {
       .eq('session_id', sessionId);
 
     if (error) {
-      throw new CourseServerError(error.message);
+      console.error(
+        'An error occurred while getting the session courses count: ',
+        sessionId,
+        error,
+      );
+      throw new ServerError(error.message);
     }
 
     return count;
@@ -150,7 +180,12 @@ export class CourseSupabaseRepository implements CourseRepository {
         upsert: false,
       });
     if (uploadError) {
-      throw new CourseServerError(uploadError.message);
+      console.error(
+        'An error occurred while uploading the course file: ',
+        storagePath,
+        uploadError,
+      );
+      throw new ServerError(uploadError.message);
     }
   }
 
@@ -174,7 +209,12 @@ export class CourseSupabaseRepository implements CourseRepository {
         .from('courses-pdf')
         .remove([storagePath])
         .catch(() => undefined);
-      throw new CourseServerError(error.message);
+      console.error(
+        'An error occurred while inserting the course file: ',
+        storagePath,
+        error,
+      );
+      throw new ServerError(error.message);
     }
 
     return FileMapper.toDomain(data);
@@ -195,7 +235,7 @@ export class CourseSupabaseRepository implements CourseRepository {
         courseId,
         error,
       );
-      throw new CourseServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return CourseMapper.validatedQuestionsToDomain(data);
@@ -215,7 +255,7 @@ export class CourseSupabaseRepository implements CourseRepository {
         courseId,
         error,
       );
-      throw new CourseServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return data.map(FileMapper.toDomain);
@@ -237,7 +277,7 @@ export class CourseSupabaseRepository implements CourseRepository {
         courseId,
         error,
       );
-      throw new CourseServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return SessionMapper.courseWithSessionToDomain(data);
@@ -259,7 +299,7 @@ export class CourseSupabaseRepository implements CourseRepository {
         sessionId,
         error,
       );
-      throw new CourseServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return data ? data.map(CourseMapper.toDomain) : [];
@@ -272,7 +312,7 @@ export class CourseSupabaseRepository implements CourseRepository {
 
     if (error) {
       console.error(`Error downloading file from storage: ${filePath}`, error);
-      throw new CourseServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return Buffer.from(await fileData.arrayBuffer());
@@ -286,7 +326,7 @@ export class CourseSupabaseRepository implements CourseRepository {
 
     if (error) {
       console.error('Error deleting course by id: ', courseId, error);
-      throw new CourseServerError(error.message);
+      throw new ServerError(error.message);
     }
   }
 
@@ -303,7 +343,7 @@ export class CourseSupabaseRepository implements CourseRepository {
 
     if (error) {
       console.error('Error updating course: ', courseId, updates, error);
-      throw new CourseServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return CourseMapper.toDomain(data);

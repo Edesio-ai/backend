@@ -6,19 +6,7 @@ import {
   InvitationToken,
   InvitationTokenPreview,
 } from '../../../../domain/auth/invitation.type';
-import {
-  InvitationTokenAlreadyUsedError,
-  InvitationTokenExpiredError,
-  UserAlereadyExistsError,
-  UserCreationError,
-  UserCreationFailedError,
-  TeacherProfileCreationError,
-  TokenUpdateError,
-  UserLoginError,
-  TokenUserNotFoundError,
-  LogoutError,
-  InvitationTokenCreationError,
-} from '../../../../domain/auth/errors/auth.errors';
+import { TokenUserNotFoundError } from '../../../../domain/auth/errors/auth.errors';
 import {
   AuthUserWithSession,
   User,
@@ -36,7 +24,11 @@ import {
   supabaseSessionToAuthUser,
   supabaseValidatedTokenUserToUser,
 } from '../mappers/auth.mappers';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import {
+  BadRequestError,
+  ServerError,
+  UnauthorizedError,
+} from 'src/domain/shared/global/errors/global.errors';
 
 @Injectable()
 export class AuthSupabaseRepository implements AuthRepository {
@@ -66,7 +58,12 @@ export class AuthSupabaseRepository implements AuthRepository {
       .single();
 
     if (error) {
-      throw new InvitationTokenCreationError(error.message);
+      console.error(
+        'An error occurred while creating the invitation token: ',
+        body,
+        error,
+      );
+      throw new ServerError(error.message);
     }
 
     return;
@@ -79,7 +76,7 @@ export class AuthSupabaseRepository implements AuthRepository {
     );
 
     if (error) {
-      throw new LogoutError(error.message);
+      throw new ServerError(error.message);
     }
     return;
   }
@@ -94,7 +91,7 @@ export class AuthSupabaseRepository implements AuthRepository {
     });
 
     if (error) {
-      throw new UserLoginError(error.message);
+      throw new UnauthorizedError(error.message);
     }
     return {
       authUser: supabaseSessionToAuthUser(data),
@@ -124,13 +121,13 @@ export class AuthSupabaseRepository implements AuthRepository {
     }
 
     if (data.used_at) {
-      throw new InvitationTokenAlreadyUsedError();
+      throw new BadRequestError('Invitation token already used');
     }
 
     const expiresAt = new Date(data.expires_at);
 
     if (expiresAt < new Date()) {
-      throw new InvitationTokenExpiredError();
+      throw new BadRequestError('Invitation token expired');
     }
 
     const maskedEmail = this.maskEmail(data.invited_email);
@@ -168,13 +165,13 @@ export class AuthSupabaseRepository implements AuthRepository {
 
     if (error) {
       if (error.message.includes('already registered')) {
-        throw new UserAlereadyExistsError();
+        throw new BadRequestError('User already exists');
       }
-      throw new UserCreationError(error.message);
+      throw new ServerError(error.message);
     }
 
     if (!data.user) {
-      throw new UserCreationFailedError();
+      throw new ServerError('User creation failed');
     }
     return SupabaseAuthUserToUser(data.user);
   }
@@ -202,7 +199,7 @@ export class AuthSupabaseRepository implements AuthRepository {
 
     if (error) {
       await this.supabaseAuth.auth.admin.deleteUser(adminData.id);
-      throw new TeacherProfileCreationError(error.message);
+      throw new ServerError(error.message);
     }
 
     return TeacherMapper.toDomain(data);
@@ -222,7 +219,7 @@ export class AuthSupabaseRepository implements AuthRepository {
       .is('used_at', null);
 
     if (error) {
-      throw new TokenUpdateError(error.message);
+      throw new ServerError(error.message);
     }
   }
 

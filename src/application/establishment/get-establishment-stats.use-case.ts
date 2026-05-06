@@ -14,7 +14,7 @@ import {
 import {
   Establishment,
   EstablishmentStats,
-} from '../../domain/establishment/establishment.type';
+} from '../../domain/teaching/types/establishment.type';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,

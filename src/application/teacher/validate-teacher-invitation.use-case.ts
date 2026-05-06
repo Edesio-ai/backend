@@ -7,13 +7,12 @@ import {
   TOKEN_REPOSITORY,
   type TokenRepository,
 } from 'src/domain/token/contract/token.repository';
-import {
-  InvitationTokenAlreadyUsedError,
-  InvitationTokenEmailMismatchError,
-  InvitationTokenExpiredError,
-} from 'src/domain/auth/errors/auth.errors';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from 'src/domain/shared/global/errors/global.errors';
 
 @Injectable()
 export class ValidateTeacherInvitationUseCase {
@@ -44,20 +43,18 @@ export class ValidateTeacherInvitationUseCase {
     }
 
     if (new Date(invitation.expiresAt) < new Date()) {
-      throw new InvitationTokenExpiredError('Invitation token expired');
+      throw new BadRequestError('Invitation token expired');
     }
 
     if (invitation.usedAt) {
-      throw new InvitationTokenAlreadyUsedError(
-        'Invitation token already used',
-      );
+      throw new BadRequestError('Invitation token already used');
     }
 
     if (
       invitation.invitedEmail.toLowerCase() !== teacher.email?.toLowerCase()
     ) {
-      throw new InvitationTokenEmailMismatchError(
-        'Invitation email mismatch with the teacher provided',
+      throw new ForbiddenError(
+        'Invitation email mismatch with the email provided',
       );
     }
 

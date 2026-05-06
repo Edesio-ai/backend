@@ -1,4 +1,4 @@
-import { SessionServerError } from '../../../../domain/teaching/error';
+import { ServerError } from '../../../../domain/shared/global/errors/global.errors';
 import { SupabaseSessionRepository } from './session-supabase.repository';
 
 describe('SupabaseSessionRepository', () => {
@@ -17,12 +17,12 @@ describe('SupabaseSessionRepository', () => {
     fixtures.thenReturnExpectedSessions(result);
   });
 
-  it('should throw SessionServerError when query fails', async () => {
+  it('should throw ServerError when query fails', async () => {
     fixtures.whenSessionsQueryFails();
 
     const promise = fixtures.whenGetSessionsByTeacherId();
 
-    await fixtures.thenThrowSessionServerError(promise);
+    await fixtures.thenThrowServerError(promise);
     fixtures.thenQueryBuiltWithExpectedArguments();
   });
 
@@ -35,12 +35,12 @@ describe('SupabaseSessionRepository', () => {
     fixtures.thenReturnExpectedSessionByCode(result);
   });
 
-  it('should throw SessionServerError when getSessionByCode query fails', async () => {
+  it('should throw ServerError when getSessionByCode query fails', async () => {
     fixtures.whenGetSessionByCodeFails();
 
     const promise = fixtures.whenGetSessionByCode();
 
-    await fixtures.thenThrowSessionServerError(promise);
+    await fixtures.thenThrowServerError(promise);
     fixtures.thenGetSessionByCodeQueryBuiltWithExpectedArguments();
   });
 
@@ -62,12 +62,12 @@ describe('SupabaseSessionRepository', () => {
     fixtures.thenReturnExpectedCreatedSession(result);
   });
 
-  it('should throw SessionServerError when createSession fails', async () => {
+  it('should throw ServerError when createSession fails', async () => {
     fixtures.whenCreateSessionFails();
 
     const promise = fixtures.whenCreateSession();
 
-    await fixtures.thenThrowSessionServerError(promise);
+    await fixtures.thenThrowServerError(promise);
     fixtures.thenCreateSessionQueryBuiltWithExpectedArguments();
   });
 
@@ -80,12 +80,12 @@ describe('SupabaseSessionRepository', () => {
     fixtures.thenReturnExpectedUpdatedSession(result);
   });
 
-  it('should throw SessionServerError when updateSessionName fails', async () => {
+  it('should throw ServerError when updateSessionName fails', async () => {
     fixtures.whenUpdateSessionNameFails();
 
     const promise = fixtures.whenUpdateSessionName();
 
-    await fixtures.thenThrowSessionServerError(promise);
+    await fixtures.thenThrowServerError(promise);
     fixtures.thenUpdateSessionNameQueryBuiltWithExpectedArguments();
   });
 
@@ -97,12 +97,12 @@ describe('SupabaseSessionRepository', () => {
     fixtures.thenDeleteSessionQueryBuiltWithExpectedArguments();
   });
 
-  it('should throw SessionServerError when deleteSessionByTeacherId fails', async () => {
+  it('should throw ServerError when deleteSessionByTeacherId fails', async () => {
     fixtures.whenDeleteSessionFails();
 
     const promise = fixtures.whenDeleteSessionByTeacherId();
 
-    await fixtures.thenThrowSessionServerError(promise);
+    await fixtures.thenThrowServerError(promise);
     fixtures.thenDeleteSessionQueryBuiltWithExpectedArguments();
   });
 
@@ -115,12 +115,12 @@ describe('SupabaseSessionRepository', () => {
     expect(result).toEqual(fixtures.expectedSessionById);
   });
 
-  it('should throw SessionServerError when getSessionById fails', async () => {
+  it('should throw ServerError when getSessionById fails', async () => {
     fixtures.whenGetSessionByIdFails();
 
     const promise = fixtures.whenGetSessionById();
 
-    await fixtures.thenThrowSessionServerError(promise);
+    await fixtures.thenThrowServerError(promise);
     fixtures.thenGetSessionByIdQueryBuilt();
   });
 });
@@ -420,8 +420,8 @@ class Fixtures {
     });
   }
 
-  async thenThrowSessionServerError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(SessionServerError);
+  async thenThrowServerError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   thenQueryBuiltWithExpectedArguments() {

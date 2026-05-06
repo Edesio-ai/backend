@@ -4,8 +4,8 @@ import { ServerTokenError } from '../../../domain/token/token.error';
 import { SUPABASE_ADMIN } from '../supabase.module';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { TokenRepository } from 'src/domain/token/contract/token.repository';
-import { InvitationTokenBadRequestError } from 'src/domain/auth/errors/auth.errors';
 import { EstablishmentMapper } from '../teaching/mappers/establishment.mapper';
+import { BadRequestError } from 'src/domain/shared/global/errors/global.errors';
 
 export class TokenSupabaseRepository implements TokenRepository {
   constructor(
@@ -54,7 +54,7 @@ export class TokenSupabaseRepository implements TokenRepository {
       .single();
 
     if (!data || error) {
-      throw new InvitationTokenBadRequestError(
+      throw new BadRequestError(
         error ? error.message : 'Failed to mark invitation token as used',
       );
     }

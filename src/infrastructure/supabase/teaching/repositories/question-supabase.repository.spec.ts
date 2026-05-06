@@ -1,4 +1,4 @@
-import { QuestionServerError } from 'src/domain/teaching/error';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { QuestionSupabaseRepository } from './question-supabase.repository';
 import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
 import {
@@ -24,12 +24,12 @@ describe('QuestionSupabaseRepository', () => {
     fixtures.thenDeleteByCourseIdsQueryBuilt();
   });
 
-  it('should throw QuestionServerError when deleteQuestionsByCourseIds fails', async () => {
+  it('should throw ServerError when deleteQuestionsByCourseIds fails', async () => {
     fixtures.whenDeleteByCourseIdsFails();
 
     await expect(
       fixtures.whenDeleteQuestionsByCourseIds(),
-    ).rejects.toBeInstanceOf(QuestionServerError);
+    ).rejects.toBeInstanceOf(ServerError);
   });
 
   // --- getPendingQuestionCount ---
@@ -51,11 +51,11 @@ describe('QuestionSupabaseRepository', () => {
     expect(result).toBe(0);
   });
 
-  it('should throw QuestionServerError when getPendingQuestionCount fails', async () => {
+  it('should throw ServerError when getPendingQuestionCount fails', async () => {
     fixtures.whenGetPendingCountFails();
 
     await expect(fixtures.whenGetPendingQuestionCount()).rejects.toBeInstanceOf(
-      QuestionServerError,
+      ServerError,
     );
   });
 
@@ -78,11 +78,11 @@ describe('QuestionSupabaseRepository', () => {
     expect(result).toEqual([]);
   });
 
-  it('should throw QuestionServerError when getCourseQuestions fails', async () => {
+  it('should throw ServerError when getCourseQuestions fails', async () => {
     fixtures.whenGetCourseQuestionsFails();
 
     await expect(fixtures.whenGetCourseQuestions()).rejects.toBeInstanceOf(
-      QuestionServerError,
+      ServerError,
     );
   });
 
@@ -97,11 +97,11 @@ describe('QuestionSupabaseRepository', () => {
     fixtures.thenInsertQuestionsQueryBuilt();
   });
 
-  it('should throw QuestionServerError when insertQuestions fails', async () => {
+  it('should throw ServerError when insertQuestions fails', async () => {
     fixtures.whenInsertQuestionsFails();
 
     await expect(fixtures.whenInsertQuestions()).rejects.toBeInstanceOf(
-      QuestionServerError,
+      ServerError,
     );
   });
 
@@ -116,11 +116,11 @@ describe('QuestionSupabaseRepository', () => {
     fixtures.thenInsertQuestionQueryBuilt();
   });
 
-  it('should throw QuestionServerError when insertQuestion fails', async () => {
+  it('should throw ServerError when insertQuestion fails', async () => {
     fixtures.whenInsertQuestionFails();
 
     await expect(fixtures.whenInsertQuestion()).rejects.toBeInstanceOf(
-      QuestionServerError,
+      ServerError,
     );
   });
 
@@ -134,11 +134,11 @@ describe('QuestionSupabaseRepository', () => {
     fixtures.thenDeleteCourseQuestionsQueryBuilt();
   });
 
-  it('should throw QuestionServerError when deleteCourseQuizQuestions fails', async () => {
+  it('should throw ServerError when deleteCourseQuizQuestions fails', async () => {
     fixtures.whenDeleteCourseQuestionsFails();
 
     await expect(fixtures.whenDeleteCourseQuestions()).rejects.toBeInstanceOf(
-      QuestionServerError,
+      ServerError,
     );
   });
 
@@ -153,11 +153,11 @@ describe('QuestionSupabaseRepository', () => {
     fixtures.thenGetQuestionByIdQueryBuilt();
   });
 
-  it('should throw QuestionServerError when getQuestionById fails', async () => {
+  it('should throw ServerError when getQuestionById fails', async () => {
     fixtures.whenGetQuestionByIdFails();
 
     await expect(fixtures.whenGetQuestionById()).rejects.toBeInstanceOf(
-      QuestionServerError,
+      ServerError,
     );
   });
 
@@ -171,11 +171,11 @@ describe('QuestionSupabaseRepository', () => {
     fixtures.thenDeleteQuestionByIdQueryBuilt();
   });
 
-  it('should throw QuestionServerError when deleteQuestionById fails', async () => {
+  it('should throw ServerError when deleteQuestionById fails', async () => {
     fixtures.whenDeleteQuestionByIdFails();
 
     await expect(fixtures.whenDeleteQuestionById()).rejects.toBeInstanceOf(
-      QuestionServerError,
+      ServerError,
     );
   });
 
@@ -190,11 +190,11 @@ describe('QuestionSupabaseRepository', () => {
     fixtures.thenUpdateQuestionByIdQueryBuilt();
   });
 
-  it('should throw QuestionServerError when updateQuestionById fails', async () => {
+  it('should throw ServerError when updateQuestionById fails', async () => {
     fixtures.whenUpdateQuestionByIdFails();
 
     await expect(fixtures.whenUpdateQuestionById()).rejects.toBeInstanceOf(
-      QuestionServerError,
+      ServerError,
     );
   });
 
@@ -208,12 +208,12 @@ describe('QuestionSupabaseRepository', () => {
     fixtures.thenDeleteCourseQuestionsByCourseIdQueryBuilt();
   });
 
-  it('should throw QuestionServerError when deleteCourseQuestionsByCourseId fails', async () => {
+  it('should throw ServerError when deleteCourseQuestionsByCourseId fails', async () => {
     fixtures.whenDeleteCourseQuestionsByCourseIdFails();
 
     await expect(
       fixtures.whenDeleteCourseQuestionsByCourseId(),
-    ).rejects.toBeInstanceOf(QuestionServerError);
+    ).rejects.toBeInstanceOf(ServerError);
   });
 
   // --- getAnsweredQuestionCount ---
@@ -235,12 +235,12 @@ describe('QuestionSupabaseRepository', () => {
     expect(result).toBe(0);
   });
 
-  it('should throw QuestionServerError when getAnsweredQuestionCount fails', async () => {
+  it('should throw ServerError when getAnsweredQuestionCount fails', async () => {
     fixtures.whenGetAnsweredCountFails();
 
     await expect(
       fixtures.whenGetAnsweredQuestionCount(),
-    ).rejects.toBeInstanceOf(QuestionServerError);
+    ).rejects.toBeInstanceOf(ServerError);
   });
 
   // --- getStudentCourseQuestions ---
@@ -262,12 +262,12 @@ describe('QuestionSupabaseRepository', () => {
     expect(result).toEqual([]);
   });
 
-  it('should throw QuestionServerError when getStudentCourseQuestions fails', async () => {
+  it('should throw ServerError when getStudentCourseQuestions fails', async () => {
     fixtures.whenGetStudentCourseQuestionsFails();
 
     await expect(
       fixtures.whenGetStudentCourseQuestions(),
-    ).rejects.toBeInstanceOf(QuestionServerError);
+    ).rejects.toBeInstanceOf(ServerError);
   });
 });
 

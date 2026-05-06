@@ -1,6 +1,6 @@
 import { TokenSupabaseRepository } from './token-supabase.repository';
 import { ServerTokenError } from '../../../domain/token/token.error';
-import { InvitationTokenBadRequestError } from 'src/domain/auth/errors/auth.errors';
+import { BadRequestError } from 'src/domain/shared/global/errors/global.errors';
 
 describe('TokenSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -52,12 +52,12 @@ describe('TokenSupabaseRepository', () => {
     fixtures.thenMarkInvitationTokenAsUsedQueryBuiltWithExpectedArguments();
   });
 
-  it('should throw InvitationTokenBadRequestError when mark as used fails', async () => {
+  it('should throw BadRequestError when mark as used fails', async () => {
     fixtures.whenMarkInvitationTokenAsUsedFails();
 
     const promise = fixtures.whenMarkInvitationTokenAsUsed();
 
-    await fixtures.thenThrowInvitationTokenBadRequestError(promise);
+    await fixtures.thenThrowBadRequestError(promise);
     fixtures.thenMarkInvitationTokenAsUsedQueryBuiltWithExpectedArguments();
   });
 });
@@ -187,10 +187,8 @@ class Fixtures {
     await expect(promise).rejects.toBeInstanceOf(ServerTokenError);
   }
 
-  async thenThrowInvitationTokenBadRequestError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(
-      InvitationTokenBadRequestError,
-    );
+  async thenThrowBadRequestError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(BadRequestError);
   }
 
   thenQueryBuiltWithExpectedArguments() {

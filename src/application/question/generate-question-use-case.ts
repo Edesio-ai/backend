@@ -14,7 +14,6 @@ import {
   PDF_EXTRACTOR,
   type PdfExtractor,
 } from 'src/domain/pdf/contracts/pdf-extractor.interface';
-import { QuestionBadRequestError } from 'src/domain/teaching/error';
 import {
   OPENAI_REPOSITORY,
   type OpenaiRepository,
@@ -29,6 +28,7 @@ import {
 } from 'src/domain/teaching/interface/teacher.repository';
 import {
   ForbiddenError,
+  BadRequestError,
   NotFoundError,
 } from 'src/domain/shared/global/errors/global.errors';
 
@@ -92,7 +92,7 @@ export class GenerateQuestionUseCase {
       config,
     );
     if (!questions || questions.length === 0) {
-      throw new QuestionBadRequestError('Échec de la génération des questions');
+      throw new BadRequestError('Failed to generate questions');
     }
 
     await this.questionRepository.deleteCourseQuizQuestions(courseId);
@@ -147,7 +147,7 @@ export class GenerateQuestionUseCase {
         'No content available for this course. Add text or a PDF file:',
         files,
       );
-      throw new QuestionBadRequestError(
+      throw new BadRequestError(
         'No content available for this course. Add text or a PDF file.',
       );
     }

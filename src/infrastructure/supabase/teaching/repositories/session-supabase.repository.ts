@@ -6,8 +6,8 @@ import {
   Session,
   UpdateSessionNameBody,
 } from '../../../../domain/teaching/types/session.type';
-import { SessionServerError } from '../../../../domain/teaching/error';
 import { SessionMapper } from '../mappers/session.mapper';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 export class SupabaseSessionRepository implements SessionRepository {
   constructor(
@@ -23,7 +23,7 @@ export class SupabaseSessionRepository implements SessionRepository {
       .order('created_at', { ascending: false });
 
     if (error) {
-      throw new SessionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return (data ?? []).map(SessionMapper.toDomain);
@@ -38,7 +38,7 @@ export class SupabaseSessionRepository implements SessionRepository {
 
     if (error) {
       console.error('An error occure while getting session by code:', error);
-      throw new SessionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return data ? SessionMapper.toDomain(data) : null;
@@ -52,7 +52,7 @@ export class SupabaseSessionRepository implements SessionRepository {
       .single();
 
     if (error) {
-      throw new SessionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return SessionMapper.toDomain(data);
@@ -71,7 +71,7 @@ export class SupabaseSessionRepository implements SessionRepository {
       .single();
 
     if (error) {
-      throw new SessionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return SessionMapper.toDomain(data);
@@ -88,7 +88,7 @@ export class SupabaseSessionRepository implements SessionRepository {
       .eq('teacher_id', teacherId);
 
     if (error) {
-      throw new SessionServerError(error.message);
+      throw new ServerError(error.message);
     }
   }
 
@@ -100,7 +100,7 @@ export class SupabaseSessionRepository implements SessionRepository {
       .single();
 
     if (error) {
-      throw new SessionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return data ? SessionMapper.toDomain(data) : null;

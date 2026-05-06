@@ -15,19 +15,18 @@ import { Roles } from '../../auth/decorator/role.decorator';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { SupabaseUser } from '../../../domain/auth/types/auth.type';
-import { EstablishmentErrorFilter } from '../../filters/establishment.filter';
-import { TeacherErrorFilter } from '../../filters/teacher.filter';
 import { CreateEstablishmentUseCase } from '../../../application/establishment/create-establishment.use-case';
 import { CreateEstablishmentBodyDto } from '../dto/establishment/create-establishment.dto';
 import {
   Establishment,
   EstablishmentStats,
-} from '../../../domain/establishment/establishment.type';
+} from '../../../domain/teaching/types/establishment.type';
 import { GetInvitationTokenUseCase } from '../../../application/establishment/get-invitation-token.use-case';
 import { InvitationToken } from '../../../domain/auth/invitation.type';
 import { CsrfGuard } from '../../auth/guards/csrf.guard';
 import { DeleteInvitationTokenUseCase } from 'src/application/establishment/delete-invitation-token.use-case';
 import { TokenErrorFilter } from '../../filters/token.filter';
+import { GlobalErrorFilter } from 'src/presentation/filters/shared.filter';
 
 @Controller('establishment')
 export class EstablishmentController {
@@ -41,7 +40,7 @@ export class EstablishmentController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('establishment')
   @Get('stats')
-  @UseFilters(EstablishmentErrorFilter, TeacherErrorFilter)
+  @UseFilters(GlobalErrorFilter)
   async getEstablishmentStats(
     @Req() req: Request & { user: SupabaseUser },
   ): Promise<EstablishmentStats> {
@@ -53,7 +52,7 @@ export class EstablishmentController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('establishment')
   @Get('invitation-token/:establishmentId')
-  @UseFilters(EstablishmentErrorFilter)
+  @UseFilters(GlobalErrorFilter)
   async getInvitationToken(
     @Param('establishmentId') establishmentId: string,
   ): Promise<InvitationToken[]> {

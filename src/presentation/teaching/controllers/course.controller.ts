@@ -33,7 +33,6 @@ import { GetCourseFilesUseCase } from 'src/application/course/get-course-files.u
 import { GetCourseRankingUseCase } from 'src/application/course/get-course-ranking.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GlobalErrorFilter } from 'src/presentation/filters/shared.filter';
-import { TeacherErrorFilter } from 'src/presentation/filters/teacher.filter';
 import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';
 import { UpdateCourseBodyDto } from '../dto/course/UpdateCourseUseCase.dto';
 import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';
@@ -101,7 +100,7 @@ export class CourseController {
     return (await this.getCoursesFilesUseCase.execute(courseId)) || [];
   }
 
-  @UseFilters(TeacherErrorFilter, GlobalErrorFilter)
+  @UseFilters(GlobalErrorFilter)
   @Get('/:courseId/ranking')
   async getCourseRanking(
     @Param('courseId') courseId: string,

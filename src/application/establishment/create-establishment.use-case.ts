@@ -6,7 +6,7 @@ import {
 import {
   CreateEstablishmentBody,
   Establishment,
-} from '../../domain/establishment/establishment.type';
+} from '../../domain/teaching/types/establishment.type';
 
 export class CreateEstablishmentUseCase {
   constructor(

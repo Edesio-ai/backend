@@ -1,4 +1,4 @@
-import { CourseServerError } from 'src/domain/teaching/error';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { CourseSupabaseRepository } from './course-supabase.repository';
 import { CreateCourseBody } from 'src/domain/teaching/types/course.type';
 
@@ -18,12 +18,12 @@ describe('CourseSupabaseRepository', () => {
     fixtures.thenReturnsCourseIds(result);
   });
 
-  it('should throw CourseServerError when getCoursesBySessionId fails', async () => {
+  it('should throw ServerError when getCoursesBySessionId fails', async () => {
     fixtures.whenGetCoursesFails();
 
     const promise = fixtures.whenGetCoursesBySessionId();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should delete courses by session id', async () => {
@@ -34,12 +34,12 @@ describe('CourseSupabaseRepository', () => {
     fixtures.thenDeleteCoursesBySessionQueryBuilt();
   });
 
-  it('should throw CourseServerError when deleteCoursesBySessionId fails', async () => {
+  it('should throw ServerError when deleteCoursesBySessionId fails', async () => {
     fixtures.whenDeleteCoursesBySessionFails();
 
     const promise = fixtures.whenDeleteCoursesBySessionId();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should load file paths and remove them from storage', async () => {
@@ -59,21 +59,21 @@ describe('CourseSupabaseRepository', () => {
     expect(fixtures.removeMock).not.toHaveBeenCalled();
   });
 
-  it('should throw CourseServerError when course_files select fails', async () => {
+  it('should throw ServerError when course_files select fails', async () => {
     fixtures.whenCourseFilesQueryFails();
 
     const promise = fixtures.whenDeleteCoursesFilesByCourseIds();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
-  it('should throw CourseServerError when storage remove fails', async () => {
+  it('should throw ServerError when storage remove fails', async () => {
     fixtures.whenCourseFilesReturnsPaths();
     fixtures.whenRemoveFromStorageFails();
 
     const promise = fixtures.whenDeleteCoursesFilesByCourseIds();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should return count for getSessionCoursesCount', async () => {
@@ -85,12 +85,12 @@ describe('CourseSupabaseRepository', () => {
     fixtures.thenSessionCoursesCountQueryBuilt();
   });
 
-  it('should throw CourseServerError when getSessionCoursesCount fails', async () => {
+  it('should throw ServerError when getSessionCoursesCount fails', async () => {
     fixtures.whenSessionCoursesCountFails();
 
     const promise = fixtures.whenGetSessionCoursesCount();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should create course with mapped columns', async () => {
@@ -102,12 +102,12 @@ describe('CourseSupabaseRepository', () => {
     fixtures.thenReturnsCreatedCourse(result);
   });
 
-  it('should throw CourseServerError when createCourse fails', async () => {
+  it('should throw ServerError when createCourse fails', async () => {
     fixtures.whenCreateCourseFails();
 
     const promise = fixtures.whenCreateCourse();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should upload file to storage', async () => {
@@ -118,12 +118,12 @@ describe('CourseSupabaseRepository', () => {
     fixtures.thenUploadBuiltWithExpectedArgs();
   });
 
-  it('should throw CourseServerError when upload fails', async () => {
+  it('should throw ServerError when upload fails', async () => {
     fixtures.whenUploadFails();
 
     const promise = fixtures.whenStoreCourseFile();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should insert course file row', async () => {
@@ -140,7 +140,7 @@ describe('CourseSupabaseRepository', () => {
 
     const promise = fixtures.whenInsertCourseFile();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
     fixtures.thenRemoveCalledAfterInsertFailure();
   });
 
@@ -153,12 +153,12 @@ describe('CourseSupabaseRepository', () => {
     expect(result).toEqual(fixtures.expectedCourseById);
   });
 
-  it('should throw CourseServerError when getCourseById fails', async () => {
+  it('should throw ServerError when getCourseById fails', async () => {
     fixtures.whenGetCourseByIdFails();
 
     const promise = fixtures.whenGetCourseById();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should return validated questions flag', async () => {
@@ -170,12 +170,12 @@ describe('CourseSupabaseRepository', () => {
     expect(result).toEqual({ validatedQuestions: true });
   });
 
-  it('should throw CourseServerError when getCourseValidatedQuestions fails', async () => {
+  it('should throw ServerError when getCourseValidatedQuestions fails', async () => {
     fixtures.whenGetCourseValidatedQuestionsFails();
 
     const promise = fixtures.whenGetCourseValidatedQuestions();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should return session courses mapped and ordered', async () => {
@@ -195,12 +195,12 @@ describe('CourseSupabaseRepository', () => {
     expect(result).toEqual([]);
   });
 
-  it('should throw CourseServerError when getSessionCoursesBySessionId fails', async () => {
+  it('should throw ServerError when getSessionCoursesBySessionId fails', async () => {
     fixtures.whenGetSessionCoursesBySessionIdFails();
 
     const promise = fixtures.whenGetSessionCoursesBySessionId();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should return course files by course id', async () => {
@@ -212,12 +212,12 @@ describe('CourseSupabaseRepository', () => {
     expect(result).toEqual([fixtures.expectedCourseFile]);
   });
 
-  it('should throw CourseServerError when getCourseFilesByCourseId fails', async () => {
+  it('should throw ServerError when getCourseFilesByCourseId fails', async () => {
     fixtures.whenGetCourseFilesFails();
 
     const promise = fixtures.whenGetCourseFilesByCourseId();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should return course with session by id', async () => {
@@ -229,12 +229,12 @@ describe('CourseSupabaseRepository', () => {
     expect(result).toEqual(fixtures.expectedCourseWithSession);
   });
 
-  it('should throw CourseServerError when getCourseWithSessionById fails', async () => {
+  it('should throw ServerError when getCourseWithSessionById fails', async () => {
     fixtures.whenGetCourseWithSessionByIdFails();
 
     const promise = fixtures.whenGetCourseWithSessionById();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should delete course by id', async () => {
@@ -245,12 +245,12 @@ describe('CourseSupabaseRepository', () => {
     fixtures.thenDeleteCourseByIdQueryBuilt();
   });
 
-  it('should throw CourseServerError when deleteCourseById fails', async () => {
+  it('should throw ServerError when deleteCourseById fails', async () => {
     fixtures.whenDeleteCourseByIdFails();
 
     const promise = fixtures.whenDeleteCourseById();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should update course and return mapped domain object', async () => {
@@ -262,12 +262,12 @@ describe('CourseSupabaseRepository', () => {
     expect(result).toEqual(fixtures.expectedUpdatedCourse);
   });
 
-  it('should throw CourseServerError when updateCourse fails', async () => {
+  it('should throw ServerError when updateCourse fails', async () => {
     fixtures.whenUpdateCourseFails();
 
     const promise = fixtures.whenUpdateCourse();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 
   it('should return buffer from storage', async () => {
@@ -279,12 +279,12 @@ describe('CourseSupabaseRepository', () => {
     fixtures.thenDownloadCalledWithPath();
   });
 
-  it('should throw CourseServerError when getFileBufferFromStorage fails', async () => {
+  it('should throw ServerError when getFileBufferFromStorage fails', async () => {
     fixtures.whenGetFileBufferFails();
 
     const promise = fixtures.whenGetFileBufferFromStorage();
 
-    await fixtures.thenThrowCourseServerError(promise);
+    await fixtures.thenThrowServerError(promise);
   });
 });
 
@@ -759,8 +759,8 @@ class Fixtures {
     this.removeMock.mockResolvedValue({ error: null });
   }
 
-  async thenThrowCourseServerError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(CourseServerError);
+  async thenThrowServerError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   thenGetCoursesQueryBuilt() {

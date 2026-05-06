@@ -4,18 +4,10 @@ import {
   InvitationTokenPreview,
 } from '../../../../domain/auth/invitation.type';
 import {
-  InvitationTokenCreationError,
-  InvitationTokenAlreadyUsedError,
-  InvitationTokenExpiredError,
-  LogoutError,
-  UserAlereadyExistsError,
-  UserCreationError,
-  UserCreationFailedError,
-  TeacherProfileCreationError,
-  TokenUpdateError,
-  UserLoginError,
-} from '../../../../domain/auth/errors/auth.errors';
-import { ServerError } from '../../../../domain/shared/global/errors/global.errors';
+  BadRequestError,
+  ServerError,
+  UnauthorizedError,
+} from '../../../../domain/shared/global/errors/global.errors';
 import {
   AuthUserWithSession,
   Session,
@@ -46,7 +38,7 @@ describe('AuthSupabaseRepository', () => {
       await fixtures.thenThrowNotFound(promise);
     });
 
-    it('should throw InvitationTokenAlreadyUsedError when token already used', async () => {
+    it('should throw BadRequestError when token already used', async () => {
       fixtures.whenTokenAlreadyUsed();
 
       const promise = fixtures.whenGetInvitationPreview();
@@ -54,7 +46,7 @@ describe('AuthSupabaseRepository', () => {
       await fixtures.thenThrowAlreadyUsed(promise);
     });
 
-    it('should throw InvitationTokenExpiredError when token is expired', async () => {
+    it('should throw BadRequestError when token is expired', async () => {
       fixtures.whenTokenExpired();
 
       const promise = fixtures.whenGetInvitationPreview();
@@ -78,7 +70,7 @@ describe('AuthSupabaseRepository', () => {
       fixtures.thenInsertQueryBuiltWithExpectedPayload();
     });
 
-    it('should throw InvitationTokenCreationError when insert fails', async () => {
+    it('should throw ServerError when insert fails', async () => {
       fixtures.whenInsertFails();
 
       const promise = fixtures.whenCreateInvitationToken();
@@ -104,7 +96,7 @@ describe('AuthSupabaseRepository', () => {
       expect(result).toEqual(fixtures.expectedAuthUserWithSession);
     });
 
-    it('should throw UserLoginError when signInWithPassword returns error', async () => {
+    it('should throw UnauthorizedError when signInWithPassword returns error', async () => {
       fixtures.whenSignInWithPasswordFails();
 
       const promise = fixtures.whenLoginUser();
@@ -129,7 +121,7 @@ describe('AuthSupabaseRepository', () => {
       fixtures.thenSignOutCalledWithExpectedArgs();
     });
 
-    it('should throw LogoutError when signOut returns error', async () => {
+    it('should throw ServerError when signOut returns error', async () => {
       fixtures.whenSignOutFails();
 
       const promise = fixtures.whenLogoutUser();
@@ -163,7 +155,7 @@ describe('AuthSupabaseRepository', () => {
       expect(fixtures.tokensIsMock).toHaveBeenCalledWith('used_at', null);
     });
 
-    it('should throw UserAlereadyExistsError when user is already registered', async () => {
+    it('should throw BadRequestError when user is already registered', async () => {
       fixtures.whenCreateUserReturnsAlreadyRegistered();
 
       const promise = fixtures.whenCreateUser();
@@ -172,7 +164,7 @@ describe('AuthSupabaseRepository', () => {
       expect(fixtures.teachersInsertMock).not.toHaveBeenCalled();
     });
 
-    it('should throw UserCreationError on other admin createAuthUser errors', async () => {
+    it('should throw ServerError on other admin createAuthUser errors', async () => {
       fixtures.whenCreateUserReturnsGenericError();
 
       const promise = fixtures.whenCreateUser();
@@ -180,7 +172,7 @@ describe('AuthSupabaseRepository', () => {
       await fixtures.thenThrowUserCreationError(promise);
     });
 
-    it('should throw UserCreationFailedError when admin response has no user', async () => {
+    it('should throw ServerError when admin response has no user', async () => {
       fixtures.whenCreateUserReturnsNoUser();
 
       const promise = fixtures.whenCreateUser();
@@ -188,7 +180,7 @@ describe('AuthSupabaseRepository', () => {
       await fixtures.thenThrowTeacherCreationFailed(promise);
     });
 
-    it('should throw TeacherProfileCreationError and delete auth user when teacher insert fails', async () => {
+    it('should throw ServerError and delete auth user when teacher insert fails', async () => {
       fixtures.whenCreateUserSucceedsButTeacherInsertFails();
 
       const promise = fixtures.whenCreateUser();
@@ -197,7 +189,7 @@ describe('AuthSupabaseRepository', () => {
       expect(fixtures.deleteUserMock).toHaveBeenCalledWith('user-uuid-1');
     });
 
-    it('should throw TokenUpdateError when updating invitation token fails', async () => {
+    it('should throw ServerError when updating invitation token fails', async () => {
       fixtures.whenCreateUserAndTeacherInsertSucceedButTokenUpdateFails();
 
       const promise = fixtures.whenCreateUser();
@@ -293,14 +285,12 @@ class GetInvitationPreviewFixtures {
   }
 
   async thenThrowAlreadyUsed(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(
-      InvitationTokenAlreadyUsedError,
-    );
+    await expect(promise).rejects.toBeInstanceOf(BadRequestError);
     await expect(promise).rejects.toThrow('Invitation token already used');
   }
 
   async thenThrowExpired(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(InvitationTokenExpiredError);
+    await expect(promise).rejects.toBeInstanceOf(BadRequestError);
     await expect(promise).rejects.toThrow('Invitation token expired');
   }
 }
@@ -409,7 +399,7 @@ class LoginUserFixtures {
   }
 
   async thenThrowUserLoginError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(UserLoginError);
+    await expect(promise).rejects.toBeInstanceOf(UnauthorizedError);
     await expect(promise).rejects.toThrow('Invalid login credentials');
   }
 }
@@ -475,7 +465,7 @@ class CreateInvitationTokenFixtures {
   }
 
   async thenThrowInvitationTokenCreationError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(InvitationTokenCreationError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
     await expect(promise).rejects.toThrow('insert failed');
   }
 }
@@ -648,23 +638,24 @@ class CreateUserFixtures {
   }
 
   async thenThrowTeacherAlreadyExists(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(UserAlereadyExistsError);
+    await expect(promise).rejects.toBeInstanceOf(BadRequestError);
+    await expect(promise).rejects.toThrow('User already exists');
   }
 
   async thenThrowUserCreationError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(UserCreationError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   async thenThrowTeacherCreationFailed(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(UserCreationFailedError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   async thenThrowTeacherProfileCreationError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(TeacherProfileCreationError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   async thenThrowTokenUpdateError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(TokenUpdateError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 }
 
@@ -707,7 +698,7 @@ class LogoutUserFixtures {
   }
 
   async thenThrowLogoutError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(LogoutError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
     await expect(promise).rejects.toThrow('logout failed');
   }
 }

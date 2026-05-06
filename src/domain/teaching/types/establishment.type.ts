@@ -1,4 +1,4 @@
-import { TeacherWithStats } from '../teaching/types/teacher.type';
+import { TeacherWithStats } from './teacher.type';
 
 export type CreateEstablishmentBody = {
   supabaseUserId: string;

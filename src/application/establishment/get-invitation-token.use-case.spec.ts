@@ -1,7 +1,7 @@
 import { GetInvitationTokenUseCase } from './get-invitation-token.use-case';
 import { EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
 import { InvitationToken } from '../../domain/auth/invitation.type';
-import { EstablishmentIdNotFoundError } from '../../domain/establishment/error';
+import { NotFoundError } from '../../domain/shared/global/errors/global.errors';
 
 describe('GetInvitationTokenUseCase', () => {
   let fixtures: Fixtures;
@@ -19,10 +19,10 @@ describe('GetInvitationTokenUseCase', () => {
     fixtures.thenReturnExpectedInvitationTokens(result);
   });
 
-  it('should throw EstablishmentIdNotFoundError when establishment id is empty', async () => {
+  it('should throw NotFoundError when establishment id is empty', async () => {
     const promise = fixtures.whenExecuteWith('');
 
-    await fixtures.thenThrowEstablishmentIdNotFound(promise);
+    await fixtures.thenThrowNotFoundForEmptyEstablishmentId(promise);
     fixtures.thenRepositoryNotCalled();
   });
 
@@ -89,8 +89,8 @@ class Fixtures {
     );
   }
 
-  async thenThrowEstablishmentIdNotFound(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(EstablishmentIdNotFoundError);
+  async thenThrowNotFoundForEmptyEstablishmentId(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(NotFoundError);
   }
 
   async thenThrowRepositoryError(promise: Promise<unknown>) {

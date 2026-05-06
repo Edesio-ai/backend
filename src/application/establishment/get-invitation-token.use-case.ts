@@ -5,7 +5,7 @@ import {
   type EstablishmentRepository,
 } from '../../domain/teaching/interface/establishment.repository';
 import { InvitationToken } from '../../domain/auth/invitation.type';
-import { EstablishmentIdNotFoundError } from '../../domain/establishment/error';
+import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 export class GetInvitationTokenUseCase {
   constructor(
@@ -15,7 +15,7 @@ export class GetInvitationTokenUseCase {
 
   async execute(establishmentId: string): Promise<InvitationToken[]> {
     if (!establishmentId) {
-      throw new EstablishmentIdNotFoundError();
+      throw new NotFoundError('Establishment id not found');
     }
     const invitationTokens =
       await this.establishmentRepository.getInvitationTokenByEstablishmentId(

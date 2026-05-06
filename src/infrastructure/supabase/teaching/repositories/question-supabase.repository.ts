@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
 import { SUPABASE_ADMIN } from '../../supabase.module';
-import { QuestionServerError } from 'src/domain/teaching/error';
 import {
   CreateQuestionBody,
   GeneratedQuestion,
@@ -11,7 +10,7 @@ import {
 import { QuestionMapper } from '../mappers/question.mapper';
 import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
 import { CourseQuestionMapper } from '../mappers/course-question.mapper';
-
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 export class QuestionSupabaseRepository implements QuestionsRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
 
@@ -27,7 +26,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
         courseIds,
         error,
       );
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
   }
 
@@ -44,7 +43,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
         courseIds,
         countError,
       );
-      throw new QuestionServerError(countError.message);
+      throw new ServerError(countError.message);
     }
 
     return count ?? 0;
@@ -63,7 +62,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
         courseId,
         error,
       );
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return data?.map(QuestionMapper.toDomain) ?? [];
@@ -80,7 +79,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
 
     if (error) {
       console.error('error inserting questions for course id', courseId, error);
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return data?.map(QuestionMapper.toDomain) ?? [];
@@ -98,7 +97,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
         courseId,
         error,
       );
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
   }
 
@@ -111,7 +110,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
 
     if (error) {
       console.error('error inserting question', question, error);
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return QuestionMapper.toDomain(data);
@@ -126,7 +125,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
 
     if (error) {
       console.error('error getting question by id', questionId, error);
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return QuestionMapper.toDomain(data);
@@ -140,7 +139,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
 
     if (error) {
       console.error('error deleting question by id', questionId, error);
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
   }
 
@@ -162,7 +161,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
         updates,
         error,
       );
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return QuestionMapper.toDomain(data);
@@ -182,7 +181,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
         courseId,
         error,
       );
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
   }
   async getAnsweredQuestionCount(studentId: string): Promise<number> {
@@ -198,7 +197,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
         studentId,
         error,
       );
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return count ?? 0;
@@ -216,7 +215,7 @@ export class QuestionSupabaseRepository implements QuestionsRepository {
         courseId,
         error,
       );
-      throw new QuestionServerError(error.message);
+      throw new ServerError(error.message);
     }
 
     return data?.map(CourseQuestionMapper.toDomain) ?? [];

@@ -1,7 +1,6 @@
 import { GetSessionCoursesUseCase } from './get-session-courses.use-case';
-import { SessionNotFoundError } from '../../domain/auth/errors/auth.errors';
 import { AuthUser } from '../../domain/auth/types/auth.type';
-import { Establishment } from '../../domain/establishment/establishment.type';
+import { Establishment } from '../../domain/teaching/types/establishment.type';
 import {
   ForbiddenError,
   NotFoundError,
@@ -45,12 +44,12 @@ describe('GetSessionCoursesUseCase', () => {
     expect(fixtures.sessionRepository.getSessionById).not.toHaveBeenCalled();
   });
 
-  it('should throw SessionNotFoundError when session is missing (teacher path)', async () => {
+  it('should throw NotFoundError when session is missing (teacher path)', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenSessionNotFound();
 
     await expect(fixtures.whenExecuteAsTeacher()).rejects.toBeInstanceOf(
-      SessionNotFoundError,
+      NotFoundError,
     );
     expect(
       fixtures.courseRepository.getSessionCoursesBySessionId,
@@ -110,12 +109,12 @@ describe('GetSessionCoursesUseCase', () => {
     expect(fixtures.sessionRepository.getSessionById).not.toHaveBeenCalled();
   });
 
-  it('should throw SessionNotFoundError when session is missing (establishment path)', async () => {
+  it('should throw NotFoundError when session is missing (establishment path)', async () => {
     fixtures.whenEstablishmentFound();
     fixtures.whenSessionNotFound();
 
     await expect(fixtures.whenExecuteAsEstablishment()).rejects.toBeInstanceOf(
-      SessionNotFoundError,
+      NotFoundError,
     );
     expect(
       fixtures.teachersRepository.getTeacherByConditions,

@@ -3,8 +3,11 @@ import {
   GenerateQuestionUseCase,
 } from './generate-question-use-case';
 import { AuthUser } from '../../domain/auth/types/auth.type';
-import { ForbiddenError } from '../../domain/shared/global/errors/global.errors';
-import { QuestionBadRequestError } from '../../domain/teaching/error';
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from '../../domain/shared/global/errors/global.errors';
 import { OpenaiRepository } from '../../domain/shared/llm/openai/contracts/opena-ai.repository';
 import { PdfExtractor } from '../../domain/pdf/contracts/pdf-extractor.interface';
 import { CourseRepository } from '../../domain/teaching/interface/course.repository';
@@ -18,7 +21,6 @@ import {
   GeneratedQuestion,
   Question,
 } from '../../domain/teaching/types/question.type';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 describe('GenerateQuestionUseCase', () => {
   let fixtures: Fixtures;
@@ -44,24 +46,24 @@ describe('GenerateQuestionUseCase', () => {
     expect(fixtures.openaiRepository.generateQuestions).not.toHaveBeenCalled();
   });
 
-  it('should throw QuestionBadRequestError when no content and no files', async () => {
+  it('should throw BadRequestError when no content and no files', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseWithSessionMatchesTeacher({ contentText: '' });
     fixtures.whenNoFiles();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      QuestionBadRequestError,
+      BadRequestError,
     );
   });
 
-  it('should throw QuestionBadRequestError when OpenAI returns no questions', async () => {
+  it('should throw BadRequestError when OpenAI returns no questions', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseWithSessionMatchesTeacher();
     fixtures.whenNoFiles();
     fixtures.whenOpenAiReturnsNoQuestions();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      QuestionBadRequestError,
+      BadRequestError,
     );
   });
 

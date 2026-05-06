@@ -1,5 +1,5 @@
 import { InvitationToken } from '../../auth/invitation.type';
-import { Establishment } from '../../establishment/establishment.type';
+import { Establishment } from '../../teaching/types/establishment.type';
 
 export const ESTABLISHMENT_REPOSITORY = Symbol('ESTABLISHMENT_REPOSITORY');
 

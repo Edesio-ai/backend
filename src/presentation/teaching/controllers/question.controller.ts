@@ -18,7 +18,6 @@ import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { Question } from 'src/domain/teaching/types/question.type';
 import { GetCourseQuestionsUseCase } from 'src/application/question/get-course-questions.use-case';
 import { GlobalErrorFilter } from 'src/presentation/filters/shared.filter';
-import { TeacherErrorFilter } from 'src/presentation/filters/teacher.filter';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { GenerateQuestionDto } from '../dto/question/generate-question.dto';
 import { GenerateQuestionUseCase } from 'src/application/question/generate-question-use-case';
@@ -35,7 +34,7 @@ import { GetAnsweredQuestionCountUseCase } from 'src/application/question/get-an
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('teacher')
-@UseFilters(GlobalErrorFilter, TeacherErrorFilter)
+@UseFilters(GlobalErrorFilter)
 @Controller('question')
 export class QuestionController {
   constructor(

@@ -1,10 +1,9 @@
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import {
-  InvitationTokenAlreadyUsedError,
-  InvitationTokenEmailMismatchError,
-  InvitationTokenExpiredError,
-} from 'src/domain/auth/errors/auth.errors';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from 'src/domain/shared/global/errors/global.errors';
 import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
 import { TokenRepository } from 'src/domain/token/contract/token.repository';
 import { ValidateTeacherInvitationUseCase } from './validate-teacher-invitation.use-case';
@@ -49,7 +48,8 @@ describe('ValidateTeacherInvitationUseCase', () => {
 
     const promise = fixtures.whenExecute();
 
-    await expect(promise).rejects.toBeInstanceOf(InvitationTokenExpiredError);
+    await expect(promise).rejects.toBeInstanceOf(BadRequestError);
+    await expect(promise).rejects.toThrow('Invitation token expired');
   });
 
   it('should throw when invitation token is already used', async () => {
@@ -58,9 +58,8 @@ describe('ValidateTeacherInvitationUseCase', () => {
 
     const promise = fixtures.whenExecute();
 
-    await expect(promise).rejects.toBeInstanceOf(
-      InvitationTokenAlreadyUsedError,
-    );
+    await expect(promise).rejects.toBeInstanceOf(BadRequestError);
+    await expect(promise).rejects.toThrow('Invitation token already used');
   });
 
   it('should throw when invitation email does not match teacher email', async () => {
@@ -69,9 +68,7 @@ describe('ValidateTeacherInvitationUseCase', () => {
 
     const promise = fixtures.whenExecute();
 
-    await expect(promise).rejects.toBeInstanceOf(
-      InvitationTokenEmailMismatchError,
-    );
+    await expect(promise).rejects.toBeInstanceOf(ForbiddenError);
   });
 
   it('should mark token as used, link teacher and return invitation on success', async () => {

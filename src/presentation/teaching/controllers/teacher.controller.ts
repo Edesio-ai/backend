@@ -18,7 +18,6 @@ import { Teacher } from 'src/domain/teaching/types/teacher.type';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { ValidateTeacherInvitationBodyDto } from 'src/presentation/teaching/dto/teacher/validate-teacher-invitation-body.dto';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/validate-teacher-invitation.use-case';
-import { TeacherErrorFilter } from 'src/presentation/filters/teacher.filter';
 import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
 
 @Controller('teacher')
@@ -58,7 +57,7 @@ export class TeacherController {
   @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
   @Roles('teacher')
   @Post('validate-invitation')
-  @UseFilters(TokenErrorFilter, TeacherErrorFilter)
+  @UseFilters(TokenErrorFilter)
   async validateTeacherInvitation(
     @Req() req: Request & { user: SupabaseUser },
     @Body() body: ValidateTeacherInvitationBodyDto,

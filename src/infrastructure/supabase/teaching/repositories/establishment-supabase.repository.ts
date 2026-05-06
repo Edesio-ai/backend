@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 
 import { type EstablishmentRepository } from 'src/domain/teaching/interface/establishment.repository';
 import { SUPABASE_ADMIN } from '../../supabase.module';
-import { Establishment } from '../../../../domain/establishment/establishment.type';
+import { Establishment } from '../../../../domain/teaching/types/establishment.type';
 import { InvitationToken } from '../../../../domain/auth/invitation.type';
 import { EstablishmentMapper } from '../mappers/establishment.mapper';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
