@@ -9,6 +9,7 @@ import {
 } from '../../domain/shared/global/errors/global.errors';
 import { SessionStudent } from '../../domain/teaching/types/student.type';
 import { AuthUser } from '../../domain/auth/types/auth.type';
+import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('GetSessionStudentUseCase', () => {
   let fixtures: Fixtures;
@@ -216,22 +217,7 @@ class Fixtures {
   public readonly useCase: GetSessionStudentUseCase;
 
   constructor() {
-    this.studentRepository = {
-      getStudentsByIds: jest.fn(),
-      createStudentSession: jest.fn(),
-      getStudentJoinedSessions: jest.fn(),
-      getStudentByUserId: jest.fn(),
-      getStudentsSessionsByIds: jest.fn(),
-      getStudentSessionsBySessionId: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
-      deleteStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSession: jest.fn(),
-      getStudentStatsByCourseId: jest.fn(),
-      deleteStudentCourseStatsByCourseId: jest.fn(),
-      createStudent: jest.fn(),
-      storeStudentPhoto: jest.fn(),
-      updateStudentPhoto: jest.fn(),
-    };
+    this.studentRepository = createMockStudentRepository();
     this.teacherRepository = {
       linkTeacherToEstablishment: jest.fn(),
       getTeacherByEstablishmentId: jest.fn(),

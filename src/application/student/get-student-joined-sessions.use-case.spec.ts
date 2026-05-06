@@ -1,6 +1,7 @@
 import { GetStudentJoinedSessionsUseCase } from './get-student-joined-sessions.use-case';
 import { StudentRepository } from '../../domain/teaching/interface/student.repository';
 import { StudentJoinedSession } from '../../domain/teaching/types/student.type';
+import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('GetStudentJoinedSessionsUseCase', () => {
   let fixtures: Fixtures;
@@ -61,22 +62,7 @@ class Fixtures {
   public readonly useCase: GetStudentJoinedSessionsUseCase;
 
   constructor() {
-    this.studentRepository = {
-      createStudent: jest.fn(),
-      getStudentByUserId: jest.fn(),
-      getStudentsSessionsByIds: jest.fn(),
-      getStudentSessionsBySessionId: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
-      getStudentsByIds: jest.fn(),
-      deleteStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSession: jest.fn(),
-      getStudentStatsByCourseId: jest.fn(),
-      deleteStudentCourseStatsByCourseId: jest.fn(),
-      getStudentJoinedSessions: jest.fn(),
-      createStudentSession: jest.fn(),
-      storeStudentPhoto: jest.fn(),
-      updateStudentPhoto: jest.fn(),
-    };
+    this.studentRepository = createMockStudentRepository();
     this.useCase = new GetStudentJoinedSessionsUseCase(this.studentRepository);
   }
 

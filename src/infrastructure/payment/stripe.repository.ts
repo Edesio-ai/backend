@@ -97,6 +97,7 @@ export class StripeRepository implements StripeClientInterface {
       const session = await this.stripeClient.checkout.sessions.create({
         mode: 'subscription',
         customer_email: email,
+        allow_promotion_codes: true,
         line_items: [
           {
             price: priceId,

@@ -8,6 +8,7 @@ import { CourseRepository } from 'src/domain/teaching/interface/course.repositor
 import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
 import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
 import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
+import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('DeleteCourseUseCase', () => {
   let fixtures: Fixtures;
@@ -182,22 +183,7 @@ class Fixtures {
       getAnsweredQuestionCount: jest.fn(),
     };
 
-    this.studentRepository = {
-      getStudentsByIds: jest.fn(),
-      createStudentSession: jest.fn(),
-      getStudentJoinedSessions: jest.fn(),
-      getStudentByUserId: jest.fn(),
-      getStudentsSessionsByIds: jest.fn(),
-      getStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSessionsBySessionId: jest.fn(),
-      getStudentStatsByCourseId: jest.fn(),
-      deleteStudentCourseStatsByCourseId: jest.fn(),
-      createStudent: jest.fn(),
-      storeStudentPhoto: jest.fn(),
-      updateStudentPhoto: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
-      deleteStudentSession: jest.fn(),
-    };
+    this.studentRepository = createMockStudentRepository();
 
     this.useCase = new DeleteCourseUseCase(
       this.courseRepository,

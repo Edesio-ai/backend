@@ -11,6 +11,7 @@ import { EstablishmentRepository } from '../../domain/teaching/interface/establi
 import { SessionRepository } from '../../domain/teaching/interface/session.repository';
 import { StudentRepository } from '../../domain/teaching/interface/student.repository';
 import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
+import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { Course } from '../../domain/teaching/types/course.type';
 
 describe('GetSessionCoursesUseCase', () => {
@@ -320,22 +321,7 @@ class Fixtures {
       createEstablishment: jest.fn(),
       getInvitationTokenByEstablishmentId: jest.fn(),
     };
-    this.studentRepository = {
-      getStudentsByIds: jest.fn(),
-      createStudentSession: jest.fn(),
-      getStudentJoinedSessions: jest.fn(),
-      getStudentByUserId: jest.fn(),
-      getStudentsSessionsByIds: jest.fn(),
-      getStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSession: jest.fn(),
-      getStudentStatsByCourseId: jest.fn(),
-      deleteStudentCourseStatsByCourseId: jest.fn(),
-      createStudent: jest.fn(),
-      storeStudentPhoto: jest.fn(),
-      updateStudentPhoto: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
-    };
+    this.studentRepository = createMockStudentRepository();
     this.useCase = new GetSessionCoursesUseCase(
       this.courseRepository,
       this.teachersRepository,

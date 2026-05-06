@@ -228,6 +228,7 @@ class Fixtures {
     this.openaiRepository = {
       generateQuestions: jest.fn(),
       evaluateAnswer: jest.fn(),
+      generateCompletionFeedback: jest.fn(),
     };
     this.questionRepository = {
       getQuestionById: jest.fn(),

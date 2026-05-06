@@ -24,7 +24,7 @@ import {
   FILE_REPOSITORY,
   type FileRepository,
 } from 'src/domain/teaching/interface/file.repository';
-import { StudentCourseStats } from 'src/domain/teaching/types/student.type';
+import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
 import { CourseDetails } from 'src/domain/teaching/types/course.type';
 
 export class GetCourseDetailsUseCase {
@@ -86,15 +86,17 @@ export class GetCourseDetailsUseCase {
         createdAt: courseWithSession.createdAt,
       },
       questions: questions || [],
-      students: (students || []).map((student: StudentCourseStats) => ({
-        id: student.student.id,
-        name: student.student.name,
-        email: student.student.email,
-        photoUrl: student.student.photoUrl,
-        correctAnswers: student.correctAnswers,
-        attemptedQuestions: student.attemptedQuestions,
-        lastAttemptAt: student.lastAttemptAt,
-      })),
+      students: (students || []).map(
+        (student: StudentCourseStatsWithStudent) => ({
+          id: student.student.id,
+          name: student.student.name,
+          email: student.student.email,
+          photoUrl: student.student.photoUrl,
+          correctAnswers: student.correctAnswers,
+          attemptedQuestions: student.attemptedQuestions,
+          lastAttemptAt: student.lastAttemptAt,
+        }),
+      ),
       files: files || [],
     };
   }

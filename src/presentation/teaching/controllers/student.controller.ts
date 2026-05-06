@@ -34,6 +34,8 @@ import { GetStudentBatchUseCase } from 'src/application/student/get-student-batc
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadStudentPhotoUseCase } from 'src/application/student/upload-student-photo.use-case';
 import { DeleteStudentSessionUseCase } from 'src/application/student/delete-student-session.use-case';
+import { UpdateOrCreateStudentCourseStatsBodyDto } from '../dto/student/update-or-create-student-course-stats.dto';
+import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/student/update-or-create-student-course-stats.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')
@@ -49,6 +51,7 @@ export class StudentController {
     private readonly getStudentBatchUseCase: GetStudentBatchUseCase,
     private readonly uploadStudentPhotoUseCase: UploadStudentPhotoUseCase,
     private readonly deleteStudentSessionUseCase: DeleteStudentSessionUseCase,
+    private readonly updateOrCreateStudentCourseStatsUseCase: UpdateOrCreateStudentCourseStatsUseCase,
   ) {}
 
   @Get()
@@ -141,5 +144,20 @@ export class StudentController {
   ): Promise<void> {
     const { user } = req;
     await this.deleteStudentSessionUseCase.execute(sessionId, user);
+  }
+
+  @Post('course/:courseId/stats')
+  async updateOrCreateStudentStats(
+    @Param('courseId') courseId: string,
+    @Req() req: Request & { user: AuthUser },
+    @Body() body: UpdateOrCreateStudentCourseStatsBodyDto,
+  ): Promise<void> {
+    const { user } = req;
+
+    await this.updateOrCreateStudentCourseStatsUseCase.execute(
+      courseId,
+      user,
+      body,
+    );
   }
 }

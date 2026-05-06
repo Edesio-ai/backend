@@ -20,7 +20,7 @@ import {
   STUDENT_REPOSITORY,
   type StudentRepository,
 } from 'src/domain/teaching/interface/student.repository';
-import { StudentCourseStats } from 'src/domain/teaching/types/student.type';
+import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 @Injectable()
@@ -91,7 +91,7 @@ export class GetCourseRankingUseCase {
   }
 
   private getRankingWithRate(
-    studentStats: StudentCourseStats[],
+    studentStats: StudentCourseStatsWithStudent[],
   ): CourseRankingWithRate[] {
     return studentStats.map((row): CourseRankingWithRate => {
       const student = row.student;

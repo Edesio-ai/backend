@@ -6,6 +6,7 @@ import {
   StudentPhotoUpload,
 } from '../../domain/teaching/types/student.type';
 import { AuthUser } from '../../domain/auth/types/auth.type';
+import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('UploadStudentPhotoUseCase', () => {
   let fixtures: Fixtures;
@@ -123,22 +124,7 @@ class Fixtures {
   public readonly useCase: UploadStudentPhotoUseCase;
 
   constructor() {
-    this.studentRepository = {
-      getStudentsByIds: jest.fn(),
-      createStudentSession: jest.fn(),
-      getStudentJoinedSessions: jest.fn(),
-      getStudentByUserId: jest.fn(),
-      getStudentsSessionsByIds: jest.fn(),
-      getStudentSessionsBySessionId: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
-      deleteStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSession: jest.fn(),
-      getStudentStatsByCourseId: jest.fn(),
-      deleteStudentCourseStatsByCourseId: jest.fn(),
-      createStudent: jest.fn(),
-      storeStudentPhoto: jest.fn(),
-      updateStudentPhoto: jest.fn(),
-    };
+    this.studentRepository = createMockStudentRepository();
     this.useCase = new UploadStudentPhotoUseCase(this.studentRepository);
   }
 

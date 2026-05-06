@@ -2,6 +2,7 @@ import { GetEstablishmentsStatsUseCase } from './get-establishment-stats.use-cas
 import { EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
 import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
 import { StudentRepository } from '../../domain/teaching/interface/student.repository';
+import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('GetEstablishmentsStatsUseCase', () => {
   let fixtures: Fixtures;
@@ -57,22 +58,7 @@ class Fixtures {
       createTeacher: jest.fn(),
       getTeacherByConditions: jest.fn(),
     };
-    this.studentRepository = {
-      getStudentsByIds: jest.fn(),
-      createStudentSession: jest.fn(),
-      getStudentJoinedSessions: jest.fn(),
-      getStudentByUserId: jest.fn(),
-      getStudentsSessionsByIds: jest.fn(),
-      getStudentSessionsBySessionId: jest.fn(),
-      getStudentSessionBySessionId: jest.fn(),
-      storeStudentPhoto: jest.fn(),
-      updateStudentPhoto: jest.fn(),
-      deleteStudentSessionsBySessionId: jest.fn(),
-      deleteStudentSession: jest.fn(),
-      getStudentStatsByCourseId: jest.fn(),
-      deleteStudentCourseStatsByCourseId: jest.fn(),
-      createStudent: jest.fn(),
-    };
+    this.studentRepository = createMockStudentRepository();
 
     this.getEstablishmentsStatsUseCase = new GetEstablishmentsStatsUseCase(
       this.establishmentRepository,

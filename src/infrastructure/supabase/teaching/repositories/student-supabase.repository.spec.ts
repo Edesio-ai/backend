@@ -355,6 +355,74 @@ describe('StudentSupabaseRepository', () => {
       ServerError,
     );
   });
+
+  // ─── getStudentCourseStatsByStudentIdAndCourseId ─────────────────────────────
+
+  it('should return mapped student course stats when row exists', async () => {
+    fixtures.whenCourseStatByStudentCourseReturnsData();
+
+    const result =
+      await fixtures.whenGetStudentCourseStatsByStudentIdAndCourseId();
+
+    fixtures.thenCourseStatByStudentCourseQueryBuilt();
+    expect(result).toEqual(fixtures.expectedSingleStudentCourseStat);
+  });
+
+  it('should return null when no student course stat row', async () => {
+    fixtures.whenCourseStatByStudentCourseReturnsNull();
+
+    const result =
+      await fixtures.whenGetStudentCourseStatsByStudentIdAndCourseId();
+
+    expect(result).toBeNull();
+  });
+
+  it('should throw ServerError when getStudentCourseStatsByStudentIdAndCourseId fails', async () => {
+    fixtures.whenCourseStatByStudentCourseQueryFails();
+
+    await expect(
+      fixtures.whenGetStudentCourseStatsByStudentIdAndCourseId(),
+    ).rejects.toBeInstanceOf(ServerError);
+  });
+
+  // ─── createStudentCourseStats ────────────────────────────────────────────────
+
+  it('should insert student course stats', async () => {
+    fixtures.whenCreateStudentCourseStatsSucceeds();
+
+    await fixtures.whenCreateStudentCourseStats();
+
+    fixtures.thenCreateStudentCourseStatsInsertBuilt();
+  });
+
+  it('should throw ServerError when createStudentCourseStats fails', async () => {
+    fixtures.whenCreateStudentCourseStatsFails();
+
+    await expect(
+      fixtures.whenCreateStudentCourseStats(),
+    ).rejects.toBeInstanceOf(ServerError);
+  });
+
+  // ─── updateStudentCourseStats ────────────────────────────────────────────────
+
+  it('should update student course stats by id', async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-05-05T15:00:00.000Z'));
+    fixtures.whenUpdateStudentCourseStatsSucceeds();
+
+    await fixtures.whenUpdateStudentCourseStats();
+
+    fixtures.thenUpdateStudentCourseStatsQueryBuilt();
+    jest.useRealTimers();
+  });
+
+  it('should throw ServerError when updateStudentCourseStats fails', async () => {
+    fixtures.whenUpdateStudentCourseStatsFails();
+
+    await expect(
+      fixtures.whenUpdateStudentCourseStats(),
+    ).rejects.toBeInstanceOf(ServerError);
+  });
 });
 
 class Fixtures {
@@ -520,6 +588,40 @@ class Fixtures {
     },
   ];
 
+  public readonly studentIdForCourseStat = 'student-1';
+  public readonly courseIdForSingleStat = 'course-stat-1';
+  public readonly singleStudentCourseStatSupabaseRow = {
+    id: 'stat-row-1',
+    student_id: 'student-1',
+    course_id: 'course-stat-1',
+    attempted_questions: 3,
+    correct_answers: 2,
+    last_attempt_at: '2026-01-10T00:00:00.000Z',
+  };
+  public readonly expectedSingleStudentCourseStat = {
+    id: 'stat-row-1',
+    studentId: 'student-1',
+    courseId: 'course-stat-1',
+    attemptedQuestions: 3,
+    correctAnswers: 2,
+    lastAttemptAt: '2026-01-10T00:00:00.000Z',
+  };
+  public readonly statToInsert = {
+    studentId: 'student-1',
+    courseId: 'course-stat-1',
+    attemptedQuestions: 4,
+    correctAnswers: 3,
+    lastAttemptAt: '2026-01-11T00:00:00.000Z',
+  };
+  public readonly statIdToUpdate = 'stat-update-1';
+  public readonly statToUpdatePayload = {
+    studentId: 'student-1',
+    courseId: 'course-stat-1',
+    attemptedQuestions: 10,
+    correctAnswers: 9,
+    lastAttemptAt: '2026-01-01T00:00:00.000Z',
+  };
+
   // ─── Supabase chain mocks ────────────────────────────────────────────────────
 
   private readonly inMock = jest.fn();
@@ -610,6 +712,24 @@ class Fixtures {
     eq: this.deleteStudentSessionFirstEqMock,
   }));
 
+  private readonly statsByStudentCourseMaybeSingleMock = jest.fn();
+  private readonly statsByStudentCourseSecondEqMock = jest.fn(() => ({
+    maybeSingle: this.statsByStudentCourseMaybeSingleMock,
+  }));
+  private readonly statsByStudentCourseFirstEqMock = jest.fn(() => ({
+    eq: this.statsByStudentCourseSecondEqMock,
+  }));
+  private readonly statsByStudentCourseSelectMock = jest.fn(() => ({
+    eq: this.statsByStudentCourseFirstEqMock,
+  }));
+
+  public readonly courseStatsInsertMock = jest.fn();
+
+  private readonly courseStatsUpdateEqMock = jest.fn();
+  private readonly courseStatsUpdateUpdateMock = jest.fn(() => ({
+    eq: this.courseStatsUpdateEqMock,
+  }));
+
   private mode:
     | 'select'
     | 'delete'
@@ -623,12 +743,24 @@ class Fixtures {
     | 'student-session-by-session-id'
     | 'get-students-by-ids'
     | 'update-student-photo'
-    | 'delete-student-session' = 'select';
+    | 'delete-student-session'
+    | 'stats-by-student-course'
+    | 'stats-insert'
+    | 'stats-update' = 'select';
 
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'student_course_stats') {
       if (this.mode === 'stats-delete') {
         return { delete: this.statsDeleteMock };
+      }
+      if (this.mode === 'stats-insert') {
+        return { insert: this.courseStatsInsertMock };
+      }
+      if (this.mode === 'stats-update') {
+        return { update: this.courseStatsUpdateUpdateMock };
+      }
+      if (this.mode === 'stats-by-student-course') {
+        return { select: this.statsByStudentCourseSelectMock };
       }
       return { select: this.statsSelectMock };
     }
@@ -762,6 +894,27 @@ class Fixtures {
     return this.repository.deleteStudentSession(
       this.sessionIdToDelete,
       'student-1',
+    );
+  }
+
+  whenGetStudentCourseStatsByStudentIdAndCourseId() {
+    this.mode = 'stats-by-student-course';
+    return this.repository.getStudentCourseStatsByStudentIdAndCourseId(
+      this.studentIdForCourseStat,
+      this.courseIdForSingleStat,
+    );
+  }
+
+  whenCreateStudentCourseStats() {
+    this.mode = 'stats-insert';
+    return this.repository.createStudentCourseStats(this.statToInsert);
+  }
+
+  whenUpdateStudentCourseStats() {
+    this.mode = 'stats-update';
+    return this.repository.updateStudentCourseStats(
+      this.statIdToUpdate,
+      this.statToUpdatePayload,
     );
   }
 
@@ -971,6 +1124,47 @@ class Fixtures {
     });
   }
 
+  whenCourseStatByStudentCourseReturnsData() {
+    this.statsByStudentCourseMaybeSingleMock.mockResolvedValue({
+      data: this.singleStudentCourseStatSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenCourseStatByStudentCourseReturnsNull() {
+    this.statsByStudentCourseMaybeSingleMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+  }
+
+  whenCourseStatByStudentCourseQueryFails() {
+    this.statsByStudentCourseMaybeSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'course stat query failed' },
+    });
+  }
+
+  whenCreateStudentCourseStatsSucceeds() {
+    this.courseStatsInsertMock.mockResolvedValue({ error: null });
+  }
+
+  whenCreateStudentCourseStatsFails() {
+    this.courseStatsInsertMock.mockResolvedValue({
+      error: { message: 'insert course stats failed' },
+    });
+  }
+
+  whenUpdateStudentCourseStatsSucceeds() {
+    this.courseStatsUpdateEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenUpdateStudentCourseStatsFails() {
+    this.courseStatsUpdateEqMock.mockResolvedValue({
+      error: { message: 'update course stats failed' },
+    });
+  }
+
   // ─── Then assertions ─────────────────────────────────────────────────────────
 
   thenReturnExpectedStudentSessions(result: any) {
@@ -1119,6 +1313,44 @@ class Fixtures {
     expect(this.deleteStudentSessionSecondEqMock).toHaveBeenCalledWith(
       'student_id',
       'student-1',
+    );
+  }
+
+  thenCourseStatByStudentCourseQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_course_stats');
+    expect(this.statsByStudentCourseSelectMock).toHaveBeenCalledWith('*');
+    expect(this.statsByStudentCourseFirstEqMock).toHaveBeenCalledWith(
+      'student_id',
+      this.studentIdForCourseStat,
+    );
+    expect(this.statsByStudentCourseSecondEqMock).toHaveBeenCalledWith(
+      'course_id',
+      this.courseIdForSingleStat,
+    );
+    expect(this.statsByStudentCourseMaybeSingleMock).toHaveBeenCalled();
+  }
+
+  thenCreateStudentCourseStatsInsertBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_course_stats');
+    expect(this.courseStatsInsertMock).toHaveBeenCalledWith({
+      student_id: this.statToInsert.studentId,
+      course_id: this.statToInsert.courseId,
+      attempted_questions: this.statToInsert.attemptedQuestions,
+      correct_answers: this.statToInsert.correctAnswers,
+      last_attempt_at: this.statToInsert.lastAttemptAt,
+    });
+  }
+
+  thenUpdateStudentCourseStatsQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('student_course_stats');
+    expect(this.courseStatsUpdateUpdateMock).toHaveBeenCalledWith({
+      attempted_questions: this.statToUpdatePayload.attemptedQuestions,
+      correct_answers: this.statToUpdatePayload.correctAnswers,
+      last_attempt_at: '2026-05-05T15:00:00.000Z',
+    });
+    expect(this.courseStatsUpdateEqMock).toHaveBeenCalledWith(
+      'id',
+      this.statIdToUpdate,
     );
   }
 }
