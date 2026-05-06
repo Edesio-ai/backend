@@ -1,3 +1,4 @@
+import { CourseQuestion } from '../types/course-question.type';
 import {
   CreateQuestionBody,
   GeneratedQuestion,
@@ -25,4 +26,5 @@ export interface QuestionsRepository {
   ): Promise<Question>;
   deleteCourseQuestionsByCourseId(courseId: string): Promise<void>;
   getAnsweredQuestionCount(userId: string): Promise<number>;
+  getStudentCourseQuestions(courseId: string): Promise<CourseQuestion[]>;
 }
