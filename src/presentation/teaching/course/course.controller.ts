@@ -17,7 +17,7 @@ import { CsrfGuard } from '../../auth/guards/csrf.guard';
 import { Roles } from '../../auth/decorator/role.decorator';
 import { CreateCourseUseCase } from 'src/application/course/create-course.use-case';
 import { CreateCourseBodyDto } from '../dto/course/create-course-body.dto';
-import { GetCourseValidatedQuestionsUseCase } from 'src/application/course/get-course-validated-questions';
+import { GetCourseValidatedQuestionsUseCase } from 'src/application/course/get-course-validated-questions.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GlobalErrorFilter } from 'src/presentation/filters/global';
 import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';

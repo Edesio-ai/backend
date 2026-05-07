@@ -1,4 +1,4 @@
-import { GetCourseValidatedQuestionsUseCase } from './get-course-validated-questions';
+import { GetCourseValidatedQuestionsUseCase } from './get-course-validated-questions.use-case';
 import { CourseRepository } from '../../domain/teaching/interface/course.repository';
 
 describe('GetCourseValidatedQuestionsUseCase', () => {

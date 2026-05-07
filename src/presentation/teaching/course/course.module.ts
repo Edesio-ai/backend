@@ -3,7 +3,7 @@ import { CourseController } from '../course/course.controller';
 import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/course-persistence.module';
 import { CreateCourseUseCase } from 'src/application/course/create-course.use-case';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
-import { GetCourseValidatedQuestionsUseCase } from 'src/application/course/get-course-validated-questions';
+import { GetCourseValidatedQuestionsUseCase } from 'src/application/course/get-course-validated-questions.use-case';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
