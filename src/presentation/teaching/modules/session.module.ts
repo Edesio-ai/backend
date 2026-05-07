@@ -14,6 +14,8 @@ import { GetCoursesSessionCountUseCase } from 'src/application/session/get-cours
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
 import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
+import { GetSessionDetailsUseCase } from 'src/application/session/get-session-details.use-case';
+import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/file-persistence.module';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teac
     QuestionPersistenceModule,
     StudentPersistenceModule,
     EstablishmentPersistenceModule,
+    FilePersistenceModule,
   ],
   controllers: [SessionController],
   providers: [
@@ -34,6 +37,7 @@ import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teac
     DeleteSessionUseCase,
     GetCoursesSessionCountUseCase,
     GetSessionCoursesUseCase,
+    GetSessionDetailsUseCase,
   ],
 })
 export class SessionModule {}

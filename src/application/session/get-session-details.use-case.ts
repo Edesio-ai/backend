@@ -25,9 +25,9 @@ import {
   type FileRepository,
 } from 'src/domain/teaching/interface/file.repository';
 import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
-import { CourseDetails } from 'src/domain/teaching/types/course.type';
+import { SessionDetails } from 'src/domain/teaching/types/course.type';
 
-export class GetCourseDetailsUseCase {
+export class GetSessionDetailsUseCase {
   constructor(
     @Inject(ESTABLISHMENT_REPOSITORY)
     private readonly establishmentRepository: EstablishmentRepository,
@@ -41,7 +41,7 @@ export class GetCourseDetailsUseCase {
     private readonly filesRepository: FileRepository,
   ) {}
 
-  async execute(courseId: string, user: AuthUser): Promise<CourseDetails> {
+  async execute(courseId: string, user: AuthUser): Promise<SessionDetails> {
     const establishment =
       await this.establishmentRepository.getEstablishmentByUserId(user.id);
     if (!establishment) {

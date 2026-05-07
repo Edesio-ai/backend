@@ -1,4 +1,4 @@
-import { GetCourseDetailsUseCase } from './get-course-details.use-case';
+import { GetSessionDetailsUseCase } from './get-session-details.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ForbiddenError,
@@ -11,7 +11,7 @@ import { StudentRepository } from 'src/domain/teaching/interface/student.reposit
 import { FileRepository } from 'src/domain/teaching/interface/file.repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
-describe('GetCourseDetailsUseCase', () => {
+describe('GetSessionDetailsUseCase', () => {
   let fixtures: Fixtures;
 
   beforeEach(() => {
@@ -163,7 +163,7 @@ class Fixtures {
   public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
   public readonly studentsRepository: jest.Mocked<StudentRepository>;
   public readonly filesRepository: jest.Mocked<FileRepository>;
-  public readonly useCase: GetCourseDetailsUseCase;
+  public readonly useCase: GetSessionDetailsUseCase;
 
   constructor() {
     this.establishmentRepository = {
@@ -201,6 +201,7 @@ class Fixtures {
       updateQuestionById: jest.fn(),
       deleteCourseQuestionsByCourseId: jest.fn(),
       getAnsweredQuestionCount: jest.fn(),
+      getStudentCourseQuestions: jest.fn(),
     };
     this.studentsRepository = createMockStudentRepository();
     this.filesRepository = {
@@ -208,7 +209,7 @@ class Fixtures {
       getCourseFileById: jest.fn(),
       getCourseFilesByCourseId: jest.fn(),
     };
-    this.useCase = new GetCourseDetailsUseCase(
+    this.useCase = new GetSessionDetailsUseCase(
       this.establishmentRepository,
       this.coursesRepository,
       this.questionsRepository,

@@ -23,8 +23,9 @@ import { DeleteSessionUseCase } from 'src/application/session/delete-session.use
 import { GetCoursesSessionCountUseCase } from 'src/application/session/get-courses-session-count.use-case';
 import { CreateSessionBodyDto } from '../dto/session/create-session.dto';
 import { UpdateSessionBodyDto } from '../dto/session/uppdate-session-body.dto';
-import { Course, CourseRanking } from 'src/domain/teaching/types/course.type';
+import { Course, SessionDetails } from 'src/domain/teaching/types/course.type';
 import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
+import { GetSessionDetailsUseCase } from 'src/application/session/get-session-details.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('teacher')
@@ -38,6 +39,7 @@ export class SessionController {
     private readonly deleteSessionUseCase: DeleteSessionUseCase,
     private readonly getCoursesSessionCountUseCase: GetCoursesSessionCountUseCase,
     private readonly getSessionCoursesUseCase: GetSessionCoursesUseCase,
+    private readonly getSessionDetailsUseCase: GetSessionDetailsUseCase,
   ) {}
 
   @Delete(':sessionId')
@@ -104,5 +106,19 @@ export class SessionController {
   ): Promise<Course[]> {
     const { user } = req;
     return (await this.getSessionCoursesUseCase.execute(sessionId, user)) || [];
+  }
+
+  @Roles('establishment')
+  @Get('course/:courseId/details')
+  async getSessionDetails(
+    @Param('courseId') courseId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<{ data: SessionDetails }> {
+    const { user } = req;
+    const courseDetail = await this.getSessionDetailsUseCase.execute(
+      courseId,
+      user,
+    );
+    return { data: courseDetail };
   }
 }

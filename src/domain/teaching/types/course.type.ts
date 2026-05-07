@@ -84,7 +84,7 @@ export type CourseRanking = {
 
 export type CourseRankingWithRate = Omit<CourseRanking, 'rank'>;
 
-export type CourseDetails = {
+export type SessionDetails = {
   course: Partial<CourseWithSession>;
   questions: Partial<Question>[];
   students: Partial<CourseRanking>[];
