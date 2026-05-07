@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TeacherModule } from './modules/teacher.module';
 import { SessionModule } from './modules/session.module';
-import { EstablishmentModule } from './modules/establishment.module';
+import { EstablishmentModule } from './establishment/establishment.module';
 import { QuestionModule } from './questions/question.module';
 import { FileModule } from './file/file.module';
 import { StudentModule } from './modules/student.module';

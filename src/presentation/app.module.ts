@@ -5,6 +5,7 @@ import { BillingModule } from './billing/billing.module';
 import { TeachingModule } from './teaching/teaching.module';
 import { ExportModule } from './export/modules/export.module';
 import { LlmModule } from './llm/llm.module';
+import { InvitationTokenModule } from './invitation-token/invitation-token.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { LlmModule } from './llm/llm.module';
     TeachingModule,
     ExportModule,
     LlmModule,
+    InvitationTokenModule,
   ],
   controllers: [],
   providers: [],
