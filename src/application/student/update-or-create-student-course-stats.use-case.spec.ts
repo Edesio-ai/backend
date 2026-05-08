@@ -5,7 +5,7 @@ import type { CourseRepository } from 'src/domain/teaching/interface/course.repo
 import type { StudentRepository } from 'src/domain/teaching/interface/student.repository';
 import { Course } from 'src/domain/teaching/types/course.type';
 import { Student } from 'src/domain/teaching/types/student.type';
-import type { UpdateOrCreateStudentCourseStatsBodyDto } from 'src/presentation/teaching/dto/student/update-or-create-student-course-stats.dto';
+import type { UpdateOrCreateStudentCourseStatsBodyDto } from 'src/presentation/teaching/student-course-stats/dtos/update-or-create-student-course-stats.dto';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('UpdateOrCreateStudentCourseStatsUseCase', () => {

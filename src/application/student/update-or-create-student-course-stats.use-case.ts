@@ -8,7 +8,7 @@ import {
   STUDENT_REPOSITORY,
   type StudentRepository,
 } from 'src/domain/teaching/interface/student.repository';
-import { UpdateOrCreateStudentCourseStatsBodyDto } from 'src/presentation/teaching/dto/student/update-or-create-student-course-stats.dto';
+import { UpdateOrCreateStudentCourseStatsBodyDto } from 'src/presentation/teaching/student-course-stats/dtos/update-or-create-student-course-stats.dto';
 
 export class UpdateOrCreateStudentCourseStatsUseCase {
   constructor(

@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
+  Post,
   Req,
   UseFilters,
   UseGuards,
@@ -14,6 +16,8 @@ import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { GlobalErrorFilter } from 'src/presentation/filters/global';
+import { UpdateOrCreateStudentCourseStatsBodyDto } from './dtos/update-or-create-student-course-stats.dto';
+import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/student/update-or-create-student-course-stats.use-case';
 
 @UseFilters(GlobalErrorFilter)
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
@@ -22,6 +26,7 @@ import { GlobalErrorFilter } from 'src/presentation/filters/global';
 export class StudentCourseStatsController {
   constructor(
     private readonly getCourseRankingUseCase: GetCourseRankingUseCase,
+    private readonly updateOrCreateStudentCourseStatsUseCase: UpdateOrCreateStudentCourseStatsUseCase,
   ) {}
 
   @Get('course/:courseId/ranking')
@@ -33,5 +38,21 @@ export class StudentCourseStatsController {
     const ranking =
       (await this.getCourseRankingUseCase.execute(courseId, user)) || [];
     return ranking || [];
+  }
+
+  @Roles('student')
+  @Post('course/:courseId')
+  async updateOrCreateStudentCourseStats(
+    @Param('courseId') courseId: string,
+    @Req() req: Request & { user: AuthUser },
+    @Body() body: UpdateOrCreateStudentCourseStatsBodyDto,
+  ): Promise<void> {
+    const { user } = req;
+
+    await this.updateOrCreateStudentCourseStatsUseCase.execute(
+      courseId,
+      user,
+      body,
+    );
   }
 }

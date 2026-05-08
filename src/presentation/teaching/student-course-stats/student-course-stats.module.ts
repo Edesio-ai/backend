@@ -6,6 +6,7 @@ import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/mo
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
+import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/student/update-or-create-student-course-stats.use-case';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/
     SessionsPersistenceModule,
   ],
   controllers: [StudentCourseStatsController],
-  providers: [GetCourseRankingUseCase],
+  providers: [GetCourseRankingUseCase, UpdateOrCreateStudentCourseStatsUseCase],
 })
 export class StudentCourseStatsModule {}

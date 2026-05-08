@@ -15,6 +15,8 @@ import { GetPendingQuestionCountUseCase } from 'src/application/question/get-pen
 import { AuthErrorFilter } from 'src/presentation/filters/auth.filter';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetAnsweredQuestionCountUseCase } from 'src/application/question/get-answered-question-count.use-case';
+import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
+import { GetStudentCourseQuestionsUseCase } from 'src/application/student/get-student-course-questions.use-case';
 
 @Controller('course-questions')
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
@@ -24,6 +26,7 @@ export class CourseQuestionsController {
   constructor(
     private readonly getPendingQuestionCountUseCase: GetPendingQuestionCountUseCase,
     private readonly getAnsweredQuestionsCountUseCase: GetAnsweredQuestionCountUseCase,
+    private readonly getStudentCourseQuestionsUseCase: GetStudentCourseQuestionsUseCase,
   ) {}
 
   @Get('pending/:sessionId')
@@ -40,5 +43,19 @@ export class CourseQuestionsController {
     const answeredQuestionsCount =
       await this.getAnsweredQuestionsCountUseCase.execute(user);
     return { answeredQuestionsCount };
+  }
+
+  @Roles('student')
+  @Get('course/:courseId')
+  async getStudentCourseQuestions(
+    @Param('courseId') courseId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<CourseQuestion[]> {
+    const { user } = req;
+    const questions = await this.getStudentCourseQuestionsUseCase.execute(
+      courseId,
+      user,
+    );
+    return questions;
   }
 }
