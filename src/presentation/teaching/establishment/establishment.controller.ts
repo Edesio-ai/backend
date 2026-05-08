@@ -1,14 +1,17 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 
 import { GetEstablishmentsStatsUseCase } from '../../../application/establishment/get-establishment-stats.use-case';
-import { Roles } from '../../auth/decorator/role.decorator';
-import { SupabaseUser } from '../../../domain/auth/types/auth.type';
 import { CreateEstablishmentUseCase } from '../../../application/establishment/create-establishment.use-case';
 import { CreateEstablishmentBodyDto } from './dtos/create-establishment.dto';
 import {
   Establishment,
   EstablishmentStats,
 } from '../../../domain/teaching/types/establishment.type';
+import { Roles } from '../../auth/decorator/role.decorator';
+import { CurrentUser } from '../../auth/decorator/current-user.decorator';
+import { Public } from '../../auth/decorator/public.decorator';
+import { SkipCsrf } from '../../auth/decorator/skip-csrf.decorator';
+import type { AuthUser } from '../../../domain/auth/types/auth.type';
 
 @Controller('establishment')
 export class EstablishmentController {
@@ -20,13 +23,14 @@ export class EstablishmentController {
   @Roles('establishment')
   @Get('stats')
   async getEstablishmentStats(
-    @Req() req: Request & { user: SupabaseUser },
+    @CurrentUser() user: AuthUser,
   ): Promise<EstablishmentStats> {
-    const { user } = req;
     const stats = await this.getEstablishmentsStatsUseCase.execute(user.id);
     return stats;
   }
 
+  @Public()
+  @SkipCsrf()
   @Post('create')
   async createEstablishment(
     @Body() body: CreateEstablishmentBodyDto,

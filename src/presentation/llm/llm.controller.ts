@@ -1,11 +1,12 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
+import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { GenerateCompletionFeedbackBodyDto } from './dtos/generate-completion-feedback-body.dto';
 import { GenerateCompletionFeedbackUseCase } from 'src/application/llm/generate-completion-feedback.use-case';
 import { GenerateQuestionDto } from 'src/presentation/llm/dtos/generate-question.dto';
 import { Question } from 'src/domain/teaching/types/question.type';
-import { AuthUser } from 'src/domain/auth/types/auth.type';
+import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GenerateQuestionUseCase } from 'src/application/question/generate-question-use-case';
 import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
 import { EvaluateAnswerDto } from './dtos/evaluate-answer.dto';
@@ -30,10 +31,9 @@ export class LlmController {
 
   @Post('generate-questions')
   async generateQuestion(
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
     @Body() body: GenerateQuestionDto,
   ): Promise<{ questions: Question[]; questionCount: number }> {
-    const { user } = req;
     const questions = await this.generateQuestionUseCase.execute(body, user);
     return {
       questions,

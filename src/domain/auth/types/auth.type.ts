@@ -106,7 +106,7 @@ export type Role = 'teacher' | 'establishment' | 'student' | 'standalone';
 export type AuthUser = {
   id: string;
   email: string;
-  emailConfirmedAt: string;
+  emailConfirmedAt?: string | null;
   metadata: UserMetadata;
 };
 

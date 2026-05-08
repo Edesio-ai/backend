@@ -1,7 +1,7 @@
 import {
   CreateInvitationTokenBody,
   CreateInvitationTokenUseCase,
-} from './create-invitation-toke.use-case';
+} from './create-invitation-token.use-case';
 import { AuthRepository } from '../../domain/auth/contract/auth.repository';
 
 describe('CreateInvitationTokenUseCase', () => {

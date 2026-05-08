@@ -6,7 +6,7 @@ import {
   SupabaseAuthUserToUser,
   supabaseValidatedTokenUserToUser,
 } from './auth.mappers';
-import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-toke.use-case';
+import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-token.use-case';
 import { SupabaseInvitationToken } from 'src/domain/auth/invitation.type';
 import { Session, SupabaseUser } from 'src/domain/auth/types/auth.type';
 

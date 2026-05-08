@@ -6,14 +6,14 @@ import {
   Param,
   Patch,
   Post,
-  Req,
 } from '@nestjs/common';
 import { Course } from 'src/domain/teaching/types/course.type';
 import { Roles } from '../../auth/decorator/role.decorator';
+import { CurrentUser } from '../../auth/decorator/current-user.decorator';
 import { CreateCourseUseCase } from 'src/application/course/create-course.use-case';
 import { CreateCourseBodyDto } from './dto/create-course-body.dto';
 import { GetCourseValidatedQuestionsUseCase } from 'src/application/course/get-course-validated-questions.use-case';
-import { AuthUser } from 'src/domain/auth/types/auth.type';
+import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';
 import { UpdateCourseBodyDto } from './dto/UpdateCourseUseCase.dto';
 import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';
@@ -52,9 +52,8 @@ export class CourseController {
   @Delete(':courseId')
   async deleteCourse(
     @Param('courseId') courseId: string,
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
   ): Promise<{ success: boolean }> {
-    const { user } = req;
     await this.deleteCourseUseCase.execute(courseId, user);
 
     return { success: true };
@@ -63,10 +62,9 @@ export class CourseController {
   @Patch(':courseId')
   async deleteCourseFiles(
     @Param('courseId') courseId: string,
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
     @Body() body: UpdateCourseBodyDto,
   ): Promise<{ data: Course }> {
-    const { user } = req;
     const course = await this.updateCourseUseCase.execute(courseId, body, user);
 
     return { data: course };
@@ -75,9 +73,8 @@ export class CourseController {
   @Post(':courseId/validate-questions')
   async validateQuestions(
     @Param('courseId') courseId: string,
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
   ): Promise<{ data: Course }> {
-    const { user } = req;
     const course = await this.validateCourseQuestionsUseCase.execute(
       courseId,
       user,
@@ -98,9 +95,8 @@ export class CourseController {
   @Get('session/:sessionId')
   async getCoursesBySessionId(
     @Param('sessionId') sessionId: string,
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
   ): Promise<Course[]> {
-    const { user } = req;
     return (await this.getSessionCoursesUseCase.execute(sessionId, user)) || [];
   }
 }

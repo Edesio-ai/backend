@@ -6,10 +6,10 @@ import {
   Param,
   Patch,
   Post,
-  Req,
 } from '@nestjs/common';
-import { AuthUser } from 'src/domain/auth/types/auth.type';
+import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
+import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { CreateQuestionDto } from './dtos/create-question.dto';
 import { CreateQuestionUseCase } from 'src/application/question/create-question.use-case';
 import { DeleteQuestionByIdUseCase } from 'src/application/question/delete-question-by-id.use-case';
@@ -31,19 +31,17 @@ export class QuestionController {
   @Roles('student', 'teacher')
   @Get('course/:courseId')
   async getCourseQuestions(
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
     @Param('courseId') courseId: string,
   ): Promise<Question[]> {
-    const { user } = req;
     return (await this.getCourseQuestionsUseCase.execute(courseId, user)) || [];
   }
 
   @Post()
   async createQuestion(
     @Body() body: CreateQuestionDto,
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
   ): Promise<{ data: Question }> {
-    const { user } = req;
     const question = await this.createQuestionUseCase.execute(body, user);
     return { data: question };
   }
@@ -51,9 +49,8 @@ export class QuestionController {
   @Delete(':questionId')
   async deleteQuestionById(
     @Param('questionId') questionId: string,
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
   ): Promise<{ success: boolean }> {
-    const { user } = req;
     const success = await this.deleteQuestionByIdUseCase.execute(
       questionId,
       user,
@@ -65,9 +62,8 @@ export class QuestionController {
   async updateQuestionById(
     @Param('courseId') courseId: string,
     @Body() body: UpdateQuestionDto,
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
   ): Promise<{ question: Question }> {
-    const { user } = req;
     const question = await this.updateQuestionUseCase.execute(
       courseId,
       body,

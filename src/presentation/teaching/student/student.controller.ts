@@ -4,13 +4,13 @@ import {
   Controller,
   Get,
   Post,
-  Req,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthUser } from 'src/domain/auth/types/auth.type';
+import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetStudentByUserIdUseCase } from 'src/application/student/get-student-by-user-id.use-case';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
+import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { CreateStudentUseCase } from 'src/application/student/create-student.use-case';
 import {
   Student,
@@ -32,15 +32,13 @@ export class StudentController {
   ) {}
 
   @Get()
-  async getStudentByUserId(@Req() req: Request & { user: AuthUser }) {
-    const { user } = req;
+  async getStudentByUserId(@CurrentUser() user: AuthUser) {
     const student = await this.getStudentByUserIdUseCase.execute(user.id);
     return student;
   }
 
   @Post()
-  async createStudent(@Req() req: Request & { user: AuthUser }) {
-    const { user } = req;
+  async createStudent(@CurrentUser() user: AuthUser) {
     const student = await this.createStudentUseCase.execute(user);
     return student;
   }
@@ -49,7 +47,6 @@ export class StudentController {
   @Post('batch')
   async getStudentBatch(
     @Body() body: GetStudentBatchBodyDto,
-    @Req() req: Request & { user: AuthUser },
   ): Promise<Student[]> {
     const students = await this.getStudentBatchUseCase.execute(body);
     return students ?? [];
@@ -58,11 +55,9 @@ export class StudentController {
   @UseInterceptors(FileInterceptor('file'))
   @Post('photo')
   async uploadStudentPhoto(
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ photoUrl: string }> {
-    const { user } = req;
-
     if (!file?.buffer) {
       throw new BadRequestException('Missing File');
     }

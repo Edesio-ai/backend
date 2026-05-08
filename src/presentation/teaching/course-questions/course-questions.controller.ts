@@ -1,8 +1,9 @@
-import { Controller, Get, Param, Req } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
+import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { GetPendingQuestionCountUseCase } from 'src/application/question/get-pending-question-count.use-case';
-import { AuthUser } from 'src/domain/auth/types/auth.type';
+import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetAnsweredQuestionCountUseCase } from 'src/application/question/get-answered-question-count.use-case';
 import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
 import { GetStudentCourseQuestionsUseCase } from 'src/application/student/get-student-course-questions.use-case';
@@ -24,9 +25,8 @@ export class CourseQuestionsController {
 
   @Get('answered')
   async getAnsweredQuestionsCount(
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
   ): Promise<{ answeredQuestionsCount: number }> {
-    const { user } = req;
     const answeredQuestionsCount =
       await this.getAnsweredQuestionsCountUseCase.execute(user);
     return { answeredQuestionsCount };
@@ -36,9 +36,8 @@ export class CourseQuestionsController {
   @Get('course/:courseId')
   async getStudentCourseQuestions(
     @Param('courseId') courseId: string,
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
   ): Promise<CourseQuestion[]> {
-    const { user } = req;
     const questions = await this.getStudentCourseQuestionsUseCase.execute(
       courseId,
       user,

@@ -1,27 +1,21 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { Roles } from '../auth/decorator/role.decorator';
+import { CurrentUser } from '../auth/decorator/current-user.decorator';
 import { DeleteInvitationTokenUseCase } from 'src/application/establishment/delete-invitation-token.use-case';
 import {
   InvitationToken,
   InvitationTokenPreview,
 } from 'src/domain/auth/invitation.type';
 import { GetInvitationTokenUseCase } from 'src/application/establishment/get-invitation-token.use-case';
-import { SupabaseUser } from 'src/domain/auth/types/auth.type';
+import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { ValidateTeacherInvitationBodyDto } from './dtos/validate-teacher-invitation-body.dto';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/validate-teacher-invitation.use-case';
 import { GetInvitationPreviewParamsDto } from './dtos/get-invitation-preview.dto';
 import { GetInvitationPreviewUseCase } from 'src/application/auth/get-invitation-preview.use-case';
 import { CreateInvitationTokenBodyDto } from './dtos/create-invitation-token.dto';
-import { CreateInvitationTokenUseCase } from 'src/application/auth/create-invitation-toke.use-case';
+import { CreateInvitationTokenUseCase } from 'src/application/auth/create-invitation-token.use-case';
 
+@Roles('establishment')
 @Controller('invtation-token')
 export class InvitationTokenController {
   constructor(
@@ -69,10 +63,9 @@ export class InvitationTokenController {
   @Roles('teacher')
   @Post('validate')
   async validateTeacherInvitation(
-    @Req() req: Request & { user: SupabaseUser },
+    @CurrentUser() user: AuthUser,
     @Body() body: ValidateTeacherInvitationBodyDto,
   ): Promise<any> {
-    const { user } = req;
     const { id } = user;
     const invitationToken = await this.validateTeacherInvitationUseCase.execute(
       id,

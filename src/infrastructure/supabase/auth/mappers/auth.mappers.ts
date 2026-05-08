@@ -1,4 +1,4 @@
-import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-toke.use-case';
+import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-token.use-case';
 import {
   InvitationTokenPreview,
   SupabaseInvitationToken,

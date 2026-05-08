@@ -6,12 +6,12 @@ import {
   Param,
   Post,
   Put,
-  Req,
 } from '@nestjs/common';
 
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
-import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
-import { AuthUser, SupabaseUser } from 'src/domain/auth/types/auth.type';
+import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
+
+import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Session } from 'src/domain/teaching/types/session.type';
 import { CreateSessionUseCase } from 'src/application/session/create-session.use-case';
 import { UpdateSessionNameUseCase } from 'src/application/session/update-session-name.use-case';
@@ -21,6 +21,7 @@ import { CreateSessionBodyDto } from './dtos/create-session.dto';
 import { UpdateSessionBodyDto } from './dtos/uppdate-session-body.dto';
 import { SessionDetails } from 'src/domain/teaching/types/course.type';
 import { GetSessionDetailsUseCase } from 'src/application/session/get-session-details.use-case';
+import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
 
 @Roles('teacher')
 @Controller('session')
@@ -36,12 +37,10 @@ export class SessionController {
 
   @Delete(':sessionId')
   async deleteSession(
-    @Req() req: Request & { user: SupabaseUser },
+    @CurrentUser() user: AuthUser,
     @Param('sessionId') sessionId: string,
   ) {
-    const { user } = req;
-    const { id } = user;
-    await this.deleteSessionUseCase.execute(sessionId, id);
+    await this.deleteSessionUseCase.execute(sessionId, user.id);
     return { success: true };
   }
 
@@ -51,13 +50,8 @@ export class SessionController {
   }
 
   @Get('teacher-sessions')
-  async getTeacherSessions(
-    @Req() req: Request & { user: SupabaseUser },
-  ): Promise<Session[]> {
-    const { user } = req;
-    const { id } = user;
-
-    return await this.getTeacherSessionsUseCase.execute(id);
+  async getTeacherSessions(@CurrentUser() user: AuthUser): Promise<Session[]> {
+    return await this.getTeacherSessionsUseCase.execute(user.id);
   }
 
   @Put(':sessionId')
@@ -86,9 +80,8 @@ export class SessionController {
   @Get('course/:courseId/details')
   async getSessionDetails(
     @Param('courseId') courseId: string,
-    @Req() req: Request & { user: AuthUser },
+    @CurrentUser() user: AuthUser,
   ): Promise<{ data: SessionDetails }> {
-    const { user } = req;
     const courseDetail = await this.getSessionDetailsUseCase.execute(
       courseId,
       user,
