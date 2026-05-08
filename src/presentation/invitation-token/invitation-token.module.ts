@@ -7,6 +7,8 @@ import { InvitationTokenController } from './invitation-token.controller';
 import { TokenPersistenceModule } from 'src/infrastructure/supabase/token/token-persistence.module';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/validate-teacher-invitation.use-case';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
+import { GetInvitationPreviewUseCase } from 'src/application/auth/get-invitation-preview.use-case';
+import { CreateInvitationTokenUseCase } from 'src/application/auth/create-invitation-toke.use-case';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/m
     GetInvitationTokenUseCase,
     DeleteInvitationTokenUseCase,
     ValidateTeacherInvitationUseCase,
+    GetInvitationPreviewUseCase,
+    CreateInvitationTokenUseCase,
   ],
 })
 export class InvitationTokenModule {}

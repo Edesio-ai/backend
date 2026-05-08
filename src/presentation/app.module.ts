@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { BillingModule } from './billing/billing.module';
 import { TeachingModule } from './teaching/teaching.module';
-import { ExportModule } from './export/modules/export.module';
+import { ExportModule } from './export/export.module';
 import { LlmModule } from './llm/llm.module';
 import { InvitationTokenModule } from './invitation-token/invitation-token.module';
 

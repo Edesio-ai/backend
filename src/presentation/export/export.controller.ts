@@ -8,7 +8,7 @@ import {
   Param,
 } from '@nestjs/common';
 import type { Response } from 'express';
-import { ExportQuestionsDto } from '../dtos/exportQuestions.dto';
+import { ExportQuestionsDto } from './dtos/exportQuestions.dto';
 import { ExportQuestionsUseCase } from 'src/application/export/export-questions.use-case';
 import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';

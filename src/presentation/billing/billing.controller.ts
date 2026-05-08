@@ -12,9 +12,9 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../../domain/auth/types/auth.type';
 import { CsrfGuard } from '../auth/guards/csrf.guard';
 import { CreateCheckoutSessionsUseCase } from '../../application/billing/create-checkout-session.use-case';
-import { CreateCheckoutSessionBodyDto } from './dto/createCheckoutSession.dto';
 import { AuthErrorFilter } from '../filters/auth.filter';
 import { GlobalErrorFilter } from '../filters/global';
+import { CreateCheckoutSessionBodyDto } from './dtos/createCheckoutSession.dto';
 
 @Controller('billing')
 export class BillingController {

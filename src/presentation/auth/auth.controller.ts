@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   Post,
   Req,
   Res,
@@ -12,52 +11,30 @@ import {
 import type { Request, Response } from 'express';
 
 import { GenerateCsrfTokenUseCase } from '../../application/auth/generate-csrf-token.use-case';
-import { GetInvitationPreviewUseCase } from '../../application/auth/get-invitation-preview.use-case';
 import { GetUserSessionUseCase } from '../../application/auth/get-user-session.use-case';
 import { LoginUseCase } from '../../application/auth/login.use-case';
 import { RegisterUseCase } from '../../application/auth/register.use-case';
-import { SendInvitationUseCase } from '../../application/auth/send-invitation.use-case';
-import { InvitationTokenPreview } from '../../domain/auth/invitation.type';
 import {
   AuthUser,
   GetUserSessionResponse,
 } from '../../domain/auth/types/auth.type';
 import { AuthErrorFilter } from '../filters/auth.filter';
-import { Roles } from './decorator/role.decorator';
-import { GetInvitationPreviewParamsDto } from './dto/get-invitation-preview.dto';
 import { RegisterBody } from './dto/register-body.dto';
 import { LoginBodyDto } from './dto/login-body.dto';
-import { SendInvitationBodyDto } from './dto/send-invitation-body.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CsrfGuard } from './guards/csrf.guard';
-import { RolesGuard } from './guards/roles.guard';
 import { LogoutUseCase } from '../../application/auth/logout.use-case';
-import { CreateInvitationTokenBodyDto } from './dto/create-invitation-token.dto';
-import { CreateInvitationTokenUseCase } from '../../application/auth/create-invitation-toke.use-case';
 import { GlobalErrorFilter } from '../filters/global';
 
 @Controller('auth')
 @UseFilters(AuthErrorFilter, GlobalErrorFilter)
 export class AuthController {
   constructor(
-    private readonly getInvitationPreviewUseCase: GetInvitationPreviewUseCase,
     private readonly registerUseCase: RegisterUseCase,
     private readonly loginUseCase: LoginUseCase,
-    private readonly sendInvitationUseCase: SendInvitationUseCase,
     private readonly getUserSessionUseCase: GetUserSessionUseCase,
     private readonly generateCsrfTokenUseCase: GenerateCsrfTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
-    private readonly createInvitationTokenUseCase: CreateInvitationTokenUseCase,
   ) {}
-
-  @Get('invitation-preview/:token')
-  async getInvitationPreview(
-    @Param() params: GetInvitationPreviewParamsDto,
-  ): Promise<InvitationTokenPreview> {
-    const invitationTokenPreview =
-      await this.getInvitationPreviewUseCase.execute(params.token);
-    return invitationTokenPreview;
-  }
 
   @Get('session')
   async getUserSession(@Req() req: Request): Promise<GetUserSessionResponse> {
@@ -114,26 +91,6 @@ export class AuthController {
     res.cookie('refresh_token', session.refreshToken, cookieOptions);
 
     return authUser;
-  }
-
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('establishment')
-  @Post('send-invitation')
-  async sendInvitation(
-    @Body() body: SendInvitationBodyDto,
-  ): Promise<{ success: boolean }> {
-    await this.sendInvitationUseCase.execute(body);
-    return { success: true };
-  }
-
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('establishment')
-  @Post('invitation-token/create')
-  async createInvitationToken(
-    @Body() body: CreateInvitationTokenBodyDto,
-  ): Promise<{ success: boolean }> {
-    await this.createInvitationTokenUseCase.execute(body);
-    return { success: true };
   }
 
   @Post('logout')
