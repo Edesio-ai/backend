@@ -15,7 +15,7 @@ import { CreateTeacherBodyDto } from 'src/presentation/teaching/teacher/dtos/cre
 import { CreateTeacherUseCase } from 'src/application/teacher/create-teacher.use-case';
 import { Teacher } from 'src/domain/teaching/types/teacher.type';
 import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
-import { GlobalErrorFilter } from 'src/presentation/filters/global';
+import { GlobalErrorFilter } from 'src/presentation/filters/global.filter';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)

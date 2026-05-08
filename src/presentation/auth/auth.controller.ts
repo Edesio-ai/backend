@@ -5,7 +5,6 @@ import {
   Post,
   Req,
   Res,
-  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
@@ -18,15 +17,12 @@ import {
   AuthUser,
   GetUserSessionResponse,
 } from '../../domain/auth/types/auth.type';
-import { AuthErrorFilter } from '../filters/auth.filter';
 import { RegisterBody } from './dto/register-body.dto';
 import { LoginBodyDto } from './dto/login-body.dto';
 import { CsrfGuard } from './guards/csrf.guard';
 import { LogoutUseCase } from '../../application/auth/logout.use-case';
-import { GlobalErrorFilter } from '../filters/global';
 
 @Controller('auth')
-@UseFilters(AuthErrorFilter, GlobalErrorFilter)
 export class AuthController {
   constructor(
     private readonly registerUseCase: RegisterUseCase,

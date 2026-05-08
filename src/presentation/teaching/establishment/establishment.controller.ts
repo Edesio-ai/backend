@@ -4,7 +4,6 @@ import {
   Get,
   Post,
   Req,
-  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 
@@ -19,7 +18,6 @@ import {
   Establishment,
   EstablishmentStats,
 } from '../../../domain/teaching/types/establishment.type';
-import { GlobalErrorFilter } from 'src/presentation/filters/global';
 
 @Controller('establishment')
 export class EstablishmentController {
@@ -31,7 +29,6 @@ export class EstablishmentController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('establishment')
   @Get('stats')
-  @UseFilters(GlobalErrorFilter)
   async getEstablishmentStats(
     @Req() req: Request & { user: SupabaseUser },
   ): Promise<EstablishmentStats> {

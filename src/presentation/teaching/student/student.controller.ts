@@ -6,7 +6,6 @@ import {
   Post,
   Req,
   UploadedFile,
-  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -25,11 +24,9 @@ import { GetStudentBatchBodyDto } from './dtos/get-student-batch.dto';
 import { GetStudentBatchUseCase } from 'src/application/student/get-student-batch.use-case';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadStudentPhotoUseCase } from 'src/application/student/upload-student-photo.use-case';
-import { GlobalErrorFilter } from 'src/presentation/filters/global';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')
-@UseFilters(GlobalErrorFilter)
 @Controller('student')
 export class StudentController {
   constructor(

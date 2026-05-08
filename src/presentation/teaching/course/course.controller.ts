@@ -7,7 +7,6 @@ import {
   Patch,
   Post,
   Req,
-  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { Course } from 'src/domain/teaching/types/course.type';
@@ -19,7 +18,6 @@ import { CreateCourseUseCase } from 'src/application/course/create-course.use-ca
 import { CreateCourseBodyDto } from './dto/create-course-body.dto';
 import { GetCourseValidatedQuestionsUseCase } from 'src/application/course/get-course-validated-questions.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { GlobalErrorFilter } from 'src/presentation/filters/global';
 import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';
 import { UpdateCourseBodyDto } from './dto/UpdateCourseUseCase.dto';
 import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';
@@ -28,7 +26,6 @@ import { GetCoursesSessionCountUseCase } from 'src/application/course/get-course
 import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-@UseFilters(GlobalErrorFilter)
 @Roles('teacher')
 @Controller('course')
 export class CourseController {

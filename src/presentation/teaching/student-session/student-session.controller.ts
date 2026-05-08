@@ -5,7 +5,6 @@ import {
   Param,
   Post,
   Req,
-  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { StudentJoinedSession } from 'src/domain/teaching/types/student.type';
@@ -13,7 +12,6 @@ import { GetStudentJoinedSessionsUseCase } from 'src/application/student/get-stu
 import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
-import { GlobalErrorFilter } from 'src/presentation/filters/global';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { JoinSessionByCodeUseCase } from 'src/application/student/join-session-by-code.use-case';
@@ -22,7 +20,6 @@ import { GetSessionStudentUseCase } from 'src/application/student/get-session-st
 import { DeleteStudentSessionUseCase } from 'src/application/student/delete-student-session.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-@UseFilters(GlobalErrorFilter)
 @Roles('student')
 @Controller('student-session')
 export class StudentSessionController {

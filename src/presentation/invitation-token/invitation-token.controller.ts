@@ -6,11 +6,9 @@ import {
   Param,
   Post,
   Req,
-  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { Roles } from '../auth/decorator/role.decorator';
-import { GlobalErrorFilter } from '../filters/global';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CsrfGuard } from '../auth/guards/csrf.guard';
@@ -30,7 +28,6 @@ import { CreateInvitationTokenUseCase } from 'src/application/auth/create-invita
 
 @UseGuards(JwtAuthGuard, RolesGuard, CsrfGuard)
 @Roles('establishment')
-@UseFilters(GlobalErrorFilter)
 @Controller('invtation-token')
 export class InvitationTokenController {
   constructor(

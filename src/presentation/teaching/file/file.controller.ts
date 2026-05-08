@@ -5,7 +5,6 @@ import {
   Param,
   Post,
   UploadedFile,
-  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,7 +13,6 @@ import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
-import { GlobalErrorFilter } from 'src/presentation/filters/global';
 import {
   CourseFile,
   CourseFileUpload,
@@ -56,7 +54,6 @@ export class FileController {
     return { data };
   }
 
-  @UseFilters(GlobalErrorFilter)
   @Delete(':fileId')
   async deleteCourseFile(
     @Param('fileId') fileId: string,
