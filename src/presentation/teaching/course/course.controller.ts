@@ -24,6 +24,8 @@ import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-ca
 import { UpdateCourseBodyDto } from './dto/UpdateCourseUseCase.dto';
 import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';
 import { ValidateCourseQuestionsUseCase } from 'src/application/course/validate-course-questions.use-case';
+import { GetCoursesSessionCountUseCase } from 'src/application/course/get-courses-session-count.use-case';
+import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @UseFilters(GlobalErrorFilter)
@@ -36,6 +38,8 @@ export class CourseController {
     private readonly deleteCourseUseCase: DeleteCourseUseCase,
     private readonly updateCourseUseCase: UpdateCourseUseCase,
     private readonly validateCourseQuestionsUseCase: ValidateCourseQuestionsUseCase,
+    private readonly getCoursesSessionCountUseCase: GetCoursesSessionCountUseCase,
+    private readonly getSessionCoursesUseCase: GetSessionCoursesUseCase,
   ) {}
 
   @Post()
@@ -88,5 +92,23 @@ export class CourseController {
     );
 
     return { data: course };
+  }
+
+  @Get('session/:sessionId/count')
+  async getCoursesSessionCount(
+    @Param('sessionId') sessionId: string,
+  ): Promise<{ count: number }> {
+    const count = await this.getCoursesSessionCountUseCase.execute(sessionId);
+    return { count: count };
+  }
+
+  @Roles('teacher', 'establishment', 'student')
+  @Get('session/:sessionId')
+  async getCoursesBySessionId(
+    @Param('sessionId') sessionId: string,
+    @Req() req: Request & { user: AuthUser },
+  ): Promise<Course[]> {
+    const { user } = req;
+    return (await this.getSessionCoursesUseCase.execute(sessionId, user)) || [];
   }
 }

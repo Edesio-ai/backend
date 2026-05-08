@@ -20,11 +20,9 @@ import { CreateSessionUseCase } from 'src/application/session/create-session.use
 import { UpdateSessionNameUseCase } from 'src/application/session/update-session-name.use-case';
 import { GetSessionByCodeUseCase } from 'src/application/session/get-session-by-code.use-case';
 import { DeleteSessionUseCase } from 'src/application/session/delete-session.use-case';
-import { GetCoursesSessionCountUseCase } from 'src/application/session/get-courses-session-count.use-case';
-import { CreateSessionBodyDto } from '../dto/session/create-session.dto';
-import { UpdateSessionBodyDto } from '../dto/session/uppdate-session-body.dto';
-import { Course, SessionDetails } from 'src/domain/teaching/types/course.type';
-import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
+import { CreateSessionBodyDto } from './dtos/create-session.dto';
+import { UpdateSessionBodyDto } from './dtos/uppdate-session-body.dto';
+import { SessionDetails } from 'src/domain/teaching/types/course.type';
 import { GetSessionDetailsUseCase } from 'src/application/session/get-session-details.use-case';
 
 @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
@@ -37,8 +35,6 @@ export class SessionController {
     private readonly updateSessionNameUseCase: UpdateSessionNameUseCase,
     private readonly getSessionByCodeUseCase: GetSessionByCodeUseCase,
     private readonly deleteSessionUseCase: DeleteSessionUseCase,
-    private readonly getCoursesSessionCountUseCase: GetCoursesSessionCountUseCase,
-    private readonly getSessionCoursesUseCase: GetSessionCoursesUseCase,
     private readonly getSessionDetailsUseCase: GetSessionDetailsUseCase,
   ) {}
 
@@ -88,24 +84,6 @@ export class SessionController {
     return {
       session,
     };
-  }
-
-  @Get('/:sessionId/courses-count')
-  async getCoursesSessionCount(
-    @Param('sessionId') sessionId: string,
-  ): Promise<{ count: number }> {
-    const count = await this.getCoursesSessionCountUseCase.execute(sessionId);
-    return { count: count };
-  }
-
-  @Roles('teacher', 'establishment', 'student')
-  @Get('/:sessionId/courses')
-  async getSessionCourses(
-    @Param('sessionId') sessionId: string,
-    @Req() req: Request & { user: AuthUser },
-  ): Promise<Course[]> {
-    const { user } = req;
-    return (await this.getSessionCoursesUseCase.execute(sessionId, user)) || [];
   }
 
   @Roles('establishment')

@@ -17,6 +17,15 @@ describe('GetSessionByCodeUseCase', () => {
     fixtures.thenReturnSession(result);
   });
 
+  it('should return null when repository finds no session', async () => {
+    fixtures.whenSessionNotFound();
+
+    const result = await fixtures.whenExecute();
+
+    fixtures.thenGetSessionByCodeCalledWithExpectedCode();
+    expect(result).toBeNull();
+  });
+
   it('should propagate repository errors', async () => {
     fixtures.whenRepositoryFails();
 
@@ -61,6 +70,10 @@ class Fixtures {
 
   whenSessionFound() {
     this.sessionRepository.getSessionByCode.mockResolvedValue(this.session);
+  }
+
+  whenSessionNotFound() {
+    this.sessionRepository.getSessionByCode.mockResolvedValue(null);
   }
 
   whenRepositoryFails() {

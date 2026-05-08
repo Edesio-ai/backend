@@ -8,11 +8,11 @@ import {
 export class GetSessionByCodeUseCase {
   constructor(
     @Inject(SESSION_REPOSITORY)
-    private readonly teacherSessionsRepository: SessionRepository,
+    private readonly sessionRepository: SessionRepository,
   ) {}
 
   async execute(code: string): Promise<Session | null> {
-    const session = await this.teacherSessionsRepository.getSessionByCode(code);
+    const session = await this.sessionRepository.getSessionByCode(code);
 
     return session;
   }

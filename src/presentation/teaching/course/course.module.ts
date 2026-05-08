@@ -13,6 +13,8 @@ import { UpdateCourseUseCase } from 'src/application/course/update-course.use-ca
 import { ValidateCourseQuestionsUseCase } from 'src/application/course/validate-course-questions.use-case';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
 import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/file-persistence.module';
+import { GetCoursesSessionCountUseCase } from 'src/application/course/get-courses-session-count.use-case';
+import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modu
     DeleteCourseUseCase,
     UpdateCourseUseCase,
     ValidateCourseQuestionsUseCase,
+    GetCoursesSessionCountUseCase,
+    GetSessionCoursesUseCase,
   ],
 })
 export class CourseModule {}

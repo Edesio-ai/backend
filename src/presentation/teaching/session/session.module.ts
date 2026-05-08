@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SessionController } from '../controllers/session.controller';
+import { SessionController } from './session.controller';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
@@ -10,9 +10,7 @@ import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/mo
 import { DeleteSessionUseCase } from 'src/application/session/delete-session.use-case';
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
-import { GetCoursesSessionCountUseCase } from 'src/application/session/get-courses-session-count.use-case';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
-import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
 import { GetSessionDetailsUseCase } from 'src/application/session/get-session-details.use-case';
 import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/file-persistence.module';
@@ -35,8 +33,6 @@ import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modu
     UpdateSessionNameUseCase,
     GetSessionByCodeUseCase,
     DeleteSessionUseCase,
-    GetCoursesSessionCountUseCase,
-    GetSessionCoursesUseCase,
     GetSessionDetailsUseCase,
   ],
 })
