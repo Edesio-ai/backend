@@ -1,17 +1,6 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Req } from '@nestjs/common';
 import { StudentJoinedSession } from 'src/domain/teaching/types/student.type';
 import { GetStudentJoinedSessionsUseCase } from 'src/application/student/get-student-joined-sessions.use-case';
-import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
-import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
-import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { JoinSessionByCodeUseCase } from 'src/application/student/join-session-by-code.use-case';
@@ -19,7 +8,6 @@ import { SessionStudent } from 'src/domain/teaching/types/student.type';
 import { GetSessionStudentUseCase } from 'src/application/student/get-session-student.use-case';
 import { DeleteStudentSessionUseCase } from 'src/application/student/delete-student-session.use-case';
 
-@UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')
 @Controller('student-session')
 export class StudentSessionController {

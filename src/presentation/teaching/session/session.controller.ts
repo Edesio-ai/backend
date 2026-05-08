@@ -7,12 +7,9 @@ import {
   Post,
   Put,
   Req,
-  UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
+
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
-import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
-import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
 import { AuthUser, SupabaseUser } from 'src/domain/auth/types/auth.type';
 import { Session } from 'src/domain/teaching/types/session.type';
@@ -25,7 +22,6 @@ import { UpdateSessionBodyDto } from './dtos/uppdate-session-body.dto';
 import { SessionDetails } from 'src/domain/teaching/types/course.type';
 import { GetSessionDetailsUseCase } from 'src/application/session/get-session-details.use-case';
 
-@UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('teacher')
 @Controller('session')
 export class SessionController {

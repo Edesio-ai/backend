@@ -6,15 +6,11 @@ import {
   Post,
   Req,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetStudentByUserIdUseCase } from 'src/application/student/get-student-by-user-id.use-case';
-import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
-import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 import { CreateStudentUseCase } from 'src/application/student/create-student.use-case';
 import {
   Student,
@@ -25,9 +21,8 @@ import { GetStudentBatchUseCase } from 'src/application/student/get-student-batc
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadStudentPhotoUseCase } from 'src/application/student/upload-student-photo.use-case';
 
-@UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-@Roles('student')
 @Controller('student')
+@Roles('student')
 export class StudentController {
   constructor(
     private readonly getStudentByUserIdUseCase: GetStudentByUserIdUseCase,

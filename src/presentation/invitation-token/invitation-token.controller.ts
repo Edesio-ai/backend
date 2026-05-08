@@ -6,12 +6,8 @@ import {
   Param,
   Post,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { Roles } from '../auth/decorator/role.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { CsrfGuard } from '../auth/guards/csrf.guard';
 import { DeleteInvitationTokenUseCase } from 'src/application/establishment/delete-invitation-token.use-case';
 import {
   InvitationToken,
@@ -26,8 +22,6 @@ import { GetInvitationPreviewUseCase } from 'src/application/auth/get-invitation
 import { CreateInvitationTokenBodyDto } from './dtos/create-invitation-token.dto';
 import { CreateInvitationTokenUseCase } from 'src/application/auth/create-invitation-toke.use-case';
 
-@UseGuards(JwtAuthGuard, RolesGuard, CsrfGuard)
-@Roles('establishment')
 @Controller('invtation-token')
 export class InvitationTokenController {
   constructor(

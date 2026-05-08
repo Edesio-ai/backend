@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 
 import { GenerateCsrfTokenUseCase } from '../../application/auth/generate-csrf-token.use-case';
 import { NodeTokenGeneratorProvider } from '../../infrastructure/security/node-token-generator.provider';
@@ -10,6 +11,10 @@ import { TOKEN_GENERATOR } from '../../domain/shared/security/interface/token-ge
 import { AuthController } from './auth.controller';
 import { GetUserSessionUseCase } from '../../application/auth/get-user-session.use-case';
 import { LogoutUseCase } from '../../application/auth/logout.use-case';
+import { AppHttpSecurityGuard } from './guards/app-http-security.guard';
+import { CsrfGuard } from './guards/csrf.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [AuthPersistenceModule, MailerModule],
@@ -19,6 +24,11 @@ import { LogoutUseCase } from '../../application/auth/logout.use-case';
       provide: TOKEN_GENERATOR,
       useClass: NodeTokenGeneratorProvider,
     },
+    JwtAuthGuard,
+    RolesGuard,
+    CsrfGuard,
+    AppHttpSecurityGuard,
+    { provide: APP_GUARD, useClass: AppHttpSecurityGuard },
     GenerateCsrfTokenUseCase,
     RegisterUseCase,
     LoginUseCase,

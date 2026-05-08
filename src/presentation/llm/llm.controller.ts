@@ -1,13 +1,5 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
-import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
-import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
+import { Body, Controller, Post, Req } from '@nestjs/common';
+
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { GenerateCompletionFeedbackBodyDto } from './dtos/generate-completion-feedback-body.dto';
 import { GenerateCompletionFeedbackUseCase } from 'src/application/llm/generate-completion-feedback.use-case';
@@ -19,7 +11,6 @@ import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type'
 import { EvaluateAnswerDto } from './dtos/evaluate-answer.dto';
 import { EvaluateAnswerUseCase } from 'src/application/question/evaluate-answer.use-case';
 
-@UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('student')
 @Controller('llm')
 export class LlmController {

@@ -1,15 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { GetSubscriptionStatusUseCase } from '../../application/billing/get-subscription-status.use-case';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../../domain/auth/types/auth.type';
-import { CsrfGuard } from '../auth/guards/csrf.guard';
 import { CreateCheckoutSessionsUseCase } from '../../application/billing/create-checkout-session.use-case';
 import { CreateCheckoutSessionBodyDto } from './dtos/createCheckoutSession.dto';
 
@@ -20,7 +11,6 @@ export class BillingController {
     private readonly createCheckoutSessionUseCase: CreateCheckoutSessionsUseCase,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get('subscription-status')
   async getSubscriptionStatus(
     @Req() req: Request & { user: User },
@@ -29,7 +19,6 @@ export class BillingController {
     return this.getSubscriptionStatusUseCase.execute(user);
   }
 
-  @UseGuards(JwtAuthGuard, CsrfGuard)
   @Post('checkout-session')
   async createCheckoutSession(
     @Req() req: Request & { user: User },

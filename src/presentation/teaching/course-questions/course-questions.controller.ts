@@ -1,14 +1,6 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Req } from '@nestjs/common';
+
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
-import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
-import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
-import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { GetPendingQuestionCountUseCase } from 'src/application/question/get-pending-question-count.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetAnsweredQuestionCountUseCase } from 'src/application/question/get-answered-question-count.use-case';
@@ -16,7 +8,6 @@ import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
 import { GetStudentCourseQuestionsUseCase } from 'src/application/student/get-student-course-questions.use-case';
 
 @Controller('course-questions')
-@UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('teacher')
 export class CourseQuestionsController {
   constructor(

@@ -1,25 +1,13 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { GetCourseRankingUseCase } from 'src/application/course/get-course-ranking.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { CourseRanking } from 'src/domain/teaching/types/course.type';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
-import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
-import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { UpdateOrCreateStudentCourseStatsBodyDto } from './dtos/update-or-create-student-course-stats.dto';
 import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/student/update-or-create-student-course-stats.use-case';
 
-@UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-@Roles('teacher')
 @Controller('student-course-stats')
+@Roles('teacher')
 export class StudentCourseStatsController {
   constructor(
     private readonly getCourseRankingUseCase: GetCourseRankingUseCase,

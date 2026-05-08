@@ -1,4 +1,5 @@
-import { ForbiddenException } from '@nestjs/common';
+import { ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { CsrfGuard } from './csrf.guard';
 
 describe('CsrfGuard', () => {
@@ -42,10 +43,21 @@ describe('CsrfGuard', () => {
 
     fixtures.thenAllowRequest(result);
   });
+
+  it('should allow mutable requests when SkipCsrf metadata is set', () => {
+    fixtures.whenRequestMethodIs('POST');
+    fixtures.whenCsrfTokensAreMissing();
+    fixtures.whenSkipCsrfReflectionReturns(true);
+
+    const result = fixtures.whenCanActivate();
+
+    fixtures.thenAllowRequest(result);
+  });
 });
 
 class Fixtures {
   public readonly guard: CsrfGuard;
+  private readonly reflector: Reflector;
   private readonly request: {
     method: string;
     cookies?: Record<string, string>;
@@ -53,7 +65,9 @@ class Fixtures {
   };
 
   constructor() {
-    this.guard = new CsrfGuard();
+    this.reflector = new Reflector();
+    this.guard = new CsrfGuard(this.reflector);
+
     this.request = {
       method: 'GET',
       headers: {},
@@ -74,12 +88,24 @@ class Fixtures {
     this.request.headers['x-csrf-token'] = headerToken;
   }
 
+  whenSkipCsrfReflectionReturns(skip: boolean) {
+    jest.spyOn(this.reflector, 'getAllAndOverride').mockReturnValue(skip);
+  }
+
   whenCanActivate() {
+    class TestTarget {}
+
+    async function TestHandler(): Promise<void> {
+      //
+    }
+
     const context = {
       switchToHttp: () => ({
         getRequest: () => this.request,
       }),
-    } as any;
+      getHandler: () => TestHandler,
+      getClass: () => TestTarget,
+    } as ExecutionContext;
 
     return this.guard.canActivate(context);
   }

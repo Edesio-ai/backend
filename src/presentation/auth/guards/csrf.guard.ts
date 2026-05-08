@@ -4,12 +4,25 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+
+import { SKIP_CSRF_KEY } from '../decorator/skip-csrf.decorator';
 import type { Request } from 'express';
 import { timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class CsrfGuard implements CanActivate {
+  constructor(private readonly reflector: Reflector) {}
+
   canActivate(context: ExecutionContext): boolean {
+    const skipCsrf = this.reflector.getAllAndOverride<boolean>(SKIP_CSRF_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (skipCsrf) {
+      return true;
+    }
+
     const req = context.switchToHttp().getRequest<Request>();
 
     if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {

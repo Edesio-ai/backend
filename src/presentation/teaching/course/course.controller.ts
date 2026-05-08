@@ -7,12 +7,8 @@ import {
   Patch,
   Post,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { Course } from 'src/domain/teaching/types/course.type';
-import { RolesGuard } from '../../auth/guards/roles.guard';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { CsrfGuard } from '../../auth/guards/csrf.guard';
 import { Roles } from '../../auth/decorator/role.decorator';
 import { CreateCourseUseCase } from 'src/application/course/create-course.use-case';
 import { CreateCourseBodyDto } from './dto/create-course-body.dto';
@@ -25,7 +21,6 @@ import { ValidateCourseQuestionsUseCase } from 'src/application/course/validate-
 import { GetCoursesSessionCountUseCase } from 'src/application/course/get-courses-session-count.use-case';
 import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
 
-@UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
 @Roles('teacher')
 @Controller('course')
 export class CourseController {

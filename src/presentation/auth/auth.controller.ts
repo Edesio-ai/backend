@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
 import { GenerateCsrfTokenUseCase } from '../../application/auth/generate-csrf-token.use-case';
@@ -19,7 +11,8 @@ import {
 } from '../../domain/auth/types/auth.type';
 import { RegisterBody } from './dto/register-body.dto';
 import { LoginBodyDto } from './dto/login-body.dto';
-import { CsrfGuard } from './guards/csrf.guard';
+import { Public } from './decorator/public.decorator';
+import { SkipCsrf } from './decorator/skip-csrf.decorator';
 import { LogoutUseCase } from '../../application/auth/logout.use-case';
 
 @Controller('auth')
@@ -46,6 +39,7 @@ export class AuthController {
     return { user, role };
   }
 
+  @Public()
   @Get('csrf')
   getCsrf(@Res({ passthrough: true }) res: Response): { csrfToken: string } {
     const { csrfToken, maxAgeMs } = this.generateCsrfTokenUseCase.execute();
@@ -62,11 +56,15 @@ export class AuthController {
     return { csrfToken };
   }
 
+  @Public()
+  @SkipCsrf()
   @Post('register')
   async register(@Body() body: RegisterBody): Promise<void> {
     await this.registerUseCase.execute(body);
     return;
   }
+  @Public()
+  @SkipCsrf()
   @Post('login')
   async login(
     @Body() body: LoginBodyDto,
@@ -89,8 +87,8 @@ export class AuthController {
     return authUser;
   }
 
+  @Public()
   @Post('logout')
-  @UseGuards(CsrfGuard)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const accessToken = req.cookies?.access_token;
     if (accessToken) {
