@@ -11,25 +11,23 @@ import { GetTeacherByUserIdUseCase } from 'src/application/teacher/get-teacher-b
 import { RolesGuard } from 'src/presentation/auth/guards/roles.guard';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { SupabaseUser } from 'src/domain/auth/types/auth.type';
-import { CreateTeacherBodyDto } from 'src/presentation/teaching/dto/teacher/create-teacher-body.dto';
+import { CreateTeacherBodyDto } from 'src/presentation/teaching/teacher/dtos/create-teacher-body.dto';
 import { CreateTeacherUseCase } from 'src/application/teacher/create-teacher.use-case';
 import { Teacher } from 'src/domain/teaching/types/teacher.type';
-import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
-import { ValidateTeacherInvitationBodyDto } from 'src/presentation/teaching/dto/teacher/validate-teacher-invitation-body.dto';
-import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/validate-teacher-invitation.use-case';
 import { JwtAuthGuard } from 'src/presentation/auth/guards/jwt-auth.guard';
 import { GlobalErrorFilter } from 'src/presentation/filters/global';
+import { CsrfGuard } from 'src/presentation/auth/guards/csrf.guard';
 
+@UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
+@Roles('teacher')
 @Controller('teacher')
 export class TeacherController {
   constructor(
     private readonly getTeacherByUserIdUseCase: GetTeacherByUserIdUseCase,
     private readonly createTeacherUseCase: CreateTeacherUseCase,
-    private readonly validateTeacherInvitationUseCase: ValidateTeacherInvitationUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('teacher')
   @Get()
   @UseFilters(GlobalErrorFilter)
   async getTeacherByUserId(
@@ -41,7 +39,6 @@ export class TeacherController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('teacher')
   @Post()
   @UseFilters(GlobalErrorFilter)
   async createTeacher(
@@ -52,26 +49,5 @@ export class TeacherController {
     const { id } = user;
 
     return this.createTeacherUseCase.execute(id, body);
-  }
-
-  @UseGuards(JwtAuthGuard, CsrfGuard, RolesGuard)
-  @Roles('teacher')
-  @Post('validate-invitation')
-  @UseFilters(GlobalErrorFilter)
-  async validateTeacherInvitation(
-    @Req() req: Request & { user: SupabaseUser },
-    @Body() body: ValidateTeacherInvitationBodyDto,
-  ): Promise<any> {
-    const { user } = req;
-    const { id } = user;
-    const invitationToken = await this.validateTeacherInvitationUseCase.execute(
-      id,
-      body.token,
-    );
-
-    return {
-      success: true,
-      etablissementId: invitationToken?.establishmentId,
-    };
   }
 }
