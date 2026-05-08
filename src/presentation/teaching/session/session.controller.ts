@@ -13,15 +13,15 @@ import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decora
 
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Session } from 'src/domain/teaching/types/session.type';
-import { CreateSessionUseCase } from 'src/application/session/create-session.use-case';
-import { UpdateSessionNameUseCase } from 'src/application/session/update-session-name.use-case';
-import { GetSessionByCodeUseCase } from 'src/application/session/get-session-by-code.use-case';
-import { DeleteSessionUseCase } from 'src/application/session/delete-session.use-case';
+import { CreateSessionUseCase } from 'src/application/teaching/session/create-session.use-case';
+import { UpdateSessionNameUseCase } from 'src/application/teaching/session/update-session-name.use-case';
+import { GetSessionByCodeUseCase } from 'src/application/teaching/session/get-session-by-code.use-case';
+import { DeleteSessionUseCase } from 'src/application/teaching/session/delete-session.use-case';
 import { CreateSessionBodyDto } from './dtos/create-session.dto';
 import { UpdateSessionBodyDto } from './dtos/uppdate-session-body.dto';
 import { SessionDetails } from 'src/domain/teaching/types/course.type';
-import { GetSessionDetailsUseCase } from 'src/application/session/get-session-details.use-case';
-import { GetTeacherSessionsUseCase } from 'src/application/teacher/get-teacher-sessions.use-case';
+import { GetSessionDetailsUseCase } from 'src/application/teaching/session/get-session-details.use-case';
+import { GetTeacherSessionsUseCase } from 'src/application/teaching/session/get-teacher-sessions.use-case';
 
 @Roles('teacher')
 @Controller('session')

@@ -1,6 +1,6 @@
 import { UserMetadata, AuthUserWithSession, User } from '../types/auth.type';
 import { InvitationToken, InvitationTokenPreview } from '../invitation.type';
-import { CreateInvitationTokenBody } from 'src/application/auth/create-invitation-token.use-case';
+import { CreateInvitationTokenBody } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
 
 export const AUTH_REPOSITORY = Symbol('AUTH_REPOSITORY');
 

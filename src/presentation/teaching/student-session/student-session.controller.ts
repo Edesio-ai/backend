@@ -1,13 +1,13 @@
 import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { StudentJoinedSession } from 'src/domain/teaching/types/student.type';
-import { GetStudentJoinedSessionsUseCase } from 'src/application/student/get-student-joined-sessions.use-case';
+import { GetStudentJoinedSessionsUseCase } from 'src/application/teaching/student-session/get-student-joined-sessions.use-case';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
-import { JoinSessionByCodeUseCase } from 'src/application/student/join-session-by-code.use-case';
+import { JoinSessionByCodeUseCase } from 'src/application/teaching/student-session/join-session-by-code.use-case';
 import { SessionStudent } from 'src/domain/teaching/types/student.type';
-import { GetSessionStudentUseCase } from 'src/application/student/get-session-student.use-case';
-import { DeleteStudentSessionUseCase } from 'src/application/student/delete-student-session.use-case';
+import { GetSessionStudentUseCase } from 'src/application/teaching/student-session/get-session-student.use-case';
+import { DeleteStudentSessionUseCase } from 'src/application/teaching/student-session/delete-student-session.use-case';
 
 @Roles('student')
 @Controller('student-session')

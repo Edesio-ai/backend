@@ -7,19 +7,19 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
-import { GetStudentByUserIdUseCase } from 'src/application/student/get-student-by-user-id.use-case';
+import { GetStudentByUserIdUseCase } from 'src/application/teaching/student/get-student-by-user-id.use-case';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
-import { CreateStudentUseCase } from 'src/application/student/create-student.use-case';
+import { CreateStudentUseCase } from 'src/application/teaching/student/create-student.use-case';
 import {
   Student,
   StudentPhotoUpload,
 } from 'src/domain/teaching/types/student.type';
 import { GetStudentBatchBodyDto } from './dtos/get-student-batch.dto';
-import { GetStudentBatchUseCase } from 'src/application/student/get-student-batch.use-case';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadStudentPhotoUseCase } from 'src/application/student/upload-student-photo.use-case';
+import { GetStudentBatchUseCase } from 'src/application/teaching/student/get-student-batch.use-case';
+import { UploadStudentPhotoUseCase } from 'src/application/teaching/student/upload-student-photo.use-case';
 
 @Controller('student')
 @Roles('student')

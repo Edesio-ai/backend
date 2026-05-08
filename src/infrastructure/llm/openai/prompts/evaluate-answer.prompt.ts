@@ -1,4 +1,4 @@
-import { EvaluateAnswerBody } from 'src/application/question/evaluate-answer.use-case';
+import { EvaluateAnswerBody } from 'src/application/llm/evaluate-answer.use-case';
 
 export const getEvaluateAnswerSystemPrompt = (): string => {
   return `

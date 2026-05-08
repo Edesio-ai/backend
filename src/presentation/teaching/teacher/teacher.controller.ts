@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post, UseFilters } from '@nestjs/common';
 
-import { GetTeacherByUserIdUseCase } from 'src/application/teacher/get-teacher-by-user-id.use-case';
+import { GetTeacherByUserIdUseCase } from 'src/application/teaching/teacher/get-teacher-by-user-id.use-case';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { CreateTeacherBodyDto } from 'src/presentation/teaching/teacher/dtos/create-teacher-body.dto';
-import { CreateTeacherUseCase } from 'src/application/teacher/create-teacher.use-case';
+import { CreateTeacherUseCase } from 'src/application/teaching/teacher/create-teacher.use-case';
 import { Teacher } from 'src/domain/teaching/types/teacher.type';
 import { GlobalErrorFilter } from 'src/presentation/filters/global.filter';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';

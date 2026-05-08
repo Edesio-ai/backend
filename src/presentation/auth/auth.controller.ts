@@ -5,6 +5,7 @@ import { GenerateCsrfTokenUseCase } from '../../application/auth/generate-csrf-t
 import { GetUserSessionUseCase } from '../../application/auth/get-user-session.use-case';
 import { LoginUseCase } from '../../application/auth/login.use-case';
 import { RegisterUseCase } from '../../application/auth/register.use-case';
+import { LogoutUseCase } from '../../application/auth/logout.use-case';
 import {
   AuthUser,
   GetUserSessionResponse,
@@ -13,7 +14,6 @@ import { RegisterBody } from './dto/register-body.dto';
 import { LoginBodyDto } from './dto/login-body.dto';
 import { Public } from './decorator/public.decorator';
 import { SkipCsrf } from './decorator/skip-csrf.decorator';
-import { LogoutUseCase } from '../../application/auth/logout.use-case';
 
 @Controller('auth')
 export class AuthController {

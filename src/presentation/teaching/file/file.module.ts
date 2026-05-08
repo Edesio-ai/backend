@@ -2,10 +2,10 @@ import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modu
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { Module } from '@nestjs/common';
 import { FileController } from './file.controller';
-import { DeleteCourseFileUseCase } from 'src/application/course/delete-course-file.use-case';
-import { UploadCourseFileUseCase } from 'src/application/course/upload-course-file.use-case';
+import { DeleteCourseFileUseCase } from 'src/application/teaching/file/delete-course-file.use-case';
+import { UploadCourseFileUseCase } from 'src/application/teaching/file/upload-course-file.use-case';
 import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/course-persistence.module';
-import { GetCourseFilesUseCase } from 'src/application/course/get-course-files.use-case';
+import { GetCourseFilesUseCase } from 'src/application/teaching/file/get-course-files.use-case';
 
 @Module({
   imports: [

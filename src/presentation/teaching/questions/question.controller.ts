@@ -11,12 +11,12 @@ import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { CreateQuestionDto } from './dtos/create-question.dto';
-import { CreateQuestionUseCase } from 'src/application/question/create-question.use-case';
-import { DeleteQuestionByIdUseCase } from 'src/application/question/delete-question-by-id.use-case';
+import { CreateQuestionUseCase } from 'src/application/teaching/question/create-question.use-case';
+import { DeleteQuestionByIdUseCase } from 'src/application/teaching/question/delete-question-by-id.use-case';
 import { UpdateQuestionDto } from './dtos/update-question.dto';
-import { UpdateQuestionByIdUseCase } from 'src/application/question/update-question-by-id.use-case';
+import { UpdateQuestionByIdUseCase } from 'src/application/teaching/question/update-question-by-id.use-case';
 import { Question } from 'src/domain/teaching/types/question.type';
-import { GetCourseQuestionsUseCase } from 'src/application/question/get-course-questions.use-case';
+import { GetCourseQuestionsUseCase } from 'src/application/teaching/question/get-course-questions.use-case';
 
 @Roles('teacher')
 @Controller('question')

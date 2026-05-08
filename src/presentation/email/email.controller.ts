@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 
 import { SendInvitationBodyDto } from './dtos/send-invitation-body.dto';
-import { SendInvitationUseCase } from 'src/application/auth/send-invitation.use-case';
+import { SendInvitationUseCase } from 'src/application/email/send-invitation.use-case';
 
 import { Roles } from '../auth/decorator/role.decorator';
 

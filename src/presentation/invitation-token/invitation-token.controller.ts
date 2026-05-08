@@ -1,19 +1,19 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { Roles } from '../auth/decorator/role.decorator';
 import { CurrentUser } from '../auth/decorator/current-user.decorator';
-import { DeleteInvitationTokenUseCase } from 'src/application/establishment/delete-invitation-token.use-case';
+import { GetInvitationTokenUseCase } from 'src/application/teaching/invitation-token/get-invitation-token.use-case';
 import {
   InvitationToken,
   InvitationTokenPreview,
 } from 'src/domain/auth/invitation.type';
-import { GetInvitationTokenUseCase } from 'src/application/establishment/get-invitation-token.use-case';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { ValidateTeacherInvitationBodyDto } from './dtos/validate-teacher-invitation-body.dto';
-import { ValidateTeacherInvitationUseCase } from 'src/application/teacher/validate-teacher-invitation.use-case';
+import { ValidateTeacherInvitationUseCase } from 'src/application/teaching/invitation-token/validate-teacher-invitation.use-case';
 import { GetInvitationPreviewParamsDto } from './dtos/get-invitation-preview.dto';
-import { GetInvitationPreviewUseCase } from 'src/application/auth/get-invitation-preview.use-case';
+import { GetInvitationPreviewUseCase } from 'src/application/teaching/invitation-token/get-invitation-preview.use-case';
 import { CreateInvitationTokenBodyDto } from './dtos/create-invitation-token.dto';
-import { CreateInvitationTokenUseCase } from 'src/application/auth/create-invitation-token.use-case';
+import { DeleteInvitationTokenUseCase } from 'src/application/teaching/invitation-token/delete-invitation-token.use-case';
+import { CreateInvitationTokenUseCase } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
 
 @Roles('establishment')
 @Controller('invtation-token')

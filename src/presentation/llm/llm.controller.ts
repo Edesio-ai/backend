@@ -7,10 +7,10 @@ import { GenerateCompletionFeedbackUseCase } from 'src/application/llm/generate-
 import { GenerateQuestionDto } from 'src/presentation/llm/dtos/generate-question.dto';
 import { Question } from 'src/domain/teaching/types/question.type';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
-import { GenerateQuestionUseCase } from 'src/application/question/generate-question-use-case';
+import { GenerateQuestionUseCase } from 'src/application/llm/generate-question-use-case';
 import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
 import { EvaluateAnswerDto } from './dtos/evaluate-answer.dto';
-import { EvaluateAnswerUseCase } from 'src/application/question/evaluate-answer.use-case';
+import { EvaluateAnswerUseCase } from 'src/application/llm/evaluate-answer.use-case';
 
 @Roles('student')
 @Controller('llm')

@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { GetCourseRankingUseCase } from 'src/application/course/get-course-ranking.use-case';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { CourseRanking } from 'src/domain/teaching/types/course.type';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { UpdateOrCreateStudentCourseStatsBodyDto } from './dtos/update-or-create-student-course-stats.dto';
-import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/student/update-or-create-student-course-stats.use-case';
+import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/teaching/student-course-stats/update-or-create-student-course-stats.use-case';
+import { GetCourseRankingUseCase } from 'src/application/teaching/student-course-stats/get-course-ranking.use-case';
 
 @Controller('student-course-stats')
 @Roles('teacher')

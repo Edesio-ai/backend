@@ -10,16 +10,16 @@ import {
 import { Course } from 'src/domain/teaching/types/course.type';
 import { Roles } from '../../auth/decorator/role.decorator';
 import { CurrentUser } from '../../auth/decorator/current-user.decorator';
-import { CreateCourseUseCase } from 'src/application/course/create-course.use-case';
+import { CreateCourseUseCase } from 'src/application/teaching/course/create-course.use-case';
 import { CreateCourseBodyDto } from './dto/create-course-body.dto';
-import { GetCourseValidatedQuestionsUseCase } from 'src/application/course/get-course-validated-questions.use-case';
+import { GetCourseValidatedQuestionsUseCase } from 'src/application/teaching/course/get-course-validated-questions.use-case';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
-import { DeleteCourseUseCase } from 'src/application/course/delete-course.use-case';
+import { DeleteCourseUseCase } from 'src/application/teaching/course/delete-course.use-case';
 import { UpdateCourseBodyDto } from './dto/UpdateCourseUseCase.dto';
-import { UpdateCourseUseCase } from 'src/application/course/update-course.use-case';
-import { ValidateCourseQuestionsUseCase } from 'src/application/course/validate-course-questions.use-case';
-import { GetCoursesSessionCountUseCase } from 'src/application/course/get-courses-session-count.use-case';
-import { GetSessionCoursesUseCase } from 'src/application/session/get-session-courses.use-case';
+import { UpdateCourseUseCase } from 'src/application/teaching/course/update-course.use-case';
+import { ValidateCourseQuestionsUseCase } from 'src/application/teaching/course/validate-course-questions.use-case';
+import { GetCoursesSessionCountUseCase } from 'src/application/teaching/course/get-courses-session-count.use-case';
+import { GetSessionCoursesUseCase } from 'src/application/teaching/course/get-session-courses.use-case';
 
 @Roles('teacher')
 @Controller('course')

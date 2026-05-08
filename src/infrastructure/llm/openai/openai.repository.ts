@@ -15,7 +15,7 @@ import {
   getEvaluateAnswerUserPrompt,
 } from './prompts/evaluate-answer.prompt';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import { EvaluateAnswerBody } from 'src/application/question/evaluate-answer.use-case';
+import { EvaluateAnswerBody } from 'src/application/llm/evaluate-answer.use-case';
 import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
 import { GenerateCompletionFeedbackBody } from 'src/application/llm/generate-completion-feedback.use-case';
 import { getGenerateCompletionFeedbackSystemPrompt } from './prompts/generate-completion-feedback.prompt';

@@ -2,11 +2,11 @@ import { Controller, Get, Param } from '@nestjs/common';
 
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
-import { GetPendingQuestionCountUseCase } from 'src/application/question/get-pending-question-count.use-case';
+import { GetPendingQuestionCountUseCase } from 'src/application/teaching/course-question/get-pending-question-count.use-case';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
-import { GetAnsweredQuestionCountUseCase } from 'src/application/question/get-answered-question-count.use-case';
+import { GetAnsweredQuestionCountUseCase } from 'src/application/teaching/course-question/get-answered-question-count.use-case';
 import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
-import { GetStudentCourseQuestionsUseCase } from 'src/application/student/get-student-course-questions.use-case';
+import { GetStudentCourseQuestionsUseCase } from 'src/application/teaching/course-question/get-student-course-questions.use-case';
 
 @Controller('course-questions')
 @Roles('teacher')
