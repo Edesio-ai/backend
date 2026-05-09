@@ -2,7 +2,7 @@ import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+} from 'src/domain/teaching/interfaces/course.repository';
 import {
   CourseRanking,
   CourseRankingWithRate,
@@ -11,15 +11,15 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interface/teacher.repository';
+} from 'src/domain/teaching/interfaces/teacher.repository';
 import {
   SESSION_REPOSITORY,
   type SessionRepository,
-} from 'src/domain/teaching/interface/session.repository';
+} from 'src/domain/teaching/interfaces/session.repository';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
 import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 

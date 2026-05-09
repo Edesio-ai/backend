@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { SessionModule } from './session/session.module';
 import { EstablishmentModule } from './establishment/establishment.module';
 import { QuestionModule } from './questions/question.module';
-import { FileModule } from './file/file.module';
+import { CourseFileModule } from './course-file/course-file.module';
 import { CourseQuestionModule } from './course-questions/course-question.module';
 import { CourseModule } from './course/course.module';
 import { StudentCourseStatsModule } from './student-course-stats/student-course-stats.module';
@@ -17,7 +17,7 @@ import { TeacherModule } from './teacher/teacher.module';
     SessionModule,
     CourseModule,
     QuestionModule,
-    FileModule,
+    CourseFileModule,
     StudentModule,
     CourseQuestionModule,
     StudentCourseStatsModule,

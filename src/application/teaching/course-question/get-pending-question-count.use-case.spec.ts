@@ -1,7 +1,9 @@
 import { GetPendingQuestionCountUseCase } from 'src/application/teaching/course-question/get-pending-question-count.use-case';
-import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
+import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
 import { SupabaseCourse } from 'src/domain/teaching/types/course.type';
+import { createMockCourseRepository } from 'src/testing/mock-course-repository';
+import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 
 describe('GetPendingQuestionCountUseCase', () => {
   let fixtures: Fixtures;
@@ -80,36 +82,8 @@ class Fixtures {
   public readonly useCase: GetPendingQuestionCountUseCase;
 
   constructor() {
-    this.courseRepository = {
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-    };
-    this.questionsRepository = {
-      getQuestionById: jest.fn(),
-      deleteQuestionById: jest.fn(),
-      insertQuestions: jest.fn(),
-      deleteQuestionsByCourseIds: jest.fn(),
-      getPendingQuestionCount: jest.fn(),
-      getCourseQuestions: jest.fn(),
-      deleteCourseQuizQuestions: jest.fn(),
-      insertQuestion: jest.fn(),
-      updateQuestionById: jest.fn(),
-      deleteCourseQuestionsByCourseId: jest.fn(),
-      getAnsweredQuestionCount: jest.fn(),
-    };
+    this.courseRepository = createMockCourseRepository();
+    this.questionsRepository = createMockQuestionsRepository();
 
     this.useCase = new GetPendingQuestionCountUseCase(
       this.questionsRepository,

@@ -1,15 +1,18 @@
 import { ForbiddenException } from '@nestjs/common';
 import { GetCourseRankingUseCase } from 'src/application/teaching/student-course-stats/get-course-ranking.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
-import { SessionRepository } from 'src/domain/teaching/interface/session.repository';
-import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
-import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
+import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import { Course } from 'src/domain/teaching/types/course.type';
 import { Session } from 'src/domain/teaching/types/session.type';
 import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import { createMockCourseRepository } from 'src/testing/mock-course-repository';
+import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GetCourseRankingUseCase', () => {
   let fixtures: Fixtures;
@@ -169,39 +172,9 @@ class Fixtures {
   public readonly useCase: GetCourseRankingUseCase;
 
   constructor() {
-    this.courseRepository = {
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-    };
-    this.teacherRepository = {
-      linkTeacherToEstablishment: jest.fn(),
-      getTeacherByEstablishmentId: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-      getTeacherByUserId: jest.fn(),
-      createTeacher: jest.fn(),
-      getTeacherByConditions: jest.fn(),
-    };
-    this.sessionRepository = {
-      getSessionsByTeacherId: jest.fn(),
-      getSessionByCode: jest.fn(),
-      createSession: jest.fn(),
-      updateSessionName: jest.fn(),
-      deleteSessionByTeacherId: jest.fn(),
-      getSessionById: jest.fn(),
-    };
+    this.courseRepository = createMockCourseRepository();
+    this.teacherRepository = createMockTeacherRepository();
+    this.sessionRepository = createMockSessionRepository();
     this.studentRepository = createMockStudentRepository();
 
     this.useCase = new GetCourseRankingUseCase(

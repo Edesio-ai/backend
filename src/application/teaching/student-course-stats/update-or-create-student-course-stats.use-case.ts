@@ -3,11 +3,11 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+} from 'src/domain/teaching/interfaces/course.repository';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
 import { UpdateOrCreateStudentCourseStatsBodyDto } from 'src/presentation/teaching/student-course-stats/dtos/update-or-create-student-course-stats.dto';
 
 export class UpdateOrCreateStudentCourseStatsUseCase {

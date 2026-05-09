@@ -4,7 +4,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/global/errors/global.errors';
-import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
+import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import { TokenRepository } from 'src/domain/token/contract/token.repository';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teaching/invitation-token/validate-teacher-invitation.use-case';
 

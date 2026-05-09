@@ -2,12 +2,12 @@ import { Inject } from '@nestjs/common';
 import {
   QUESTIONS_REPOSITORY,
   type QuestionsRepository,
-} from 'src/domain/teaching/interface/questions.repository';
+} from 'src/domain/teaching/interfaces/questions.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 export class GetAnsweredQuestionCountUseCase {

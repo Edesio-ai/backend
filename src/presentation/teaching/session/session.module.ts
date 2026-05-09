@@ -6,7 +6,7 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/m
 import { CreateSessionUseCase } from 'src/application/teaching/session/create-session.use-case';
 import { UpdateSessionNameUseCase } from 'src/application/teaching/session/update-session-name.use-case';
 import { GetSessionByCodeUseCase } from 'src/application/teaching/session/get-session-by-code.use-case';
-import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/course-persistence.module';
+import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/course/course-persistence.module';
 import { DeleteSessionUseCase } from 'src/application/teaching/session/delete-session.use-case';
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
@@ -14,6 +14,7 @@ import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
 import { GetSessionDetailsUseCase } from 'src/application/teaching/session/get-session-details.use-case';
 import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/file-persistence.module';
+import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modu
     StudentPersistenceModule,
     EstablishmentPersistenceModule,
     FilePersistenceModule,
+    CourseFilePersistenceModule,
   ],
   controllers: [SessionController],
   providers: [

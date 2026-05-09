@@ -2,24 +2,28 @@ import { Inject } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+} from 'src/domain/teaching/interfaces/course.repository';
 import {
   QUESTIONS_REPOSITORY,
   type QuestionsRepository,
-} from 'src/domain/teaching/interface/questions.repository';
+} from 'src/domain/teaching/interfaces/questions.repository';
 import {
   SESSION_REPOSITORY,
   type SessionRepository,
-} from 'src/domain/teaching/interface/session.repository';
+} from 'src/domain/teaching/interfaces/session.repository';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interface/teacher.repository';
+} from 'src/domain/teaching/interfaces/teacher.repository';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import {
+  COURSE_FILE_REPOSITORY,
+  type ICourseFileRepository,
+} from 'src/domain/teaching/interfaces/i-course-file.repository';
 
 export class DeleteSessionUseCase {
   constructor(
@@ -33,6 +37,8 @@ export class DeleteSessionUseCase {
     private readonly teacherRepository: TeacherRepository,
     @Inject(STUDENT_REPOSITORY)
     private readonly studentSupabaseRepository: StudentRepository,
+    @Inject(COURSE_FILE_REPOSITORY)
+    private readonly courseFileRepository: ICourseFileRepository,
   ) {}
 
   async execute(sessionId: string, userId: string): Promise<void> {
@@ -45,7 +51,7 @@ export class DeleteSessionUseCase {
       await this.questionsRepository.deleteQuestionsByCourseIds(
         sessionCoursesIds,
       );
-      await this.courseRepository.deleteCoursesFilesByCourseIds(
+      await this.courseFileRepository.deleteCoursesFilesByCourseIds(
         sessionCoursesIds,
       );
     }

@@ -6,20 +6,22 @@ import {
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+} from 'src/domain/teaching/interfaces/course.repository';
 import {
   FILE_REPOSITORY,
   type FileRepository,
-} from 'src/domain/teaching/interface/file.repository';
+} from 'src/domain/teaching/interfaces/file.repository';
+import {
+  COURSE_FILE_REPOSITORY,
+  type ICourseFileRepository,
+} from 'src/domain/teaching/interfaces/i-course-file.repository';
 
 export class ExportCourseFileUseCase {
   constructor(
-    @Inject(PDF_EXTRACTOR)
-    private readonly pdfExtractor: PdfExtractor,
     @Inject(FILE_REPOSITORY)
     private readonly fileRepository: FileRepository,
-    @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    @Inject(COURSE_FILE_REPOSITORY)
+    private readonly courseFileRepository: ICourseFileRepository,
   ) {}
 
   async execute(fileId: string): Promise<{ buffer: Buffer; fileName: string }> {
@@ -28,7 +30,7 @@ export class ExportCourseFileUseCase {
       throw new NotFoundException('File not found');
     }
 
-    const buffer = await this.courseRepository.getFileBufferFromStorage(
+    const buffer = await this.courseFileRepository.getFileBufferFromStorage(
       file.fileUrl,
     );
     if (!buffer) {

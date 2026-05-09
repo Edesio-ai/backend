@@ -1,5 +1,5 @@
 import { CreateEstablishmentUseCase } from './create-establishment.use-case';
-import { EstablishmentRepository } from 'src/domain/teaching/interface/establishment.repository';
+import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
 import {
   CreateEstablishmentBody,
   Establishment,

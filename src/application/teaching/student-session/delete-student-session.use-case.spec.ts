@@ -1,5 +1,5 @@
 import { DeleteStudentSessionUseCase } from 'src/application/teaching/student-session/delete-student-session.use-case';
-import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
+import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import {
   ForbiddenError,
   NotFoundError,

@@ -1,5 +1,4 @@
 import { Inject } from '@nestjs/common';
-import { StudentRepository } from '../../../../domain/teaching/interface/student.repository';
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import { StudentMapper } from '../mappers/student.mapper';
 import { mapList } from '../../common/mapper.util';
@@ -14,6 +13,7 @@ import {
 } from 'src/domain/teaching/types/student.type';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
+import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 
 export class StudentSupabaseRepository implements StudentRepository {
   constructor(

@@ -1,6 +1,5 @@
 import { Inject } from '@nestjs/common';
 import { SUPABASE_ADMIN } from '../../supabase.module';
-import { SessionRepository } from '../../../../domain/teaching/interface/session.repository';
 import {
   CreateSessionBody,
   Session,
@@ -8,6 +7,7 @@ import {
 } from '../../../../domain/teaching/types/session.type';
 import { SessionMapper } from '../mappers/session.mapper';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
 
 export class SupabaseSessionRepository implements SessionRepository {
   constructor(

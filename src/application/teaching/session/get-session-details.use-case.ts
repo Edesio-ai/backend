@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import {
   ESTABLISHMENT_REPOSITORY,
   type EstablishmentRepository,
-} from 'src/domain/teaching/interface/establishment.repository';
+} from 'src/domain/teaching/interfaces/establishment.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ForbiddenError,
@@ -11,19 +11,19 @@ import {
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+} from 'src/domain/teaching/interfaces/course.repository';
 import {
   QUESTIONS_REPOSITORY,
   type QuestionsRepository,
-} from 'src/domain/teaching/interface/questions.repository';
+} from 'src/domain/teaching/interfaces/questions.repository';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
 import {
   FILE_REPOSITORY,
   type FileRepository,
-} from 'src/domain/teaching/interface/file.repository';
+} from 'src/domain/teaching/interfaces/file.repository';
 import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
 import { SessionDetails } from 'src/domain/teaching/types/course.type';
 

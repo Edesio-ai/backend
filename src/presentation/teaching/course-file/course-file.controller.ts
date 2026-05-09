@@ -7,7 +7,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { DeleteCourseFileUseCase } from 'src/application/teaching/file/delete-course-file.use-case';
+import { DeleteCourseFileUseCase } from 'src/application/teaching/course-file/delete-course-file.use-case';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import {
   CourseFile,
@@ -15,12 +15,12 @@ import {
 } from 'src/domain/teaching/types/course.type';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BadRequestError } from 'src/domain/shared/global/errors/global.errors';
-import { UploadCourseFileUseCase } from 'src/application/teaching/file/upload-course-file.use-case';
-import { GetCourseFilesUseCase } from 'src/application/teaching/file/get-course-files.use-case';
+import { UploadCourseFileUseCase } from 'src/application/teaching/course-file/upload-course-file.use-case';
+import { GetCourseFilesUseCase } from 'src/application/teaching/course-file/get-course-files.use-case';
 
 @Roles('teacher')
-@Controller('file')
-export class FileController {
+@Controller('course-file')
+export class CourseFileController {
   constructor(
     private readonly deleteCourseFileUseCase: DeleteCourseFileUseCase,
     private readonly uploadCourseFileUseCase: UploadCourseFileUseCase,

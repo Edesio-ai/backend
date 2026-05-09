@@ -3,7 +3,7 @@ import { Inject } from '@nestjs/common';
 import {
   ESTABLISHMENT_REPOSITORY,
   type EstablishmentRepository,
-} from 'src/domain/teaching/interface/establishment.repository';
+} from 'src/domain/teaching/interfaces/establishment.repository';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 

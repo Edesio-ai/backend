@@ -1,7 +1,7 @@
-import { FileSupabaseRepository } from '../repositories/file-supabase.repository';
+import { FileSupabaseRepository } from '../repositories/course-file-supabase.repository';
 import { Module } from '@nestjs/common';
 import { SupabaseModule } from '../../supabase.module';
-import { FILE_REPOSITORY } from 'src/domain/teaching/interface/file.repository';
+import { FILE_REPOSITORY } from 'src/domain/teaching/interfaces/file.repository';
 
 @Module({
   imports: [SupabaseModule],

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SESSION_REPOSITORY } from '../../../../domain/teaching/interface/session.repository';
+import { SESSION_REPOSITORY } from 'src/domain/teaching/interfaces/session.repository';
 import { SupabaseSessionRepository } from '../repositories/session-supabase.repository';
 import { SupabaseModule } from '../../supabase.module';
 

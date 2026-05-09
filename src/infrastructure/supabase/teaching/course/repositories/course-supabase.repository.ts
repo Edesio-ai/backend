@@ -1,23 +1,20 @@
 import { Inject } from '@nestjs/common';
-import { SUPABASE_ADMIN } from '../../supabase.module';
-import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
+import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
 import {
   SupabaseCourse,
-  CourseFileUpload,
   CreateCourseBody,
   Course,
-  CourseFile,
   CourseWithSession,
 } from 'src/domain/teaching/types/course.type';
-import { CourseMapper } from '../mappers/course.mapper';
-import { FileMapper } from '../mappers/file.mapper';
-import { SessionMapper } from '../mappers/session.mapper';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { CourseMapper } from '../mappers/course.mapper';
+import { SessionMapper } from '../../mappers/session.mapper';
+import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 
 export class CourseSupabaseRepository implements CourseRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
 
-  async getCourseById(courseId: string): Promise<Course> {
+  public async getCourseById(courseId: string): Promise<Course> {
     const { data, error } = await this.supabase
       .from('courses')
       .select('id, session_id')
@@ -36,7 +33,9 @@ export class CourseSupabaseRepository implements CourseRepository {
     return CourseMapper.toDomain(data);
   }
 
-  async getCoursesBySessionId(sessionId: string): Promise<SupabaseCourse[]> {
+  public async getCoursesBySessionId(
+    sessionId: string,
+  ): Promise<SupabaseCourse[]> {
     const { data, error } = await this.supabase
       .from('courses')
       .select('id')
@@ -52,33 +51,6 @@ export class CourseSupabaseRepository implements CourseRepository {
     }
 
     return data;
-  }
-
-  async deleteCoursesFilesByCourseIds(courseIds: string[]): Promise<void> {
-    for (const courseId of courseIds) {
-      const files = await this.getCoursesFilesByCourseIds(courseId);
-      if (files && files.length > 0) {
-        const filePaths = files.map((file) => file.fileUrl);
-        await this.deleteCoursesFilesFromStorage(filePaths);
-        await this.deleteCourseFileFromDatabase(courseId);
-      }
-    }
-  }
-
-  private async deleteCourseFileFromDatabase(courseId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('course_files')
-      .delete()
-      .eq('course_id', courseId);
-
-    if (error) {
-      console.error(
-        'Error deleting course files for course id: ',
-        courseId,
-        error,
-      );
-      throw new ServerError(error.message);
-    }
   }
 
   async deleteCoursesBySessionId(sessionId: string): Promise<void> {
@@ -116,41 +88,6 @@ export class CourseSupabaseRepository implements CourseRepository {
     return CourseMapper.toDomain(data);
   }
 
-  private async getCoursesFilesByCourseIds(
-    courseId: string,
-  ): Promise<{ fileUrl: string }[]> {
-    const { data, error } = await this.supabase
-      .from('course_files')
-      .select('file_url')
-      .eq('course_id', courseId);
-
-    if (error) {
-      console.error(
-        'An error occurred while getting the courses files by course id: ',
-        courseId,
-        error,
-      );
-      throw new ServerError(error.message);
-    }
-
-    return CourseMapper.fileUrlsToDomain(data);
-  }
-
-  private async deleteCoursesFilesFromStorage(files: string[]): Promise<void> {
-    const { error } = await this.supabase.storage
-      .from('courses-pdf')
-      .remove(files);
-
-    if (error) {
-      console.error(
-        'An error occurred while deleting the courses files from storage: ',
-        files,
-        error,
-      );
-      throw new ServerError(error.message);
-    }
-  }
-
   async getSessionCoursesCount(sessionId: string): Promise<number> {
     const { count, error } = await this.supabase
       .from('courses')
@@ -167,57 +104,6 @@ export class CourseSupabaseRepository implements CourseRepository {
     }
 
     return count;
-  }
-
-  public async storeCourseFile(
-    file: CourseFileUpload,
-    storagePath: string,
-  ): Promise<void> {
-    const { error: uploadError } = await this.supabase.storage
-      .from('courses-pdf')
-      .upload(storagePath, file.buffer, {
-        contentType: file.mimeType || 'application/octet-stream',
-        upsert: false,
-      });
-    if (uploadError) {
-      console.error(
-        'An error occurred while uploading the course file: ',
-        storagePath,
-        uploadError,
-      );
-      throw new ServerError(uploadError.message);
-    }
-  }
-
-  public async insertCourseFile(
-    courseId: string,
-    file: CourseFileUpload,
-    storagePath: string,
-  ): Promise<CourseFile> {
-    const { data, error } = await this.supabase
-      .from('course_files')
-      .insert({
-        course_id: courseId,
-        file_url: storagePath,
-        file_name: file.originalFileName,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      await this.supabase.storage
-        .from('courses-pdf')
-        .remove([storagePath])
-        .catch(() => undefined);
-      console.error(
-        'An error occurred while inserting the course file: ',
-        storagePath,
-        error,
-      );
-      throw new ServerError(error.message);
-    }
-
-    return FileMapper.toDomain(data);
   }
 
   public async getCourseValidatedQuestions(
@@ -239,26 +125,6 @@ export class CourseSupabaseRepository implements CourseRepository {
     }
 
     return CourseMapper.validatedQuestionsToDomain(data);
-  }
-
-  public async getCourseFilesByCourseId(
-    courseId: string,
-  ): Promise<CourseFile[]> {
-    const { data, error } = await this.supabase
-      .from('course_files')
-      .select('*')
-      .eq('course_id', courseId);
-
-    if (error) {
-      console.error(
-        'An error occurred while getting the course files for courseId: ',
-        courseId,
-        error,
-      );
-      throw new ServerError(error.message);
-    }
-
-    return data.map(FileMapper.toDomain);
   }
 
   public async getCourseWithSessionById(
@@ -303,19 +169,6 @@ export class CourseSupabaseRepository implements CourseRepository {
     }
 
     return data ? data.map(CourseMapper.toDomain) : [];
-  }
-
-  public async getFileBufferFromStorage(filePath: string): Promise<Buffer> {
-    const { data: fileData, error } = await this.supabase.storage
-      .from('courses-pdf')
-      .download(filePath);
-
-    if (error) {
-      console.error(`Error downloading file from storage: ${filePath}`, error);
-      throw new ServerError(error.message);
-    }
-
-    return Buffer.from(await fileData.arrayBuffer());
   }
 
   public async deleteCourseById(courseId: string): Promise<void> {

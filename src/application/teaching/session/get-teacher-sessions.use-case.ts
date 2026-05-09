@@ -2,12 +2,12 @@ import { Inject } from '@nestjs/common';
 import {
   SESSION_REPOSITORY,
   type SessionRepository,
-} from 'src/domain/teaching/interface/session.repository';
+} from 'src/domain/teaching/interfaces/session.repository';
 import { Session } from 'src/domain/teaching/types/session.type';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interface/teacher.repository';
+} from 'src/domain/teaching/interfaces/teacher.repository';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 export class GetTeacherSessionsUseCase {

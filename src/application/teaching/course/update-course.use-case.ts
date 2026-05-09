@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+} from 'src/domain/teaching/interfaces/course.repository';
 import { Course } from 'src/domain/teaching/types/course.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
@@ -12,7 +12,7 @@ import {
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interface/teacher.repository';
+} from 'src/domain/teaching/interfaces/teacher.repository';
 
 export type UpdateCourseBody = {
   title?: string | null;

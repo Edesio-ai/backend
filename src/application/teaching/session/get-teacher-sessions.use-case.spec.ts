@@ -1,6 +1,6 @@
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
-import { SessionRepository } from 'src/domain/teaching/interface/session.repository';
-import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
+import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import { GetTeacherSessionsUseCase } from 'src/application/teaching/session/get-teacher-sessions.use-case';
 
 describe('GetTeacherSessionsUseCase', () => {

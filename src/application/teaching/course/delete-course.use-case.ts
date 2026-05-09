@@ -2,12 +2,12 @@ import { Inject } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+} from 'src/domain/teaching/interfaces/course.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interface/teacher.repository';
+} from 'src/domain/teaching/interfaces/teacher.repository';
 import {
   NotFoundError,
   UnauthorizedError,
@@ -15,11 +15,15 @@ import {
 import {
   QUESTIONS_REPOSITORY,
   type QuestionsRepository,
-} from 'src/domain/teaching/interface/questions.repository';
+} from 'src/domain/teaching/interfaces/questions.repository';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
+import {
+  COURSE_FILE_REPOSITORY,
+  type ICourseFileRepository,
+} from 'src/domain/teaching/interfaces/i-course-file.repository';
 
 export class DeleteCourseUseCase {
   constructor(
@@ -31,6 +35,8 @@ export class DeleteCourseUseCase {
     private readonly questionsRepository: QuestionsRepository,
     @Inject(STUDENT_REPOSITORY)
     private readonly studentRepository: StudentRepository,
+    @Inject(COURSE_FILE_REPOSITORY)
+    private readonly courseFileRepository: ICourseFileRepository,
   ) {}
 
   async execute(courseId: string, user: AuthUser): Promise<void> {
@@ -60,7 +66,7 @@ export class DeleteCourseUseCase {
     }
 
     await this.questionsRepository.deleteCourseQuizQuestions(courseId);
-    await this.courseRepository.deleteCoursesFilesByCourseIds([courseId]);
+    await this.courseFileRepository.deleteCoursesFilesByCourseIds([courseId]);
     await this.studentRepository.deleteStudentCourseStatsByCourseId(courseId);
     await this.questionsRepository.deleteCourseQuestionsByCourseId(courseId);
     await this.courseRepository.deleteCourseById(courseId);

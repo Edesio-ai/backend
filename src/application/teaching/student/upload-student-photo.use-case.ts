@@ -4,7 +4,7 @@ import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
 import { StudentPhotoUpload } from 'src/domain/teaching/types/student.type';
 
 export class UploadStudentPhotoUseCase {

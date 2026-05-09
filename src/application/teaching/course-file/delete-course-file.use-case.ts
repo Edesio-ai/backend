@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   FILE_REPOSITORY,
   type FileRepository,
-} from 'src/domain/teaching/interface/file.repository';
+} from 'src/domain/teaching/interfaces/file.repository';
 
 @Injectable()
 export class DeleteCourseFileUseCase {

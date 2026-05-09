@@ -1,4 +1,4 @@
-import type { StudentRepository } from 'src/domain/teaching/interface/student.repository';
+import type { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 
 export function createMockStudentRepository(): jest.Mocked<StudentRepository> {
   return {

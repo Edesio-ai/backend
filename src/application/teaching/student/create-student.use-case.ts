@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
 import { Student } from 'src/domain/teaching/types/student.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 

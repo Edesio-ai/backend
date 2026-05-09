@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CourseController } from '../course/course.controller';
-import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/course-persistence.module';
+import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/course/course-persistence.module';
 import { CreateCourseUseCase } from 'src/application/teaching/course/create-course.use-case';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { GetCourseValidatedQuestionsUseCase } from 'src/application/teaching/course/get-course-validated-questions.use-case';
@@ -15,6 +15,7 @@ import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teac
 import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/file-persistence.module';
 import { GetCoursesSessionCountUseCase } from 'src/application/teaching/course/get-courses-session-count.use-case';
 import { GetSessionCoursesUseCase } from 'src/application/teaching/course/get-session-courses.use-case';
+import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { GetSessionCoursesUseCase } from 'src/application/teaching/course/get-se
     QuestionPersistenceModule,
     EstablishmentPersistenceModule,
     FilePersistenceModule,
+    CourseFilePersistenceModule,
   ],
   controllers: [CourseController],
   providers: [

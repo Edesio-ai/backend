@@ -1,6 +1,7 @@
 import { GetCourseFilesUseCase } from './get-course-files.use-case';
-import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
+import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
 import { CourseFile } from 'src/domain/teaching/types/course.type';
+import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 
 describe('GetCourseFilesUseCase', () => {
   let fixtures: Fixtures;
@@ -16,10 +17,10 @@ describe('GetCourseFilesUseCase', () => {
 
     expect(result).toEqual(fixtures.courseFiles);
     expect(
-      fixtures.courseRepository.getCourseFilesByCourseId,
+      fixtures.courseFileRepository.getCourseFilesByCourseId,
     ).toHaveBeenCalledWith(fixtures.courseId);
     expect(
-      fixtures.courseRepository.getCourseFilesByCourseId,
+      fixtures.courseFileRepository.getCourseFilesByCourseId,
     ).toHaveBeenCalledTimes(1);
   });
 
@@ -46,29 +47,13 @@ class Fixtures {
     },
   ];
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly useCase: GetCourseFilesUseCase;
 
   constructor() {
-    this.courseRepository = {
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-    };
+    this.courseFileRepository = createMockCourseFileRepository();
 
-    this.useCase = new GetCourseFilesUseCase(this.courseRepository);
+    this.useCase = new GetCourseFilesUseCase(this.courseFileRepository);
   }
 
   whenExecute() {
@@ -76,13 +61,13 @@ class Fixtures {
   }
 
   whenRepositoryReturnsFiles() {
-    this.courseRepository.getCourseFilesByCourseId.mockResolvedValue(
+    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue(
       this.courseFiles,
     );
   }
 
   whenRepositoryThrows() {
-    this.courseRepository.getCourseFilesByCourseId.mockRejectedValue(
+    this.courseFileRepository.getCourseFilesByCourseId.mockRejectedValue(
       this.repositoryError,
     );
   }

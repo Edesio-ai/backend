@@ -1,6 +1,7 @@
 import { CreateCourseUseCase } from './create-course.use-case';
-import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
+import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import { CreateCourseBody } from 'src/domain/teaching/types/course.type';
+import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 
 describe('CreateCourseUseCase', () => {
   let fixtures: Fixtures;
@@ -50,23 +51,7 @@ class Fixtures {
   public readonly useCase: CreateCourseUseCase;
 
   constructor() {
-    this.courseRepository = {
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-    };
+    this.courseRepository = createMockCourseRepository();
     this.useCase = new CreateCourseUseCase(this.courseRepository);
   }
 

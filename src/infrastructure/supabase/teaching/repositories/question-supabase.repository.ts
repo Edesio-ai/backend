@@ -1,5 +1,4 @@
 import { Inject } from '@nestjs/common';
-import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import {
   CreateQuestionBody,
@@ -9,8 +8,10 @@ import {
 } from 'src/domain/teaching/types/question.type';
 import { QuestionMapper } from '../mappers/question.mapper';
 import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
-import { CourseQuestionMapper } from '../mappers/course-question.mapper';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { CourseQuestionMapper } from '../mappers/course-question.mapper';
+import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+
 export class QuestionSupabaseRepository implements QuestionsRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
 

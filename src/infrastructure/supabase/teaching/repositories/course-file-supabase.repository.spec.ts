@@ -1,4 +1,4 @@
-import { FileSupabaseRepository } from './file-supabase.repository';
+import { FileSupabaseRepository } from './course-file-supabase.repository';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 describe('FileSupabaseRepository', () => {

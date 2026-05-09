@@ -10,9 +10,10 @@ import {
 } from 'src/domain/shared/global/errors/global.errors';
 import { OpenaiRepository } from 'src/domain/shared/llm/openai/contracts/opena-ai.repository';
 import { PdfExtractor } from 'src/domain/pdf/contracts/pdf-extractor.interface';
-import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
-import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
+import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
+import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
 import {
   CourseFile,
   CourseWithSession,
@@ -21,6 +22,8 @@ import {
   GeneratedQuestion,
   Question,
 } from 'src/domain/teaching/types/question.type';
+import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
+import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 
 describe('GenerateQuestionUseCase', () => {
   let fixtures: Fixtures;
@@ -203,26 +206,11 @@ class Fixtures {
   public readonly openaiRepository: jest.Mocked<OpenaiRepository>;
   public readonly questionRepository: jest.Mocked<QuestionsRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly useCase: GenerateQuestionUseCase;
 
   constructor() {
-    this.courseRepository = {
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-    };
+    this.courseRepository = createMockCourseRepository();
     this.pdfExtractor = {
       extractTextFromPdf: jest.fn(),
       extractQuestionsToPdf: jest.fn(),
@@ -255,12 +243,15 @@ class Fixtures {
       getTeacherByConditions: jest.fn(),
     };
 
+    this.courseFileRepository = createMockCourseFileRepository();
+
     this.useCase = new GenerateQuestionUseCase(
       this.courseRepository,
       this.pdfExtractor,
       this.openaiRepository,
       this.questionRepository,
       this.teacherRepository,
+      this.courseFileRepository,
     );
   }
 
@@ -298,14 +289,14 @@ class Fixtures {
   }
 
   whenNoFiles() {
-    this.courseRepository.getCourseFilesByCourseId.mockResolvedValue([]);
+    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue([]);
   }
 
   whenFilesAvailable() {
-    this.courseRepository.getCourseFilesByCourseId.mockResolvedValue([
+    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue([
       this.courseFile,
     ]);
-    this.courseRepository.getFileBufferFromStorage.mockResolvedValue(
+    this.courseFileRepository.getFileBufferFromStorage.mockResolvedValue(
       Buffer.from('pdf-data'),
     );
   }

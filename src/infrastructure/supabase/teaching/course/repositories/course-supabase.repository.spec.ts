@@ -1,6 +1,7 @@
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import { CourseSupabaseRepository } from './course-supabase.repository';
 import { CreateCourseBody } from 'src/domain/teaching/types/course.type';
+import { CourseFileRepository } from 'src/infrastructure/supabase/teaching/course-file/repositories/course-file.repository';
+import { CourseSupabaseRepository } from 'src/infrastructure/supabase/teaching/course/repositories/course-supabase.repository';
 
 describe('CourseSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -524,6 +525,7 @@ class Fixtures {
   });
 
   public readonly repository: CourseSupabaseRepository;
+  public readonly courseFileRepository: CourseFileRepository;
 
   constructor() {
     const supabaseMock = {
@@ -531,6 +533,7 @@ class Fixtures {
       storage: { from: this.storageFromMock },
     };
     this.repository = new CourseSupabaseRepository(supabaseMock as any);
+    this.courseFileRepository = new CourseFileRepository(supabaseMock as any);
   }
 
   whenGetCoursesBySessionId() {
@@ -542,7 +545,9 @@ class Fixtures {
   }
 
   whenDeleteCoursesFilesByCourseIds() {
-    return this.repository.deleteCoursesFilesByCourseIds(this.courseIds);
+    return this.courseFileRepository.deleteCoursesFilesByCourseIds(
+      this.courseIds,
+    );
   }
 
   whenGetSessionCoursesCount() {
@@ -554,14 +559,14 @@ class Fixtures {
   }
 
   whenStoreCourseFile() {
-    return this.repository.storeCourseFile(
+    return this.courseFileRepository.storeCourseFile(
       this.fileUpload as any,
       this.storagePath,
     );
   }
 
   whenInsertCourseFile() {
-    return this.repository.insertCourseFile(
+    return this.courseFileRepository.insertCourseFile(
       this.courseId,
       this.fileUpload as any,
       this.storagePath,
@@ -581,7 +586,7 @@ class Fixtures {
   }
 
   whenGetCourseFilesByCourseId() {
-    return this.repository.getCourseFilesByCourseId(this.courseId);
+    return this.courseFileRepository.getCourseFilesByCourseId(this.courseId);
   }
 
   whenGetCourseByIdSucceeds() {
@@ -1060,7 +1065,7 @@ class Fixtures {
   public readonly filePath = 'course-1/doc.pdf';
 
   whenGetFileBufferFromStorage() {
-    return this.repository.getFileBufferFromStorage(this.filePath);
+    return this.courseFileRepository.getFileBufferFromStorage(this.filePath);
   }
 
   whenGetFileBufferSucceeds() {

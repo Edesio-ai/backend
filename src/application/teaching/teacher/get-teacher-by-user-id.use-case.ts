@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interface/teacher.repository';
+} from 'src/domain/teaching/interfaces/teacher.repository';
 import { Teacher } from 'src/domain/teaching/types/teacher.type';
 
 export class GetTeacherByUserIdUseCase {

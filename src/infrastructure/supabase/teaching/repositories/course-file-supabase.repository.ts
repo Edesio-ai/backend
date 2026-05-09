@@ -1,10 +1,10 @@
 import { Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from '../../supabase.module';
-import { FileRepository } from 'src/domain/teaching/interface/file.repository';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { CourseFile } from 'src/domain/teaching/types/course.type';
-import { FileMapper } from '../mappers/file.mapper';
+import { courseFileMapper } from '../mappers/course-file.mapper';
+import { FileRepository } from 'src/domain/teaching/interfaces/file.repository';
 
 export class FileSupabaseRepository implements FileRepository {
   constructor(
@@ -39,7 +39,7 @@ export class FileSupabaseRepository implements FileRepository {
       throw new ServerError(error.message);
     }
 
-    return FileMapper.toDomain(data);
+    return courseFileMapper.toDomain(data);
   }
 
   public async getCourseFilesByCourseId(
@@ -58,7 +58,7 @@ export class FileSupabaseRepository implements FileRepository {
       throw new ServerError(error.message);
     }
 
-    return data.map(FileMapper.toDomain);
+    return data.map(courseFileMapper.toDomain);
   }
 
   private async deleteFileFromStorage(fileUrl: string): Promise<void> {

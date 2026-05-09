@@ -3,7 +3,7 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+} from 'src/domain/teaching/interfaces/course.repository';
 import { CourseFile } from 'src/domain/teaching/types/course.type';
 import {
   GeneratedQuestion,
@@ -21,16 +21,20 @@ import {
 import {
   QUESTIONS_REPOSITORY,
   type QuestionsRepository,
-} from 'src/domain/teaching/interface/questions.repository';
+} from 'src/domain/teaching/interfaces/questions.repository';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interface/teacher.repository';
+} from 'src/domain/teaching/interfaces/teacher.repository';
 import {
   ForbiddenError,
   BadRequestError,
   NotFoundError,
 } from 'src/domain/shared/global/errors/global.errors';
+import {
+  COURSE_FILE_REPOSITORY,
+  type ICourseFileRepository,
+} from 'src/domain/teaching/interfaces/i-course-file.repository';
 
 export type GenerateQuestionBody = {
   courseId: string;
@@ -51,6 +55,8 @@ export class GenerateQuestionUseCase {
     private readonly questionRepository: QuestionsRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
+    @Inject(COURSE_FILE_REPOSITORY)
+    private readonly courseFileRepository: ICourseFileRepository,
   ) {}
 
   async execute(
@@ -75,7 +81,7 @@ export class GenerateQuestionUseCase {
 
     const language = courseWithSession.session.language || 'francais';
     const courseFiles =
-      await this.courseRepository.getCourseFilesByCourseId(courseId);
+      await this.courseFileRepository.getCourseFilesByCourseId(courseId);
 
     const contentText = courseWithSession.contentText || '';
     const combinedText = await this.getCombinedText(contentText, courseFiles);
@@ -124,9 +130,10 @@ export class GenerateQuestionUseCase {
     if (files && files.length > 0) {
       for (const file of files) {
         try {
-          const buffer = await this.courseRepository.getFileBufferFromStorage(
-            file.fileUrl,
-          );
+          const buffer =
+            await this.courseFileRepository.getFileBufferFromStorage(
+              file.fileUrl,
+            );
           const pdfText = await this.pdfExtractor.extractTextFromPdf(buffer);
           if (pdfText) {
             combinedText +=

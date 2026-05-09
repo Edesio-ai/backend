@@ -6,11 +6,11 @@ import { Inject } from '@nestjs/common';
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interface/teacher.repository';
+} from 'src/domain/teaching/interfaces/teacher.repository';
 import {
   ForbiddenError,
   NotFoundError,
@@ -18,12 +18,12 @@ import {
 import {
   SESSION_REPOSITORY,
   type SessionRepository,
-} from 'src/domain/teaching/interface/session.repository';
+} from 'src/domain/teaching/interfaces/session.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ESTABLISHMENT_REPOSITORY,
   type EstablishmentRepository,
-} from 'src/domain/teaching/interface/establishment.repository';
+} from 'src/domain/teaching/interfaces/establishment.repository';
 
 export class GetSessionStudentUseCase {
   constructor(

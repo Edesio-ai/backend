@@ -44,9 +44,6 @@ export const CourseMapper = {
     return row;
   },
 
-  fileUrlsToDomain: (files: { file_url: string }[]): { fileUrl: string }[] =>
-    files.map((f) => ({ fileUrl: f.file_url })),
-
   validatedQuestionsToDomain: (data: {
     validated_questions: boolean;
   }): { validatedQuestions: boolean } => ({

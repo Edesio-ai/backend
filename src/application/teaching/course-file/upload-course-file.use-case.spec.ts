@@ -1,6 +1,7 @@
-import { UploadCourseFileUseCase } from 'src/application/teaching/file/upload-course-file.use-case';
-import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
+import { UploadCourseFileUseCase } from 'src/application/teaching/course-file/upload-course-file.use-case';
+import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
 import { CourseFileUpload } from 'src/domain/teaching/types/course.type';
+import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 
 describe('UploadCourseFileUseCase', () => {
   let fixtures: Fixtures;
@@ -30,7 +31,7 @@ describe('UploadCourseFileUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.courseRepository.storeCourseFile).toHaveBeenCalledWith(
+    expect(fixtures.courseFileRepository.storeCourseFile).toHaveBeenCalledWith(
       fixtures.file,
       `${fixtures.courseId}/1700000000000.pdf`,
     );
@@ -42,7 +43,9 @@ describe('UploadCourseFileUseCase', () => {
     const promise = fixtures.whenExecute();
 
     await fixtures.thenThrowRepositoryError(promise);
-    expect(fixtures.courseRepository.insertCourseFile).not.toHaveBeenCalled();
+    expect(
+      fixtures.courseFileRepository.insertCourseFile,
+    ).not.toHaveBeenCalled();
   });
 
   it('should propagate error when insertCourseFile fails', async () => {
@@ -73,28 +76,12 @@ class Fixtures {
 
   public readonly repositoryError = new Error('storage failed');
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly useCase: UploadCourseFileUseCase;
 
   constructor() {
-    this.courseRepository = {
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-    };
-    this.useCase = new UploadCourseFileUseCase(this.courseRepository);
+    this.courseFileRepository = createMockCourseFileRepository();
+    this.useCase = new UploadCourseFileUseCase(this.courseFileRepository);
   }
 
   whenExecute() {
@@ -102,42 +89,42 @@ class Fixtures {
   }
 
   whenUploadAndInsertSucceed() {
-    this.courseRepository.storeCourseFile.mockResolvedValue();
-    this.courseRepository.insertCourseFile.mockResolvedValue(
+    this.courseFileRepository.storeCourseFile.mockResolvedValue();
+    this.courseFileRepository.insertCourseFile.mockResolvedValue(
       this.insertedFile as any,
     );
   }
 
   whenStoreFails() {
-    this.courseRepository.storeCourseFile.mockRejectedValue(
+    this.courseFileRepository.storeCourseFile.mockRejectedValue(
       this.repositoryError,
     );
   }
 
   whenStoreSucceedsInsertFails() {
-    this.courseRepository.storeCourseFile.mockResolvedValue();
-    this.courseRepository.insertCourseFile.mockRejectedValue(
+    this.courseFileRepository.storeCourseFile.mockResolvedValue();
+    this.courseFileRepository.insertCourseFile.mockRejectedValue(
       this.repositoryError,
     );
   }
 
   thenStoreCourseFileCalledWithExpectedPath() {
     const expectedPath = `${this.courseId}/1700000000000.pdf`;
-    expect(this.courseRepository.storeCourseFile).toHaveBeenCalledWith(
+    expect(this.courseFileRepository.storeCourseFile).toHaveBeenCalledWith(
       this.file,
       expectedPath,
     );
-    expect(this.courseRepository.storeCourseFile).toHaveBeenCalledTimes(1);
+    expect(this.courseFileRepository.storeCourseFile).toHaveBeenCalledTimes(1);
   }
 
   thenInsertCourseFileCalledWithSamePath() {
     const expectedPath = `${this.courseId}/1700000000000.pdf`;
-    expect(this.courseRepository.insertCourseFile).toHaveBeenCalledWith(
+    expect(this.courseFileRepository.insertCourseFile).toHaveBeenCalledWith(
       this.courseId,
       this.file,
       expectedPath,
     );
-    expect(this.courseRepository.insertCourseFile).toHaveBeenCalledTimes(1);
+    expect(this.courseFileRepository.insertCourseFile).toHaveBeenCalledTimes(1);
   }
 
   thenReturnInsertedFile(result: unknown) {

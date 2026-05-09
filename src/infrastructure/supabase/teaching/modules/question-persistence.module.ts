@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { QUESTIONS_REPOSITORY } from '../../../../domain/teaching/interface/questions.repository';
+import { QUESTIONS_REPOSITORY } from 'src/domain/teaching/interfaces/questions.repository';
 import { QuestionSupabaseRepository } from '../repositories/question-supabase.repository';
 import { SupabaseModule } from '../../supabase.module';
 

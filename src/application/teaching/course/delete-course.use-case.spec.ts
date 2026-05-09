@@ -4,11 +4,16 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from 'src/domain/shared/global/errors/global.errors';
-import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
-import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
-import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
+import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
+import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
+import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
+import { createMockCourseRepository } from 'src/testing/mock-course-repository';
+import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('DeleteCourseUseCase', () => {
   let fixtures: Fixtures;
@@ -59,7 +64,7 @@ describe('DeleteCourseUseCase', () => {
       fixtures.questionsRepository.deleteCourseQuizQuestions,
     ).toHaveBeenCalledWith(fixtures.courseId);
     expect(
-      fixtures.courseRepository.deleteCoursesFilesByCourseIds,
+      fixtures.courseFileRepository.deleteCoursesFilesByCourseIds,
     ).toHaveBeenCalledWith([fixtures.courseId]);
     expect(
       fixtures.studentRepository.deleteStudentCourseStatsByCourseId,
@@ -83,7 +88,7 @@ describe('DeleteCourseUseCase', () => {
       callOrder.push('deleteCourseQuizQuestions');
     });
     (
-      fixtures.courseRepository.deleteCoursesFilesByCourseIds as jest.Mock
+      fixtures.courseFileRepository.deleteCoursesFilesByCourseIds as jest.Mock
     ).mockImplementation(async () => {
       callOrder.push('deleteCoursesFilesByCourseIds');
     });
@@ -139,57 +144,26 @@ class Fixtures {
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
   public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly useCase: DeleteCourseUseCase;
 
   constructor() {
-    this.courseRepository = {
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-    };
+    this.courseRepository = createMockCourseRepository();
 
-    this.teacherRepository = {
-      linkTeacherToEstablishment: jest.fn(),
-      getTeacherByEstablishmentId: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-      getTeacherByUserId: jest.fn(),
-      createTeacher: jest.fn(),
-      getTeacherByConditions: jest.fn(),
-    };
+    this.teacherRepository = createMockTeacherRepository();
 
-    this.questionsRepository = {
-      getQuestionById: jest.fn(),
-      deleteQuestionById: jest.fn(),
-      insertQuestions: jest.fn(),
-      insertQuestion: jest.fn(),
-      deleteQuestionsByCourseIds: jest.fn(),
-      getPendingQuestionCount: jest.fn(),
-      getCourseQuestions: jest.fn(),
-      deleteCourseQuizQuestions: jest.fn(),
-      updateQuestionById: jest.fn(),
-      deleteCourseQuestionsByCourseId: jest.fn(),
-      getAnsweredQuestionCount: jest.fn(),
-    };
+    this.questionsRepository = createMockQuestionsRepository();
 
     this.studentRepository = createMockStudentRepository();
+
+    this.courseFileRepository = createMockCourseFileRepository();
 
     this.useCase = new DeleteCourseUseCase(
       this.courseRepository,
       this.teacherRepository,
       this.questionsRepository,
       this.studentRepository,
+      this.courseFileRepository,
     );
   }
 
@@ -231,7 +205,7 @@ class Fixtures {
     this.questionsRepository.deleteCourseQuizQuestions.mockResolvedValue(
       undefined,
     );
-    this.courseRepository.deleteCoursesFilesByCourseIds.mockResolvedValue(
+    this.courseFileRepository.deleteCoursesFilesByCourseIds.mockResolvedValue(
       undefined,
     );
     this.studentRepository.deleteStudentCourseStatsByCourseId.mockResolvedValue(

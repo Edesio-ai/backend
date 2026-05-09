@@ -4,11 +4,13 @@ import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/global/errors/global.errors';
-import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
-import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
+import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
 import { Course } from 'src/domain/teaching/types/course.type';
+import { createMockCourseRepository } from 'src/testing/mock-course-repository';
+import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('GetStudentCourseQuestionsUseCase', () => {
@@ -144,38 +146,9 @@ class Fixtures {
   public readonly useCase: GetStudentCourseQuestionsUseCase;
 
   constructor() {
-    this.questionsRepository = {
-      getQuestionById: jest.fn(),
-      deleteQuestionById: jest.fn(),
-      deleteQuestionsByCourseIds: jest.fn(),
-      getPendingQuestionCount: jest.fn(),
-      getCourseQuestions: jest.fn(),
-      insertQuestions: jest.fn(),
-      insertQuestion: jest.fn(),
-      deleteCourseQuizQuestions: jest.fn(),
-      updateQuestionById: jest.fn(),
-      deleteCourseQuestionsByCourseId: jest.fn(),
-      getAnsweredQuestionCount: jest.fn(),
-      getStudentCourseQuestions: jest.fn(),
-    };
+    this.questionsRepository = createMockQuestionsRepository();
     this.studentRepository = createMockStudentRepository();
-    this.courseRepository = {
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-    };
+    this.courseRepository = createMockCourseRepository();
 
     this.useCase = new GetStudentCourseQuestionsUseCase(
       this.questionsRepository,

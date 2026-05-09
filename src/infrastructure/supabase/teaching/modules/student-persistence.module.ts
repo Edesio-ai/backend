@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { StudentSupabaseRepository } from '../repositories/student-supabase.repository';
-import { STUDENT_REPOSITORY } from 'src/domain/teaching/interface/student.repository';
+import { STUDENT_REPOSITORY } from 'src/domain/teaching/interfaces/student.repository';
 import { SupabaseModule } from '../../supabase.module';
 
 @Module({

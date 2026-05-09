@@ -4,16 +4,12 @@ import { ExportQuestionsUseCase } from 'src/application/export/export-questions.
 import { PdfModule } from 'src/infrastructure/pdf/pdf.module';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { ExportCourseFileUseCase } from 'src/application/export/export-course-file.use-case';
-import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/course-persistence.module';
+import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/course/course-persistence.module';
 import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/file-persistence.module';
+import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
 
 @Module({
-  imports: [
-    PdfModule,
-    AuthPersistenceModule,
-    CoursePersistenceModule,
-    FilePersistenceModule,
-  ],
+  imports: [PdfModule, FilePersistenceModule, CourseFilePersistenceModule],
   controllers: [ExportController],
   providers: [ExportQuestionsUseCase, ExportCourseFileUseCase],
 })

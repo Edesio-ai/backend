@@ -4,7 +4,7 @@ import { TokenUserNotFoundError } from '../../domain/auth/errors/auth.errors';
 import {
   SUBSCRIPTION_REPOSITORY,
   type SubscriptionRepository,
-} from '../../domain/teaching/interface/subscription.repository';
+} from 'src/domain/teaching/interfaces/subscription.repository';
 import {
   STRIPE_CLIENT_INTERFACE,
   type StripeClientInterface,

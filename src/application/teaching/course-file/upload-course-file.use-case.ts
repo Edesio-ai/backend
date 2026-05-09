@@ -4,21 +4,25 @@ import {
   CourseFile,
 } from 'src/domain/teaching/types/course.type';
 import {
-  COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+  COURSE_FILE_REPOSITORY,
+  type ICourseFileRepository,
+} from 'src/domain/teaching/interfaces/i-course-file.repository';
 
 export class UploadCourseFileUseCase {
   constructor(
-    @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    @Inject(COURSE_FILE_REPOSITORY)
+    private readonly courseFileRepository: ICourseFileRepository,
   ) {}
 
   async execute(courseId: string, file: CourseFileUpload): Promise<CourseFile> {
     const ext = file.originalFileName.split('.').pop() ?? 'bin';
     const storagePath = `${courseId}/${Date.now()}.${ext}`;
-    await this.courseRepository.storeCourseFile(file, storagePath);
+    await this.courseFileRepository.storeCourseFile(file, storagePath);
 
-    return this.courseRepository.insertCourseFile(courseId, file, storagePath);
+    return this.courseFileRepository.insertCourseFile(
+      courseId,
+      file,
+      storagePath,
+    );
   }
 }

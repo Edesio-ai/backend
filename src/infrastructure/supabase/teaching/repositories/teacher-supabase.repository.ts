@@ -1,6 +1,5 @@
 import { Inject } from '@nestjs/common';
 import { SUPABASE_ADMIN } from '../../supabase.module';
-import { TeacherRepository } from '../../../../domain/teaching/interface/teacher.repository';
 import {
   Teacher,
   TeacherSession,
@@ -8,6 +7,7 @@ import {
 import { TeacherMapper } from '../mappers/teacher.mapper';
 import { mapList } from '../../common/mapper.util';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 
 export class TeacherSupabaseRepository implements TeacherRepository {
   constructor(

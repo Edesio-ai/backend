@@ -3,7 +3,7 @@ import { Session } from 'src/domain/teaching/types/session.type';
 import {
   SESSION_REPOSITORY,
   type SessionRepository,
-} from 'src/domain/teaching/interface/session.repository';
+} from 'src/domain/teaching/interfaces/session.repository';
 
 export class GetSessionByCodeUseCase {
   constructor(

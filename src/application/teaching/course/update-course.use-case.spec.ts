@@ -7,8 +7,10 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from 'src/domain/shared/global/errors/global.errors';
-import { CourseRepository } from 'src/domain/teaching/interface/course.repository';
-import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
+import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
+import { createMockCourseRepository } from 'src/testing/mock-course-repository';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('UpdateCourseUseCase', () => {
   let fixtures: Fixtures;
@@ -138,31 +140,8 @@ class Fixtures {
   public readonly useCase: UpdateCourseUseCase;
 
   constructor() {
-    this.courseRepository = {
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-    };
-    this.teacherRepository = {
-      linkTeacherToEstablishment: jest.fn(),
-      getTeacherByEstablishmentId: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-      getTeacherByUserId: jest.fn(),
-      createTeacher: jest.fn(),
-      getTeacherByConditions: jest.fn(),
-    };
+    this.courseRepository = createMockCourseRepository();
+    this.teacherRepository = createMockTeacherRepository();
     this.useCase = new UpdateCourseUseCase(
       this.courseRepository,
       this.teacherRepository,

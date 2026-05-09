@@ -7,7 +7,7 @@ import {
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
 
 export class DeleteStudentSessionUseCase {
   constructor(

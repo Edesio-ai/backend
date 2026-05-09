@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+} from 'src/domain/teaching/interfaces/course.repository';
 
 export class GetCourseValidatedQuestionsUseCase {
   constructor(

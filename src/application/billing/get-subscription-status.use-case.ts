@@ -7,11 +7,11 @@ import {
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interface/teacher.repository';
+} from 'src/domain/teaching/interfaces/teacher.repository';
 import {
   ESTABLISHMENT_REPOSITORY,
   type EstablishmentRepository,
-} from '../../domain/teaching/interface/establishment.repository';
+} from 'src/domain/teaching/interfaces/establishment.repository';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 
 @Injectable()

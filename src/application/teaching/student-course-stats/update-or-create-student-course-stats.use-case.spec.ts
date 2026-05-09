@@ -1,11 +1,12 @@
 import { NotFoundException } from '@nestjs/common';
 import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/teaching/student-course-stats/update-or-create-student-course-stats.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import type { CourseRepository } from 'src/domain/teaching/interface/course.repository';
-import type { StudentRepository } from 'src/domain/teaching/interface/student.repository';
+import type { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import type { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import { Course } from 'src/domain/teaching/types/course.type';
 import { Student } from 'src/domain/teaching/types/student.type';
 import type { UpdateOrCreateStudentCourseStatsBodyDto } from 'src/presentation/teaching/student-course-stats/dtos/update-or-create-student-course-stats.dto';
+import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('UpdateOrCreateStudentCourseStatsUseCase', () => {
@@ -113,23 +114,7 @@ class Fixtures {
 
   constructor() {
     this.studentRepository = createMockStudentRepository();
-    this.courseRepository = {
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-    };
+    this.courseRepository = createMockCourseRepository();
     this.useCase = new UpdateOrCreateStudentCourseStatsUseCase(
       this.studentRepository,
       this.courseRepository,

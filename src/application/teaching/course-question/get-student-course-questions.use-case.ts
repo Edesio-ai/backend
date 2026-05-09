@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import {
   QUESTIONS_REPOSITORY,
   type QuestionsRepository,
-} from 'src/domain/teaching/interface/questions.repository';
+} from 'src/domain/teaching/interfaces/questions.repository';
 import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
@@ -12,11 +12,11 @@ import {
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
-} from 'src/domain/teaching/interface/student.repository';
+} from 'src/domain/teaching/interfaces/student.repository';
 import {
   COURSE_REPOSITORY,
   type CourseRepository,
-} from 'src/domain/teaching/interface/course.repository';
+} from 'src/domain/teaching/interfaces/course.repository';
 
 export class GetStudentCourseQuestionsUseCase {
   constructor(

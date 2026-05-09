@@ -1,6 +1,6 @@
 import { GetAnsweredQuestionCountUseCase } from 'src/application/teaching/course-question/get-answered-question-count.use-case';
-import { QuestionsRepository } from 'src/domain/teaching/interface/questions.repository';
-import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
+import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Student } from 'src/domain/teaching/types/student.type';

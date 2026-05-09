@@ -60,21 +60,6 @@ describe('CourseMapper', () => {
     });
   });
 
-  describe('fileUrlsToDomain', () => {
-    it('maps file_url to fileUrl', () => {
-      expect(
-        CourseMapper.fileUrlsToDomain([
-          { file_url: 'a.pdf' },
-          { file_url: 'b.pdf' },
-        ]),
-      ).toEqual([{ fileUrl: 'a.pdf' }, { fileUrl: 'b.pdf' }]);
-    });
-
-    it('returns empty array for empty input', () => {
-      expect(CourseMapper.fileUrlsToDomain([])).toEqual([]);
-    });
-  });
-
   describe('validatedQuestionsToDomain', () => {
     it('maps validated_questions column to domain shape', () => {
       expect(

@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import {
   ESTABLISHMENT_REPOSITORY,
   type EstablishmentRepository,
-} from 'src/domain/teaching/interface/establishment.repository';
+} from 'src/domain/teaching/interfaces/establishment.repository';
 import {
   CreateEstablishmentBody,
   Establishment,

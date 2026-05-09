@@ -1,7 +1,7 @@
 import { QuestionController } from './question.controller';
 import { Module } from '@nestjs/common';
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
-import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/course-persistence.module';
+import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/course/course-persistence.module';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { GetCourseQuestionsUseCase } from 'src/application/teaching/question/get-course-questions.use-case';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';

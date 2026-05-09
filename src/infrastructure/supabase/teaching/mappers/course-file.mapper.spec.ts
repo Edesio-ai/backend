@@ -1,7 +1,7 @@
-import { FileMapper } from './file.mapper';
+import { courseFileMapper } from './course-file.mapper';
 import { SupabaseCourseFile } from 'src/domain/teaching/types/course.type';
 
-describe('FileMapper', () => {
+describe('courseFileMapper', () => {
   describe('toDomain', () => {
     it('maps all fields from a Supabase row to a domain CourseFile', () => {
       const row: SupabaseCourseFile = {
@@ -12,7 +12,7 @@ describe('FileMapper', () => {
         created_at: '2026-01-01T00:00:00.000Z',
       };
 
-      expect(FileMapper.toDomain(row)).toEqual({
+      expect(courseFileMapper.toDomain(row)).toEqual({
         id: 'f-1',
         courseId: 'c-1',
         fileUrl: 'c-1/doc.pdf',
@@ -30,7 +30,7 @@ describe('FileMapper', () => {
         created_at: '',
       };
 
-      expect(FileMapper.toDomain(row)).toEqual({
+      expect(courseFileMapper.toDomain(row)).toEqual({
         id: 'f-2',
         courseId: 'c-2',
         fileUrl: '',
