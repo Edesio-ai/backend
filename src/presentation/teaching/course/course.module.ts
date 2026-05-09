@@ -12,7 +12,6 @@ import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/
 import { UpdateCourseUseCase } from 'src/application/teaching/course/update-course.use-case';
 import { ValidateCourseQuestionsUseCase } from 'src/application/teaching/course/validate-course-questions.use-case';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
-import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/file-persistence.module';
 import { GetCoursesSessionCountUseCase } from 'src/application/teaching/course/get-courses-session-count.use-case';
 import { GetSessionCoursesUseCase } from 'src/application/teaching/course/get-session-courses.use-case';
 import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
@@ -26,7 +25,6 @@ import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teachin
     StudentPersistenceModule,
     QuestionPersistenceModule,
     EstablishmentPersistenceModule,
-    FilePersistenceModule,
     CourseFilePersistenceModule,
   ],
   controllers: [CourseController],

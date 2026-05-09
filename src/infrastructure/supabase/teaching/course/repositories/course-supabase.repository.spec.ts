@@ -1,6 +1,6 @@
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { CreateCourseBody } from 'src/domain/teaching/types/course.type';
-import { CourseFileRepository } from 'src/infrastructure/supabase/teaching/course-file/repositories/course-file.repository';
+import { CourseFileRepository } from 'src/infrastructure/supabase/teaching/course-file/repositories/course-file-supabase.repository';
 import { CourseSupabaseRepository } from 'src/infrastructure/supabase/teaching/course/repositories/course-supabase.repository';
 
 describe('CourseSupabaseRepository', () => {

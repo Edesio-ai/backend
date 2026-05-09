@@ -1,4 +1,4 @@
-import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/file-persistence.module';
+
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { Module } from '@nestjs/common';
 import { CourseFileController } from './course-file.controller';
@@ -10,7 +10,6 @@ import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teachin
 
 @Module({
   imports: [
-    FilePersistenceModule,
     AuthPersistenceModule,
     CoursePersistenceModule,
     CourseFilePersistenceModule,

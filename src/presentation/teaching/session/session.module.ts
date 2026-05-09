@@ -13,7 +13,6 @@ import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/m
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
 import { GetSessionDetailsUseCase } from 'src/application/teaching/session/get-session-details.use-case';
-import { FilePersistenceModule } from 'src/infrastructure/supabase/teaching/modules/file-persistence.module';
 import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
 
 @Module({
@@ -25,7 +24,6 @@ import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teachin
     QuestionPersistenceModule,
     StudentPersistenceModule,
     EstablishmentPersistenceModule,
-    FilePersistenceModule,
     CourseFilePersistenceModule,
   ],
   controllers: [SessionController],

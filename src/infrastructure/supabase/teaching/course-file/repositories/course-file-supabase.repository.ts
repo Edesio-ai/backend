@@ -13,6 +13,49 @@ export class CourseFileRepository implements ICourseFileRepository {
     this.supabase = supabase;
   }
 
+  public async deleteFileById(fileId: string): Promise<void> {
+    const file = await this.getCourseFileById(fileId);
+    await this.deleteFileFromStorage(file.fileUrl);
+
+    const { error } = await this.supabase
+      .from('course_files')
+      .delete()
+      .eq('id', fileId);
+
+    if (error) {
+      console.error(`Error deleting file from database: ${fileId}`, error);
+      throw new ServerError(error.message);
+    }
+  }
+
+  public async getCourseFileById(fileId: string): Promise<CourseFile> {
+    const { data, error } = await this.supabase
+      .from('course_files')
+      .select('*')
+      .eq('id', fileId)
+      .single();
+
+    if (error) {
+      console.error(`Error getting course file by id: ${fileId}`, error);
+      throw new ServerError(error.message);
+    }
+
+    return courseFileMapper.toDomain(data);
+  }
+
+  
+
+  private async deleteFileFromStorage(fileUrl: string): Promise<void> {
+    const { error } = await this.supabase.storage
+      .from('courses-pdf')
+      .remove([fileUrl]);
+
+    if (error) {
+      console.error(`Error deleting file from storage: ${fileUrl}`, error);
+      throw new ServerError(error.message);
+    }
+  }
+
   public async getFileBufferFromStorage(filePath: string): Promise<Buffer> {
     const { data: fileData, error } = await this.supabase.storage
       .from('courses-pdf')

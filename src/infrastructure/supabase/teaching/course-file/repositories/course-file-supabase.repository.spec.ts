@@ -1,4 +1,4 @@
-import { FileSupabaseRepository } from './course-file-supabase.repository';
+import { CourseFileRepository } from './course-file-supabase.repository';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 describe('FileSupabaseRepository', () => {
@@ -135,14 +135,14 @@ class Fixtures {
     remove: this.removeMock,
   }));
 
-  public readonly repository: FileSupabaseRepository;
+  public readonly repository: CourseFileRepository;
 
   constructor() {
     const supabaseMock = {
       from: this.fromMock,
       storage: { from: this.storageFromMock },
     };
-    this.repository = new FileSupabaseRepository(supabaseMock as any);
+    this.repository = new CourseFileRepository(supabaseMock as any);
   }
 
   whenDeleteFileById() {

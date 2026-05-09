@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  FILE_REPOSITORY,
-  type FileRepository,
-} from 'src/domain/teaching/interfaces/file.repository';
+  COURSE_FILE_REPOSITORY,
+  type ICourseFileRepository,
+} from 'src/domain/teaching/interfaces/i-course-file.repository';
 
 @Injectable()
 export class DeleteCourseFileUseCase {
   constructor(
-    @Inject(FILE_REPOSITORY)
-    private readonly fileRepository: FileRepository,
+    @Inject(COURSE_FILE_REPOSITORY)
+    private readonly courseFileRepository: ICourseFileRepository,
   ) {}
 
   async execute(fileId: string): Promise<void> {
-    await this.fileRepository.deleteFileById(fileId);
+    await this.courseFileRepository.deleteFileById(fileId);
   }
 }

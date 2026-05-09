@@ -1,9 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { ExportCourseFileUseCase } from './export-course-file.use-case';
-import { FileRepository } from 'src/domain/teaching/interfaces/file.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
-import { createMockFileRepository } from 'src/testing/mock-file-repository';
 
 describe('ExportCourseFileUseCase', () => {
   let fixtures: Fixtures;
@@ -38,9 +36,9 @@ describe('ExportCourseFileUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(fixtures.fileRepository.getCourseFileById).toHaveBeenCalledWith(
-      fixtures.fileId,
-    );
+    expect(
+      fixtures.courseFileRepository.getCourseFileById,
+    ).toHaveBeenCalledWith(fixtures.fileId);
     expect(
       fixtures.courseFileRepository.getFileBufferFromStorage,
     ).toHaveBeenCalledWith(fixtures.courseFile.fileUrl);
@@ -78,17 +76,12 @@ class Fixtures {
   public readonly buffer = Buffer.from('pdf content');
   public readonly repositoryError = new Error('repository error');
 
-  public readonly fileRepository: jest.Mocked<FileRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly useCase: ExportCourseFileUseCase;
 
   constructor() {
-    this.fileRepository = createMockFileRepository();
     this.courseFileRepository = createMockCourseFileRepository();
-    this.useCase = new ExportCourseFileUseCase(
-      this.fileRepository,
-      this.courseFileRepository,
-    );
+    this.useCase = new ExportCourseFileUseCase(this.courseFileRepository);
   }
 
   whenExecute() {
@@ -96,15 +89,17 @@ class Fixtures {
   }
 
   whenGetCourseFileByIdSucceeds() {
-    this.fileRepository.getCourseFileById.mockResolvedValue(this.courseFile);
+    this.courseFileRepository.getCourseFileById.mockResolvedValue(
+      this.courseFile,
+    );
   }
 
   whenGetCourseFileByIdReturnsNull() {
-    this.fileRepository.getCourseFileById.mockResolvedValue(null as any);
+    this.courseFileRepository.getCourseFileById.mockResolvedValue(null as any);
   }
 
   whenGetCourseFileByIdFails() {
-    this.fileRepository.getCourseFileById.mockRejectedValue(
+    this.courseFileRepository.getCourseFileById.mockRejectedValue(
       this.repositoryError,
     );
   }
