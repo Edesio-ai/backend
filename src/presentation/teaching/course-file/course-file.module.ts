@@ -1,4 +1,3 @@
-
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { Module } from '@nestjs/common';
 import { CourseFileController } from './course-file.controller';

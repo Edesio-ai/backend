@@ -74,7 +74,8 @@ export class GetSessionDetailsUseCase {
       await this.questionsRepository.getCourseQuestions(courseId);
     const students =
       await this.studentsRepository.getStudentStatsByCourseId(courseId);
-    const files = await this.courseFileRepository.getCourseFilesByCourseId(courseId);
+    const files =
+      await this.courseFileRepository.getCourseFilesByCourseId(courseId);
 
     return {
       course: {

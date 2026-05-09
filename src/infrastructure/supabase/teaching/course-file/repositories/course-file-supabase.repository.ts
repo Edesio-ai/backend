@@ -43,8 +43,6 @@ export class CourseFileRepository implements ICourseFileRepository {
     return courseFileMapper.toDomain(data);
   }
 
-  
-
   private async deleteFileFromStorage(fileUrl: string): Promise<void> {
     const { error } = await this.supabase.storage
       .from('courses-pdf')
