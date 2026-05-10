@@ -1,12 +1,13 @@
+import { ValidateTeacherInvitationUseCase } from 'src/application/teaching/invitation-token/validate-teacher-invitation.use-case';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import { TokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
-import { ValidateTeacherInvitationUseCase } from 'src/application/teaching/invitation-token/validate-teacher-invitation.use-case';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('ValidateTeacherInvitationUseCase', () => {
   let fixtures: Fixtures;
@@ -108,22 +109,19 @@ class Fixtures {
   };
 
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
-  public readonly tokenRepository: jest.Mocked<TokenRepository>;
+  public readonly tokenRepository: jest.Mocked<IInvitationTokenRepository>;
   public readonly useCase: ValidateTeacherInvitationUseCase;
 
   constructor() {
-    this.teacherRepository = {
-      linkTeacherToEstablishment: jest.fn(),
-      getTeacherByEstablishmentId: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-      getTeacherByUserId: jest.fn(),
-      createTeacher: jest.fn(),
-      getTeacherByConditions: jest.fn(),
-    };
+    this.teacherRepository = createMockTeacherRepository();
     this.tokenRepository = {
       deleteInvitationToken: jest.fn(),
       getInvitationByToken: jest.fn(),
       markInvitationTokenAsUsed: jest.fn(),
+      getInvitationTokenByEstablishmentId: jest.fn(),
+      createInvitationToken: jest.fn(),
+      getInvitationPreview: jest.fn(),
+      updateTokenUsedAt: jest.fn(),
     };
     this.useCase = new ValidateTeacherInvitationUseCase(
       this.teacherRepository,

@@ -1,16 +1,17 @@
 import { GetSessionStudentUseCase } from './get-session-student.use-case';
-import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
-import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
-import { SessionStudent } from 'src/domain/teaching/types/student.type';
+import { SessionStudent } from 'src/domain/teaching/student/type/student.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GetSessionStudentUseCase', () => {
   let fixtures: Fixtures;
@@ -223,14 +224,7 @@ class Fixtures {
   constructor() {
     this.studentRepository = createMockStudentRepository();
     this.studentSessionRepository = createMockStudentSessionRepository();
-    this.teacherRepository = {
-      linkTeacherToEstablishment: jest.fn(),
-      getTeacherByEstablishmentId: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-      getTeacherByUserId: jest.fn(),
-      createTeacher: jest.fn(),
-      getTeacherByConditions: jest.fn(),
-    };
+    this.teacherRepository = createMockTeacherRepository();
     this.sessionRepository = {
       getSessionsByTeacherId: jest.fn(),
       getSessionByCode: jest.fn(),
@@ -238,12 +232,12 @@ class Fixtures {
       updateSessionName: jest.fn(),
       deleteSessionByTeacherId: jest.fn(),
       getSessionById: jest.fn(),
+      getTeachersSessionsByIds: jest.fn(),
     };
     this.establishmentRepository = {
       getEstablishmentById: jest.fn(),
       getEstablishmentByUserId: jest.fn(),
       createEstablishment: jest.fn(),
-      getInvitationTokenByEstablishmentId: jest.fn(),
     };
     this.useCase = new GetSessionStudentUseCase(
       this.studentRepository,

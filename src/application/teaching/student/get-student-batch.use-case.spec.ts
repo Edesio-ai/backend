@@ -2,8 +2,8 @@ import {
   GetStudentBatchUseCase,
   GetStudentBatchBody,
 } from './get-student-batch.use-case';
-import { IStudentRepository } from 'src/domain/teaching/interface/student.repository';
-import { Student } from 'src/domain/teaching/types/student.type';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import { Student } from 'src/domain/teaching/student/type/student.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('GetStudentBatchUseCase', () => {

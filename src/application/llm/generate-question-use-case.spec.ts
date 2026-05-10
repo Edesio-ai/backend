@@ -8,22 +8,23 @@ import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
-import { IOpenAiProvider } from 'src/domain/shared/llm/openai/contracts/opena-ai.repository';
+import { IOpenAiProvider } from 'src/domain/llm/openai/contracts/open-ai.provider';
 import { IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 import {
   CourseFile,
   CourseWithSession,
-} from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/course/types/course.type';
 import {
   GeneratedQuestion,
   Question,
 } from 'src/domain/teaching/question/types/question.type';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GenerateQuestionUseCase', () => {
   let fixtures: Fixtures;
@@ -226,22 +227,11 @@ class Fixtures {
       insertQuestions: jest.fn(),
       insertQuestion: jest.fn(),
       deleteQuestionsByCourseIds: jest.fn(),
-      getPendingQuestionCount: jest.fn(),
       getCourseQuestions: jest.fn(),
       deleteCourseQuizQuestions: jest.fn(),
       updateQuestionById: jest.fn(),
-      deleteCourseQuestionsByCourseId: jest.fn(),
-      getAnsweredQuestionCount: jest.fn(),
-      getCourseQuestionsByCourseId: jest.fn(),
     };
-    this.teacherRepository = {
-      linkTeacherToEstablishment: jest.fn(),
-      getTeacherByEstablishmentId: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-      getTeacherByUserId: jest.fn(),
-      createTeacher: jest.fn(),
-      getTeacherByConditions: jest.fn(),
-    };
+    this.teacherRepository = createMockTeacherRepository();
 
     this.courseFileRepository = createMockCourseFileRepository();
 

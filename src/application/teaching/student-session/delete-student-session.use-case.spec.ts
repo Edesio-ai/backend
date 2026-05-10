@@ -1,6 +1,6 @@
 import { DeleteStudentSessionUseCase } from 'src/application/teaching/student-session/delete-student-session.use-case';
-import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import {
   ForbiddenError,
   NotFoundError,
@@ -9,7 +9,7 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   Student,
   StudentSession,
-} from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/student/type/student.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 

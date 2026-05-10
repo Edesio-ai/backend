@@ -1,23 +1,23 @@
 import { GetSessionCoursesUseCase } from 'src/application/teaching/course/get-session-courses.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { Establishment } from 'src/domain/teaching/types/establishment.type';
+import { Establishment } from 'src/domain/teaching/establishment/types/establishment.type';
 import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
-import { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
-import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
-import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
+import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
+import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
-import { Course } from 'src/domain/teaching/types/course.type';
+import { Course } from 'src/domain/teaching/course/types/course.type';
 
 describe('GetSessionCoursesUseCase', () => {
   let fixtures: Fixtures;

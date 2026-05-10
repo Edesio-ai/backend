@@ -1,4 +1,4 @@
-import { ISessionRepository } from 'src/domain/teaching/interface/session.repository';
+import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { UpdateSessionNameUseCase } from './update-session-name.use-case';
 
 describe('UpdateSessionNameUseCase', () => {
@@ -53,6 +53,7 @@ class Fixtures {
       updateSessionName: jest.fn(),
       deleteSessionByTeacherId: jest.fn(),
       getSessionById: jest.fn(),
+      getTeachersSessionsByIds: jest.fn(),
     };
     this.useCase = new UpdateSessionNameUseCase(this.sessionRepository);
   }

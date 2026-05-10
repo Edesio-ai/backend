@@ -192,8 +192,11 @@ class Fixtures {
   };
 
   public readonly updatePayload = {
+    studentId: this.studentId,
+    courseId: this.courseId,
     attemptedQuestions: 11,
     correctAnswers: 9,
+    lastAttemptAt: this.lastAttemptAt,
   };
 
   public readonly supabase: { from: jest.Mock };

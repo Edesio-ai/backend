@@ -1,5 +1,5 @@
 import { DeleteCourseFileUseCase } from './delete-course-file.use-case';
-import { FileRepository } from 'src/domain/teaching/interface/file.repository';
+import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 
 describe('DeleteCourseFileUseCase', () => {
   let fixtures: Fixtures;
@@ -13,10 +13,12 @@ describe('DeleteCourseFileUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.fileRepository.deleteFileById).toHaveBeenCalledWith(
+    expect(fixtures.courseFileRepository.deleteFileById).toHaveBeenCalledWith(
       fixtures.fileId,
     );
-    expect(fixtures.fileRepository.deleteFileById).toHaveBeenCalledTimes(1);
+    expect(fixtures.courseFileRepository.deleteFileById).toHaveBeenCalledTimes(
+      1,
+    );
   });
 
   it('should propagate errors thrown by deleteFileById', async () => {
@@ -30,16 +32,11 @@ class Fixtures {
   public readonly fileId = 'file-1';
   public readonly repositoryError = new Error('delete failed');
 
-  public readonly fileRepository: jest.Mocked<FileRepository>;
+  public readonly courseFileRepository = createMockCourseFileRepository();
   public readonly useCase: DeleteCourseFileUseCase;
 
   constructor() {
-    this.fileRepository = {
-      deleteFileById: jest.fn(),
-      getCourseFileById: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-    };
-    this.useCase = new DeleteCourseFileUseCase(this.fileRepository);
+    this.useCase = new DeleteCourseFileUseCase(this.courseFileRepository);
   }
 
   whenExecute() {
@@ -47,10 +44,12 @@ class Fixtures {
   }
 
   whenDeleteFileSucceeds() {
-    this.fileRepository.deleteFileById.mockResolvedValue(undefined);
+    this.courseFileRepository.deleteFileById.mockResolvedValue(undefined);
   }
 
   whenDeleteFileFails() {
-    this.fileRepository.deleteFileById.mockRejectedValue(this.repositoryError);
+    this.courseFileRepository.deleteFileById.mockRejectedValue(
+      this.repositoryError,
+    );
   }
 }

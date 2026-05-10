@@ -2,7 +2,7 @@ import {
   CreateInvitationTokenBody,
   CreateInvitationTokenUseCase,
 } from './create-invitation-token.use-case';
-import { IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
+import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 
 describe('CreateInvitationTokenUseCase', () => {
   let fixtures: Fixtures;
@@ -30,24 +30,25 @@ describe('CreateInvitationTokenUseCase', () => {
 });
 
 class Fixtures {
-  public readonly authRepository: jest.Mocked<IAuthRepository>;
+  public readonly invitationTokenRepository: jest.Mocked<IInvitationTokenRepository>;
   public readonly createInvitationTokenUseCase: CreateInvitationTokenUseCase;
 
   public readonly body: CreateInvitationTokenBody;
   public readonly repositoryError: Error;
 
   constructor() {
-    this.authRepository = {
-      getInvitationPreview: jest.fn(),
-      createUser: jest.fn(),
-      loginUser: jest.fn(),
-      validateToken: jest.fn(),
-      logoutUser: jest.fn(),
+    this.invitationTokenRepository = {
+      deleteInvitationToken: jest.fn(),
+      getInvitationByToken: jest.fn(),
+      markInvitationTokenAsUsed: jest.fn(),
+      getInvitationTokenByEstablishmentId: jest.fn(),
       createInvitationToken: jest.fn(),
+      getInvitationPreview: jest.fn(),
+      updateTokenUsedAt: jest.fn(),
     };
 
     this.createInvitationTokenUseCase = new CreateInvitationTokenUseCase(
-      this.authRepository,
+      this.invitationTokenRepository,
     );
 
     this.body = {
@@ -65,11 +66,13 @@ class Fixtures {
   }
 
   whenCreateInvitationTokenResolves() {
-    this.authRepository.createInvitationToken.mockResolvedValue(undefined);
+    this.invitationTokenRepository.createInvitationToken.mockResolvedValue(
+      undefined,
+    );
   }
 
   whenCreateInvitationTokenThrowsError() {
-    this.authRepository.createInvitationToken.mockRejectedValue(
+    this.invitationTokenRepository.createInvitationToken.mockRejectedValue(
       this.repositoryError,
     );
   }
@@ -79,9 +82,11 @@ class Fixtures {
   }
 
   thenCreateInvitationTokenCalledWithExpectedArguments() {
-    expect(this.authRepository.createInvitationToken).toHaveBeenCalledWith(
-      this.body,
-    );
-    expect(this.authRepository.createInvitationToken).toHaveBeenCalledTimes(1);
+    expect(
+      this.invitationTokenRepository.createInvitationToken,
+    ).toHaveBeenCalledWith(this.body);
+    expect(
+      this.invitationTokenRepository.createInvitationToken,
+    ).toHaveBeenCalledTimes(1);
   }
 }

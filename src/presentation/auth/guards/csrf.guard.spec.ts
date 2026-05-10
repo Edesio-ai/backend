@@ -105,7 +105,7 @@ class Fixtures {
       }),
       getHandler: () => TestHandler,
       getClass: () => TestTarget,
-    } as ExecutionContext;
+    } as unknown as ExecutionContext;
 
     return this.guard.canActivate(context);
   }

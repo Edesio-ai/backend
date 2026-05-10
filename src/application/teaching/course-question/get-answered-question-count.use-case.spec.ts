@@ -1,9 +1,9 @@
 import { GetAnsweredQuestionCountUseCase } from 'src/application/teaching/course-question/get-answered-question-count.use-case';
-import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import type { ICourseQuestionRepository } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { Student } from 'src/domain/teaching/types/student.type';
+import { Student } from 'src/domain/teaching/student/type/student.type';
 import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 

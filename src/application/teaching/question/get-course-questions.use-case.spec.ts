@@ -4,11 +4,11 @@ import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
@@ -17,7 +17,7 @@ import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository
 import {
   Course,
   CourseWithSession,
-} from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/course/types/course.type';
 import { Question } from 'src/domain/teaching/question/types/question.type';
 
 /** Même valeur que dans `GetCourseQuestionsUseCase.checkTeacherAccess` (PostgREST select). */

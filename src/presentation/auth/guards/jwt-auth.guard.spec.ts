@@ -57,7 +57,7 @@ describe('JwtAuthGuard', () => {
     await guard.canActivate(mockHttpContext(req));
 
     expect(authRepository.validateToken).toHaveBeenCalledWith('ok-token');
-    expect(req.user).toEqual(user);
+    expect((req as Request & { user?: unknown }).user).toEqual(user);
   });
 });
 
@@ -72,5 +72,5 @@ function mockHttpContext(req: Request): ExecutionContext {
     switchToHttp: () => ({ getRequest: () => req }),
     getHandler: () => ProtectedHandler,
     getClass: () => TestTarget,
-  } as ExecutionContext;
+  } as unknown as ExecutionContext;
 }

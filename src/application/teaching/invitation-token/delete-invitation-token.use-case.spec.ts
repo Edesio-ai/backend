@@ -1,5 +1,5 @@
 import { DeleteInvitationTokenUseCase } from './delete-invitation-token.use-case';
-import { TokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
+import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 
 describe('DeleteInvitationTokenUseCase', () => {
   let fixtures: Fixtures;
@@ -28,7 +28,7 @@ class Fixtures {
   public readonly token = 'token-id-1';
   public readonly repositoryError = new Error('delete failed');
 
-  public readonly tokenRepository: jest.Mocked<TokenRepository>;
+  public readonly tokenRepository: jest.Mocked<IInvitationTokenRepository>;
   public readonly useCase: DeleteInvitationTokenUseCase;
 
   constructor() {
@@ -36,6 +36,10 @@ class Fixtures {
       deleteInvitationToken: jest.fn().mockResolvedValue(undefined),
       getInvitationByToken: jest.fn(),
       markInvitationTokenAsUsed: jest.fn(),
+      getInvitationTokenByEstablishmentId: jest.fn(),
+      createInvitationToken: jest.fn(),
+      getInvitationPreview: jest.fn(),
+      updateTokenUsedAt: jest.fn(),
     };
     this.useCase = new DeleteInvitationTokenUseCase(this.tokenRepository);
   }

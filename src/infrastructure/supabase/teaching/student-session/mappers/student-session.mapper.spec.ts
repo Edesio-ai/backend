@@ -2,7 +2,7 @@ import type { SupabaseSession } from 'src/domain/teaching/session/types/session.
 import type {
   SupabaseSessionStudent,
   SupabaseStudentJoinedSession,
-} from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/student/type/student.type';
 import { StudentSessionMapper } from './student-session.mapper';
 
 describe('StudentSessionMapper', () => {

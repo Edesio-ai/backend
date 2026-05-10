@@ -1,11 +1,11 @@
 import { NotFoundException } from '@nestjs/common';
 import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/teaching/student-course-stats/update-or-create-student-course-stats.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import type { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import type { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
-import { Course } from 'src/domain/teaching/types/course.type';
-import { Student } from 'src/domain/teaching/types/student.type';
+import type { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import type { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
+import { Course } from 'src/domain/teaching/course/types/course.type';
+import { Student } from 'src/domain/teaching/student/type/student.type';
 import type { UpdateOrCreateStudentCourseStatsBodyDto } from 'src/presentation/teaching/student-course-stats/dtos/update-or-create-student-course-stats.dto';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';

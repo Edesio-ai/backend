@@ -1,6 +1,6 @@
 import { GetCourseFilesUseCase } from './get-course-files.use-case';
-import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
-import { CourseFile } from 'src/domain/teaching/types/course.type';
+import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
+import { CourseFile } from 'src/domain/teaching/course/types/course.type';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 
 describe('GetCourseFilesUseCase', () => {

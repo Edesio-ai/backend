@@ -4,13 +4,13 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from 'src/domain/shared/errors/global.errors';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
-import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
-import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
-import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
+import type { ICourseQuestionRepository } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';

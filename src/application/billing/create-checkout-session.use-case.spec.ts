@@ -1,6 +1,6 @@
 import { CreateCheckoutSessionsUseCase } from './create-checkout-session.use-case';
 import { IStripeClientProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
-import { SubscriptionRepository } from '../../domain/teaching/interface/subscription.repository';
+import { SubscriptionRepository } from '../../domain/subscription/contracts/subscription.repository';
 import { User } from '../../domain/auth/types/auth.type';
 import { TokenUserNotFoundError } from '../../domain/auth/errors/auth.errors';
 

@@ -1,6 +1,6 @@
 import { SessionMapper } from './session.mapper';
 import { SupabaseSession } from 'src/domain/teaching/session/types/session.type';
-import { SupabaseCourseWithSession } from 'src/domain/teaching/types/course.type';
+import { SupabaseCourseWithSession } from 'src/domain/teaching/course/types/course.type';
 
 describe('SessionMapper', () => {
   let fixtures: Fixtures;

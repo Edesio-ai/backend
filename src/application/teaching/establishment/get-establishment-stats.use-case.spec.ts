@@ -1,10 +1,11 @@
 import { GetEstablishmentsStatsUseCase } from './get-establishment-stats.use-case';
-import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
-import type { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
+import type { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GetEstablishmentsStatsUseCase', () => {
   let fixtures: Fixtures;
@@ -51,15 +52,8 @@ class Fixtures {
       getEstablishmentById: jest.fn(),
       getEstablishmentByUserId: jest.fn(),
       createEstablishment: jest.fn(),
-      getInvitationTokenByEstablishmentId: jest.fn(),
     };
-    this.teacherRepository = {
-      getTeacherByEstablishmentId: jest.fn(),
-      getTeacherByUserId: jest.fn(),
-      linkTeacherToEstablishment: jest.fn(),
-      createTeacher: jest.fn(),
-      getTeacherByConditions: jest.fn(),
-    };
+    this.teacherRepository = createMockTeacherRepository();
     this.studentSessionRepository = createMockStudentSessionRepository();
     this.sessionRepository = createMockSessionRepository();
 

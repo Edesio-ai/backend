@@ -1,6 +1,6 @@
 import { JoinSessionByCodeUseCase } from './join-session-by-code.use-case';
-import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import {
   BadRequestError,
   NotFoundError,
@@ -9,7 +9,7 @@ import { Session } from 'src/domain/teaching/session/types/session.type';
 import {
   Student,
   StudentJoinedSession,
-} from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/student/type/student.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 
@@ -125,6 +125,7 @@ class Fixtures {
       updateSessionName: jest.fn(),
       deleteSessionByTeacherId: jest.fn(),
       getSessionById: jest.fn(),
+      getTeachersSessionsByIds: jest.fn(),
     };
     this.useCase = new JoinSessionByCodeUseCase(
       this.studentRepository,

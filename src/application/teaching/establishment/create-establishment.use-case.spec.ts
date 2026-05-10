@@ -1,9 +1,9 @@
 import { CreateEstablishmentUseCase } from './create-establishment.use-case';
-import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import {
   CreateEstablishmentBody,
   Establishment,
-} from 'src/domain/teaching/types/establishment.type';
+} from 'src/domain/teaching/establishment/types/establishment.type';
 
 describe('CreateEstablishmentUseCase', () => {
   let fixtures: Fixtures;
@@ -44,7 +44,6 @@ class Fixtures {
       getEstablishmentById: jest.fn(),
       getEstablishmentByUserId: jest.fn(),
       createEstablishment: jest.fn(),
-      getInvitationTokenByEstablishmentId: jest.fn(),
     };
 
     this.createEstablishmentUseCase = new CreateEstablishmentUseCase(

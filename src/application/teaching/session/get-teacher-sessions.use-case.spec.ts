@@ -1,7 +1,8 @@
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
-import { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
+import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { GetTeacherSessionsUseCase } from 'src/application/teaching/session/get-teacher-sessions.use-case';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GetTeacherSessionsUseCase', () => {
   let fixtures: Fixtures;
@@ -68,14 +69,7 @@ class Fixtures {
   public readonly useCase: GetTeacherSessionsUseCase;
 
   constructor() {
-    this.teacherRepository = {
-      linkTeacherToEstablishment: jest.fn(),
-      getTeacherByEstablishmentId: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-      getTeacherByUserId: jest.fn(),
-      createTeacher: jest.fn(),
-      getTeacherByConditions: jest.fn(),
-    };
+    this.teacherRepository = createMockTeacherRepository();
     this.sessionRepository = {
       getSessionsByTeacherId: jest.fn(),
       getSessionByCode: jest.fn(),
@@ -83,6 +77,7 @@ class Fixtures {
       updateSessionName: jest.fn(),
       deleteSessionByTeacherId: jest.fn(),
       getSessionById: jest.fn(),
+      getTeachersSessionsByIds: jest.fn(),
     };
     this.useCase = new GetTeacherSessionsUseCase(
       this.sessionRepository,

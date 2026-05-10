@@ -1,6 +1,6 @@
 import { CreateCourseUseCase } from './create-course.use-case';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { CreateCourseBody } from 'src/domain/teaching/types/course.type';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { CreateCourseBody } from 'src/domain/teaching/course/types/course.type';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 
 describe('CreateCourseUseCase', () => {

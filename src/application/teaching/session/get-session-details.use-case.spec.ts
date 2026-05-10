@@ -4,12 +4,12 @@ import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
-import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
-import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
-import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
+import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';

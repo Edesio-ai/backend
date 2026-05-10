@@ -1,7 +1,7 @@
-import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
 import { GetInvitationTokenUseCase } from './get-invitation-token.use-case';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
+import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 
 describe('GetInvitationTokenUseCase', () => {
   let fixtures: Fixtures;
@@ -37,7 +37,7 @@ describe('GetInvitationTokenUseCase', () => {
 });
 
 class Fixtures {
-  public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
+  public readonly invitationTokenRepository: jest.Mocked<IInvitationTokenRepository>;
   public readonly getInvitationTokenUseCase: GetInvitationTokenUseCase;
 
   public readonly establishmentId: string;
@@ -45,15 +45,18 @@ class Fixtures {
   public readonly repositoryError: Error;
 
   constructor() {
-    this.establishmentRepository = {
-      getEstablishmentById: jest.fn(),
-      getEstablishmentByUserId: jest.fn(),
+    this.invitationTokenRepository = {
+      deleteInvitationToken: jest.fn(),
+      getInvitationByToken: jest.fn(),
+      markInvitationTokenAsUsed: jest.fn(),
       getInvitationTokenByEstablishmentId: jest.fn(),
-      createEstablishment: jest.fn(),
-    } as any;
+      createInvitationToken: jest.fn(),
+      getInvitationPreview: jest.fn(),
+      updateTokenUsedAt: jest.fn(),
+    };
 
     this.getInvitationTokenUseCase = new GetInvitationTokenUseCase(
-      this.establishmentRepository,
+      this.invitationTokenRepository,
     );
 
     this.establishmentId = 'est-1';
@@ -78,13 +81,13 @@ class Fixtures {
   }
 
   whenRepositoryReturnsInvitationTokens() {
-    this.establishmentRepository.getInvitationTokenByEstablishmentId.mockResolvedValue(
+    this.invitationTokenRepository.getInvitationTokenByEstablishmentId.mockResolvedValue(
       this.invitationTokens,
     );
   }
 
   whenRepositoryThrowsError() {
-    this.establishmentRepository.getInvitationTokenByEstablishmentId.mockRejectedValue(
+    this.invitationTokenRepository.getInvitationTokenByEstablishmentId.mockRejectedValue(
       this.repositoryError,
     );
   }
@@ -99,16 +102,16 @@ class Fixtures {
 
   thenRepositoryCalledWithEstablishmentId() {
     expect(
-      this.establishmentRepository.getInvitationTokenByEstablishmentId,
+      this.invitationTokenRepository.getInvitationTokenByEstablishmentId,
     ).toHaveBeenCalledWith(this.establishmentId);
     expect(
-      this.establishmentRepository.getInvitationTokenByEstablishmentId,
+      this.invitationTokenRepository.getInvitationTokenByEstablishmentId,
     ).toHaveBeenCalledTimes(1);
   }
 
   thenRepositoryNotCalled() {
     expect(
-      this.establishmentRepository.getInvitationTokenByEstablishmentId,
+      this.invitationTokenRepository.getInvitationTokenByEstablishmentId,
     ).not.toHaveBeenCalled();
   }
 

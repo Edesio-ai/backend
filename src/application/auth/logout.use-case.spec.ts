@@ -35,12 +35,10 @@ class Fixtures {
 
   constructor() {
     this.authRepository = {
-      getInvitationPreview: jest.fn(),
-      createUser: jest.fn(),
+      createAuthUser: jest.fn(),
       loginUser: jest.fn(),
       validateToken: jest.fn(),
       logoutUser: jest.fn(),
-      createInvitationToken: jest.fn(),
     };
 
     this.logoutUseCase = new LogoutUseCase(this.authRepository);

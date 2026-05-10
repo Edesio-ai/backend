@@ -4,11 +4,11 @@ import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
-import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import type { ICourseQuestionRepository } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
-import { Course } from 'src/domain/teaching/types/course.type';
+import { Course } from 'src/domain/teaching/course/types/course.type';
 import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';

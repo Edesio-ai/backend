@@ -1,10 +1,10 @@
 import { DeleteSessionUseCase } from './delete-session.use-case';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
-import { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
-import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
+import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';

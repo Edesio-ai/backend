@@ -1,5 +1,5 @@
 import { GetSessionByCodeUseCase } from './get-session-by-code.use-case';
-import { ISessionRepository } from 'src/domain/teaching/interface/session.repository';
+import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 
 describe('GetSessionByCodeUseCase', () => {
   let fixtures: Fixtures;
@@ -59,6 +59,7 @@ class Fixtures {
       updateSessionName: jest.fn(),
       deleteSessionByTeacherId: jest.fn(),
       getSessionById: jest.fn(),
+      getTeachersSessionsByIds: jest.fn(),
     };
 
     this.useCase = new GetSessionByCodeUseCase(this.sessionRepository);

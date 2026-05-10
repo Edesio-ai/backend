@@ -236,7 +236,10 @@ class Fixtures {
     const supabaseMock = {
       from: this.fromMock,
     };
-    this.repository = new TeacherSupabaseRepository(supabaseMock as any);
+    this.repository = new TeacherSupabaseRepository(
+      supabaseMock as any,
+      supabaseMock as any,
+    );
   }
 
   whenGetTeacherByEstablishmentId() {

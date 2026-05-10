@@ -1,4 +1,4 @@
-import { SupabaseEstablishment } from 'src/domain/teaching/types/establishment.type';
+import { SupabaseEstablishment } from 'src/domain/teaching/establishment/types/establishment.type';
 import { EstablishmentMapper } from './establishment.mapper';
 
 describe('EstablishmentMapper', () => {

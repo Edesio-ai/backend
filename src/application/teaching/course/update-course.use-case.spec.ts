@@ -7,8 +7,8 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from 'src/domain/shared/errors/global.errors';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 

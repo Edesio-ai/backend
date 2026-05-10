@@ -1,5 +1,5 @@
 import { CreateSessionUseCase } from './create-session.use-case';
-import { ISessionRepository } from 'src/domain/teaching/interface/session.repository';
+import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { CreateSessionBody } from 'src/domain/teaching/session/types/session.type';
 
 describe('CreateSessionUseCase', () => {
@@ -57,6 +57,7 @@ class Fixtures {
       updateSessionName: jest.fn(),
       deleteSessionByTeacherId: jest.fn(),
       getSessionById: jest.fn(),
+      getTeachersSessionsByIds: jest.fn(),
     };
     this.useCase = new CreateSessionUseCase(this.sessionRepository);
   }

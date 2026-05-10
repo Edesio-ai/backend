@@ -2,7 +2,7 @@ import {
   EvaluateAnswerUseCase,
   EvaluateAnswerBody,
 } from './evaluate-answer.use-case';
-import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
+import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
 
 describe('EvaluateAnswerUseCase', () => {
   let fixtures: Fixtures;

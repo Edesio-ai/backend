@@ -1,10 +1,10 @@
 import { UploadStudentPhotoUseCase } from './upload-student-photo.use-case';
-import { IStudentRepository } from 'src/domain/teaching/interface/student.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   Student,
   StudentPhotoUpload,
-} from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/student/type/student.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 

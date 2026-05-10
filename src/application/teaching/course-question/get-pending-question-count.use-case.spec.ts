@@ -1,7 +1,7 @@
 import { GetPendingQuestionCountUseCase } from 'src/application/teaching/course-question/get-pending-question-count.use-case';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
-import { SupabaseCourse } from 'src/domain/teaching/types/course.type';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import type { ICourseQuestionRepository } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
+import { SupabaseCourse } from 'src/domain/teaching/course/types/course.type';
 import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 

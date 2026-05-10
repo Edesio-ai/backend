@@ -1,5 +1,6 @@
 import { CreateTeacherUseCase } from './create-teacher.use-case';
-import { TeacherRepository } from 'src/domain/teaching/interface/teacher.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('CreateTeacherUseCase', () => {
   let fixtures: Fixtures;
@@ -47,14 +48,7 @@ class Fixtures {
   public readonly useCase: CreateTeacherUseCase;
 
   constructor() {
-    this.teacherRepository = {
-      linkTeacherToEstablishment: jest.fn(),
-      getTeacherByEstablishmentId: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-      getTeacherByUserId: jest.fn(),
-      createTeacher: jest.fn(),
-      getTeacherByConditions: jest.fn(),
-    };
+    this.teacherRepository = createMockTeacherRepository();
 
     this.useCase = new CreateTeacherUseCase(this.teacherRepository);
   }

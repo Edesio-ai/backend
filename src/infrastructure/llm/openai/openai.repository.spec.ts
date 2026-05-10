@@ -1,7 +1,7 @@
 import { IOpenAiProvider } from './openai.repository';
 import { QuestionGenerationConfig } from 'src/domain/teaching/question/types/question.type';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
-import { EvaluateAnswerBody } from 'src/application/question/evaluate-answer.use-case';
+import { EvaluateAnswerBody } from 'src/application/llm/evaluate-answer.use-case';
 import { GenerateCompletionFeedbackBody } from 'src/application/llm/generate-completion-feedback.use-case';
 
 describe('IOpenAiProvider', () => {

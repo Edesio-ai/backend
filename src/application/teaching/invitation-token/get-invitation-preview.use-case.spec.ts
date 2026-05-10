@@ -1,7 +1,7 @@
 import { GetInvitationPreviewUseCase } from './get-invitation-preview.use-case';
-import { IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
 import { InvitationTokenPreview } from 'src/domain/auth/invitation.type';
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
+import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 
 describe('GetInvitationPreviewUseCase', () => {
   let fixtures: Fixtures;
@@ -35,7 +35,7 @@ describe('GetInvitationPreviewUseCase', () => {
 });
 
 class Fixtures {
-  public readonly authRepository: jest.Mocked<IAuthRepository>;
+  public readonly invitationTokenRepository: jest.Mocked<IInvitationTokenRepository>;
   public readonly getInvitationPreviewUseCase: GetInvitationPreviewUseCase;
 
   public readonly token = 'token-123';
@@ -43,17 +43,18 @@ class Fixtures {
   public readonly repositoryError: Error;
 
   constructor() {
-    this.authRepository = {
-      getInvitationPreview: jest.fn(),
-      createUser: jest.fn(),
-      loginUser: jest.fn(),
-      validateToken: jest.fn(),
-      logoutUser: jest.fn(),
+    this.invitationTokenRepository = {
+      deleteInvitationToken: jest.fn(),
+      getInvitationByToken: jest.fn(),
+      markInvitationTokenAsUsed: jest.fn(),
+      getInvitationTokenByEstablishmentId: jest.fn(),
       createInvitationToken: jest.fn(),
+      getInvitationPreview: jest.fn(),
+      updateTokenUsedAt: jest.fn(),
     };
 
     this.getInvitationPreviewUseCase = new GetInvitationPreviewUseCase(
-      this.authRepository,
+      this.invitationTokenRepository,
     );
 
     this.preview = {
@@ -71,11 +72,13 @@ class Fixtures {
   }
 
   whenRepositoryReturnsPreview() {
-    this.authRepository.getInvitationPreview.mockResolvedValue(this.preview);
+    this.invitationTokenRepository.getInvitationPreview.mockResolvedValue(
+      this.preview,
+    );
   }
 
   whenRepositoryThrowsError() {
-    this.authRepository.getInvitationPreview.mockRejectedValue(
+    this.invitationTokenRepository.getInvitationPreview.mockRejectedValue(
       this.repositoryError,
     );
   }
@@ -89,14 +92,18 @@ class Fixtures {
   }
 
   thenRepositoryCalledWith(token: string) {
-    expect(this.authRepository.getInvitationPreview).toHaveBeenCalledWith(
-      token,
-    );
-    expect(this.authRepository.getInvitationPreview).toHaveBeenCalledTimes(1);
+    expect(
+      this.invitationTokenRepository.getInvitationPreview,
+    ).toHaveBeenCalledWith(token);
+    expect(
+      this.invitationTokenRepository.getInvitationPreview,
+    ).toHaveBeenCalledTimes(1);
   }
 
   thenRepositoryNotCalled() {
-    expect(this.authRepository.getInvitationPreview).not.toHaveBeenCalled();
+    expect(
+      this.invitationTokenRepository.getInvitationPreview,
+    ).not.toHaveBeenCalled();
   }
 
   thenReturnExpectedPreview(result: InvitationTokenPreview) {

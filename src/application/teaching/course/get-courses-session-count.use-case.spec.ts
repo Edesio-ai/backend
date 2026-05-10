@@ -1,5 +1,5 @@
 import { GetCoursesSessionCountUseCase } from './get-courses-session-count.use-case';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 
 describe('GetCoursesSessionCountUseCase', () => {

@@ -4,9 +4,9 @@ import {
 } from './create-question.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { UnauthorizedError } from 'src/domain/shared/errors/global.errors';
-import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { Question } from 'src/domain/teaching/question/types/question.type';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
