@@ -1,5 +1,5 @@
 import { SubscriptionSupabaseRepository } from './subscription-supabase.repository';
-import { ServerError } from '../../../domain/shared/global/errors/global.errors';
+import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 
 describe('SubscriptionSupabaseRepository', () => {
   let fixtures: Fixtures;

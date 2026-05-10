@@ -1,12 +1,13 @@
 import { Inject } from '@nestjs/common';
-import { SUPABASE_ADMIN } from '../supabase.module';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { SubscriptionRepository } from 'src/domain/teaching/interfaces/subscription.repository';
+import { SUPABASE_ADMIN } from '../../supabase.module';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 export class SubscriptionSupabaseRepository implements SubscriptionRepository {
   constructor(
     @Inject(SUPABASE_ADMIN)
-    private readonly supabase: any,
+    private readonly supabase: SupabaseClient,
   ) {}
 
   async getUserSubscription(userId: string): Promise<any> {

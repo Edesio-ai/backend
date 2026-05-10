@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { SupabaseModule } from '../supabase.module';
-import { SubscriptionSupabaseRepository } from './subscription-supabase.repository';
 import { SUBSCRIPTION_REPOSITORY } from 'src/domain/teaching/interfaces/subscription.repository';
+import { SupabaseModule } from '../supabase.module';
+import { SubscriptionSupabaseRepository } from './repositories/subscription-supabase.repository';
 
 @Module({
   imports: [SupabaseModule],
