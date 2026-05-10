@@ -1,5 +1,5 @@
 import { StripeRepository } from './stripe.repository';
-import { ServerError } from '../../domain/shared/global/errors/global.errors';
+import { ServerError } from '../../domain/shared/errors/global.errors';
 
 describe('StripeRepository', () => {
   let fixtures: Fixtures;

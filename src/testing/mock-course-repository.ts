@@ -1,6 +1,6 @@
-import type { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import type { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 
-export function createMockCourseRepository(): jest.Mocked<CourseRepository> {
+export function createMockCourseRepository(): jest.Mocked<ICourseRepository> {
   return {
     createCourse: jest.fn(),
     deleteCourseById: jest.fn(),

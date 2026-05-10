@@ -1,7 +1,7 @@
 import { DeleteSessionUseCase } from './delete-session.use-case';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
-import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
@@ -61,9 +61,9 @@ class Fixtures {
 
   public readonly repositoryError = new Error('db failed');
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
-  public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
-  public readonly sessionRepository: jest.Mocked<SessionRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
+  public readonly questionsRepository: jest.Mocked<IQuestionsRepository>;
+  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;

@@ -1,14 +1,14 @@
 import { ForbiddenException } from '@nestjs/common';
 import { GetCourseRankingUseCase } from 'src/application/teaching/student-course-stats/get-course-ranking.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
 import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import { Course } from 'src/domain/teaching/types/course.type';
-import { Session } from 'src/domain/teaching/types/session.type';
+import { Session } from 'src/domain/teaching/session/types/session.type';
 import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockStudentCourseStatsRepository } from 'src/testing/mock-student-course-stats-repository';
@@ -165,9 +165,9 @@ class Fixtures {
     },
   ];
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
-  public readonly sessionRepository: jest.Mocked<SessionRepository>;
+  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly useCase: GetCourseRankingUseCase;
 

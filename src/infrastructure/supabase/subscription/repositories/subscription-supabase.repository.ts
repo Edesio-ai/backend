@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import { SubscriptionRepository } from 'src/domain/teaching/interfaces/subscription.repository';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
+import { SubscriptionRepository } from 'src/domain/subscription/contracts/subscription.repository';
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import { SupabaseClient } from '@supabase/supabase-js';
 

@@ -1,13 +1,13 @@
 import { Inject } from '@nestjs/common';
 import {
   AUTH_REPOSITORY,
-  type AuthRepository,
-} from '../../domain/auth/contract/auth.repository';
+  type IAuthRepository,
+} from '../../domain/auth/contracts/i-auth.repository';
 
 export class LogoutUseCase {
   constructor(
     @Inject(AUTH_REPOSITORY)
-    private readonly authRepository: AuthRepository,
+    private readonly authRepository: IAuthRepository,
   ) {}
 
   async execute(accessToken: string): Promise<void> {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { InvitationTokenSupabaseRepository } from './repositories/invtiation-token-supabase.repository';
-import { INVITATION_TOKEN_REPOSITORY } from 'src/domain/token/contract/token.repository';
+import { INVITATION_TOKEN_REPOSITORY } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 import { SupabaseModule } from '../supabase.module';
 
 @Module({

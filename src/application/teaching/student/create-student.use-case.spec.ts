@@ -1,5 +1,5 @@
 import { CreateStudentUseCase } from './create-student.use-case';
-import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
+import { IStudentRepository } from 'src/domain/teaching/interface/student.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Student } from 'src/domain/teaching/types/student.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
@@ -53,7 +53,7 @@ class Fixtures {
     photoUrl: '',
   };
 
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly useCase: CreateStudentUseCase;
 
   constructor() {

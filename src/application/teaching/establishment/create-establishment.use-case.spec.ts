@@ -1,5 +1,5 @@
 import { CreateEstablishmentUseCase } from './create-establishment.use-case';
-import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
 import {
   CreateEstablishmentBody,
   Establishment,
@@ -32,7 +32,7 @@ describe('CreateEstablishmentUseCase', () => {
 });
 
 class Fixtures {
-  public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
+  public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly createEstablishmentUseCase: CreateEstablishmentUseCase;
 
   public readonly body: CreateEstablishmentBody;

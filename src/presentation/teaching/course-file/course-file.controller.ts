@@ -12,9 +12,9 @@ import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import {
   CourseFile,
   CourseFileUpload,
-} from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/course/types/course.type';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { BadRequestError } from 'src/domain/shared/global/errors/global.errors';
+import { BadRequestError } from 'src/domain/shared/errors/global.errors';
 import { UploadCourseFileUseCase } from 'src/application/teaching/course-file/upload-course-file.use-case';
 import { GetCourseFilesUseCase } from 'src/application/teaching/course-file/get-course-files.use-case';
 

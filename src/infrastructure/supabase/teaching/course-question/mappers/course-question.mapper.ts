@@ -1,7 +1,7 @@
 import {
   CourseQuestion,
   SupabaseCourseQuestion,
-} from 'src/domain/teaching/types/course-question.type';
+} from 'src/domain/teaching/course-question/types/course-question.type';
 
 export const CourseQuestionMapper = {
   toDomain: (row: SupabaseCourseQuestion): CourseQuestion => ({

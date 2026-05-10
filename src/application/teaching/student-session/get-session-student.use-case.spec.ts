@@ -1,12 +1,12 @@
 import { GetSessionStudentUseCase } from './get-session-student.use-case';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
-import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import { SessionStudent } from 'src/domain/teaching/types/student.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
@@ -211,10 +211,10 @@ class Fixtures {
     },
   ];
 
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
-  public readonly sessionRepository: jest.Mocked<SessionRepository>;
-  public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
+  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
+  public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly studentSessionRepository: ReturnType<
     typeof createMockStudentSessionRepository
   >;

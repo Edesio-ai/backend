@@ -2,16 +2,16 @@ import { Inject } from '@nestjs/common';
 import {
   CreateSessionBody,
   Session,
-} from 'src/domain/teaching/types/session.type';
+} from 'src/domain/teaching/session/types/session.type';
 import {
   SESSION_REPOSITORY,
-  type SessionRepository,
-} from 'src/domain/teaching/interfaces/session.repository';
+  type ISessionRepository,
+} from 'src/domain/teaching/session/contracts/i-session.repository';
 
 export class CreateSessionUseCase {
   constructor(
     @Inject(SESSION_REPOSITORY)
-    private readonly sessionRepository: SessionRepository,
+    private readonly sessionRepository: ISessionRepository,
   ) {}
 
   async execute(body: CreateSessionBody): Promise<Session> {

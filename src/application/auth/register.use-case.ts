@@ -2,29 +2,30 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import {
   AUTH_REPOSITORY,
-  type AuthRepository,
-} from '../../domain/auth/contract/auth.repository';
+  type IAuthRepository,
+} from '../../domain/auth/contracts/i-auth.repository';
 import { RegisterBody, UserMetadata } from '../../domain/auth/types/auth.type';
 import {
   EMAIL_PROVIDER,
-  type EmailProviderInterface,
-} from '../../domain/email/contract/email.interface';
-import {
-  TEACHER_REPOSITORY,
-  type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
+  type IEmailProvider,
+} from '../../domain/email/contract/i-email.interface';
+
 import {
   type IInvitationTokenRepository,
   INVITATION_TOKEN_REPOSITORY,
-} from 'src/domain/token/contract/token.repository';
+} from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
+import {
+  TEACHER_REPOSITORY,
+  type TeacherRepository,
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 @Injectable()
 export class RegisterUseCase {
   constructor(
     @Inject(AUTH_REPOSITORY)
-    private readonly authRepository: AuthRepository,
+    private readonly authRepository: IAuthRepository,
     @Inject(EMAIL_PROVIDER)
-    private readonly emailProvider: EmailProviderInterface,
+    private readonly emailProvider: IEmailProvider,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
     @Inject(INVITATION_TOKEN_REPOSITORY)

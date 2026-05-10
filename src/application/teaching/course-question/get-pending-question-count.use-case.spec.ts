@@ -1,5 +1,5 @@
 import { GetPendingQuestionCountUseCase } from 'src/application/teaching/course-question/get-pending-question-count.use-case';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
 import { SupabaseCourse } from 'src/domain/teaching/types/course.type';
 import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
@@ -77,7 +77,7 @@ class Fixtures {
   public readonly courseError = new Error('courses query failed');
   public readonly courseQuestionsError = new Error('pending count failed');
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly courseQuestionRepository: jest.Mocked<ICourseQuestionRepository>;
   public readonly useCase: GetPendingQuestionCountUseCase;
 

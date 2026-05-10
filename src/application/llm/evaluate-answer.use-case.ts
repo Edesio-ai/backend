@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { OPENAI_REPOSITORY } from 'src/domain/shared/llm/openai/contracts/opena-ai.repository';
-import { OpenaiRepository } from 'src/infrastructure/llm/openai/openai.repository';
-import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
+import { IOpenAiProvider } from 'src/infrastructure/llm/openai/openai.repository';
+import { OPENAI_REPOSITORY } from 'src/domain/llm/openai/contracts/open-ai.provider';
+import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
 
 export interface EvaluateAnswerBody {
   questionText: string;
@@ -14,7 +14,7 @@ export interface EvaluateAnswerBody {
 export class EvaluateAnswerUseCase {
   constructor(
     @Inject(OPENAI_REPOSITORY)
-    private readonly openaiRepository: OpenaiRepository,
+    private readonly openaiRepository: IOpenAiProvider,
   ) {}
 
   async execute(body: EvaluateAnswerBody): Promise<EvaluateAnswerResponse> {

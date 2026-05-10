@@ -4,8 +4,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   GeneratedQuestion,
   QuestionGenerationConfig,
-} from 'src/domain/teaching/types/question.type';
-import type { OpenaiRepository as OpenaiRepositoryContract } from 'src/domain/shared/llm/openai/contracts/opena-ai.repository';
+} from 'src/domain/teaching/question/types/question.type';
+import type { IOpenAiProvider as OpenaiRepositoryContract } from 'src/domain/llm/openai/contracts/open-ai.provider';
 import {
   getGenerateQuestionSystemPrompt,
   getGenerateQuestionUserPrompt,
@@ -14,15 +14,15 @@ import {
   getEvaluateAnswerSystemPrompt,
   getEvaluateAnswerUserPrompt,
 } from './prompts/evaluate-answer.prompt';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { EvaluateAnswerBody } from 'src/application/llm/evaluate-answer.use-case';
-import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
+import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
 import { GenerateCompletionFeedbackBody } from 'src/application/llm/generate-completion-feedback.use-case';
 import { getGenerateCompletionFeedbackSystemPrompt } from './prompts/generate-completion-feedback.prompt';
 import { getGenerateCompletionFeedbackUserPrompt } from './prompts/generate-completion-feedback.prompt';
 
 @Injectable()
-export class OpenaiRepository implements OpenaiRepositoryContract {
+export class IOpenAiProvider implements OpenaiRepositoryContract {
   constructor(
     @Inject(OPENAI_CLIENT)
     private readonly openai: OpenAI,

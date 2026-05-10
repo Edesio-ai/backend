@@ -1,7 +1,7 @@
 import {
   CourseFile,
   SupabaseCourseFile,
-} from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/course/types/course.type';
 
 export const courseFileMapper = {
   toDomain: (data: SupabaseCourseFile): CourseFile => ({

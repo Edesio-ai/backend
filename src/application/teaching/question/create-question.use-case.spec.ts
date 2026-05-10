@@ -3,11 +3,11 @@ import {
   CreateQuestionUseCase,
 } from './create-question.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { UnauthorizedError } from 'src/domain/shared/global/errors/global.errors';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import { UnauthorizedError } from 'src/domain/shared/errors/global.errors';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import { Question } from 'src/domain/teaching/types/question.type';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
@@ -104,9 +104,9 @@ class Fixtures {
 
   public readonly repositoryError = new Error('repository error');
 
-  public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
+  public readonly questionsRepository: jest.Mocked<IQuestionsRepository>;
   public readonly teachersRepository: jest.Mocked<TeacherRepository>;
-  public readonly coursesRepository: jest.Mocked<CourseRepository>;
+  public readonly coursesRepository: jest.Mocked<ICourseRepository>;
   public readonly useCase: CreateQuestionUseCase;
 
   constructor() {

@@ -4,11 +4,11 @@ import {
   SupabaseSession,
   SupabaseSessionInsert,
   UpdateSessionNameBody,
-} from 'src/domain/teaching/types/session.type';
+} from 'src/domain/teaching/session/types/session.type';
 import {
   CourseWithSession,
   SupabaseCourseWithSession,
-} from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/course/types/course.type';
 
 export const SessionMapper = {
   toDomain: (row: SupabaseSession): Session => ({

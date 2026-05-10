@@ -1,8 +1,8 @@
 import { GetSubscriptionStatusUseCase } from './get-subscription-status.use-case';
 import { User } from '../../domain/auth/types/auth.type';
-import { NotFoundError } from '../../domain/shared/global/errors/global.errors';
-import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
-import { EstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
+import { NotFoundError } from '../../domain/shared/errors/global.errors';
+import { IStripeClientProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
+import { IEstablishmentRepository } from '../../domain/teaching/interface/establishment.repository';
 import { TeacherRepository } from '../../domain/teaching/interface/teacher.repository';
 
 describe('GetSubscriptionStatusUseCase', () => {
@@ -67,9 +67,9 @@ describe('GetSubscriptionStatusUseCase', () => {
 });
 
 class Fixtures {
-  public readonly paymentClient: jest.Mocked<StripeClientInterface>;
+  public readonly paymentClient: jest.Mocked<IStripeClientProvider>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
-  public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
+  public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly getSubscriptionStatusUseCase: GetSubscriptionStatusUseCase;
 
   public readonly establishmentUser: User;

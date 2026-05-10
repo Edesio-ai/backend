@@ -2,7 +2,7 @@ import {
   CreateEstablishmentBody,
   Establishment,
   SupabaseEstablishment,
-} from 'src/domain/teaching/types/establishment.type';
+} from 'src/domain/teaching/establishment/types/establishment.type';
 
 type SupabaseEstablishmentInsert = {
   supabase_user_id: string;

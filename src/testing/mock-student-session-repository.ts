@@ -1,4 +1,4 @@
-import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
+import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 
 export function createMockStudentSessionRepository(): jest.Mocked<IStudentSessionRepository> {
   return {

@@ -1,4 +1,4 @@
-import type { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
+import type { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 export function createMockTeacherRepository(): jest.Mocked<TeacherRepository> {
   return {

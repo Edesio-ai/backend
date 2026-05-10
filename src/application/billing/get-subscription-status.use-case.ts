@@ -2,27 +2,27 @@ import { Inject, Injectable } from '@nestjs/common';
 import { User } from '../../domain/auth/types/auth.type';
 import {
   STRIPE_CLIENT_INTERFACE,
-  type StripeClientInterface,
-} from '../../domain/billing/contracts/stripe-client.interface';
+  type IStripeClientProvider,
+} from '../../domain/billing/contracts/i-stripe-client.provider';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   ESTABLISHMENT_REPOSITORY,
-  type EstablishmentRepository,
-} from 'src/domain/teaching/interfaces/establishment.repository';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+  type IEstablishmentRepository,
+} from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 
 @Injectable()
 export class GetSubscriptionStatusUseCase {
   constructor(
     @Inject(STRIPE_CLIENT_INTERFACE)
-    private readonly paymentClient: StripeClientInterface,
+    private readonly paymentClient: IStripeClientProvider,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
     @Inject(ESTABLISHMENT_REPOSITORY)
-    private readonly establishmentRepository: EstablishmentRepository,
+    private readonly establishmentRepository: IEstablishmentRepository,
   ) {}
 
   async execute(user: User): Promise<any> {

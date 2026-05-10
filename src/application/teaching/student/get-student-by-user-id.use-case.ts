@@ -1,14 +1,14 @@
 import { Inject } from '@nestjs/common';
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
-import { Student } from 'src/domain/teaching/types/student.type';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
+import { Student } from 'src/domain/teaching/student/type/student.type';
 
 export class GetStudentByUserIdUseCase {
   constructor(
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    private readonly studentRepository: IStudentRepository,
   ) {}
 
   async execute(userId: string): Promise<Student | null> {

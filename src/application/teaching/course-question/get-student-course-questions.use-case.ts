@@ -1,35 +1,35 @@
 import { Inject } from '@nestjs/common';
-import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
+import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   COURSE_QUESTION_REPOSITORY,
   type ICourseQuestionRepository,
-} from 'src/domain/teaching/interfaces/i-course-question.repository';
+} from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 import {
-  type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
-} from 'src/domain/teaching/interfaces/i-student-session.repository';
+  type IStudentSessionRepository,
+} from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 
 export class GetStudentCourseQuestionsUseCase {
   constructor(
     @Inject(COURSE_QUESTION_REPOSITORY)
     private readonly courseQuestionRepository: ICourseQuestionRepository,
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    private readonly studentRepository: IStudentRepository,
     @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    private readonly courseRepository: ICourseRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
     private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}

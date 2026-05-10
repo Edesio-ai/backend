@@ -1,7 +1,7 @@
 import { GetAnsweredQuestionCountUseCase } from 'src/application/teaching/course-question/get-answered-question-count.use-case';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Student } from 'src/domain/teaching/types/student.type';
 import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
@@ -78,7 +78,7 @@ class Fixtures {
   };
 
   public readonly courseQuestionRepository: jest.Mocked<ICourseQuestionRepository>;
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly useCase: GetAnsweredQuestionCountUseCase;
 
   constructor() {

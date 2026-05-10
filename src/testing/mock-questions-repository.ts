@@ -1,6 +1,6 @@
-import type { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import type { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 
-export function createMockQuestionsRepository(): jest.Mocked<QuestionsRepository> {
+export function createMockQuestionsRepository(): jest.Mocked<IQuestionsRepository> {
   return {
     deleteCourseQuizQuestions: jest.fn(),
     deleteQuestionById: jest.fn(),

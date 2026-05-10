@@ -7,7 +7,7 @@ import { RegisterUseCase } from '../../application/auth/register.use-case';
 import { MailerModule } from '../../infrastructure/mailer/mailer.module';
 import { LoginUseCase } from '../../application/auth/login.use-case';
 import { AuthPersistenceModule } from '../../infrastructure/supabase/auth/auth-persistence.module';
-import { TOKEN_GENERATOR } from '../../domain/shared/security/interface/token-generator.provider';
+import { TOKEN_GENERATOR } from '../../domain/shared/security/contracts/i-token-generator.provider';
 import { AuthController } from './auth.controller';
 import { GetUserSessionUseCase } from '../../application/auth/get-user-session.use-case';
 import { LogoutUseCase } from '../../application/auth/logout.use-case';

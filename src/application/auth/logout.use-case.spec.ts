@@ -1,5 +1,5 @@
 import { LogoutUseCase } from './logout.use-case';
-import { AuthRepository } from '../../domain/auth/contract/auth.repository';
+import { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
 
 describe('LogoutUseCase', () => {
   let fixtures: Fixtures;
@@ -27,7 +27,7 @@ describe('LogoutUseCase', () => {
 });
 
 class Fixtures {
-  public readonly authRepository: jest.Mocked<AuthRepository>;
+  public readonly authRepository: jest.Mocked<IAuthRepository>;
   public readonly logoutUseCase: LogoutUseCase;
 
   public readonly accessToken: string;

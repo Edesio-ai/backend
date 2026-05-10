@@ -1,19 +1,19 @@
 import { Inject } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   COURSE_QUESTION_REPOSITORY,
   type ICourseQuestionRepository,
-} from 'src/domain/teaching/interfaces/i-course-question.repository';
+} from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 
 export class GetPendingQuestionCountUseCase {
   constructor(
     @Inject(COURSE_QUESTION_REPOSITORY)
     private readonly courseQuestionRepository: ICourseQuestionRepository,
     @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    private readonly courseRepository: ICourseRepository,
   ) {}
 
   async execute(sessionId: string): Promise<number> {

@@ -2,8 +2,8 @@ import {
   ExportQuestionsUseCase,
   ExportQuestionsBody,
 } from './export-questions.use-case';
-import { PdfExtractor } from 'src/domain/pdf/contracts/pdf-extractor.interface';
-import { Question } from 'src/domain/teaching/types/question.type';
+import { IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 
 const SAMPLE_QUESTION: Question = {
   id: 'q-1',
@@ -82,7 +82,7 @@ class Fixtures {
   public readonly fakeFileName = 'questions_Math_matiques_2026-01-01.pdf';
   public readonly extractorError = new Error('extractor error');
 
-  public readonly pdfExtractor: jest.Mocked<PdfExtractor> = {
+  public readonly pdfExtractor: jest.Mocked<IPdfExtractorProvider> = {
     extractTextFromPdf: jest.fn(),
     extractQuestionsToPdf: jest.fn(),
   };

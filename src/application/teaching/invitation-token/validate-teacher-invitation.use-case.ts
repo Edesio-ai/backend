@@ -2,17 +2,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   INVITATION_TOKEN_REPOSITORY,
   type IInvitationTokenRepository,
-} from 'src/domain/token/contract/token.repository';
+} from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 
 @Injectable()
 export class ValidateTeacherInvitationUseCase {

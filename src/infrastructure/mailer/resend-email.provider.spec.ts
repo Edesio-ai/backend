@@ -1,5 +1,5 @@
 import { ResendEmailProvider } from './resend-email.provider';
-import { ServerError } from '../../domain/shared/global/errors/global.errors';
+import { ServerError } from '../../domain/shared/errors/global.errors';
 
 describe('ResendEmailProvider', () => {
   let fixtures: Fixtures;

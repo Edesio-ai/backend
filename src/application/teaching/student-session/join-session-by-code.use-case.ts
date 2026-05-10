@@ -1,27 +1,27 @@
 import { Inject } from '@nestjs/common';
 import {
   SESSION_REPOSITORY,
-  type SessionRepository,
-} from 'src/domain/teaching/interfaces/session.repository';
+  type ISessionRepository,
+} from 'src/domain/teaching/session/contracts/i-session.repository';
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
 import {
   BadRequestError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
-} from 'src/domain/teaching/interfaces/i-student-session.repository';
+} from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 
 export class JoinSessionByCodeUseCase {
   constructor(
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    private readonly studentRepository: IStudentRepository,
     @Inject(SESSION_REPOSITORY)
-    private readonly sessionRepository: SessionRepository,
+    private readonly sessionRepository: ISessionRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
     private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}

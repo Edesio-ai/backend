@@ -4,29 +4,29 @@ import {
   BadRequestError,
   NotFoundError,
   UnauthorizedError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   QUESTIONS_REPOSITORY,
-  type QuestionsRepository,
-} from 'src/domain/teaching/interfaces/questions.repository';
+  type IQuestionsRepository,
+} from 'src/domain/teaching/question/contracts/i-questions.repository';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
-import { Course } from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { Course } from 'src/domain/teaching/course/types/course.type';
 
 export class ValidateCourseQuestionsUseCase {
   constructor(
     @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    private readonly courseRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
     @Inject(QUESTIONS_REPOSITORY)
-    private readonly questionsRepository: QuestionsRepository,
+    private readonly questionsRepository: IQuestionsRepository,
   ) {}
 
   async execute(courseId: string, user: AuthUser): Promise<Course> {

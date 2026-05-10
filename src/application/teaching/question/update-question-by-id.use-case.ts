@@ -2,25 +2,25 @@ import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   QUESTIONS_REPOSITORY,
-  type QuestionsRepository,
-} from 'src/domain/teaching/interfaces/questions.repository';
+  type IQuestionsRepository,
+} from 'src/domain/teaching/question/contracts/i-questions.repository';
 import {
   BadRequestError,
   NotFoundError,
   UnauthorizedError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   Question,
   QuestionType,
-} from 'src/domain/teaching/types/question.type';
+} from 'src/domain/teaching/question/types/question.type';
 
 interface UpdateQuestionBody {
   questionText?: string | undefined;
@@ -34,9 +34,9 @@ interface UpdateQuestionBody {
 export class UpdateQuestionByIdUseCase {
   constructor(
     @Inject(QUESTIONS_REPOSITORY)
-    private readonly questionsRepository: QuestionsRepository,
+    private readonly questionsRepository: IQuestionsRepository,
     @Inject(COURSE_REPOSITORY)
-    private readonly coursesRepository: CourseRepository,
+    private readonly coursesRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
   ) {}

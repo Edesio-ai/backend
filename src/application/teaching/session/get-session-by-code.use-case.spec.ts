@@ -1,5 +1,5 @@
 import { GetSessionByCodeUseCase } from './get-session-by-code.use-case';
-import { SessionRepository } from 'src/domain/teaching/interface/session.repository';
+import { ISessionRepository } from 'src/domain/teaching/interface/session.repository';
 
 describe('GetSessionByCodeUseCase', () => {
   let fixtures: Fixtures;
@@ -48,7 +48,7 @@ class Fixtures {
 
   public readonly repositoryError = new Error('query failed');
 
-  public readonly sessionRepository: jest.Mocked<SessionRepository>;
+  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly useCase: GetSessionByCodeUseCase;
 
   constructor() {

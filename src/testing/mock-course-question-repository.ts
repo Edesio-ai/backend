@@ -1,4 +1,4 @@
-import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
+import type { ICourseQuestionRepository } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 
 export function createMockCourseQuestionRepository(): jest.Mocked<ICourseQuestionRepository> {
   return {

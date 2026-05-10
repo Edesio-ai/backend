@@ -1,18 +1,18 @@
 import { Inject } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
-import { Course } from 'src/domain/teaching/types/course.type';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { Course } from 'src/domain/teaching/course/types/course.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   NotFoundError,
   UnauthorizedError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 export type UpdateCourseBody = {
   title?: string | null;
@@ -23,7 +23,7 @@ export type UpdateCourseBody = {
 export class UpdateCourseUseCase {
   constructor(
     @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    private readonly courseRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
   ) {}

@@ -4,7 +4,7 @@ import {
   Teacher,
   Session,
   SupabaseTeacherInsert,
-} from 'src/domain/teaching/types/teacher.type';
+} from 'src/domain/teaching/teacher/types/teacher.type';
 
 export const TeacherMapper = {
   toDomain: (row: SupabaseTeacher): Teacher => ({

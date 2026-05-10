@@ -3,20 +3,20 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
-} from 'src/domain/teaching/interfaces/i-student-session.repository';
+} from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
 
 export class DeleteStudentSessionUseCase {
   constructor(
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    private readonly studentRepository: IStudentRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
     private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}

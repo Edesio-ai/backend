@@ -3,45 +3,45 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   ESTABLISHMENT_REPOSITORY,
-  type EstablishmentRepository,
-} from 'src/domain/teaching/interfaces/establishment.repository';
+  type IEstablishmentRepository,
+} from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
-} from 'src/domain/teaching/interfaces/i-student-session.repository';
+} from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import {
   SESSION_REPOSITORY,
-  type SessionRepository,
-} from 'src/domain/teaching/interfaces/session.repository';
+  type ISessionRepository,
+} from 'src/domain/teaching/session/contracts/i-session.repository';
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
-import { Course } from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { Course } from 'src/domain/teaching/course/types/course.type';
 
 export class GetSessionCoursesUseCase {
   constructor(
     @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    private readonly courseRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teachersRepository: TeacherRepository,
     @Inject(SESSION_REPOSITORY)
-    private readonly sessionRepository: SessionRepository,
+    private readonly sessionRepository: ISessionRepository,
     @Inject(ESTABLISHMENT_REPOSITORY)
-    private readonly establishmentRepository: EstablishmentRepository,
+    private readonly establishmentRepository: IEstablishmentRepository,
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    private readonly studentRepository: IStudentRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
     private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}

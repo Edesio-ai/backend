@@ -1,4 +1,4 @@
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { SupabaseSessionRepository } from './session-supabase.repository';
 
 describe('SupabaseSessionRepository', () => {

@@ -1,4 +1,4 @@
-import { SessionRepository } from 'src/domain/teaching/interface/session.repository';
+import { ISessionRepository } from 'src/domain/teaching/interface/session.repository';
 import { UpdateSessionNameUseCase } from './update-session-name.use-case';
 
 describe('UpdateSessionNameUseCase', () => {
@@ -42,7 +42,7 @@ class Fixtures {
   };
   public readonly repositoryError = new Error('update failed');
 
-  public readonly sessionRepository: jest.Mocked<SessionRepository>;
+  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly useCase: UpdateSessionNameUseCase;
 
   constructor() {

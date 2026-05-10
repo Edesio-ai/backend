@@ -1,7 +1,7 @@
-import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
 import { GetInvitationTokenUseCase } from './get-invitation-token.use-case';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 
 describe('GetInvitationTokenUseCase', () => {
   let fixtures: Fixtures;
@@ -37,7 +37,7 @@ describe('GetInvitationTokenUseCase', () => {
 });
 
 class Fixtures {
-  public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
+  public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly getInvitationTokenUseCase: GetInvitationTokenUseCase;
 
   public readonly establishmentId: string;

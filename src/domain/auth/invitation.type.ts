@@ -1,4 +1,4 @@
-import { SupabaseEstablishment } from '../teaching/types/establishment.type';
+import { SupabaseEstablishment } from '../teaching/establishment/types/establishment.type';
 
 export type InvitationTokenPreview = {
   isValid: true;

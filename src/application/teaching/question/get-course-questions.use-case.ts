@@ -1,41 +1,41 @@
-import { Question } from 'src/domain/teaching/types/question.type';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Inject } from '@nestjs/common';
 import {
   QUESTIONS_REPOSITORY,
-  type QuestionsRepository,
-} from 'src/domain/teaching/interfaces/questions.repository';
+  type IQuestionsRepository,
+} from 'src/domain/teaching/question/contracts/i-questions.repository';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
 import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
-} from 'src/domain/teaching/interfaces/i-student-session.repository';
+} from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 
 export class GetCourseQuestionsUseCase {
   constructor(
     @Inject(QUESTIONS_REPOSITORY)
-    private readonly questionsRepository: QuestionsRepository,
+    private readonly questionsRepository: IQuestionsRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teachersRepository: TeacherRepository,
     @Inject(COURSE_REPOSITORY)
-    private readonly coursesRepository: CourseRepository,
+    private readonly coursesRepository: ICourseRepository,
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    private readonly studentRepository: IStudentRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
     private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}

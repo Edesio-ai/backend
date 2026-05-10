@@ -5,7 +5,7 @@ import {
   QuestionUpdate,
   SupabaseQuestion,
   SupabaseQuestionUpdate,
-} from 'src/domain/teaching/types/question.type';
+} from 'src/domain/teaching/question/types/question.type';
 
 type SupabaseQuestionInsert = {
   course_id: string;

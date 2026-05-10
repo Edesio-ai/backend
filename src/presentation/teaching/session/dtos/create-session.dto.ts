@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { type SessionLanguage } from 'src/domain/teaching/types/session.type';
+import { type SessionLanguage } from 'src/domain/teaching/session/types/session.type';
 
 export class CreateSessionBodyDto {
   @IsString()

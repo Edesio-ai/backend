@@ -1,4 +1,4 @@
-import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
+import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
 
 export function createMockStudentCourseStatsRepository(): jest.Mocked<IStudentCourseStatsRepository> {
   return {

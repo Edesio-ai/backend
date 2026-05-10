@@ -5,11 +5,11 @@ import {
   InvitationToken,
   InvitationTokenPreview,
 } from 'src/domain/auth/invitation.type';
-import { IInvitationTokenRepository } from 'src/domain/token/contract/token.repository';
+import { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 import {
   BadRequestError,
   ServerError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import { invitationTokenMapper } from '../mappers/invitation-token.mapper';
 import { CreateInvitationTokenBody } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
 

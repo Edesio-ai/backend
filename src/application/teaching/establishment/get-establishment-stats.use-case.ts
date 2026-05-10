@@ -1,40 +1,40 @@
 import { Inject } from '@nestjs/common';
-import { ESTABLISHMENT_REPOSITORY } from 'src/domain/teaching/interfaces/establishment.repository';
-import { type EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { ESTABLISHMENT_REPOSITORY } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
+import { type IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   Teacher,
   Session,
   TeacherWithStats,
-} from 'src/domain/teaching/types/teacher.type';
+} from 'src/domain/teaching/teacher/types/teacher.type';
 import {
   Establishment,
   EstablishmentStats,
-} from 'src/domain/teaching/types/establishment.type';
-import type { StudentSession } from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/establishment/types/establishment.type';
 import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
-} from 'src/domain/teaching/interfaces/i-student-session.repository';
+} from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import {
   SESSION_REPOSITORY,
-  type SessionRepository,
-} from 'src/domain/teaching/interfaces/session.repository';
+  type ISessionRepository,
+} from 'src/domain/teaching/session/contracts/i-session.repository';
+import { StudentSession } from 'src/domain/teaching/student/type/student.type';
 
 export class GetEstablishmentsStatsUseCase {
   constructor(
     @Inject(ESTABLISHMENT_REPOSITORY)
-    private readonly establishmentRepository: EstablishmentRepository,
+    private readonly establishmentRepository: IEstablishmentRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
     private readonly studentSessionRepository: IStudentSessionRepository,
     @Inject(SESSION_REPOSITORY)
-    private readonly sessionRepository: SessionRepository,
+    private readonly sessionRepository: ISessionRepository,
   ) {}
 
   async execute(userId: string): Promise<EstablishmentStats> {

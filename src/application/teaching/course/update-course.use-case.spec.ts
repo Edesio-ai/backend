@@ -6,8 +6,8 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   NotFoundError,
   UnauthorizedError,
-} from 'src/domain/shared/global/errors/global.errors';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+} from 'src/domain/shared/errors/global.errors';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
@@ -135,7 +135,7 @@ class Fixtures {
 
   public readonly repositoryError = new Error('update failed');
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly useCase: UpdateCourseUseCase;
 

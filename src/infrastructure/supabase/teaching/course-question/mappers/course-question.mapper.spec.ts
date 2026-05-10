@@ -1,4 +1,4 @@
-import { SupabaseCourseQuestion } from 'src/domain/teaching/types/course-question.type';
+import { SupabaseCourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { CourseQuestionMapper } from '../mappers/course-question.mapper';
 
 describe('CourseQuestionMapper', () => {

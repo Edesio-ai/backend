@@ -1,6 +1,6 @@
-import type { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import type { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 
-export function createMockSessionRepository(): jest.Mocked<SessionRepository> {
+export function createMockSessionRepository(): jest.Mocked<ISessionRepository> {
   return {
     createSession: jest.fn(),
     deleteSessionByTeacherId: jest.fn(),

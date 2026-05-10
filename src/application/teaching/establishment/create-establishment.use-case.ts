@@ -1,17 +1,17 @@
 import { Inject } from '@nestjs/common';
 import {
   ESTABLISHMENT_REPOSITORY,
-  type EstablishmentRepository,
-} from 'src/domain/teaching/interfaces/establishment.repository';
+  type IEstablishmentRepository,
+} from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import {
   CreateEstablishmentBody,
   Establishment,
-} from 'src/domain/teaching/types/establishment.type';
+} from 'src/domain/teaching/establishment/types/establishment.type';
 
 export class CreateEstablishmentUseCase {
   constructor(
     @Inject(ESTABLISHMENT_REPOSITORY)
-    private readonly establishmentRepository: EstablishmentRepository,
+    private readonly establishmentRepository: IEstablishmentRepository,
   ) {}
 
   async execute(body: CreateEstablishmentBody): Promise<Establishment> {

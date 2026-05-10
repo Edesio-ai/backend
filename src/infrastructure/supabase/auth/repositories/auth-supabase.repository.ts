@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { AuthRepository } from '../../../../domain/auth/contract/auth.repository';
+import { IAuthRepository } from '../../../../domain/auth/contracts/i-auth.repository';
 import { TokenUserNotFoundError } from '../../../../domain/auth/errors/auth.errors';
 import {
   AuthUserWithSession,
@@ -13,10 +13,10 @@ import {
   BadRequestError,
   ServerError,
   UnauthorizedError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 
 @Injectable()
-export class AuthSupabaseRepository implements AuthRepository {
+export class AuthSupabaseRepository implements IAuthRepository {
   constructor(@Inject(SUPABASE_AUTH) private readonly supabaseAuth: any) {}
 
   public async validateToken(token: string): Promise<User> {

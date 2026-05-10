@@ -3,20 +3,20 @@ import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   COURSE_QUESTION_REPOSITORY,
   type ICourseQuestionRepository,
-} from 'src/domain/teaching/interfaces/i-course-question.repository';
+} from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 
 export class GetAnsweredQuestionCountUseCase {
   constructor(
     @Inject(COURSE_QUESTION_REPOSITORY)
     private readonly courseQuestionRepository: ICourseQuestionRepository,
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    private readonly studentRepository: IStudentRepository,
   ) {}
 
   async execute(user: AuthUser): Promise<number> {

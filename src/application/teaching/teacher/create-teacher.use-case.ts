@@ -2,8 +2,8 @@ import { Inject } from '@nestjs/common';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
-import { Teacher } from 'src/domain/teaching/types/teacher.type';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
 
 type CreateTeacherBody = {
   name: string;

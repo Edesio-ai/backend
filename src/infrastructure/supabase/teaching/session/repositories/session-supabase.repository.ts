@@ -6,13 +6,13 @@ import {
   SupabaseSession,
   Session,
   UpdateSessionNameBody,
-} from 'src/domain/teaching/types/session.type';
+} from 'src/domain/teaching/session/types/session.type';
 import { SessionMapper } from '../mappers/session.mapper';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
+import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { mapList } from 'src/infrastructure/supabase/common/mapper.util';
 
-export class SupabaseSessionRepository implements SessionRepository {
+export class SupabaseSessionRepository implements ISessionRepository {
   constructor(
     @Inject(SUPABASE_ADMIN)
     private readonly supabase: SupabaseClient,

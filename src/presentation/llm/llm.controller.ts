@@ -5,10 +5,10 @@ import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decora
 import { GenerateCompletionFeedbackBodyDto } from './dtos/generate-completion-feedback-body.dto';
 import { GenerateCompletionFeedbackUseCase } from 'src/application/llm/generate-completion-feedback.use-case';
 import { GenerateQuestionDto } from 'src/presentation/llm/dtos/generate-question.dto';
-import { Question } from 'src/domain/teaching/types/question.type';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GenerateQuestionUseCase } from 'src/application/llm/generate-question-use-case';
-import { EvaluateAnswerResponse } from 'src/domain/shared/llm/types/openai.type';
+import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
 import { EvaluateAnswerDto } from './dtos/evaluate-answer.dto';
 import { EvaluateAnswerUseCase } from 'src/application/llm/evaluate-answer.use-case';
 

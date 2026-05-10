@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { StudentCourseStatsSupabaseRepository } from './student-course-states-supabase.repository';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 
 describe('StudentCourseStatsSupabaseRepository', () => {
   let fixtures: Fixtures;

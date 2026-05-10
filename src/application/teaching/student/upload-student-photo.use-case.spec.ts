@@ -1,6 +1,6 @@
 import { UploadStudentPhotoUseCase } from './upload-student-photo.use-case';
-import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import { IStudentRepository } from 'src/domain/teaching/interface/student.repository';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   Student,
   StudentPhotoUpload,
@@ -120,7 +120,7 @@ class Fixtures {
     byteLength: 15,
   };
 
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly useCase: UploadStudentPhotoUseCase;
 
   constructor() {

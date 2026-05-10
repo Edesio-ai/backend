@@ -16,7 +16,7 @@ import { CreateStudentUseCase } from 'src/application/teaching/student/create-st
 import {
   Student,
   StudentPhotoUpload,
-} from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/student/type/student.type';
 import { GetStudentBatchBodyDto } from './dtos/get-student-batch.dto';
 import { GetStudentBatchUseCase } from 'src/application/teaching/student/get-student-batch.use-case';
 import { UploadStudentPhotoUseCase } from 'src/application/teaching/student/upload-student-photo.use-case';

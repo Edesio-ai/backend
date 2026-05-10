@@ -1,9 +1,9 @@
 import { RegisterUseCase } from './register.use-case';
-import { AuthRepository } from '../../domain/auth/contract/auth.repository';
-import { EmailProviderInterface } from '../../domain/email/contract/email.interface';
+import { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
+import { IEmailProvider } from '../../domain/email/contract/i-email.interface';
 import { RegisterBody } from '../../domain/auth/types/auth.type';
 import type { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import type { IInvitationTokenRepository } from 'src/domain/token/contract/token.repository';
+import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('RegisterUseCase', () => {
@@ -62,8 +62,8 @@ describe('RegisterUseCase', () => {
 });
 
 class Fixtures {
-  public readonly authRepository: jest.Mocked<AuthRepository>;
-  public readonly emailProvider: jest.Mocked<EmailProviderInterface>;
+  public readonly authRepository: jest.Mocked<IAuthRepository>;
+  public readonly emailProvider: jest.Mocked<IEmailProvider>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly invitationTokenRepository: jest.Mocked<IInvitationTokenRepository>;
   public readonly registerUseCase: RegisterUseCase;

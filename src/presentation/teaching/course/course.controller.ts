@@ -7,7 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { Course } from 'src/domain/teaching/types/course.type';
+import { Course } from 'src/domain/teaching/course/types/course.type';
 import { Roles } from '../../auth/decorator/role.decorator';
 import { CurrentUser } from '../../auth/decorator/current-user.decorator';
 import { CreateCourseUseCase } from 'src/application/teaching/course/create-course.use-case';

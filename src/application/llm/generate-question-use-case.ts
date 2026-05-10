@@ -2,39 +2,40 @@ import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
-import { CourseFile } from 'src/domain/teaching/types/course.type';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { CourseFile } from 'src/domain/teaching/course/types/course.type';
 import {
   GeneratedQuestion,
   Question,
   QuestionGenerationConfig,
-} from 'src/domain/teaching/types/question.type';
+} from 'src/domain/teaching/question/types/question.type';
 import {
   PDF_EXTRACTOR,
-  type PdfExtractor,
-} from 'src/domain/pdf/contracts/pdf-extractor.interface';
+  type IPdfExtractorProvider,
+} from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
 import {
   OPENAI_REPOSITORY,
-  type OpenaiRepository,
-} from 'src/domain/shared/llm/openai/contracts/opena-ai.repository';
-import {
-  QUESTIONS_REPOSITORY,
-  type QuestionsRepository,
-} from 'src/domain/teaching/interfaces/questions.repository';
+  type IOpenAiProvider,
+} from 'src/domain/llm/openai/contracts/open-ai.provider';
+
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   ForbiddenError,
   BadRequestError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import {
   COURSE_FILE_REPOSITORY,
   type ICourseFileRepository,
-} from 'src/domain/teaching/interfaces/i-course-file.repository';
+} from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
+import {
+  QUESTIONS_REPOSITORY,
+  type IQuestionsRepository,
+} from 'src/domain/teaching/question/contracts/i-questions.repository';
 
 export type GenerateQuestionBody = {
   courseId: string;
@@ -46,13 +47,13 @@ export type GenerateQuestionBody = {
 export class GenerateQuestionUseCase {
   constructor(
     @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    private readonly courseRepository: ICourseRepository,
     @Inject(PDF_EXTRACTOR)
-    private readonly pdfExtractor: PdfExtractor,
+    private readonly pdfExtractor: IPdfExtractorProvider,
     @Inject(OPENAI_REPOSITORY)
-    private readonly openaiRepository: OpenaiRepository,
+    private readonly openaiRepository: IOpenAiProvider,
     @Inject(QUESTIONS_REPOSITORY)
-    private readonly questionRepository: QuestionsRepository,
+    private readonly questionRepository: IQuestionsRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
     @Inject(COURSE_FILE_REPOSITORY)

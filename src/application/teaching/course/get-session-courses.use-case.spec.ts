@@ -4,12 +4,12 @@ import { Establishment } from 'src/domain/teaching/types/establishment.type';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
-import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+} from 'src/domain/shared/errors/global.errors';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
@@ -279,11 +279,11 @@ class Fixtures {
 
   public readonly coursesError = new Error('courses failed');
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly teachersRepository: jest.Mocked<TeacherRepository>;
-  public readonly sessionRepository: jest.Mocked<SessionRepository>;
-  public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
+  public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
   public readonly useCase: GetSessionCoursesUseCase;
 

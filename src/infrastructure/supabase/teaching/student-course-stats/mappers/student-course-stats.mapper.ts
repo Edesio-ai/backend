@@ -7,7 +7,7 @@ import type {
   SupabaseStudentCourseStatsWithStudent,
   supabaseUpdateStudentCourseStats,
   UpdateStudentCourseStats,
-} from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/student/type/student.type';
 import { mapList } from 'src/infrastructure/supabase/common/mapper.util';
 
 function courseStatWithStudentRowToDomain(

@@ -1,53 +1,53 @@
 import { Inject } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   NotFoundError,
   UnauthorizedError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
 import {
   COURSE_FILE_REPOSITORY,
   type ICourseFileRepository,
-} from 'src/domain/teaching/interfaces/i-course-file.repository';
+} from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 import {
   COURSE_QUESTION_REPOSITORY,
   type ICourseQuestionRepository,
-} from 'src/domain/teaching/interfaces/i-course-question.repository';
+} from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 import {
   QUESTIONS_REPOSITORY,
-  type QuestionsRepository,
-} from 'src/domain/teaching/interfaces/questions.repository';
+  type IQuestionsRepository,
+} from 'src/domain/teaching/question/contracts/i-questions.repository';
 import {
   type IStudentCourseStatsRepository,
   STUDENT_COURSE_STATS_REPOSITORY,
-} from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
+} from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
 
 export class DeleteCourseUseCase {
   constructor(
     @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    private readonly courseRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
     @Inject(COURSE_QUESTION_REPOSITORY)
     private readonly courseQuestionRepository: ICourseQuestionRepository,
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    private readonly studentRepository: IStudentRepository,
     @Inject(COURSE_FILE_REPOSITORY)
     private readonly courseFileRepository: ICourseFileRepository,
     @Inject(QUESTIONS_REPOSITORY)
-    private readonly questionsRepository: QuestionsRepository,
+    private readonly questionsRepository: IQuestionsRepository,
     @Inject(STUDENT_COURSE_STATS_REPOSITORY)
     private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}

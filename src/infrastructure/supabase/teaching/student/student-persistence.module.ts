@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { STUDENT_REPOSITORY } from 'src/domain/teaching/interfaces/student.repository';
+import { STUDENT_REPOSITORY } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { SupabaseModule } from '../../supabase.module';
 import { StudentSupabaseRepository } from './repositories/student-supabase.repository';
 

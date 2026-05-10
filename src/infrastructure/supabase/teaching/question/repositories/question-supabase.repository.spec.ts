@@ -1,9 +1,9 @@
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 import {
   CreateQuestionBody,
   GeneratedQuestion,
   Question,
-} from 'src/domain/teaching/types/question.type';
+} from 'src/domain/teaching/question/types/question.type';
 import { QuestionSupabaseRepository } from './question-supabase.repository';
 
 describe('QuestionSupabaseRepository', () => {

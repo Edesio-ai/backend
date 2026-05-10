@@ -15,7 +15,7 @@ import { CreateQuestionUseCase } from 'src/application/teaching/question/create-
 import { DeleteQuestionByIdUseCase } from 'src/application/teaching/question/delete-question-by-id.use-case';
 import { UpdateQuestionDto } from './dtos/update-question.dto';
 import { UpdateQuestionByIdUseCase } from 'src/application/teaching/question/update-question-by-id.use-case';
-import { Question } from 'src/domain/teaching/types/question.type';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 import { GetCourseQuestionsUseCase } from 'src/application/teaching/question/get-course-questions.use-case';
 
 @Roles('teacher')

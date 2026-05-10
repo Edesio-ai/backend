@@ -1,5 +1,5 @@
 import { SendInvitationUseCase } from './send-invitation.use-case';
-import { EmailProviderInterface } from '../../domain/email/contract/email.interface';
+import { IEmailProvider } from '../../domain/email/contract/i-email.interface';
 import { EmailBody } from '../../domain/email/type/email.type';
 
 describe('SendInvitationUseCase', () => {
@@ -38,7 +38,7 @@ describe('SendInvitationUseCase', () => {
 });
 
 class Fixtures {
-  public readonly emailProvider: jest.Mocked<EmailProviderInterface>;
+  public readonly emailProvider: jest.Mocked<IEmailProvider>;
   public readonly sendInvitationUseCase: SendInvitationUseCase;
 
   public readonly body: EmailBody;

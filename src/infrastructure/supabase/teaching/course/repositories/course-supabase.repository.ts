@@ -5,13 +5,13 @@ import {
   CreateCourseBody,
   Course,
   CourseWithSession,
-} from 'src/domain/teaching/types/course.type';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/teaching/course/types/course.type';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { CourseMapper } from '../mappers/course.mapper';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { SessionMapper } from '../../session/mappers/session.mapper';
 
-export class CourseSupabaseRepository implements CourseRepository {
+export class CourseSupabaseRepository implements ICourseRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
 
   public async getCourseById(courseId: string): Promise<Course> {

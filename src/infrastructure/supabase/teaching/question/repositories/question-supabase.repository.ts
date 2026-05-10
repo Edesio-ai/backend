@@ -5,12 +5,12 @@ import {
   GeneratedQuestion,
   Question,
   QuestionUpdate,
-} from 'src/domain/teaching/types/question.type';
+} from 'src/domain/teaching/question/types/question.type';
 import { QuestionMapper } from '../mappers/question.mapper';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
+import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 
-export class QuestionSupabaseRepository implements QuestionsRepository {
+export class QuestionSupabaseRepository implements IQuestionsRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
 
   async deleteQuestionsByCourseIds(courseIds: string[]): Promise<void> {

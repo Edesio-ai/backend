@@ -1,5 +1,5 @@
 import { GetCoursesSessionCountUseCase } from './get-courses-session-count.use-case';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 
 describe('GetCoursesSessionCountUseCase', () => {
@@ -31,7 +31,7 @@ class Fixtures {
   public readonly sessionId = 'session-1';
   public readonly repositoryError = new Error('count query failed');
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly useCase: GetCoursesSessionCountUseCase;
 
   constructor() {

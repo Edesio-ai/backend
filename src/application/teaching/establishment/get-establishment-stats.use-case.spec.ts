@@ -1,8 +1,8 @@
 import { GetEstablishmentsStatsUseCase } from './get-establishment-stats.use-case';
-import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
-import type { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import type { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 
@@ -33,10 +33,10 @@ describe('GetEstablishmentsStatsUseCase', () => {
 });
 
 class Fixtures {
-  public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
+  public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
-  public readonly sessionRepository: jest.Mocked<SessionRepository>;
+  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly getEstablishmentsStatsUseCase: GetEstablishmentsStatsUseCase;
 
   public readonly userId: string;

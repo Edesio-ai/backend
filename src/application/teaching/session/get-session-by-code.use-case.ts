@@ -1,14 +1,14 @@
 import { Inject } from '@nestjs/common';
-import { Session } from 'src/domain/teaching/types/session.type';
+import { Session } from 'src/domain/teaching/session/types/session.type';
 import {
   SESSION_REPOSITORY,
-  type SessionRepository,
-} from 'src/domain/teaching/interfaces/session.repository';
+  type ISessionRepository,
+} from 'src/domain/teaching/session/contracts/i-session.repository';
 
 export class GetSessionByCodeUseCase {
   constructor(
     @Inject(SESSION_REPOSITORY)
-    private readonly sessionRepository: SessionRepository,
+    private readonly sessionRepository: ISessionRepository,
   ) {}
 
   async execute(code: string): Promise<Session | null> {

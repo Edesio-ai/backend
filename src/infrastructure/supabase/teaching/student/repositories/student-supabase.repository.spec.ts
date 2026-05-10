@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { StudentSupabaseRepository } from './student-supabase.repository';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 
 describe('StudentSupabaseRepository', () => {

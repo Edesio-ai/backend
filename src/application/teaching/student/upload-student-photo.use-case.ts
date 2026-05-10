@@ -1,16 +1,16 @@
 import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
-import { StudentPhotoUpload } from 'src/domain/teaching/types/student.type';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
+import { StudentPhotoUpload } from 'src/domain/teaching/student/type/student.type';
 
 export class UploadStudentPhotoUseCase {
   constructor(
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    private readonly studentRepository: IStudentRepository,
   ) {}
 
   async execute(user: AuthUser, payload: StudentPhotoUpload): Promise<string> {

@@ -1,13 +1,13 @@
 import { Inject } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 
 export class GetCourseValidatedQuestionsUseCase {
   constructor(
     @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    private readonly courseRepository: ICourseRepository,
   ) {}
 
   async execute(courseId: string): Promise<{ validatedQuestions: boolean }> {

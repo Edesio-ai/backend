@@ -2,13 +2,16 @@ import { Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from '../../../supabase.module';
 import { mapList } from '../../../common/mapper.util';
-import { InsertStudent, Student } from 'src/domain/teaching/types/student.type';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import {
+  InsertStudent,
+  Student,
+} from 'src/domain/teaching/student/type/student.type';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { StudentMapper } from '../mappers/student.mapper';
 
-export class StudentSupabaseRepository implements StudentRepository {
+export class StudentSupabaseRepository implements IStudentRepository {
   constructor(
     @Inject(SUPABASE_ADMIN)
     private readonly supabase: SupabaseClient,

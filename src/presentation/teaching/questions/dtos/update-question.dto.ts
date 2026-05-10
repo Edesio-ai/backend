@@ -1,5 +1,5 @@
 import { IsArray, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
-import { type QuestionType } from 'src/domain/teaching/types/question.type';
+import { type QuestionType } from 'src/domain/teaching/question/types/question.type';
 
 export class UpdateQuestionDto {
   @IsString()

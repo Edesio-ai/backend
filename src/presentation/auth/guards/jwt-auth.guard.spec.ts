@@ -1,12 +1,12 @@
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import type { AuthRepository } from 'src/domain/auth/contract/auth.repository';
+import type { IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
 import type { Request } from 'express';
 
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 describe('JwtAuthGuard', () => {
-  let authRepository: jest.Mocked<Pick<AuthRepository, 'validateToken'>>;
+  let authRepository: jest.Mocked<Pick<IAuthRepository, 'validateToken'>>;
   let reflector: Reflector;
   let guard: JwtAuthGuard;
 

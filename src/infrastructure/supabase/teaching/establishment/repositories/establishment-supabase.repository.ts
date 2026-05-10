@@ -1,12 +1,12 @@
 import { Inject } from '@nestjs/common';
 
 import { SUPABASE_ADMIN } from '../../../supabase.module';
-import { Establishment } from 'src/domain/teaching/types/establishment.type';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { Establishment } from 'src/domain/teaching/establishment/types/establishment.type';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
+import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import { EstablishmentMapper } from '../mappers/establishment.mapper';
 
-export class EstablishmentSupabaseRepository implements EstablishmentRepository {
+export class EstablishmentSupabaseRepository implements IEstablishmentRepository {
   constructor(
     @Inject(SUPABASE_ADMIN)
     private readonly supabase: any,

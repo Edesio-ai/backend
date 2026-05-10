@@ -1,5 +1,5 @@
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
+import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { CourseQuestionSupabaseRepository } from './course-question-supabase';
 
 describe('CourseQuestionSupabaseRepository', () => {

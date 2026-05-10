@@ -1,37 +1,37 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   CourseRanking,
   CourseRankingWithRate,
-} from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/course/types/course.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
-} from 'src/domain/teaching/interfaces/teacher.repository';
+} from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   SESSION_REPOSITORY,
-  type SessionRepository,
-} from 'src/domain/teaching/interfaces/session.repository';
-import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+  type ISessionRepository,
+} from 'src/domain/teaching/session/contracts/i-session.repository';
+import { StudentCourseStatsWithStudent } from 'src/domain/teaching/student/type/student.type';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type IStudentCourseStatsRepository,
   STUDENT_COURSE_STATS_REPOSITORY,
-} from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
+} from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
 
 @Injectable()
 export class GetCourseRankingUseCase {
   constructor(
     @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    private readonly courseRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
     @Inject(SESSION_REPOSITORY)
-    private readonly sessionRepository: SessionRepository,
+    private readonly sessionRepository: ISessionRepository,
     @Inject(STUDENT_COURSE_STATS_REPOSITORY)
     private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}

@@ -1,9 +1,9 @@
 import { Inject } from '@nestjs/common';
-import {} from 'src/domain/auth/contract/auth.repository';
+import {} from 'src/domain/auth/contracts/i-auth.repository';
 import {
   INVITATION_TOKEN_REPOSITORY,
   type IInvitationTokenRepository,
-} from 'src/domain/token/contract/token.repository';
+} from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 
 export type CreateInvitationTokenBody = {
   establishmentId: string;

@@ -5,7 +5,7 @@ import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decora
 import { GetPendingQuestionCountUseCase } from 'src/application/teaching/course-question/get-pending-question-count.use-case';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetAnsweredQuestionCountUseCase } from 'src/application/teaching/course-question/get-answered-question-count.use-case';
-import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
+import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { GetStudentCourseQuestionsUseCase } from 'src/application/teaching/course-question/get-student-course-questions.use-case';
 
 @Controller('course-questions')

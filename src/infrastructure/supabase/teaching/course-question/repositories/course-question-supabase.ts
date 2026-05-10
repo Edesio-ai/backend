@@ -1,7 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
-import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
+import { ICourseQuestionRepository } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
+import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { CourseQuestionMapper } from '../mappers/course-question.mapper';
 
 export class CourseQuestionSupabaseRepository implements ICourseQuestionRepository {

@@ -1,10 +1,10 @@
 import { DeleteStudentSessionUseCase } from 'src/application/teaching/student-session/delete-student-session.use-case';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   Student,
@@ -103,7 +103,7 @@ class Fixtures {
     studentId: this.student.id,
   };
 
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
   public readonly useCase: DeleteStudentSessionUseCase;
 

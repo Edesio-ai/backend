@@ -1,6 +1,6 @@
 import { CreateSessionUseCase } from './create-session.use-case';
-import { SessionRepository } from 'src/domain/teaching/interface/session.repository';
-import { CreateSessionBody } from 'src/domain/teaching/types/session.type';
+import { ISessionRepository } from 'src/domain/teaching/interface/session.repository';
+import { CreateSessionBody } from 'src/domain/teaching/session/types/session.type';
 
 describe('CreateSessionUseCase', () => {
   let fixtures: Fixtures;
@@ -46,7 +46,7 @@ class Fixtures {
 
   public readonly repositoryError = new Error('insert failed');
 
-  public readonly sessionRepository: jest.Mocked<SessionRepository>;
+  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly useCase: CreateSessionUseCase;
 
   constructor() {

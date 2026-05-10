@@ -1,12 +1,12 @@
 import { Inject } from '@nestjs/common';
 import Stripe from 'stripe';
-import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
+import { IStripeClientProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
 import { STRIPE_CLIENT } from './stripe.module';
 import { User } from 'src/domain/auth/types/auth.type';
-import { StripeSession } from 'src/domain/billing/billing.type';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { StripeSession } from 'src/domain/billing/types/billing.type';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 
-export class StripeRepository implements StripeClientInterface {
+export class StripeRepository implements IStripeClientProvider {
   constructor(
     @Inject(STRIPE_CLIENT)
     private readonly stripeClient: Stripe,

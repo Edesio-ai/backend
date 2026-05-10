@@ -7,11 +7,11 @@ import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
-import { OpenaiRepository } from 'src/domain/shared/llm/openai/contracts/opena-ai.repository';
-import { PdfExtractor } from 'src/domain/pdf/contracts/pdf-extractor.interface';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+} from 'src/domain/shared/errors/global.errors';
+import { IOpenAiProvider } from 'src/domain/shared/llm/openai/contracts/opena-ai.repository';
+import { IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
 import {
@@ -21,7 +21,7 @@ import {
 import {
   GeneratedQuestion,
   Question,
-} from 'src/domain/teaching/types/question.type';
+} from 'src/domain/teaching/question/types/question.type';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 
@@ -201,10 +201,10 @@ class Fixtures {
     createdAt: '2026-01-01T00:00:00.000Z',
   };
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
-  public readonly pdfExtractor: jest.Mocked<PdfExtractor>;
-  public readonly openaiRepository: jest.Mocked<OpenaiRepository>;
-  public readonly questionRepository: jest.Mocked<QuestionsRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
+  public readonly pdfExtractor: jest.Mocked<IPdfExtractorProvider>;
+  public readonly openaiRepository: jest.Mocked<IOpenAiProvider>;
+  public readonly questionRepository: jest.Mocked<IQuestionsRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly useCase: GenerateQuestionUseCase;

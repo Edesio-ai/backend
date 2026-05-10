@@ -3,11 +3,11 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   NotFoundError,
   UnauthorizedError,
-} from 'src/domain/shared/global/errors/global.errors';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+} from 'src/domain/shared/errors/global.errors';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
 import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
 import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
@@ -146,11 +146,11 @@ class Fixtures {
     supabaseUserId: this.user.id,
   };
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly courseQuestionRepository: jest.Mocked<ICourseQuestionRepository>;
-  public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly questionsRepository: jest.Mocked<IQuestionsRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly useCase: DeleteCourseUseCase;

@@ -1,13 +1,13 @@
 import { Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
+import { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
 import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
 import { StudentCourseStatsMapper } from '../mappers/student-course-stats.mapper';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 import type {
   StudentCourseStats,
   StudentCourseStatsWithStudent,
-} from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/student/type/student.type';
 
 export class StudentCourseStatsSupabaseRepository implements IStudentCourseStatsRepository {
   constructor(

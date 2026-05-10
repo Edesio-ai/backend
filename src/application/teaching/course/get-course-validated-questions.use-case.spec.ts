@@ -1,5 +1,5 @@
 import { GetCourseValidatedQuestionsUseCase } from './get-course-validated-questions.use-case';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 
 describe('GetCourseValidatedQuestionsUseCase', () => {
@@ -33,7 +33,7 @@ class Fixtures {
   public readonly courseId = 'course-1';
   public readonly repositoryError = new Error('validated query failed');
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly useCase: GetCourseValidatedQuestionsUseCase;
 
   constructor() {

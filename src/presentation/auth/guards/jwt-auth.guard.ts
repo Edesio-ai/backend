@@ -10,15 +10,15 @@ import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorator/public.decorator';
 import {
   AUTH_REPOSITORY,
-  type AuthRepository,
-} from 'src/domain/auth/contract/auth.repository';
+  type IAuthRepository,
+} from 'src/domain/auth/contracts/i-auth.repository';
 import { Request } from 'express';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     @Inject(AUTH_REPOSITORY)
-    private readonly authRepository: AuthRepository,
+    private readonly authRepository: IAuthRepository,
     private readonly reflector: Reflector,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {

@@ -1,5 +1,5 @@
 import { LoginUseCase } from './login.use-case';
-import { AuthRepository } from '../../domain/auth/contract/auth.repository';
+import { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
 import {
   AuthUserWithSession,
   LoginBody,
@@ -38,7 +38,7 @@ describe('LoginUseCase', () => {
 });
 
 class Fixtures {
-  public readonly authRepository: jest.Mocked<AuthRepository>;
+  public readonly authRepository: jest.Mocked<IAuthRepository>;
   public readonly loginUseCase: LoginUseCase;
 
   public readonly loginBody: LoginBody;

@@ -3,11 +3,11 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+} from 'src/domain/shared/errors/global.errors';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { IEstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
 import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
@@ -164,10 +164,10 @@ class Fixtures {
     },
   ];
 
-  public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
-  public readonly coursesRepository: jest.Mocked<CourseRepository>;
-  public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
-  public readonly studentsRepository: jest.Mocked<StudentRepository>;
+  public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
+  public readonly coursesRepository: jest.Mocked<ICourseRepository>;
+  public readonly questionsRepository: jest.Mocked<IQuestionsRepository>;
+  public readonly studentsRepository: jest.Mocked<IStudentRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly useCase: GetSessionDetailsUseCase;

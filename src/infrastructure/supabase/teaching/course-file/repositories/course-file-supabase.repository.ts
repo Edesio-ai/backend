@@ -1,10 +1,10 @@
-import { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
+import { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 import {
   CourseFile,
   CourseFileUpload,
-} from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/course/types/course.type';
 import { courseFileMapper } from '../mappers/course-file.mapper';
 
 export class CourseFileRepository implements ICourseFileRepository {

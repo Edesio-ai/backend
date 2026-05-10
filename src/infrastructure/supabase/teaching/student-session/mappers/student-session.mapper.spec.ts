@@ -1,4 +1,4 @@
-import type { SupabaseSession } from 'src/domain/teaching/types/session.type';
+import type { SupabaseSession } from 'src/domain/teaching/session/types/session.type';
 import type {
   SupabaseSessionStudent,
   SupabaseStudentJoinedSession,

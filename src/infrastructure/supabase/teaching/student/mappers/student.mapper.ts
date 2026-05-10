@@ -3,7 +3,7 @@ import {
   Student,
   SupabaseStudent,
   SupabaseStudentInsert,
-} from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/student/type/student.type';
 
 export const StudentMapper = {
   toDomain: (row: SupabaseStudent): Student => ({

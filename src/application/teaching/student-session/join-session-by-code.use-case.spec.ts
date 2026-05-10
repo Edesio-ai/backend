@@ -1,11 +1,11 @@
 import { JoinSessionByCodeUseCase } from './join-session-by-code.use-case';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { ISessionRepository } from 'src/domain/teaching/interfaces/session.repository';
 import {
   BadRequestError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
-import { Session } from 'src/domain/teaching/types/session.type';
+} from 'src/domain/shared/errors/global.errors';
+import { Session } from 'src/domain/teaching/session/types/session.type';
 import {
   Student,
   StudentJoinedSession,
@@ -108,8 +108,8 @@ class Fixtures {
     joinedAt: '2026-01-10T00:00:00.000Z',
   };
 
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
-  public readonly sessionRepository: jest.Mocked<SessionRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
+  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly studentSessionRepository: ReturnType<
     typeof createMockStudentSessionRepository
   >;

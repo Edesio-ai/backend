@@ -1,5 +1,5 @@
 import { CreateCourseUseCase } from './create-course.use-case';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import { CreateCourseBody } from 'src/domain/teaching/types/course.type';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 
@@ -47,7 +47,7 @@ class Fixtures {
 
   public readonly repositoryError = new Error('insert failed');
 
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly useCase: CreateCourseUseCase;
 
   constructor() {

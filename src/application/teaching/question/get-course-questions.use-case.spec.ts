@@ -3,11 +3,11 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+} from 'src/domain/shared/errors/global.errors';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { IQuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
@@ -18,7 +18,7 @@ import {
   Course,
   CourseWithSession,
 } from 'src/domain/teaching/types/course.type';
-import { Question } from 'src/domain/teaching/types/question.type';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 
 /** Même valeur que dans `GetCourseQuestionsUseCase.checkTeacherAccess` (PostgREST select). */
 const TEACHER_COURSE_SELECT = `
@@ -265,10 +265,10 @@ class Fixtures {
 
   public readonly questionsError = new Error('questions query failed');
 
-  public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
+  public readonly questionsRepository: jest.Mocked<IQuestionsRepository>;
   public readonly teachersRepository: jest.Mocked<TeacherRepository>;
-  public readonly coursesRepository: jest.Mocked<CourseRepository>;
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly coursesRepository: jest.Mocked<ICourseRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
   public readonly useCase: GetCourseQuestionsUseCase;
 

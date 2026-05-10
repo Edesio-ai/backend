@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { STRIPE_CLIENT_INTERFACE } from '../../domain/billing/contracts/stripe-client.interface';
+import { STRIPE_CLIENT_INTERFACE } from '../../domain/billing/contracts/i-stripe-client.provider';
 import { StripeRepository } from './stripe.repository';
 import { StripeModule } from './stripe.module';
 

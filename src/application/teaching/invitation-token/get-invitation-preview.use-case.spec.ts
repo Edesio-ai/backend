@@ -1,7 +1,7 @@
 import { GetInvitationPreviewUseCase } from './get-invitation-preview.use-case';
-import { AuthRepository } from 'src/domain/auth/contract/auth.repository';
+import { IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
 import { InvitationTokenPreview } from 'src/domain/auth/invitation.type';
-import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 
 describe('GetInvitationPreviewUseCase', () => {
   let fixtures: Fixtures;
@@ -35,7 +35,7 @@ describe('GetInvitationPreviewUseCase', () => {
 });
 
 class Fixtures {
-  public readonly authRepository: jest.Mocked<AuthRepository>;
+  public readonly authRepository: jest.Mocked<IAuthRepository>;
   public readonly getInvitationPreviewUseCase: GetInvitationPreviewUseCase;
 
   public readonly token = 'token-123';

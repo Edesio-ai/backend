@@ -1,4 +1,4 @@
-import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
+import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 
 export function createMockCourseFileRepository(): jest.Mocked<ICourseFileRepository> {
   return {

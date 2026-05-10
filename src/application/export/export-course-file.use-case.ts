@@ -2,7 +2,7 @@ import { Inject, NotFoundException } from '@nestjs/common';
 import {
   COURSE_FILE_REPOSITORY,
   type ICourseFileRepository,
-} from 'src/domain/teaching/interfaces/i-course-file.repository';
+} from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 
 export class ExportCourseFileUseCase {
   constructor(

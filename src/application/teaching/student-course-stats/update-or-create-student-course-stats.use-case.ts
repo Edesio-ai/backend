@@ -2,16 +2,16 @@ import { Inject, NotFoundException } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   type IStudentCourseStatsRepository,
   STUDENT_COURSE_STATS_REPOSITORY,
-} from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
+} from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
 
 type UpdateOrCreateStudentCourseStatsBoyd = {
   attemptedQuestions: number;
@@ -20,9 +20,9 @@ type UpdateOrCreateStudentCourseStatsBoyd = {
 export class UpdateOrCreateStudentCourseStatsUseCase {
   constructor(
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    private readonly studentRepository: IStudentRepository,
     @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: CourseRepository,
+    private readonly courseRepository: ICourseRepository,
     @Inject(STUDENT_COURSE_STATS_REPOSITORY)
     private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}

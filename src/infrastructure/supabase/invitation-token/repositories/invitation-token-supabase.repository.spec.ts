@@ -2,7 +2,7 @@ import { InvitationTokenSupabaseRepository } from './invtiation-token-supabase.r
 import {
   BadRequestError,
   ServerError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 
 describe('InvitationTokenSupabaseRepository', () => {
   let fixtures: Fixtures;

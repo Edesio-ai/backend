@@ -1,5 +1,5 @@
 import { EstablishmentSupabaseRepository } from './establishment-supabase.repository';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 
 describe('EstablishmentSupabaseRepository', () => {
   let fixtures: Fixtures;

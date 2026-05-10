@@ -1,10 +1,10 @@
-import { OpenaiRepository } from './openai.repository';
-import { QuestionGenerationConfig } from 'src/domain/teaching/types/question.type';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { IOpenAiProvider } from './openai.repository';
+import { QuestionGenerationConfig } from 'src/domain/teaching/question/types/question.type';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { EvaluateAnswerBody } from 'src/application/question/evaluate-answer.use-case';
 import { GenerateCompletionFeedbackBody } from 'src/application/llm/generate-completion-feedback.use-case';
 
-describe('OpenaiRepository', () => {
+describe('IOpenAiProvider', () => {
   let fixtures: Fixtures;
 
   beforeEach(() => {
@@ -315,10 +315,10 @@ class Fixtures {
     },
   };
 
-  public readonly repository: OpenaiRepository;
+  public readonly repository: IOpenAiProvider;
 
   constructor() {
-    this.repository = new OpenaiRepository(this.openaiClientMock as any);
+    this.repository = new IOpenAiProvider(this.openaiClientMock as any);
   }
 
   whenGenerateQuestions(content: string, existingQuestions?: string[]) {

@@ -3,7 +3,7 @@ import {
   BadRequestError,
   ServerError,
   UnauthorizedError,
-} from '../../../../domain/shared/global/errors/global.errors';
+} from '../../../../domain/shared/errors/global.errors';
 import {
   AuthUserWithSession,
   Session,

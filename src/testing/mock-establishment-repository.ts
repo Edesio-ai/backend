@@ -1,6 +1,6 @@
-import type { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import type { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 
-export function createMockEstablishmentRepository(): jest.Mocked<EstablishmentRepository> {
+export function createMockEstablishmentRepository(): jest.Mocked<IEstablishmentRepository> {
   return {
     createEstablishment: jest.fn(),
     getEstablishmentById: jest.fn(),

@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
+import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import { mapList } from 'src/infrastructure/supabase/common/mapper.util';
 import type {
   SessionStudent,
   StudentJoinedSession,
   StudentSession,
-} from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/student/type/student.type';
 import { SUPABASE_ADMIN } from '../../../supabase.module';
 import { StudentSessionMapper } from '../mappers/student-session.mapper';
 

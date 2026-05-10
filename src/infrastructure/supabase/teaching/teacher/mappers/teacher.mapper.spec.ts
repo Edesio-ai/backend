@@ -2,7 +2,7 @@ import { TeacherMapper } from './teacher.mapper';
 import {
   SupabaseTeacher,
   SupabaseTeacherSession,
-} from 'src/domain/teaching/types/teacher.type';
+} from 'src/domain/teaching/teacher/types/teacher.type';
 
 describe('TeacherMapper', () => {
   let fixtures: Fixtures;

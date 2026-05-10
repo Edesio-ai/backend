@@ -2,7 +2,7 @@ import {
   CreateInvitationTokenBody,
   CreateInvitationTokenUseCase,
 } from './create-invitation-token.use-case';
-import { AuthRepository } from 'src/domain/auth/contract/auth.repository';
+import { IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
 
 describe('CreateInvitationTokenUseCase', () => {
   let fixtures: Fixtures;
@@ -30,7 +30,7 @@ describe('CreateInvitationTokenUseCase', () => {
 });
 
 class Fixtures {
-  public readonly authRepository: jest.Mocked<AuthRepository>;
+  public readonly authRepository: jest.Mocked<IAuthRepository>;
   public readonly createInvitationTokenUseCase: CreateInvitationTokenUseCase;
 
   public readonly body: CreateInvitationTokenBody;

@@ -1,4 +1,4 @@
-import type { SupabaseSession } from 'src/domain/teaching/types/session.type';
+import type { SupabaseSession } from 'src/domain/teaching/session/types/session.type';
 import type {
   SessionStudent,
   StudentJoinedSession,
@@ -6,7 +6,7 @@ import type {
   SupabaseSessionStudent,
   SupabaseStudentJoinedSession,
   SupabaseStudentSession,
-} from 'src/domain/teaching/types/student.type';
+} from 'src/domain/teaching/student/type/student.type';
 import { mapList } from 'src/infrastructure/supabase/common/mapper.util';
 
 function sessionsEmbedToList(

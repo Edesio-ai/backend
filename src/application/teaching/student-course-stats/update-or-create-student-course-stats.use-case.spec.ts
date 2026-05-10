@@ -1,8 +1,8 @@
 import { NotFoundException } from '@nestjs/common';
 import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/teaching/student-course-stats/update-or-create-student-course-stats.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import type { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import type { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import type { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import type { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
 import { Course } from 'src/domain/teaching/types/course.type';
 import { Student } from 'src/domain/teaching/types/student.type';
@@ -111,8 +111,8 @@ class Fixtures {
     correctAnswers: 9,
   };
 
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly useCase: UpdateOrCreateStudentCourseStatsUseCase;
 

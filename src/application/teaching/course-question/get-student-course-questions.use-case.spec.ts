@@ -3,11 +3,11 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
-import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+} from 'src/domain/shared/errors/global.errors';
+import { ICourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
-import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
+import { IStudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { Course } from 'src/domain/teaching/types/course.type';
 import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
@@ -144,8 +144,8 @@ class Fixtures {
   public readonly courseQuestionsError = new Error('course_questions failed');
 
   public readonly courseQuestionRepository: jest.Mocked<ICourseQuestionRepository>;
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly studentRepository: jest.Mocked<IStudentRepository>;
+  public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly studentSessionRepository: ReturnType<
     typeof createMockStudentSessionRepository
   >;

@@ -1,10 +1,10 @@
 import { Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { TeacherMapper } from '../mappers/teacher.mapper';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
+import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
-import { Teacher } from 'src/domain/teaching/types/teacher.type';
+import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { User } from 'src/domain/auth/types/auth.type';
 import { SUPABASE_AUTH } from 'src/infrastructure/supabase/supabase-auth.module';

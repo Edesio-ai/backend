@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
-import { EmailProviderInterface } from '../../domain/email/contract/email.interface';
+import { IEmailProvider } from '../../domain/email/contract/i-email.interface';
 import { RESEND_CLIENT } from './resend.module';
 import { buildWelcomeEmailTemplateData } from './templates/welcome/welcome-email.data';
 import { renderWelcomeEmailHtml } from './templates/welcome/welcome-email.renderer';
 import { buildProfesseurInvitationTemplateData } from './templates/invitation/professeur-invitation-email.data';
 import { renderProfesseurInvitationEmailHtml } from './templates/invitation/professeur-invitation-email.renderer';
-import { ServerError } from 'src/domain/shared/global/errors/global.errors';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 
 @Injectable()
-export class ResendEmailProvider implements EmailProviderInterface {
+export class ResendEmailProvider implements IEmailProvider {
   constructor(@Inject(RESEND_CLIENT) private readonly resend: Resend) {}
 
   public async sendProfesseurInvitation(

@@ -3,7 +3,7 @@ import {
   CreateCourseBody,
   SupabaseCourse,
   SupabaseCourseInsert,
-} from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/course/types/course.type';
 
 export const CourseMapper = {
   toDomain: (row: SupabaseCourse): Course => ({

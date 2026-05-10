@@ -1,46 +1,46 @@
 import { Inject } from '@nestjs/common';
 import {
   ESTABLISHMENT_REPOSITORY,
-  type EstablishmentRepository,
-} from 'src/domain/teaching/interfaces/establishment.repository';
+  type IEstablishmentRepository,
+} from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ForbiddenError,
   NotFoundError,
-} from 'src/domain/shared/global/errors/global.errors';
+} from 'src/domain/shared/errors/global.errors';
 import {
   COURSE_REPOSITORY,
-  type CourseRepository,
-} from 'src/domain/teaching/interfaces/course.repository';
+  type ICourseRepository,
+} from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   QUESTIONS_REPOSITORY,
-  type QuestionsRepository,
-} from 'src/domain/teaching/interfaces/questions.repository';
+  type IQuestionsRepository,
+} from 'src/domain/teaching/question/contracts/i-questions.repository';
 import {
   STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
+  type IStudentRepository,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
 import {
   COURSE_FILE_REPOSITORY,
   type ICourseFileRepository,
-} from 'src/domain/teaching/interfaces/i-course-file.repository';
-import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
-import { SessionDetails } from 'src/domain/teaching/types/course.type';
+} from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
+import { StudentCourseStatsWithStudent } from 'src/domain/teaching/student/type/student.type';
+import { SessionDetails } from 'src/domain/teaching/course/types/course.type';
 import {
   type IStudentCourseStatsRepository,
   STUDENT_COURSE_STATS_REPOSITORY,
-} from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
+} from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
 
 export class GetSessionDetailsUseCase {
   constructor(
     @Inject(ESTABLISHMENT_REPOSITORY)
-    private readonly establishmentRepository: EstablishmentRepository,
+    private readonly establishmentRepository: IEstablishmentRepository,
     @Inject(COURSE_REPOSITORY)
-    private readonly coursesRepository: CourseRepository,
+    private readonly coursesRepository: ICourseRepository,
     @Inject(QUESTIONS_REPOSITORY)
-    private readonly questionsRepository: QuestionsRepository,
+    private readonly questionsRepository: IQuestionsRepository,
     @Inject(STUDENT_REPOSITORY)
-    private readonly studentsRepository: StudentRepository,
+    private readonly studentsRepository: IStudentRepository,
     @Inject(COURSE_FILE_REPOSITORY)
     private readonly courseFileRepository: ICourseFileRepository,
     @Inject(STUDENT_COURSE_STATS_REPOSITORY)
