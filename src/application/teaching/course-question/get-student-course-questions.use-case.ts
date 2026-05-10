@@ -1,8 +1,4 @@
 import { Inject } from '@nestjs/common';
-import {
-  QUESTIONS_REPOSITORY,
-  type QuestionsRepository,
-} from 'src/domain/teaching/interfaces/questions.repository';
 import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
@@ -17,11 +13,15 @@ import {
   COURSE_REPOSITORY,
   type CourseRepository,
 } from 'src/domain/teaching/interfaces/course.repository';
+import {
+  COURSE_QUESTION_REPOSITORY,
+  type ICourseQuestionRepository,
+} from 'src/domain/teaching/interfaces/i-course-question.repository';
 
 export class GetStudentCourseQuestionsUseCase {
   constructor(
-    @Inject(QUESTIONS_REPOSITORY)
-    private readonly questionsRepository: QuestionsRepository,
+    @Inject(COURSE_QUESTION_REPOSITORY)
+    private readonly courseQuestionRepository: ICourseQuestionRepository,
     @Inject(STUDENT_REPOSITORY)
     private readonly studentRepository: StudentRepository,
     @Inject(COURSE_REPOSITORY)
@@ -30,7 +30,7 @@ export class GetStudentCourseQuestionsUseCase {
 
   async execute(courseId: string, user: AuthUser): Promise<CourseQuestion[]> {
     await this.checkStudentAccess(courseId, user.id);
-    return this.questionsRepository.getStudentCourseQuestions(courseId);
+    return this.courseQuestionRepository.getCourseQuestionsByCourseId(courseId);
   }
 
   private async checkStudentAccess(

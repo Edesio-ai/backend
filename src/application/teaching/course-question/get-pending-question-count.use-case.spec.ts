@@ -1,9 +1,9 @@
 import { GetPendingQuestionCountUseCase } from 'src/application/teaching/course-question/get-pending-question-count.use-case';
 import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
 import { SupabaseCourse } from 'src/domain/teaching/types/course.type';
+import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
-import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 
 describe('GetPendingQuestionCountUseCase', () => {
   let fixtures: Fixtures;
@@ -40,16 +40,16 @@ describe('GetPendingQuestionCountUseCase', () => {
     const promise = fixtures.whenExecute();
 
     await fixtures.thenThrowsCourseError(promise);
-    fixtures.thenQuestionsRepositoryNotCalled();
+    fixtures.thenCourseQuestionRepositoryNotCalled();
   });
 
-  it('should propagate errors from questions repository', async () => {
+  it('should propagate errors from course question repository', async () => {
     fixtures.whenSessionHasCourses();
     fixtures.whenPendingCountFails();
 
     const promise = fixtures.whenExecute();
 
-    await fixtures.thenThrowsQuestionsError(promise);
+    await fixtures.thenThrowsCourseQuestionsError(promise);
   });
 });
 
@@ -75,18 +75,18 @@ class Fixtures {
   ];
 
   public readonly courseError = new Error('courses query failed');
-  public readonly questionsError = new Error('pending count failed');
+  public readonly courseQuestionsError = new Error('pending count failed');
 
   public readonly courseRepository: jest.Mocked<CourseRepository>;
-  public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
+  public readonly courseQuestionRepository: jest.Mocked<ICourseQuestionRepository>;
   public readonly useCase: GetPendingQuestionCountUseCase;
 
   constructor() {
     this.courseRepository = createMockCourseRepository();
-    this.questionsRepository = createMockQuestionsRepository();
+    this.courseQuestionRepository = createMockCourseQuestionRepository();
 
     this.useCase = new GetPendingQuestionCountUseCase(
-      this.questionsRepository,
+      this.courseQuestionRepository,
       this.courseRepository,
     );
   }
@@ -110,12 +110,12 @@ class Fixtures {
   }
 
   whenPendingCountReturns(n: number) {
-    this.questionsRepository.getPendingQuestionCount.mockResolvedValue(n);
+    this.courseQuestionRepository.getPendingQuestionCount.mockResolvedValue(n);
   }
 
   whenPendingCountFails() {
-    this.questionsRepository.getPendingQuestionCount.mockRejectedValue(
-      this.questionsError,
+    this.courseQuestionRepository.getPendingQuestionCount.mockRejectedValue(
+      this.courseQuestionsError,
     );
   }
 
@@ -130,16 +130,16 @@ class Fixtures {
 
   thenPendingCountCalledWithCourseIds(ids: string[]) {
     expect(
-      this.questionsRepository.getPendingQuestionCount,
+      this.courseQuestionRepository.getPendingQuestionCount,
     ).toHaveBeenCalledWith(ids);
     expect(
-      this.questionsRepository.getPendingQuestionCount,
+      this.courseQuestionRepository.getPendingQuestionCount,
     ).toHaveBeenCalledTimes(1);
   }
 
-  thenQuestionsRepositoryNotCalled() {
+  thenCourseQuestionRepositoryNotCalled() {
     expect(
-      this.questionsRepository.getPendingQuestionCount,
+      this.courseQuestionRepository.getPendingQuestionCount,
     ).not.toHaveBeenCalled();
   }
 
@@ -147,7 +147,7 @@ class Fixtures {
     await expect(promise).rejects.toBe(this.courseError);
   }
 
-  async thenThrowsQuestionsError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBe(this.questionsError);
+  async thenThrowsCourseQuestionsError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBe(this.courseQuestionsError);
   }
 }

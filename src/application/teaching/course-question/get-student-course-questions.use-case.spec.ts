@@ -5,12 +5,12 @@ import {
   NotFoundError,
 } from 'src/domain/shared/global/errors/global.errors';
 import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
-import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
 import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import { CourseQuestion } from 'src/domain/teaching/types/course-question.type';
 import { Course } from 'src/domain/teaching/types/course.type';
+import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
-import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('GetStudentCourseQuestionsUseCase', () => {
@@ -39,7 +39,7 @@ describe('GetStudentCourseQuestionsUseCase', () => {
       fixtures.studentRepository.getStudentSessionBySessionId,
     ).toHaveBeenCalledWith(fixtures.sessionId);
     expect(
-      fixtures.questionsRepository.getStudentCourseQuestions,
+      fixtures.courseQuestionRepository.getCourseQuestionsByCourseId,
     ).toHaveBeenCalledWith(fixtures.courseId);
   });
 
@@ -49,7 +49,7 @@ describe('GetStudentCourseQuestionsUseCase', () => {
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
     expect(fixtures.courseRepository.getCourseById).not.toHaveBeenCalled();
     expect(
-      fixtures.questionsRepository.getStudentCourseQuestions,
+      fixtures.courseQuestionRepository.getCourseQuestionsByCourseId,
     ).not.toHaveBeenCalled();
   });
 
@@ -62,7 +62,7 @@ describe('GetStudentCourseQuestionsUseCase', () => {
       fixtures.studentRepository.getStudentSessionBySessionId,
     ).not.toHaveBeenCalled();
     expect(
-      fixtures.questionsRepository.getStudentCourseQuestions,
+      fixtures.courseQuestionRepository.getCourseQuestionsByCourseId,
     ).not.toHaveBeenCalled();
   });
 
@@ -73,7 +73,7 @@ describe('GetStudentCourseQuestionsUseCase', () => {
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
     expect(
-      fixtures.questionsRepository.getStudentCourseQuestions,
+      fixtures.courseQuestionRepository.getCourseQuestionsByCourseId,
     ).not.toHaveBeenCalled();
   });
 
@@ -84,17 +84,19 @@ describe('GetStudentCourseQuestionsUseCase', () => {
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
     expect(
-      fixtures.questionsRepository.getStudentCourseQuestions,
+      fixtures.courseQuestionRepository.getCourseQuestionsByCourseId,
     ).not.toHaveBeenCalled();
   });
 
-  it('should propagate errors from questions repository', async () => {
+  it('should propagate errors from course question repository', async () => {
     fixtures.whenStudentFound();
     fixtures.whenCourseReturned();
     fixtures.whenStudentSessionMatchesEnrollment();
     fixtures.whenCourseQuestionsFail();
 
-    await expect(fixtures.whenExecute()).rejects.toBe(fixtures.questionsError);
+    await expect(fixtures.whenExecute()).rejects.toBe(
+      fixtures.courseQuestionsError,
+    );
   });
 });
 
@@ -138,20 +140,20 @@ class Fixtures {
     },
   ];
 
-  public readonly questionsError = new Error('course_questions failed');
+  public readonly courseQuestionsError = new Error('course_questions failed');
 
-  public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
+  public readonly courseQuestionRepository: jest.Mocked<ICourseQuestionRepository>;
   public readonly studentRepository: jest.Mocked<StudentRepository>;
   public readonly courseRepository: jest.Mocked<CourseRepository>;
   public readonly useCase: GetStudentCourseQuestionsUseCase;
 
   constructor() {
-    this.questionsRepository = createMockQuestionsRepository();
+    this.courseQuestionRepository = createMockCourseQuestionRepository();
     this.studentRepository = createMockStudentRepository();
     this.courseRepository = createMockCourseRepository();
 
     this.useCase = new GetStudentCourseQuestionsUseCase(
-      this.questionsRepository,
+      this.courseQuestionRepository,
       this.studentRepository,
       this.courseRepository,
     );
@@ -200,14 +202,14 @@ class Fixtures {
   }
 
   whenCourseQuestionsReturned() {
-    this.questionsRepository.getStudentCourseQuestions.mockResolvedValue(
+    this.courseQuestionRepository.getCourseQuestionsByCourseId.mockResolvedValue(
       this.courseQuestions,
     );
   }
 
   whenCourseQuestionsFail() {
-    this.questionsRepository.getStudentCourseQuestions.mockRejectedValue(
-      this.questionsError,
+    this.courseQuestionRepository.getCourseQuestionsByCourseId.mockRejectedValue(
+      this.courseQuestionsError,
     );
   }
 }

@@ -232,7 +232,7 @@ class Fixtures {
       updateQuestionById: jest.fn(),
       deleteCourseQuestionsByCourseId: jest.fn(),
       getAnsweredQuestionCount: jest.fn(),
-      getStudentCourseQuestions: jest.fn(),
+      getCourseQuestionsByCourseId: jest.fn(),
     };
     this.teacherRepository = {
       linkTeacherToEstablishment: jest.fn(),

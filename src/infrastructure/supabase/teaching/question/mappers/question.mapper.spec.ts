@@ -1,4 +1,4 @@
-import { QuestionMapper } from './question.mapper';
+import { QuestionMapper } from '../mappers/question.mapper';
 import { SupabaseQuestion } from 'src/domain/teaching/types/question.type';
 
 describe('QuestionMapper', () => {

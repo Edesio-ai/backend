@@ -8,13 +8,14 @@ import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
 import { DeleteCourseUseCase } from 'src/application/teaching/course/delete-course.use-case';
-import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
+import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/question/question-persistence.module';
 import { UpdateCourseUseCase } from 'src/application/teaching/course/update-course.use-case';
 import { ValidateCourseQuestionsUseCase } from 'src/application/teaching/course/validate-course-questions.use-case';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 import { GetCoursesSessionCountUseCase } from 'src/application/teaching/course/get-courses-session-count.use-case';
 import { GetSessionCoursesUseCase } from 'src/application/teaching/course/get-session-courses.use-case';
 import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
+import { CourseQuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/course-question/course-question-persistence.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teachin
     QuestionPersistenceModule,
     EstablishmentPersistenceModule,
     CourseFilePersistenceModule,
+    CourseQuestionPersistenceModule,
   ],
   controllers: [CourseController],
   providers: [

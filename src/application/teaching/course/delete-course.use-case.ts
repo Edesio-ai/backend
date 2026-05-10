@@ -12,10 +12,7 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from 'src/domain/shared/global/errors/global.errors';
-import {
-  QUESTIONS_REPOSITORY,
-  type QuestionsRepository,
-} from 'src/domain/teaching/interfaces/questions.repository';
+
 import {
   STUDENT_REPOSITORY,
   type StudentRepository,
@@ -24,6 +21,14 @@ import {
   COURSE_FILE_REPOSITORY,
   type ICourseFileRepository,
 } from 'src/domain/teaching/interfaces/i-course-file.repository';
+import {
+  COURSE_QUESTION_REPOSITORY,
+  type ICourseQuestionRepository,
+} from 'src/domain/teaching/interfaces/i-course-question.repository';
+import {
+  QUESTIONS_REPOSITORY,
+  type QuestionsRepository,
+} from 'src/domain/teaching/interfaces/questions.repository';
 
 export class DeleteCourseUseCase {
   constructor(
@@ -31,12 +36,14 @@ export class DeleteCourseUseCase {
     private readonly courseRepository: CourseRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
-    @Inject(QUESTIONS_REPOSITORY)
-    private readonly questionsRepository: QuestionsRepository,
+    @Inject(COURSE_QUESTION_REPOSITORY)
+    private readonly courseQuestionRepository: ICourseQuestionRepository,
     @Inject(STUDENT_REPOSITORY)
     private readonly studentRepository: StudentRepository,
     @Inject(COURSE_FILE_REPOSITORY)
     private readonly courseFileRepository: ICourseFileRepository,
+    @Inject(QUESTIONS_REPOSITORY)
+    private readonly questionsRepository: QuestionsRepository,
   ) {}
 
   async execute(courseId: string, user: AuthUser): Promise<void> {
@@ -68,7 +75,9 @@ export class DeleteCourseUseCase {
     await this.questionsRepository.deleteCourseQuizQuestions(courseId);
     await this.courseFileRepository.deleteCoursesFilesByCourseIds([courseId]);
     await this.studentRepository.deleteStudentCourseStatsByCourseId(courseId);
-    await this.questionsRepository.deleteCourseQuestionsByCourseId(courseId);
+    await this.courseQuestionRepository.deleteCourseQuestionsByCourseId(
+      courseId,
+    );
     await this.courseRepository.deleteCourseById(courseId);
   }
 }

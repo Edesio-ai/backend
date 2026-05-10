@@ -8,7 +8,7 @@ import { UpdateSessionNameUseCase } from 'src/application/teaching/session/updat
 import { GetSessionByCodeUseCase } from 'src/application/teaching/session/get-session-by-code.use-case';
 import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/course/course-persistence.module';
 import { DeleteSessionUseCase } from 'src/application/teaching/session/delete-session.use-case';
-import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
+import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/question/question-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';

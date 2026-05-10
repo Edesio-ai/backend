@@ -8,7 +8,7 @@ import { EvaluateAnswerUseCase } from 'src/application/llm/evaluate-answer.use-c
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
 import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/course/course-persistence.module';
 import { PdfModule } from 'src/infrastructure/pdf/pdf.module';
-import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
+import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/question/question-persistence.module';
 import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
 
 @Module({

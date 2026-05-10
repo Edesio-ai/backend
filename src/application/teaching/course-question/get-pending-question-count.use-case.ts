@@ -1,17 +1,17 @@
 import { Inject } from '@nestjs/common';
 import {
-  QUESTIONS_REPOSITORY,
-  type QuestionsRepository,
-} from 'src/domain/teaching/interfaces/questions.repository';
-import {
   COURSE_REPOSITORY,
   type CourseRepository,
 } from 'src/domain/teaching/interfaces/course.repository';
+import {
+  COURSE_QUESTION_REPOSITORY,
+  type ICourseQuestionRepository,
+} from 'src/domain/teaching/interfaces/i-course-question.repository';
 
 export class GetPendingQuestionCountUseCase {
   constructor(
-    @Inject(QUESTIONS_REPOSITORY)
-    private readonly questionsRepository: QuestionsRepository,
+    @Inject(COURSE_QUESTION_REPOSITORY)
+    private readonly courseQuestionRepository: ICourseQuestionRepository,
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: CourseRepository,
   ) {}
@@ -22,7 +22,7 @@ export class GetPendingQuestionCountUseCase {
     const courseIds = courses.map((c) => c.id);
 
     const pendingQuestionCount =
-      await this.questionsRepository.getPendingQuestionCount(courseIds);
+      await this.courseQuestionRepository.getPendingQuestionCount(courseIds);
 
     return pendingQuestionCount;
   }

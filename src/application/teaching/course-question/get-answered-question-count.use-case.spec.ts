@@ -1,9 +1,10 @@
 import { GetAnsweredQuestionCountUseCase } from 'src/application/teaching/course-question/get-answered-question-count.use-case';
-import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
 import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import type { ICourseQuestionRepository } from 'src/domain/teaching/interfaces/i-course-question.repository';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Student } from 'src/domain/teaching/types/student.type';
+import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
 describe('GetAnsweredQuestionCountUseCase', () => {
@@ -21,7 +22,7 @@ describe('GetAnsweredQuestionCountUseCase', () => {
 
     expect(result).toBe(42);
     expect(
-      fixtures.questionsRepository.getAnsweredQuestionCount,
+      fixtures.courseQuestionRepository.getAnsweredQuestionCount,
     ).toHaveBeenCalledWith(fixtures.student.id);
   });
 
@@ -39,11 +40,11 @@ describe('GetAnsweredQuestionCountUseCase', () => {
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
     expect(
-      fixtures.questionsRepository.getAnsweredQuestionCount,
+      fixtures.courseQuestionRepository.getAnsweredQuestionCount,
     ).not.toHaveBeenCalled();
   });
 
-  it('should propagate errors from the questions repository', async () => {
+  it('should propagate errors from the course question repository', async () => {
     fixtures.whenStudentFound();
     fixtures.whenCountFails();
 
@@ -76,28 +77,15 @@ class Fixtures {
     photoUrl: '',
   };
 
-  public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
+  public readonly courseQuestionRepository: jest.Mocked<ICourseQuestionRepository>;
   public readonly studentRepository: jest.Mocked<StudentRepository>;
   public readonly useCase: GetAnsweredQuestionCountUseCase;
 
   constructor() {
-    this.questionsRepository = {
-      getQuestionById: jest.fn(),
-      deleteQuestionById: jest.fn(),
-      insertQuestions: jest.fn(),
-      deleteQuestionsByCourseIds: jest.fn(),
-      getPendingQuestionCount: jest.fn(),
-      getCourseQuestions: jest.fn(),
-      deleteCourseQuizQuestions: jest.fn(),
-      insertQuestion: jest.fn(),
-      updateQuestionById: jest.fn(),
-      deleteCourseQuestionsByCourseId: jest.fn(),
-      getAnsweredQuestionCount: jest.fn(),
-      getStudentCourseQuestions: jest.fn(),
-    };
+    this.courseQuestionRepository = createMockCourseQuestionRepository();
     this.studentRepository = createMockStudentRepository();
     this.useCase = new GetAnsweredQuestionCountUseCase(
-      this.questionsRepository,
+      this.courseQuestionRepository,
       this.studentRepository,
     );
   }
@@ -121,11 +109,13 @@ class Fixtures {
   }
 
   whenCountReturns(count: number) {
-    this.questionsRepository.getAnsweredQuestionCount.mockResolvedValue(count);
+    this.courseQuestionRepository.getAnsweredQuestionCount.mockResolvedValue(
+      count,
+    );
   }
 
   whenCountFails() {
-    this.questionsRepository.getAnsweredQuestionCount.mockRejectedValue(
+    this.courseQuestionRepository.getAnsweredQuestionCount.mockRejectedValue(
       new Error('count failed'),
     );
   }

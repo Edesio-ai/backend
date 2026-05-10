@@ -1,5 +1,5 @@
-import { CourseQuestionMapper } from './course-question.mapper';
 import { SupabaseCourseQuestion } from 'src/domain/teaching/types/course-question.type';
+import { CourseQuestionMapper } from '../mappers/course-question.mapper';
 
 describe('CourseQuestionMapper', () => {
   let fixtures: Fixtures;

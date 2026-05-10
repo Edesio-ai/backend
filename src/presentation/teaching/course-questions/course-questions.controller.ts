@@ -34,7 +34,7 @@ export class CourseQuestionsController {
 
   @Roles('student')
   @Get('course/:courseId')
-  async getStudentCourseQuestions(
+  async getCourseQuestionsByCourseId(
     @Param('courseId') courseId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<CourseQuestion[]> {
