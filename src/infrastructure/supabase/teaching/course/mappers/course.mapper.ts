@@ -2,14 +2,8 @@ import {
   Course,
   CreateCourseBody,
   SupabaseCourse,
+  SupabaseCourseInsert,
 } from 'src/domain/teaching/types/course.type';
-
-type SupabaseCourseInsert = {
-  session_id: string;
-  title: string;
-  description?: string | null;
-  text_content?: string | null;
-};
 
 export const CourseMapper = {
   toDomain: (row: SupabaseCourse): Course => ({

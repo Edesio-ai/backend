@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
-
-import {
-  AUTH_REPOSITORY,
-  type AuthRepository,
-} from 'src/domain/auth/contract/auth.repository';
+import {} from 'src/domain/auth/contract/auth.repository';
 import { InvitationTokenPreview } from 'src/domain/auth/invitation.type';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import {
+  INVITATION_TOKEN_REPOSITORY,
+  type IInvitationTokenRepository,
+} from 'src/domain/token/contract/token.repository';
 
 @Injectable()
 export class GetInvitationPreviewUseCase {
   constructor(
-    @Inject(AUTH_REPOSITORY)
-    private readonly authRepository: AuthRepository,
+    @Inject(INVITATION_TOKEN_REPOSITORY)
+    private readonly invitationTokenRepository: IInvitationTokenRepository,
   ) {}
 
   async execute(token: string): Promise<InvitationTokenPreview> {
@@ -20,7 +20,7 @@ export class GetInvitationPreviewUseCase {
     }
 
     const invitationTokenPreview =
-      await this.authRepository.getInvitationPreview(token);
+      await this.invitationTokenRepository.getInvitationPreview(token);
     return invitationTokenPreview;
   }
 }

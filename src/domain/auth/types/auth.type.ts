@@ -115,3 +115,8 @@ export type User = {
   email: string;
   metadata: UserMetadata;
 };
+
+export type SupabaseInvitationTokenUpdate = {
+  used_at: string;
+  used_by: string;
+};

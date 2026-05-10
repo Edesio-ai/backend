@@ -1,13 +1,17 @@
 import { Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from '../../supabase.module';
-import { InvitationToken } from 'src/domain/auth/invitation.type';
+import {
+  InvitationToken,
+  InvitationTokenPreview,
+} from 'src/domain/auth/invitation.type';
 import { IInvitationTokenRepository } from 'src/domain/token/contract/token.repository';
 import {
   BadRequestError,
   ServerError,
 } from 'src/domain/shared/global/errors/global.errors';
 import { invitationTokenMapper } from '../mappers/invitation-token.mapper';
+import { CreateInvitationTokenBody } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
 
 export class InvitationTokenSupabaseRepository implements IInvitationTokenRepository {
   constructor(
@@ -86,5 +90,89 @@ export class InvitationTokenSupabaseRepository implements IInvitationTokenReposi
     }
 
     return (data ?? []).map(invitationTokenMapper.toDomain);
+  }
+
+  public async createInvitationToken(
+    body: CreateInvitationTokenBody,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('invitation_tokens')
+      .insert(invitationTokenMapper.toInsert(body))
+      .select()
+      .single();
+
+    if (error) {
+      console.error(
+        'An error occurred while creating the invitation token: ',
+        body,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+
+    return;
+  }
+
+  public async getInvitationPreview(
+    token: string,
+  ): Promise<InvitationTokenPreview> {
+    const { data, error } = await this.supabase
+      .from('invitation_tokens')
+      .select(
+        `
+          invited_email,
+          assigned_chatbots,
+          expires_at,
+          used_at,
+          establishment:establishment!invitation_tokens_establishment_id_fkey ( name )
+        `,
+      )
+      .eq('token', token)
+      .single();
+
+    if (!data || error) {
+      throw new ServerError(error?.message);
+    }
+
+    if (data.used_at) {
+      throw new BadRequestError('Invitation token already used');
+    }
+
+    const expiresAt = new Date(data.expires_at);
+
+    if (expiresAt < new Date()) {
+      throw new BadRequestError('Invitation token expired');
+    }
+
+    const maskedEmail = this.maskEmail(data.invited_email);
+
+    return invitationTokenMapper.toPreview(data, maskedEmail);
+  }
+
+  public async updateTokenUsedAt(
+    tokenId: string,
+    teacherId: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('invitation_tokens')
+      .update(invitationTokenMapper.toUpdateUsedAt(teacherId))
+      .eq('id', tokenId)
+      .is('used_at', null);
+
+    if (error) {
+      throw new ServerError(error.message);
+    }
+  }
+
+  private maskEmail(email: string): string {
+    const [localPart, domain] = email.split('@');
+    if (!localPart || !domain) return '***';
+    if (localPart.length <= 2) {
+      return `${'*'.repeat(localPart.length)}@${domain}`;
+    }
+    const visibleStart = localPart[0];
+    const visibleEnd = localPart[localPart.length - 1];
+    const hidden = '*'.repeat(localPart.length - 2);
+    return `${visibleStart}${hidden}${visibleEnd}@${domain}`;
   }
 }

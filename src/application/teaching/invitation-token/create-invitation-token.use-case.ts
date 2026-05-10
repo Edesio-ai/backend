@@ -1,8 +1,9 @@
 import { Inject } from '@nestjs/common';
+import {} from 'src/domain/auth/contract/auth.repository';
 import {
-  AUTH_REPOSITORY,
-  type AuthRepository,
-} from 'src/domain/auth/contract/auth.repository';
+  INVITATION_TOKEN_REPOSITORY,
+  type IInvitationTokenRepository,
+} from 'src/domain/token/contract/token.repository';
 
 export type CreateInvitationTokenBody = {
   establishmentId: string;
@@ -14,11 +15,11 @@ export type CreateInvitationTokenBody = {
 
 export class CreateInvitationTokenUseCase {
   constructor(
-    @Inject(AUTH_REPOSITORY)
-    private readonly authRepository: AuthRepository,
+    @Inject(INVITATION_TOKEN_REPOSITORY)
+    private readonly invitationTokenRepository: IInvitationTokenRepository,
   ) {}
 
   async execute(body: CreateInvitationTokenBody): Promise<void> {
-    return await this.authRepository.createInvitationToken(body);
+    return await this.invitationTokenRepository.createInvitationToken(body);
   }
 }

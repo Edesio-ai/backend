@@ -3,15 +3,8 @@ import {
   SupabaseTeacherSession,
   Teacher,
   Session,
+  SupabaseTeacherInsert,
 } from 'src/domain/teaching/types/teacher.type';
-
-type SupabaseTeacherInsert = {
-  supabase_user_id: string;
-  name: string;
-  email: string;
-  establishment_id?: string | null;
-  available_chatbots?: number;
-};
 
 export const TeacherMapper = {
   toDomain: (row: SupabaseTeacher): Teacher => ({
@@ -41,20 +34,6 @@ export const TeacherMapper = {
     supabase_user_id: userId,
     name,
     email: email || '',
-  }),
-
-  toInsertWithEstablishment: (
-    userId: string,
-    name: string,
-    email: string,
-    establishmentId: string,
-    availableChatbots: number,
-  ): SupabaseTeacherInsert => ({
-    supabase_user_id: userId,
-    name,
-    email: email.toLowerCase().trim(),
-    establishment_id: establishmentId,
-    available_chatbots: availableChatbots,
   }),
 
   toEstablishmentUpdate: (

@@ -1,4 +1,8 @@
-import { SupabaseInvitationTokenRow } from 'src/domain/auth/invitation.type';
+import {
+  InvitationTokenPreview,
+  SupabaseInvitationTokenRow,
+} from 'src/domain/auth/invitation.type';
+import { CreateInvitationTokenBody } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
 import { invitationTokenMapper } from './invitation-token.mapper';
 
 describe('invitationTokenMapper', () => {
@@ -13,6 +17,87 @@ describe('invitationTokenMapper', () => {
       const result = fixtures.whenToDomain();
 
       fixtures.thenReturnsExpectedInvitationToken(result);
+    });
+  });
+
+  describe('toInsert', () => {
+    it('maps create body to Supabase insert shape', () => {
+      const expiresAt = new Date('2026-06-01T12:00:00.000Z');
+      const body: CreateInvitationTokenBody = {
+        establishmentId: 'est-1',
+        token: 'tok',
+        invitedEmail: 'inv@school.com',
+        expiresAt,
+        assignedChatbots: 3,
+      };
+
+      expect(invitationTokenMapper.toInsert(body)).toEqual({
+        establishment_id: 'est-1',
+        token: 'tok',
+        invited_email: 'inv@school.com',
+        expires_at: expiresAt.toISOString(),
+        assigned_chatbots: 3,
+      });
+    });
+  });
+
+  describe('toInsertWithEstablishment', () => {
+    it('maps teacher onboarding fields including normalized email', () => {
+      expect(
+        invitationTokenMapper.toInsertWithEstablishment(
+          'u1',
+          'A B',
+          'Teacher@School.com ',
+          'est-1',
+          2,
+        ),
+      ).toEqual({
+        supabase_user_id: 'u1',
+        name: 'A B',
+        email: 'teacher@school.com',
+        establishment_id: 'est-1',
+        available_chatbots: 2,
+      });
+    });
+  });
+
+  describe('toPreview', () => {
+    it('maps embedded establishment object', () => {
+      const result = invitationTokenMapper.toPreview(
+        { assigned_chatbots: 3, establishment: { name: 'Lycée X' } },
+        't***r@school.fr',
+      );
+
+      const expected: InvitationTokenPreview = {
+        isValid: true,
+        maskedEmail: 't***r@school.fr',
+        establishmentName: 'Lycée X',
+        assignedChatbots: 3,
+      };
+      expect(result).toEqual(expected);
+    });
+
+    it('uses first row when establishment is an array', () => {
+      const result = invitationTokenMapper.toPreview(
+        {
+          assigned_chatbots: 1,
+          establishment: [{ name: 'Collège Y' }, { name: 'ignored' }],
+        },
+        'a@b.c',
+      );
+
+      expect(result.establishmentName).toBe('Collège Y');
+      expect(result.assignedChatbots).toBe(1);
+    });
+
+    it('handles missing establishment', () => {
+      const result = invitationTokenMapper.toPreview(
+        { assigned_chatbots: 2, establishment: null },
+        'x',
+      );
+
+      expect(result.establishmentName).toBe('');
+      expect(result.assignedChatbots).toBe(2);
     });
   });
 });

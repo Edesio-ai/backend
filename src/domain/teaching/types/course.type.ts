@@ -90,3 +90,10 @@ export type SessionDetails = {
   students: Partial<CourseRanking>[];
   files: Partial<CourseFile>[];
 };
+
+export type SupabaseCourseInsert = {
+  session_id: string;
+  title: string;
+  description?: string | null;
+  text_content?: string | null;
+};

@@ -5,11 +5,17 @@ import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
 import { Teacher } from 'src/domain/teaching/types/teacher.type';
+import { InvitationToken } from 'src/domain/auth/invitation.type';
+import { User } from 'src/domain/auth/types/auth.type';
+import { SUPABASE_AUTH } from 'src/infrastructure/supabase/supabase-auth.module';
+import { invitationTokenMapper } from 'src/infrastructure/supabase/invitation-token/mappers/invitation-token.mapper';
 
 export class TeacherSupabaseRepository implements TeacherRepository {
   constructor(
     @Inject(SUPABASE_ADMIN)
     private readonly supabase: SupabaseClient,
+    @Inject(SUPABASE_AUTH)
+    private readonly supabaseAuth: SupabaseClient,
   ) {}
 
   public async getTeacherByEstablishmentId(
@@ -98,5 +104,34 @@ export class TeacherSupabaseRepository implements TeacherRepository {
     }
 
     return data ? TeacherMapper.toDomain(data) : null;
+  }
+
+  public async createTeacherWithInvitationToken(
+    adminData: User,
+    invitationToken: InvitationToken,
+  ): Promise<Teacher> {
+    const { firstname, lastname } = adminData.metadata;
+    const email = adminData.email;
+
+    const { data, error } = await this.supabase
+      .from('teachers')
+      .insert(
+        invitationTokenMapper.toInsertWithEstablishment(
+          adminData.id,
+          `${firstname} ${lastname}`,
+          email,
+          invitationToken.establishmentId,
+          invitationToken.assignedChatbots || 0,
+        ),
+      )
+      .select()
+      .single();
+
+    if (error) {
+      await this.supabaseAuth.auth.admin.deleteUser(adminData.id);
+      throw new ServerError(error.message);
+    }
+
+    return TeacherMapper.toDomain(data);
   }
 }

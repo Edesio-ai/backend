@@ -1,4 +1,3 @@
-import { CourseQuestion } from '../types/course-question.type';
 import {
   CreateQuestionBody,
   GeneratedQuestion,

@@ -35,14 +35,6 @@ describe('TeacherMapper', () => {
     });
   });
 
-  describe('toInsertWithEstablishment', () => {
-    it('builds insert with establishment', () => {
-      const result = fixtures.whenToInsertWithEstablishment();
-
-      fixtures.thenMatchesExpectedInsertWithEstablishment(result);
-    });
-  });
-
   describe('toEstablishmentUpdate', () => {
     it('builds update payload', () => {
       const result = fixtures.whenToEstablishmentUpdate();
@@ -135,16 +127,6 @@ class Fixtures {
     return TeacherMapper.toInsert('u1', 'N', 'e@x.com');
   }
 
-  whenToInsertWithEstablishment() {
-    return TeacherMapper.toInsertWithEstablishment(
-      'u1',
-      'A B',
-      'E@X.COM',
-      'est-1',
-      2,
-    );
-  }
-
   whenToEstablishmentUpdate() {
     return TeacherMapper.toEstablishmentUpdate('est-2');
   }
@@ -185,16 +167,6 @@ class Fixtures {
       supabase_user_id: 'u1',
       name: 'N',
       email: 'e@x.com',
-    });
-  }
-
-  thenMatchesExpectedInsertWithEstablishment(result: unknown) {
-    expect(result).toEqual({
-      supabase_user_id: 'u1',
-      name: 'A B',
-      email: 'e@x.com',
-      establishment_id: 'est-1',
-      available_chatbots: 2,
     });
   }
 

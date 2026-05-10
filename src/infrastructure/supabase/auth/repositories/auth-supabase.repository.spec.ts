@@ -1,9 +1,5 @@
 import { AuthSupabaseRepository } from './auth-supabase.repository';
 import {
-  InvitationToken,
-  InvitationTokenPreview,
-} from '../../../../domain/auth/invitation.type';
-import {
   BadRequestError,
   ServerError,
   UnauthorizedError,
@@ -14,72 +10,6 @@ import {
 } from '../../../../domain/auth/types/auth.type';
 
 describe('AuthSupabaseRepository', () => {
-  describe('getInvitationPreview', () => {
-    let fixtures: GetInvitationPreviewFixtures;
-
-    beforeEach(() => {
-      fixtures = new GetInvitationPreviewFixtures();
-    });
-
-    it('should return mapped preview when token is valid', async () => {
-      fixtures.whenSupabaseReturnsData();
-
-      const result = await fixtures.whenGetInvitationPreview();
-
-      fixtures.thenQueryIsBuiltWithToken();
-      fixtures.thenReturnExpectedPreview(result);
-    });
-
-    it('should throw ServerError when supabase returns error', async () => {
-      fixtures.whenSupabaseReturnsError();
-
-      const promise = fixtures.whenGetInvitationPreview();
-
-      await fixtures.thenThrowNotFound(promise);
-    });
-
-    it('should throw BadRequestError when token already used', async () => {
-      fixtures.whenTokenAlreadyUsed();
-
-      const promise = fixtures.whenGetInvitationPreview();
-
-      await fixtures.thenThrowAlreadyUsed(promise);
-    });
-
-    it('should throw BadRequestError when token is expired', async () => {
-      fixtures.whenTokenExpired();
-
-      const promise = fixtures.whenGetInvitationPreview();
-
-      await fixtures.thenThrowExpired(promise);
-    });
-  });
-
-  describe('createInvitationToken', () => {
-    let fixtures: CreateInvitationTokenFixtures;
-
-    beforeEach(() => {
-      fixtures = new CreateInvitationTokenFixtures();
-    });
-
-    it('should insert invitation token with normalized email and mapped fields', async () => {
-      fixtures.whenInsertSucceeds();
-
-      await fixtures.whenCreateInvitationToken();
-
-      fixtures.thenInsertQueryBuiltWithExpectedPayload();
-    });
-
-    it('should throw ServerError when insert fails', async () => {
-      fixtures.whenInsertFails();
-
-      const promise = fixtures.whenCreateInvitationToken();
-
-      await fixtures.thenThrowInvitationTokenCreationError(promise);
-      fixtures.thenInsertQueryBuiltWithExpectedPayload();
-    });
-  });
-
   describe('loginUser', () => {
     let fixtures: LoginUserFixtures;
 
@@ -131,43 +61,47 @@ describe('AuthSupabaseRepository', () => {
     });
   });
 
-  describe('createUser', () => {
-    let fixtures: CreateUserFixtures;
+  describe('createAuthUser', () => {
+    let fixtures: CreateAuthUserFixtures;
 
     beforeEach(() => {
-      fixtures = new CreateUserFixtures();
+      fixtures = new CreateAuthUserFixtures();
     });
 
-    it('should create auth user, teacher profile and mark invitation token as used', async () => {
-      fixtures.whenFullSuccessPath();
+    it('should create user and map result to domain User', async () => {
+      fixtures.whenAdminCreateUserSucceeds();
 
-      await fixtures.whenCreateUser();
+      const result = await fixtures.whenCreateAuthUser();
 
-      expect(fixtures.createUserMock).toHaveBeenCalledTimes(1);
-      expect(fixtures.teachersInsertMock).toHaveBeenCalledTimes(1);
-      expect(fixtures.tokensUpdateMock).toHaveBeenCalledTimes(1);
-      expect(fixtures.deleteUserMock).not.toHaveBeenCalled();
+      expect(fixtures.createUserMock).toHaveBeenCalledWith({
+        email: fixtures.emailNormalized,
+        password: fixtures.password,
+        email_confirm: true,
+        user_metadata: fixtures.metadata,
+      });
 
-      expect(fixtures.tokensEqMock).toHaveBeenCalledWith(
-        'id',
-        fixtures.invitationToken.id,
-      );
-      expect(fixtures.tokensIsMock).toHaveBeenCalledWith('used_at', null);
+      expect(result).toEqual({
+        id: 'user-uuid-1',
+        email: 'teacher@school.com',
+        metadata: {
+          firstname: 'Jean',
+          lastname: 'Dupont',
+        },
+      });
     });
 
     it('should throw BadRequestError when user is already registered', async () => {
       fixtures.whenCreateUserReturnsAlreadyRegistered();
 
-      const promise = fixtures.whenCreateUser();
+      const promise = fixtures.whenCreateAuthUser();
 
-      await fixtures.thenThrowTeacherAlreadyExists(promise);
-      expect(fixtures.teachersInsertMock).not.toHaveBeenCalled();
+      await fixtures.thenThrowUserAlreadyExists(promise);
     });
 
-    it('should throw ServerError on other admin createAuthUser errors', async () => {
+    it('should throw ServerError on other admin createUser errors', async () => {
       fixtures.whenCreateUserReturnsGenericError();
 
-      const promise = fixtures.whenCreateUser();
+      const promise = fixtures.whenCreateAuthUser();
 
       await fixtures.thenThrowUserCreationError(promise);
     });
@@ -175,125 +109,12 @@ describe('AuthSupabaseRepository', () => {
     it('should throw ServerError when admin response has no user', async () => {
       fixtures.whenCreateUserReturnsNoUser();
 
-      const promise = fixtures.whenCreateUser();
+      const promise = fixtures.whenCreateAuthUser();
 
-      await fixtures.thenThrowTeacherCreationFailed(promise);
-    });
-
-    it('should throw ServerError and delete auth user when teacher insert fails', async () => {
-      fixtures.whenCreateUserSucceedsButTeacherInsertFails();
-
-      const promise = fixtures.whenCreateUser();
-
-      await fixtures.thenThrowTeacherProfileCreationError(promise);
-      expect(fixtures.deleteUserMock).toHaveBeenCalledWith('user-uuid-1');
-    });
-
-    it('should throw ServerError when updating invitation token fails', async () => {
-      fixtures.whenCreateUserAndTeacherInsertSucceedButTokenUpdateFails();
-
-      const promise = fixtures.whenCreateUser();
-
-      await fixtures.thenThrowTokenUpdateError(promise);
+      await fixtures.thenThrowUserCreationFailed(promise);
     });
   });
 });
-
-class GetInvitationPreviewFixtures {
-  public readonly token = 'token-123';
-
-  public readonly preview: InvitationTokenPreview = {
-    isValid: true,
-    maskedEmail: 'j**n@acme.com',
-    establishmentName: 'Edesio Academy',
-    assignedChatbots: 2,
-  };
-
-  private readonly validData = {
-    invited_email: 'john@acme.com',
-    assigned_chatbots: 2,
-    expires_at: new Date(Date.now() + 60_000).toISOString(),
-    used_at: null,
-    establishment: { name: 'Edesio Academy' },
-  };
-
-  private readonly singleMock = jest.fn();
-  private readonly eqMock = jest.fn(() => ({ single: this.singleMock }));
-  private readonly selectMock = jest.fn(() => ({ eq: this.eqMock }));
-  private readonly fromMock = jest.fn(() => ({ select: this.selectMock }));
-
-  private readonly supabaseAdminMock = {
-    from: this.fromMock,
-  };
-
-  public readonly sut = new AuthSupabaseRepository(
-    {} as any,
-    this.supabaseAdminMock as any,
-  );
-
-  whenSupabaseReturnsData() {
-    this.singleMock.mockResolvedValue({
-      data: this.validData,
-      error: null,
-    });
-  }
-
-  whenSupabaseReturnsError() {
-    this.singleMock.mockResolvedValue({
-      data: null,
-      error: { message: 'not found' },
-    });
-  }
-
-  whenTokenAlreadyUsed() {
-    this.singleMock.mockResolvedValue({
-      data: {
-        ...this.validData,
-        used_at: new Date().toISOString(),
-      },
-      error: null,
-    });
-  }
-
-  whenTokenExpired() {
-    this.singleMock.mockResolvedValue({
-      data: {
-        ...this.validData,
-        expires_at: new Date(Date.now() - 60_000).toISOString(),
-      },
-      error: null,
-    });
-  }
-
-  whenGetInvitationPreview() {
-    return this.sut.getInvitationPreview(this.token);
-  }
-
-  thenQueryIsBuiltWithToken() {
-    expect(this.fromMock).toHaveBeenCalledWith('invitation_tokens');
-    expect(this.selectMock).toHaveBeenCalled();
-    expect(this.eqMock).toHaveBeenCalledWith('token', this.token);
-    expect(this.singleMock).toHaveBeenCalledTimes(1);
-  }
-
-  thenReturnExpectedPreview(result: InvitationTokenPreview) {
-    expect(result).toEqual(this.preview);
-  }
-
-  async thenThrowNotFound(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(ServerError);
-  }
-
-  async thenThrowAlreadyUsed(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(BadRequestError);
-    await expect(promise).rejects.toThrow('Invitation token already used');
-  }
-
-  async thenThrowExpired(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(BadRequestError);
-    await expect(promise).rejects.toThrow('Invitation token expired');
-  }
-}
 
 class LoginUserFixtures {
   public readonly emailInput = '  User@School.com  ';
@@ -307,13 +128,13 @@ class LoginUserFixtures {
   public readonly expectedAuthUserWithSession: AuthUserWithSession;
 
   constructor() {
-    const supabaseAdminMock = {
+    const supabaseAuthMock = {
       auth: {
         signInWithPassword: this.signInWithPasswordMock,
       },
     };
 
-    this.sut = new AuthSupabaseRepository(supabaseAdminMock as any, {} as any);
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
 
     const user: Session['user'] = {
       id: 'u1',
@@ -404,142 +225,35 @@ class LoginUserFixtures {
   }
 }
 
-class CreateInvitationTokenFixtures {
-  public readonly establishmentId = 'est-1';
-  public readonly token = 'inv-token-123';
-  public readonly invitedEmail = 'Teacher@School.com ';
-  public readonly expiresAt = new Date('2027-01-01T00:00:00.000Z');
-  public readonly assignedChatbots = 2;
+class CreateAuthUserFixtures {
+  public readonly email = 'Teacher@School.com ';
+  public readonly emailNormalized = 'teacher@school.com';
+  public readonly password = 'secret';
 
-  public readonly createBody = {
-    establishmentId: 'est-1',
-    token: 'inv-token-123',
-    invitedEmail: 'Teacher@School.com ',
-    expiresAt: new Date('2027-01-01T00:00:00.000Z'),
-    assignedChatbots: 2,
-  };
-
-  private readonly singleMock = jest.fn();
-  private readonly selectMock = jest.fn(() => ({ single: this.singleMock }));
-  private readonly insertMock = jest.fn(() => ({ select: this.selectMock }));
-  private readonly fromMock = jest.fn(() => ({ insert: this.insertMock }));
-
-  private readonly supabaseAdminMock = {
-    from: this.fromMock,
-  };
-
-  public readonly sut = new AuthSupabaseRepository(
-    this.supabaseAdminMock as any,
-    {} as any,
-  );
-
-  whenInsertSucceeds() {
-    this.singleMock.mockResolvedValue({
-      data: { id: 'new-token-id' },
-      error: null,
-    });
-  }
-
-  whenInsertFails() {
-    this.singleMock.mockResolvedValue({
-      data: null,
-      error: { message: 'insert failed' },
-    });
-  }
-
-  whenCreateInvitationToken() {
-    return this.sut.createInvitationToken(this.createBody);
-  }
-
-  thenInsertQueryBuiltWithExpectedPayload() {
-    expect(this.fromMock).toHaveBeenCalledWith('invitation_tokens');
-    expect(this.insertMock).toHaveBeenCalledWith({
-      establishment_id: this.establishmentId,
-      token: this.token,
-      invited_email: this.invitedEmail,
-      expires_at: this.expiresAt.toISOString(),
-      assigned_chatbots: this.assignedChatbots,
-    });
-    expect(this.selectMock).toHaveBeenCalledWith();
-    expect(this.singleMock).toHaveBeenCalledTimes(1);
-  }
-
-  async thenThrowInvitationTokenCreationError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(ServerError);
-    await expect(promise).rejects.toThrow('insert failed');
-  }
-}
-
-class CreateUserFixtures {
-  public readonly invitationToken: InvitationToken = {
-    id: 'inv-token-id-1',
-    establishmentId: 'est-1',
-    token: 'tok',
-    invitedEmail: 'teacher@school.com',
-    expiresAt: new Date(Date.now() + 60_000).toISOString(),
-    usedAt: null,
-    usedBy: null,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    assignedChatbots: 3,
+  public readonly metadata = {
+    firstname: 'Jean',
+    lastname: 'Dupont',
+    role: 'teacher' as const,
+    acceptTerms: true,
   };
 
   public readonly createUserMock = jest.fn();
-  public readonly deleteUserMock = jest.fn();
 
-  public readonly teachersSingleMock = jest.fn();
-  private readonly teachersSelectMock = jest.fn(() => ({
-    single: this.teachersSingleMock,
-  }));
-  public readonly teachersInsertMock = jest.fn(() => ({
-    select: this.teachersSelectMock,
-  }));
-  private readonly teachersFromMock = jest.fn(() => ({
-    insert: this.teachersInsertMock,
-  }));
+  public readonly sut: AuthSupabaseRepository;
 
-  public readonly tokensIsMock = jest.fn();
-  public readonly tokensEqMock = jest.fn(() => ({ is: this.tokensIsMock }));
-  public readonly tokensUpdateMock = jest.fn(() => ({ eq: this.tokensEqMock }));
-  private readonly tokensFromMock = jest.fn(() => ({
-    update: this.tokensUpdateMock,
-  }));
-
-  private readonly fromMock = jest.fn((table: string) => {
-    if (table === 'teachers') {
-      return this.teachersFromMock();
-    }
-    if (table === 'invitation_tokens') {
-      return this.tokensFromMock();
-    }
-    return {};
-  });
-
-  private readonly supabaseAdminMock = {
-    from: this.fromMock,
-    auth: {
-      admin: {
-        createUser: this.createUserMock,
-        deleteUser: this.deleteUserMock,
+  constructor() {
+    const supabaseAuthMock = {
+      auth: {
+        admin: {
+          createUser: this.createUserMock,
+        },
       },
-    },
-  };
+    };
 
-  public readonly sut = new AuthSupabaseRepository(
-    this.supabaseAdminMock as any,
-    this.supabaseAdminMock as any,
-  );
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
+  }
 
-  private readonly teacherRow = {
-    id: 'teacher-row-id-1',
-    supabase_user_id: 'user-uuid-1',
-    name: 'Jean Dupont',
-    email: 'teacher@school.com',
-    created_at: '2026-01-01T00:00:00.000Z',
-    establishment_id: 'est-1',
-    available_chatbots: 3,
-  };
-
-  whenFullSuccessPath() {
+  whenAdminCreateUserSucceeds() {
     this.createUserMock.mockResolvedValue({
       data: {
         user: {
@@ -554,17 +268,12 @@ class CreateUserFixtures {
       },
       error: null,
     });
-    this.teachersSingleMock.mockResolvedValue({
-      data: this.teacherRow,
-      error: null,
-    });
-    this.tokensIsMock.mockResolvedValue({ error: null });
   }
 
   whenCreateUserReturnsAlreadyRegistered() {
     this.createUserMock.mockResolvedValue({
       data: null,
-      error: { message: 'User already registered' },
+      error: { message: 'already registered somewhere' },
     });
   }
 
@@ -582,80 +291,23 @@ class CreateUserFixtures {
     });
   }
 
-  whenCreateUserSucceedsButTeacherInsertFails() {
-    this.createUserMock.mockResolvedValue({
-      data: {
-        user: {
-          id: 'user-uuid-1',
-          email: 'teacher@school.com',
-          user_metadata: {
-            firstname: 'Jean',
-            lastname: 'Dupont',
-            role: 'teacher',
-          },
-        },
-      },
-      error: null,
-    });
-    this.teachersSingleMock.mockResolvedValue({
-      data: null,
-      error: { message: 'insert failed' },
-    });
-    this.deleteUserMock.mockResolvedValue({});
+  whenCreateAuthUser() {
+    return this.sut.createAuthUser(this.email, this.password, this.metadata);
   }
 
-  whenCreateUserAndTeacherInsertSucceedButTokenUpdateFails() {
-    this.createUserMock.mockResolvedValue({
-      data: {
-        user: {
-          id: 'user-uuid-1',
-          email: 'teacher@school.com',
-          user_metadata: {
-            firstname: 'Jean',
-            lastname: 'Dupont',
-            role: 'teacher',
-          },
-        },
-      },
-      error: null,
-    });
-    this.teachersSingleMock.mockResolvedValue({
-      data: this.teacherRow,
-      error: null,
-    });
-    this.tokensIsMock.mockResolvedValue({
-      error: { message: 'update failed' },
-    });
-  }
-
-  whenCreateUser() {
-    return this.sut.createUser(
-      'teacher@school.com',
-      'secret',
-      { firstname: 'Jean', lastname: 'Dupont', role: 'teacher' },
-      this.invitationToken,
-    );
-  }
-
-  async thenThrowTeacherAlreadyExists(promise: Promise<unknown>) {
+  async thenThrowUserAlreadyExists(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(BadRequestError);
     await expect(promise).rejects.toThrow('User already exists');
   }
 
   async thenThrowUserCreationError(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
+    await expect(promise).rejects.toThrow('Network error');
   }
 
-  async thenThrowTeacherCreationFailed(promise: Promise<unknown>) {
+  async thenThrowUserCreationFailed(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
-  }
-
-  async thenThrowTeacherProfileCreationError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(ServerError);
-  }
-
-  async thenThrowTokenUpdateError(promise: Promise<unknown>) {
-    await expect(promise).rejects.toBeInstanceOf(ServerError);
+    await expect(promise).rejects.toThrow('User creation failed');
   }
 }
 
@@ -665,7 +317,7 @@ class LogoutUserFixtures {
   public readonly sut: AuthSupabaseRepository;
 
   constructor() {
-    const supabaseAdminMock = {
+    const supabaseAuthMock = {
       auth: {
         admin: {
           signOut: this.signOutMock,
@@ -673,7 +325,7 @@ class LogoutUserFixtures {
       },
     };
 
-    this.sut = new AuthSupabaseRepository(supabaseAdminMock as any, {} as any);
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
   }
 
   whenLogoutUser() {

@@ -30,3 +30,10 @@ export type UpdateSessionNameBody = {
   name: string;
   teacherId: string;
 };
+
+export type SupabaseSessionInsert = {
+  teacher_id: string;
+  name: string;
+  code: string;
+  language: string;
+};

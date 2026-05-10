@@ -15,9 +15,16 @@ import { AppHttpSecurityGuard } from './guards/app-http-security.guard';
 import { CsrfGuard } from './guards/csrf.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
+import { InvitationTokenPersistenceModule } from 'src/infrastructure/supabase/invitation-token/invitation-token-persistence.module';
 
 @Module({
-  imports: [AuthPersistenceModule, MailerModule],
+  imports: [
+    AuthPersistenceModule,
+    MailerModule,
+    TeacherPersistenceModule,
+    InvitationTokenPersistenceModule,
+  ],
   controllers: [AuthController],
   providers: [
     {

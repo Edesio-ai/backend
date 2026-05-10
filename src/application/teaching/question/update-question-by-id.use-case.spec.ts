@@ -1,7 +1,6 @@
 import { UpdateQuestionByIdUseCase } from './update-question-by-id.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
-  BadRequestError,
   NotFoundError,
   UnauthorizedError,
 } from 'src/domain/shared/global/errors/global.errors';

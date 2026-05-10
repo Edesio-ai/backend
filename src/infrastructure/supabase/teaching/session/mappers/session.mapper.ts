@@ -2,19 +2,13 @@ import {
   CreateSessionBody,
   Session,
   SupabaseSession,
+  SupabaseSessionInsert,
   UpdateSessionNameBody,
 } from 'src/domain/teaching/types/session.type';
 import {
   CourseWithSession,
   SupabaseCourseWithSession,
 } from 'src/domain/teaching/types/course.type';
-
-type SupabaseSessionInsert = {
-  teacher_id: string;
-  name: string;
-  code: string;
-  language: string;
-};
 
 export const SessionMapper = {
   toDomain: (row: SupabaseSession): Session => ({

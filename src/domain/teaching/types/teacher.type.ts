@@ -19,6 +19,14 @@ export type Teacher = {
   supabaseUserId?: string | null;
 };
 
+export type SupabaseTeacherInsert = {
+  supabase_user_id: string;
+  name: string;
+  email: string;
+  establishment_id?: string | null;
+  available_chatbots?: number;
+};
+
 export type TeacherWithStats = Teacher & {
   sessionsCount: number;
   studentsCount: number;
