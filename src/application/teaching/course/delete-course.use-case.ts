@@ -29,6 +29,10 @@ import {
   QUESTIONS_REPOSITORY,
   type QuestionsRepository,
 } from 'src/domain/teaching/interfaces/questions.repository';
+import {
+  type IStudentCourseStatsRepository,
+  STUDENT_COURSE_STATS_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
 
 export class DeleteCourseUseCase {
   constructor(
@@ -44,6 +48,8 @@ export class DeleteCourseUseCase {
     private readonly courseFileRepository: ICourseFileRepository,
     @Inject(QUESTIONS_REPOSITORY)
     private readonly questionsRepository: QuestionsRepository,
+    @Inject(STUDENT_COURSE_STATS_REPOSITORY)
+    private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}
 
   async execute(courseId: string, user: AuthUser): Promise<void> {
@@ -74,7 +80,9 @@ export class DeleteCourseUseCase {
 
     await this.questionsRepository.deleteCourseQuizQuestions(courseId);
     await this.courseFileRepository.deleteCoursesFilesByCourseIds([courseId]);
-    await this.studentRepository.deleteStudentCourseStatsByCourseId(courseId);
+    await this.studentCourseStatsRepository.deleteStudentCourseStatsByCourseId(
+      courseId,
+    );
     await this.courseQuestionRepository.deleteCourseQuestionsByCourseId(
       courseId,
     );

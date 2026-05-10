@@ -6,6 +6,7 @@ import {
 } from 'src/domain/shared/global/errors/global.errors';
 import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
+import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
 import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
@@ -15,6 +16,7 @@ import { createMockCourseQuestionRepository } from 'src/testing/mock-course-ques
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockStudentCourseStatsRepository } from 'src/testing/mock-student-course-stats-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('DeleteCourseUseCase', () => {
@@ -69,7 +71,7 @@ describe('DeleteCourseUseCase', () => {
       fixtures.courseFileRepository.deleteCoursesFilesByCourseIds,
     ).toHaveBeenCalledWith([fixtures.courseId]);
     expect(
-      fixtures.studentRepository.deleteStudentCourseStatsByCourseId,
+      fixtures.studentCourseStatsRepository.deleteStudentCourseStatsByCourseId,
     ).toHaveBeenCalledWith(fixtures.courseId);
     expect(
       fixtures.courseQuestionRepository.deleteCourseQuestionsByCourseId,
@@ -95,7 +97,8 @@ describe('DeleteCourseUseCase', () => {
       callOrder.push('deleteCoursesFilesByCourseIds');
     });
     (
-      fixtures.studentRepository.deleteStudentCourseStatsByCourseId as jest.Mock
+      fixtures.studentCourseStatsRepository
+        .deleteStudentCourseStatsByCourseId as jest.Mock
     ).mockImplementation(async () => {
       callOrder.push('deleteStudentCourseStatsByCourseId');
     });
@@ -149,6 +152,7 @@ class Fixtures {
   public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
   public readonly studentRepository: jest.Mocked<StudentRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
+  public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly useCase: DeleteCourseUseCase;
 
   constructor() {
@@ -164,6 +168,9 @@ class Fixtures {
 
     this.courseFileRepository = createMockCourseFileRepository();
 
+    this.studentCourseStatsRepository =
+      createMockStudentCourseStatsRepository();
+
     this.useCase = new DeleteCourseUseCase(
       this.courseRepository,
       this.teacherRepository,
@@ -171,6 +178,7 @@ class Fixtures {
       this.studentRepository,
       this.courseFileRepository,
       this.questionsRepository,
+      this.studentCourseStatsRepository,
     );
   }
 
@@ -215,7 +223,7 @@ class Fixtures {
     this.courseFileRepository.deleteCoursesFilesByCourseIds.mockResolvedValue(
       undefined,
     );
-    this.studentRepository.deleteStudentCourseStatsByCourseId.mockResolvedValue(
+    this.studentCourseStatsRepository.deleteStudentCourseStatsByCourseId.mockResolvedValue(
       undefined,
     );
     this.courseQuestionRepository.deleteCourseQuestionsByCourseId.mockResolvedValue(

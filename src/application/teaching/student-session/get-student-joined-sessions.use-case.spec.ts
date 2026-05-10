@@ -1,7 +1,7 @@
 import { GetStudentJoinedSessionsUseCase } from './get-student-joined-sessions.use-case';
-import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
+import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
 import { StudentJoinedSession } from 'src/domain/teaching/types/student.type';
-import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 
 describe('GetStudentJoinedSessionsUseCase', () => {
   let fixtures: Fixtures;
@@ -10,13 +10,13 @@ describe('GetStudentJoinedSessionsUseCase', () => {
     fixtures = new Fixtures();
   });
 
-  it('should call studentRepository.getStudentJoinedSessions with the student id', async () => {
+  it('should call studentSessionRepository.listSessionsEnrolledByStudent with the student id', async () => {
     fixtures.whenJoinedSessionsFound();
 
     await fixtures.whenExecute();
 
     expect(
-      fixtures.studentRepository.getStudentJoinedSessions,
+      fixtures.studentSessionRepository.listSessionsEnrolledByStudent,
     ).toHaveBeenCalledWith(fixtures.studentId);
   });
 
@@ -58,12 +58,14 @@ class Fixtures {
     },
   ];
 
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
   public readonly useCase: GetStudentJoinedSessionsUseCase;
 
   constructor() {
-    this.studentRepository = createMockStudentRepository();
-    this.useCase = new GetStudentJoinedSessionsUseCase(this.studentRepository);
+    this.studentSessionRepository = createMockStudentSessionRepository();
+    this.useCase = new GetStudentJoinedSessionsUseCase(
+      this.studentSessionRepository,
+    );
   }
 
   whenExecute() {
@@ -71,16 +73,20 @@ class Fixtures {
   }
 
   whenJoinedSessionsFound() {
-    this.studentRepository.getStudentJoinedSessions.mockResolvedValue(
+    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue(
       this.joinedSessions,
     );
   }
 
   whenNoJoinedSessionsFound() {
-    this.studentRepository.getStudentJoinedSessions.mockResolvedValue([]);
+    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue(
+      [],
+    );
   }
 
   whenRepositoryThrows(error: Error) {
-    this.studentRepository.getStudentJoinedSessions.mockRejectedValue(error);
+    this.studentSessionRepository.listSessionsEnrolledByStudent.mockRejectedValue(
+      error,
+    );
   }
 }

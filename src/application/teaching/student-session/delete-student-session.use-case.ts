@@ -5,6 +5,10 @@ import {
   NotFoundError,
 } from 'src/domain/shared/global/errors/global.errors';
 import {
+  type IStudentSessionRepository,
+  STUDENT_SESSION_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-session.repository';
+import {
   STUDENT_REPOSITORY,
   type StudentRepository,
 } from 'src/domain/teaching/interfaces/student.repository';
@@ -13,6 +17,8 @@ export class DeleteStudentSessionUseCase {
   constructor(
     @Inject(STUDENT_REPOSITORY)
     private readonly studentRepository: StudentRepository,
+    @Inject(STUDENT_SESSION_REPOSITORY)
+    private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}
 
   async execute(sessionId: string, user: AuthUser): Promise<void> {
@@ -22,7 +28,9 @@ export class DeleteStudentSessionUseCase {
     }
 
     const studentSession =
-      await this.studentRepository.getStudentSessionBySessionId(sessionId);
+      await this.studentSessionRepository.getStudentSessionBySessionId(
+        sessionId,
+      );
     if (!studentSession) {
       throw new NotFoundError('Student session not found');
     }
@@ -33,6 +41,9 @@ export class DeleteStudentSessionUseCase {
       );
     }
 
-    await this.studentRepository.deleteStudentSession(sessionId, student.id);
+    await this.studentSessionRepository.deleteStudentSession(
+      sessionId,
+      student.id,
+    );
   }
 }

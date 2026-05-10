@@ -1,17 +1,19 @@
 import { Inject } from '@nestjs/common';
 import {
-  STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
+  type IStudentSessionRepository,
+  STUDENT_SESSION_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-session.repository';
 import { StudentJoinedSession } from 'src/domain/teaching/types/student.type';
 
 export class GetStudentJoinedSessionsUseCase {
   constructor(
-    @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    @Inject(STUDENT_SESSION_REPOSITORY)
+    private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}
 
   async execute(studentId: string): Promise<StudentJoinedSession[]> {
-    return this.studentRepository.getStudentJoinedSessions(studentId);
+    return this.studentSessionRepository.listSessionsEnrolledByStudent(
+      studentId,
+    );
   }
 }

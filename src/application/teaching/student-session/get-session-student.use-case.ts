@@ -1,7 +1,4 @@
-import {
-  SessionStudent,
-  StudentSession,
-} from 'src/domain/teaching/types/student.type';
+import { SessionStudent } from 'src/domain/teaching/types/student.type';
 import { Inject } from '@nestjs/common';
 import {
   STUDENT_REPOSITORY,
@@ -24,6 +21,10 @@ import {
   ESTABLISHMENT_REPOSITORY,
   type EstablishmentRepository,
 } from 'src/domain/teaching/interfaces/establishment.repository';
+import {
+  type IStudentSessionRepository,
+  STUDENT_SESSION_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-session.repository';
 
 export class GetSessionStudentUseCase {
   constructor(
@@ -35,6 +36,8 @@ export class GetSessionStudentUseCase {
     private readonly sessionRepository: SessionRepository,
     @Inject(ESTABLISHMENT_REPOSITORY)
     private readonly establishmentRepository: EstablishmentRepository,
+    @Inject(STUDENT_SESSION_REPOSITORY)
+    private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}
 
   async execute(sessionId: string, user: AuthUser): Promise<SessionStudent[]> {
@@ -56,7 +59,7 @@ export class GetSessionStudentUseCase {
             students (id, name, email, photo_url)
         `;
     const studentsSessions =
-      await this.studentRepository.getStudentSessionsBySessionId(
+      await this.studentSessionRepository.listStudentsEnrolledInSession(
         sessionId,
         select,
       );

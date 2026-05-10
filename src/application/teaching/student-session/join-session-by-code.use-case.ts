@@ -11,6 +11,10 @@ import {
   BadRequestError,
   NotFoundError,
 } from 'src/domain/shared/global/errors/global.errors';
+import {
+  type IStudentSessionRepository,
+  STUDENT_SESSION_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-session.repository';
 
 export class JoinSessionByCodeUseCase {
   constructor(
@@ -18,6 +22,8 @@ export class JoinSessionByCodeUseCase {
     private readonly studentRepository: StudentRepository,
     @Inject(SESSION_REPOSITORY)
     private readonly sessionRepository: SessionRepository,
+    @Inject(STUDENT_SESSION_REPOSITORY)
+    private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}
 
   async execute(code: string, userId: string): Promise<void> {
@@ -32,7 +38,9 @@ export class JoinSessionByCodeUseCase {
     }
 
     const studentSessions =
-      await this.studentRepository.getStudentJoinedSessions(student.id);
+      await this.studentSessionRepository.listSessionsEnrolledByStudent(
+        student.id,
+      );
 
     const existingSession = studentSessions.find(
       (studentSession) => studentSession.id === session.id,
@@ -41,6 +49,9 @@ export class JoinSessionByCodeUseCase {
       throw new BadRequestError('Student already joined this session');
     }
 
-    await this.studentRepository.createStudentSession(student.id, session.id);
+    await this.studentSessionRepository.createStudentSession(
+      student.id,
+      session.id,
+    );
   }
 }

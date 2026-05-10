@@ -15,20 +15,20 @@ import {
   Establishment,
   EstablishmentStats,
 } from 'src/domain/teaching/types/establishment.type';
-import {
-  STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
 import type { StudentSession } from 'src/domain/teaching/types/student.type';
+import {
+  type IStudentSessionRepository,
+  STUDENT_SESSION_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-session.repository';
 
 export class GetEstablishmentsStatsUseCase {
   constructor(
     @Inject(ESTABLISHMENT_REPOSITORY)
     private readonly establishmentRepository: EstablishmentRepository,
-    @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
+    @Inject(STUDENT_SESSION_REPOSITORY)
+    private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}
 
   async execute(userId: string): Promise<EstablishmentStats> {
@@ -45,7 +45,9 @@ export class GetEstablishmentsStatsUseCase {
     const teacherSessionIds = (teachersSessions || []).map((s) => s.id);
 
     const studentsSessions: StudentSession[] =
-      await this.studentRepository.getStudentsSessionsByIds(teacherSessionIds);
+      await this.studentSessionRepository.getStudentsSessionsByIds(
+        teacherSessionIds,
+      );
 
     const studentCountPerSession: Record<string, number> = {};
     const uniqueStudents = new Set<string>();

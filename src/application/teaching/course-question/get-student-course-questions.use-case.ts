@@ -17,6 +17,10 @@ import {
   COURSE_QUESTION_REPOSITORY,
   type ICourseQuestionRepository,
 } from 'src/domain/teaching/interfaces/i-course-question.repository';
+import {
+  type IStudentSessionRepository,
+  STUDENT_SESSION_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-session.repository';
 
 export class GetStudentCourseQuestionsUseCase {
   constructor(
@@ -26,6 +30,8 @@ export class GetStudentCourseQuestionsUseCase {
     private readonly studentRepository: StudentRepository,
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: CourseRepository,
+    @Inject(STUDENT_SESSION_REPOSITORY)
+    private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}
 
   async execute(courseId: string, user: AuthUser): Promise<CourseQuestion[]> {
@@ -47,7 +53,7 @@ export class GetStudentCourseQuestionsUseCase {
     }
 
     const studentSession =
-      await this.studentRepository.getStudentSessionBySessionId(
+      await this.studentSessionRepository.getStudentSessionBySessionId(
         course.sessionId,
       );
     if (!studentSession) {

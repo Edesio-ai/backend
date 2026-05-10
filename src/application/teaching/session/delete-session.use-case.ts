@@ -15,15 +15,15 @@ import {
   TEACHER_REPOSITORY,
   type TeacherRepository,
 } from 'src/domain/teaching/interfaces/teacher.repository';
-import {
-  STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 import {
   COURSE_FILE_REPOSITORY,
   type ICourseFileRepository,
 } from 'src/domain/teaching/interfaces/i-course-file.repository';
+import {
+  type IStudentSessionRepository,
+  STUDENT_SESSION_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-session.repository';
 
 export class DeleteSessionUseCase {
   constructor(
@@ -35,10 +35,10 @@ export class DeleteSessionUseCase {
     private readonly sessionRepository: SessionRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
-    @Inject(STUDENT_REPOSITORY)
-    private readonly studentSupabaseRepository: StudentRepository,
     @Inject(COURSE_FILE_REPOSITORY)
     private readonly courseFileRepository: ICourseFileRepository,
+    @Inject(STUDENT_SESSION_REPOSITORY)
+    private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}
 
   async execute(sessionId: string, userId: string): Promise<void> {
@@ -57,7 +57,7 @@ export class DeleteSessionUseCase {
     }
 
     await this.courseRepository.deleteCoursesBySessionId(sessionId);
-    await this.studentSupabaseRepository.deleteStudentSessionsBySessionId(
+    await this.studentSessionRepository.deleteStudentSessionsBySessionId(
       sessionId,
     );
 

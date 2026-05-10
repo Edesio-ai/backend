@@ -3,13 +3,13 @@ import { CourseRepository } from 'src/domain/teaching/interfaces/course.reposito
 import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
 import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
+import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
-import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('DeleteSessionUseCase', () => {
@@ -65,7 +65,7 @@ class Fixtures {
   public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
   public readonly sessionRepository: jest.Mocked<SessionRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly useCase: DeleteSessionUseCase;
 
@@ -74,15 +74,15 @@ class Fixtures {
     this.questionsRepository = createMockQuestionsRepository();
     this.sessionRepository = createMockSessionRepository();
     this.teacherRepository = createMockTeacherRepository();
-    this.studentRepository = createMockStudentRepository();
+    this.studentSessionRepository = createMockStudentSessionRepository();
     this.courseFileRepository = createMockCourseFileRepository();
     this.useCase = new DeleteSessionUseCase(
       this.courseRepository,
       this.questionsRepository,
       this.sessionRepository,
       this.teacherRepository,
-      this.studentRepository,
       this.courseFileRepository,
+      this.studentSessionRepository,
     );
   }
 
@@ -97,7 +97,7 @@ class Fixtures {
     this.questionsRepository.deleteQuestionsByCourseIds.mockResolvedValue();
     this.courseFileRepository.deleteCoursesFilesByCourseIds.mockResolvedValue();
     this.courseRepository.deleteCoursesBySessionId.mockResolvedValue();
-    this.studentRepository.deleteStudentSessionsBySessionId.mockResolvedValue();
+    this.studentSessionRepository.deleteStudentSessionsBySessionId.mockResolvedValue();
     this.teacherRepository.getTeacherByUserId.mockResolvedValue(this.teacher);
     this.sessionRepository.deleteSessionByTeacherId.mockResolvedValue();
   }
@@ -105,7 +105,7 @@ class Fixtures {
   whenSessionHasNoCourses() {
     this.courseRepository.getCoursesBySessionId.mockResolvedValue([]);
     this.courseRepository.deleteCoursesBySessionId.mockResolvedValue();
-    this.studentRepository.deleteStudentSessionsBySessionId.mockResolvedValue();
+    this.studentSessionRepository.deleteStudentSessionsBySessionId.mockResolvedValue();
     this.teacherRepository.getTeacherByUserId.mockResolvedValue(this.teacher);
     this.sessionRepository.deleteSessionByTeacherId.mockResolvedValue();
   }
@@ -137,7 +137,7 @@ class Fixtures {
       this.sessionId,
     );
     expect(
-      this.studentRepository.deleteStudentSessionsBySessionId,
+      this.studentSessionRepository.deleteStudentSessionsBySessionId,
     ).toHaveBeenCalledWith(this.sessionId);
     expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
       this.userId,
@@ -161,7 +161,7 @@ class Fixtures {
       this.sessionId,
     );
     expect(
-      this.studentRepository.deleteStudentSessionsBySessionId,
+      this.studentSessionRepository.deleteStudentSessionsBySessionId,
     ).toHaveBeenCalledWith(this.sessionId);
     expect(
       this.sessionRepository.deleteSessionByTeacherId,

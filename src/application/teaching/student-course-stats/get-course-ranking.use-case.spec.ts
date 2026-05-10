@@ -3,7 +3,7 @@ import { GetCourseRankingUseCase } from 'src/application/teaching/student-course
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
-import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import { Course } from 'src/domain/teaching/types/course.type';
 import { Session } from 'src/domain/teaching/types/session.type';
@@ -11,7 +11,7 @@ import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
-import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockStudentCourseStatsRepository } from 'src/testing/mock-student-course-stats-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GetCourseRankingUseCase', () => {
@@ -47,7 +47,7 @@ describe('GetCourseRankingUseCase', () => {
 
     await expect(promise).rejects.toBeInstanceOf(ForbiddenException);
     expect(
-      fixtures.studentRepository.getStudentStatsByCourseId,
+      fixtures.studentCourseStatsRepository.getStudentStatsByCourseId,
     ).not.toHaveBeenCalled();
   });
 
@@ -73,7 +73,7 @@ describe('GetCourseRankingUseCase', () => {
     expect(result[3].rank).toBe(4);
     expect(result[3].successRate).toBe(50);
     expect(
-      fixtures.studentRepository.getStudentStatsByCourseId,
+      fixtures.studentCourseStatsRepository.getStudentStatsByCourseId,
     ).toHaveBeenCalledWith(fixtures.course.id);
   });
 });
@@ -168,20 +168,21 @@ class Fixtures {
   public readonly courseRepository: jest.Mocked<CourseRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly sessionRepository: jest.Mocked<SessionRepository>;
-  public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly useCase: GetCourseRankingUseCase;
 
   constructor() {
     this.courseRepository = createMockCourseRepository();
     this.teacherRepository = createMockTeacherRepository();
     this.sessionRepository = createMockSessionRepository();
-    this.studentRepository = createMockStudentRepository();
+    this.studentCourseStatsRepository =
+      createMockStudentCourseStatsRepository();
 
     this.useCase = new GetCourseRankingUseCase(
       this.courseRepository,
       this.teacherRepository,
       this.sessionRepository,
-      this.studentRepository,
+      this.studentCourseStatsRepository,
     );
   }
 
@@ -217,7 +218,7 @@ class Fixtures {
   }
 
   whenStudentStatsReturnUnsorted() {
-    this.studentRepository.getStudentStatsByCourseId.mockResolvedValue(
+    this.studentCourseStatsRepository.getStudentStatsByCourseId.mockResolvedValue(
       this.studentStatsUnsorted,
     );
   }

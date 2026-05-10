@@ -26,6 +26,10 @@ import {
 } from 'src/domain/teaching/interfaces/i-course-file.repository';
 import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
 import { SessionDetails } from 'src/domain/teaching/types/course.type';
+import {
+  type IStudentCourseStatsRepository,
+  STUDENT_COURSE_STATS_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
 
 export class GetSessionDetailsUseCase {
   constructor(
@@ -39,6 +43,8 @@ export class GetSessionDetailsUseCase {
     private readonly studentsRepository: StudentRepository,
     @Inject(COURSE_FILE_REPOSITORY)
     private readonly courseFileRepository: ICourseFileRepository,
+    @Inject(STUDENT_COURSE_STATS_REPOSITORY)
+    private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}
 
   async execute(courseId: string, user: AuthUser): Promise<SessionDetails> {
@@ -73,7 +79,9 @@ export class GetSessionDetailsUseCase {
     const questions =
       await this.questionsRepository.getCourseQuestions(courseId);
     const students =
-      await this.studentsRepository.getStudentStatsByCourseId(courseId);
+      await this.studentCourseStatsRepository.getStudentStatsByCourseId(
+        courseId,
+      );
     const files =
       await this.courseFileRepository.getCourseFilesByCourseId(courseId);
 

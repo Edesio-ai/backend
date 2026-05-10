@@ -6,14 +6,16 @@ import {
 } from 'src/domain/shared/global/errors/global.errors';
 import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
-import { FileRepository } from 'src/domain/teaching/interfaces/file.repository';
 import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
 import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import type { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
+import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
-import { createMockFileRepository } from 'src/testing/mock-file-repository';
+import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockStudentCourseStatsRepository } from 'src/testing/mock-student-course-stats-repository';
 
 describe('GetSessionDetailsUseCase', () => {
   let fixtures: Fixtures;
@@ -147,7 +149,7 @@ class Fixtures {
         id: 'stu-1',
         name: 'Alice',
         email: 'alice@school.com',
-        photoUrl: null,
+        photoUrl: '',
       },
     },
   ];
@@ -166,7 +168,8 @@ class Fixtures {
   public readonly coursesRepository: jest.Mocked<CourseRepository>;
   public readonly questionsRepository: jest.Mocked<QuestionsRepository>;
   public readonly studentsRepository: jest.Mocked<StudentRepository>;
-  public readonly filesRepository: jest.Mocked<FileRepository>;
+  public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
+  public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly useCase: GetSessionDetailsUseCase;
 
   constructor() {
@@ -174,13 +177,16 @@ class Fixtures {
     this.coursesRepository = createMockCourseRepository();
     this.questionsRepository = createMockQuestionsRepository();
     this.studentsRepository = createMockStudentRepository();
-    this.filesRepository = createMockFileRepository();
+    this.courseFileRepository = createMockCourseFileRepository();
+    this.studentCourseStatsRepository =
+      createMockStudentCourseStatsRepository();
     this.useCase = new GetSessionDetailsUseCase(
       this.establishmentRepository,
       this.coursesRepository,
       this.questionsRepository,
       this.studentsRepository,
-      this.filesRepository,
+      this.courseFileRepository,
+      this.studentCourseStatsRepository,
     );
   }
 
@@ -233,21 +239,25 @@ class Fixtures {
   }
 
   whenStudentsFound() {
-    this.studentsRepository.getStudentStatsByCourseId.mockResolvedValue(
+    this.studentCourseStatsRepository.getStudentStatsByCourseId.mockResolvedValue(
       this.studentStats as any,
     );
   }
 
   whenNoStudentsFound() {
-    this.studentsRepository.getStudentStatsByCourseId.mockResolvedValue([]);
+    this.studentCourseStatsRepository.getStudentStatsByCourseId.mockResolvedValue(
+      [],
+    );
   }
 
   whenFilesFound() {
-    this.filesRepository.getCourseFilesByCourseId.mockResolvedValue(this.files);
+    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue(
+      this.files,
+    );
   }
 
   whenNoFilesFound() {
-    this.filesRepository.getCourseFilesByCourseId.mockResolvedValue([]);
+    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue([]);
   }
 
   thenCourseDetailsReturned(result: any) {
@@ -283,10 +293,10 @@ class Fixtures {
       this.courseId,
     );
     expect(
-      this.studentsRepository.getStudentStatsByCourseId,
+      this.studentCourseStatsRepository.getStudentStatsByCourseId,
     ).toHaveBeenCalledWith(this.courseId);
-    expect(this.filesRepository.getCourseFilesByCourseId).toHaveBeenCalledWith(
-      this.courseId,
-    );
+    expect(
+      this.courseFileRepository.getCourseFilesByCourseId,
+    ).toHaveBeenCalledWith(this.courseId);
   }
 }

@@ -3,11 +3,13 @@ import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/teachin
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import type { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
 import type { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import type { IStudentCourseStatsRepository } from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
 import { Course } from 'src/domain/teaching/types/course.type';
 import { Student } from 'src/domain/teaching/types/student.type';
 import type { UpdateOrCreateStudentCourseStatsBodyDto } from 'src/presentation/teaching/student-course-stats/dtos/update-or-create-student-course-stats.dto';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockStudentCourseStatsRepository } from 'src/testing/mock-student-course-stats-repository';
 
 describe('UpdateOrCreateStudentCourseStatsUseCase', () => {
   let fixtures: Fixtures;
@@ -33,7 +35,8 @@ describe('UpdateOrCreateStudentCourseStatsUseCase', () => {
       NotFoundException,
     );
     expect(
-      fixtures.studentRepository.getStudentCourseStatsByStudentIdAndCourseId,
+      fixtures.studentCourseStatsRepository
+        .getStudentCourseStatsByStudentIdAndCourseId,
     ).not.toHaveBeenCalled();
   });
 
@@ -45,10 +48,10 @@ describe('UpdateOrCreateStudentCourseStatsUseCase', () => {
     await fixtures.whenExecute();
 
     expect(
-      fixtures.studentRepository.updateStudentCourseStats,
+      fixtures.studentCourseStatsRepository.updateStudentCourseStats,
     ).toHaveBeenCalledWith('stat-1', fixtures.body);
     expect(
-      fixtures.studentRepository.createStudentCourseStats,
+      fixtures.studentCourseStatsRepository.createStudentCourseStats,
     ).not.toHaveBeenCalled();
   });
 
@@ -62,7 +65,7 @@ describe('UpdateOrCreateStudentCourseStatsUseCase', () => {
     await fixtures.whenExecute();
 
     expect(
-      fixtures.studentRepository.createStudentCourseStats,
+      fixtures.studentCourseStatsRepository.createStudentCourseStats,
     ).toHaveBeenCalledWith({
       studentId: fixtures.student.id,
       courseId: fixtures.courseId,
@@ -71,7 +74,7 @@ describe('UpdateOrCreateStudentCourseStatsUseCase', () => {
       lastAttemptAt: '2026-05-05T10:00:00.000Z',
     });
     expect(
-      fixtures.studentRepository.updateStudentCourseStats,
+      fixtures.studentCourseStatsRepository.updateStudentCourseStats,
     ).not.toHaveBeenCalled();
     jest.useRealTimers();
   });
@@ -110,14 +113,18 @@ class Fixtures {
 
   public readonly studentRepository: jest.Mocked<StudentRepository>;
   public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly useCase: UpdateOrCreateStudentCourseStatsUseCase;
 
   constructor() {
     this.studentRepository = createMockStudentRepository();
     this.courseRepository = createMockCourseRepository();
+    this.studentCourseStatsRepository =
+      createMockStudentCourseStatsRepository();
     this.useCase = new UpdateOrCreateStudentCourseStatsUseCase(
       this.studentRepository,
       this.courseRepository,
+      this.studentCourseStatsRepository,
     );
   }
 
@@ -142,7 +149,7 @@ class Fixtures {
   }
 
   whenExistingStatsReturned() {
-    this.studentRepository.getStudentCourseStatsByStudentIdAndCourseId.mockResolvedValue(
+    this.studentCourseStatsRepository.getStudentCourseStatsByStudentIdAndCourseId.mockResolvedValue(
       {
         id: 'stat-1',
         studentId: this.student.id,
@@ -152,13 +159,13 @@ class Fixtures {
         lastAttemptAt: '2026-01-02T00:00:00.000Z',
       },
     );
-    this.studentRepository.updateStudentCourseStats.mockResolvedValue();
+    this.studentCourseStatsRepository.updateStudentCourseStats.mockResolvedValue();
   }
 
   whenNoExistingStats() {
-    this.studentRepository.getStudentCourseStatsByStudentIdAndCourseId.mockResolvedValue(
+    this.studentCourseStatsRepository.getStudentCourseStatsByStudentIdAndCourseId.mockResolvedValue(
       null,
     );
-    this.studentRepository.createStudentCourseStats.mockResolvedValue();
+    this.studentCourseStatsRepository.createStudentCourseStats.mockResolvedValue();
   }
 }

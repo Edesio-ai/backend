@@ -5,23 +5,32 @@ import {
   type CourseRepository,
 } from 'src/domain/teaching/interfaces/course.repository';
 import {
+  type IStudentCourseStatsRepository,
+  STUDENT_COURSE_STATS_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
+import {
   STUDENT_REPOSITORY,
   type StudentRepository,
 } from 'src/domain/teaching/interfaces/student.repository';
-import { UpdateOrCreateStudentCourseStatsBodyDto } from 'src/presentation/teaching/student-course-stats/dtos/update-or-create-student-course-stats.dto';
 
+type UpdateOrCreateStudentCourseStatsBoyd = {
+  attemptedQuestions: number;
+  correctAnswers: number;
+};
 export class UpdateOrCreateStudentCourseStatsUseCase {
   constructor(
     @Inject(STUDENT_REPOSITORY)
     private readonly studentRepository: StudentRepository,
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: CourseRepository,
+    @Inject(STUDENT_COURSE_STATS_REPOSITORY)
+    private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}
 
   async execute(
     courseId: string,
     user: AuthUser,
-    body: UpdateOrCreateStudentCourseStatsBodyDto,
+    body: UpdateOrCreateStudentCourseStatsBoyd,
   ): Promise<void> {
     const student = await this.studentRepository.getStudentByUserId(user.id);
     if (!student) {
@@ -32,13 +41,13 @@ export class UpdateOrCreateStudentCourseStatsUseCase {
       throw new NotFoundException('Course not found');
     }
     const existingStats =
-      await this.studentRepository.getStudentCourseStatsByStudentIdAndCourseId(
+      await this.studentCourseStatsRepository.getStudentCourseStatsByStudentIdAndCourseId(
         student.id,
         courseId,
       );
 
     if (existingStats) {
-      await this.studentRepository.updateStudentCourseStats(
+      await this.studentCourseStatsRepository.updateStudentCourseStats(
         existingStats.id,
         body,
       );
@@ -50,7 +59,9 @@ export class UpdateOrCreateStudentCourseStatsUseCase {
         correctAnswers: body.correctAnswers,
         lastAttemptAt: new Date().toISOString(),
       };
-      await this.studentRepository.createStudentCourseStats(statToInser);
+      await this.studentCourseStatsRepository.createStudentCourseStats(
+        statToInser,
+      );
     }
   }
 }

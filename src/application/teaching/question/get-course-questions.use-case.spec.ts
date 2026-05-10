@@ -8,9 +8,11 @@ import { CourseRepository } from 'src/domain/teaching/interfaces/course.reposito
 import { QuestionsRepository } from 'src/domain/teaching/interfaces/questions.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 import {
   Course,
@@ -134,7 +136,7 @@ describe('GetCourseQuestionsUseCase', () => {
         fixtures.courseId,
       );
       expect(
-        fixtures.studentRepository.getStudentSessionBySessionId,
+        fixtures.studentSessionRepository.getStudentSessionBySessionId,
       ).toHaveBeenCalledWith(fixtures.sessionId);
       expect(
         fixtures.questionsRepository.getCourseQuestions,
@@ -161,7 +163,7 @@ describe('GetCourseQuestionsUseCase', () => {
         NotFoundError,
       );
       expect(
-        fixtures.studentRepository.getStudentSessionBySessionId,
+        fixtures.studentSessionRepository.getStudentSessionBySessionId,
       ).not.toHaveBeenCalled();
       expect(
         fixtures.questionsRepository.getCourseQuestions,
@@ -267,6 +269,7 @@ class Fixtures {
   public readonly teachersRepository: jest.Mocked<TeacherRepository>;
   public readonly coursesRepository: jest.Mocked<CourseRepository>;
   public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
   public readonly useCase: GetCourseQuestionsUseCase;
 
   constructor() {
@@ -274,12 +277,14 @@ class Fixtures {
     this.teachersRepository = createMockTeacherRepository();
     this.coursesRepository = createMockCourseRepository();
     this.studentRepository = createMockStudentRepository();
+    this.studentSessionRepository = createMockStudentSessionRepository();
 
     this.useCase = new GetCourseQuestionsUseCase(
       this.questionsRepository,
       this.teachersRepository,
       this.coursesRepository,
       this.studentRepository,
+      this.studentSessionRepository,
     );
   }
 
@@ -340,21 +345,27 @@ class Fixtures {
   }
 
   whenStudentSessionMatchesEnrollment() {
-    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue({
-      sessionId: this.sessionId,
-      studentId: this.enrolledStudent.id,
-    });
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
+      {
+        sessionId: this.sessionId,
+        studentId: this.enrolledStudent.id,
+      },
+    );
   }
 
   whenStudentSessionNotFound() {
-    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue(null);
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
+      null,
+    );
   }
 
   whenStudentSessionOwnedBySomeoneElse() {
-    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue({
-      sessionId: this.sessionId,
-      studentId: 'other-student',
-    });
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
+      {
+        sessionId: this.sessionId,
+        studentId: 'other-student',
+      },
+    );
   }
 
   whenQuestionsReturned() {

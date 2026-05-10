@@ -66,9 +66,10 @@ export type SupabaseStudentInsert = Omit<
   'id' | 'created_at' | 'photo_url'
 >;
 
+/** Row from Supabase when selecting `joined_at, sessions (*)` on `student_sessions`. */
 export type SupabaseStudentJoinedSession = {
   joined_at: string;
-  sessions: SupabaseSession;
+  sessions: SupabaseSession | SupabaseSession[] | null;
 };
 
 export type StudentJoinedSession = Session & {

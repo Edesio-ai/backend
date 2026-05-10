@@ -1,6 +1,6 @@
 import { JoinSessionByCodeUseCase } from './join-session-by-code.use-case';
-import { StudentRepository } from 'src/domain/teaching/interface/student.repository';
-import { SessionRepository } from 'src/domain/teaching/interface/session.repository';
+import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
 import {
   BadRequestError,
   NotFoundError,
@@ -11,6 +11,7 @@ import {
   StudentJoinedSession,
 } from 'src/domain/teaching/types/student.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 
 describe('JoinSessionByCodeUseCase', () => {
   let fixtures: Fixtures;
@@ -61,7 +62,7 @@ describe('JoinSessionByCodeUseCase', () => {
     await fixtures.whenExecute();
 
     expect(
-      fixtures.studentRepository.createStudentSession,
+      fixtures.studentSessionRepository.createStudentSession,
     ).toHaveBeenCalledWith(fixtures.student.id, fixtures.session.id);
   });
 
@@ -109,10 +110,14 @@ class Fixtures {
 
   public readonly studentRepository: jest.Mocked<StudentRepository>;
   public readonly sessionRepository: jest.Mocked<SessionRepository>;
+  public readonly studentSessionRepository: ReturnType<
+    typeof createMockStudentSessionRepository
+  >;
   public readonly useCase: JoinSessionByCodeUseCase;
 
   constructor() {
     this.studentRepository = createMockStudentRepository();
+    this.studentSessionRepository = createMockStudentSessionRepository();
     this.sessionRepository = {
       getSessionByCode: jest.fn(),
       getSessionsByTeacherId: jest.fn(),
@@ -124,6 +129,7 @@ class Fixtures {
     this.useCase = new JoinSessionByCodeUseCase(
       this.studentRepository,
       this.sessionRepository,
+      this.studentSessionRepository,
     );
   }
 
@@ -148,20 +154,24 @@ class Fixtures {
   }
 
   whenStudentAlreadyJoinedSession() {
-    this.studentRepository.getStudentJoinedSessions.mockResolvedValue([
-      this.alreadyJoinedSession,
-    ]);
+    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue(
+      [this.alreadyJoinedSession],
+    );
   }
 
   whenStudentHasNoJoinedSessions() {
-    this.studentRepository.getStudentJoinedSessions.mockResolvedValue([]);
+    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue(
+      [],
+    );
   }
 
   whenCreateStudentSessionSucceeds() {
-    this.studentRepository.createStudentSession.mockResolvedValue(undefined);
+    this.studentSessionRepository.createStudentSession.mockResolvedValue(
+      undefined,
+    );
   }
 
   whenCreateStudentSessionFails(error: Error) {
-    this.studentRepository.createStudentSession.mockRejectedValue(error);
+    this.studentSessionRepository.createStudentSession.mockRejectedValue(error);
   }
 }

@@ -5,10 +5,11 @@ import { GetSessionStudentUseCase } from 'src/application/teaching/student-sessi
 import { GetStudentJoinedSessionsUseCase } from 'src/application/teaching/student-session/get-student-joined-sessions.use-case';
 import { JoinSessionByCodeUseCase } from 'src/application/teaching/student-session/join-session-by-code.use-case';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
-import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
+import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/student/student-persistence.module';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/session/sessions-persistence.module';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
+import { StudentSessionPersistenceModule } from 'src/infrastructure/supabase/teaching/student-session/student-session-persistence.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/m
     SessionsPersistenceModule,
     EstablishmentPersistenceModule,
     TeacherPersistenceModule,
+    StudentSessionPersistenceModule,
   ],
   controllers: [StudentSessionController],
   providers: [

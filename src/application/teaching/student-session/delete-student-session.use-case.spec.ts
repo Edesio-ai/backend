@@ -1,5 +1,6 @@
 import { DeleteStudentSessionUseCase } from 'src/application/teaching/student-session/delete-student-session.use-case';
 import { StudentRepository } from 'src/domain/teaching/interfaces/student.repository';
+import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
 import {
   ForbiddenError,
   NotFoundError,
@@ -10,6 +11,7 @@ import {
   StudentSession,
 } from 'src/domain/teaching/types/student.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
+import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 
 describe('DeleteStudentSessionUseCase', () => {
   let fixtures: Fixtures;
@@ -25,7 +27,7 @@ describe('DeleteStudentSessionUseCase', () => {
     await fixtures.whenExecute();
 
     expect(
-      fixtures.studentRepository.deleteStudentSession,
+      fixtures.studentSessionRepository.deleteStudentSession,
     ).toHaveBeenCalledWith(fixtures.sessionId, fixtures.student.id);
   });
 
@@ -34,10 +36,10 @@ describe('DeleteStudentSessionUseCase', () => {
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
     expect(
-      fixtures.studentRepository.getStudentSessionBySessionId,
+      fixtures.studentSessionRepository.getStudentSessionBySessionId,
     ).not.toHaveBeenCalled();
     expect(
-      fixtures.studentRepository.deleteStudentSession,
+      fixtures.studentSessionRepository.deleteStudentSession,
     ).not.toHaveBeenCalled();
   });
 
@@ -47,7 +49,7 @@ describe('DeleteStudentSessionUseCase', () => {
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
     expect(
-      fixtures.studentRepository.deleteStudentSession,
+      fixtures.studentSessionRepository.deleteStudentSession,
     ).not.toHaveBeenCalled();
   });
 
@@ -57,7 +59,7 @@ describe('DeleteStudentSessionUseCase', () => {
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
     expect(
-      fixtures.studentRepository.deleteStudentSession,
+      fixtures.studentSessionRepository.deleteStudentSession,
     ).not.toHaveBeenCalled();
   });
 
@@ -102,11 +104,16 @@ class Fixtures {
   };
 
   public readonly studentRepository: jest.Mocked<StudentRepository>;
+  public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
   public readonly useCase: DeleteStudentSessionUseCase;
 
   constructor() {
     this.studentRepository = createMockStudentRepository();
-    this.useCase = new DeleteStudentSessionUseCase(this.studentRepository);
+    this.studentSessionRepository = createMockStudentSessionRepository();
+    this.useCase = new DeleteStudentSessionUseCase(
+      this.studentRepository,
+      this.studentSessionRepository,
+    );
   }
 
   whenExecute() {
@@ -128,24 +135,28 @@ class Fixtures {
   }
 
   whenStudentSessionFound() {
-    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue(
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
       this.studentSession,
     );
   }
 
   whenStudentSessionNotFound() {
-    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue(null);
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
+      null,
+    );
   }
 
   whenStudentSessionOwnedByAnother() {
-    this.studentRepository.getStudentSessionBySessionId.mockResolvedValue({
-      sessionId: this.sessionId,
-      studentId: 'another-student-99',
-    });
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
+      {
+        sessionId: this.sessionId,
+        studentId: 'another-student-99',
+      },
+    );
   }
 
   whenDeleteFails() {
-    this.studentRepository.deleteStudentSession.mockRejectedValue(
+    this.studentSessionRepository.deleteStudentSession.mockRejectedValue(
       new Error('delete failed'),
     );
   }

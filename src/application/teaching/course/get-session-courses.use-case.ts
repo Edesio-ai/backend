@@ -13,6 +13,10 @@ import {
   type EstablishmentRepository,
 } from 'src/domain/teaching/interfaces/establishment.repository';
 import {
+  type IStudentSessionRepository,
+  STUDENT_SESSION_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-session.repository';
+import {
   SESSION_REPOSITORY,
   type SessionRepository,
 } from 'src/domain/teaching/interfaces/session.repository';
@@ -38,6 +42,8 @@ export class GetSessionCoursesUseCase {
     private readonly establishmentRepository: EstablishmentRepository,
     @Inject(STUDENT_REPOSITORY)
     private readonly studentRepository: StudentRepository,
+    @Inject(STUDENT_SESSION_REPOSITORY)
+    private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}
 
   async execute(sessionId: string, user: AuthUser): Promise<Course[]> {
@@ -128,7 +134,9 @@ export class GetSessionCoursesUseCase {
     }
 
     const studentSession =
-      await this.studentRepository.getStudentSessionBySessionId(sessionId);
+      await this.studentSessionRepository.getStudentSessionBySessionId(
+        sessionId,
+      );
     if (!studentSession) {
       throw new NotFoundError(`Session not found for id ${sessionId}`);
     }

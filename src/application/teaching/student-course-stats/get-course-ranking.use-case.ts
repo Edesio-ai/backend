@@ -16,12 +16,12 @@ import {
   SESSION_REPOSITORY,
   type SessionRepository,
 } from 'src/domain/teaching/interfaces/session.repository';
-import {
-  STUDENT_REPOSITORY,
-  type StudentRepository,
-} from 'src/domain/teaching/interfaces/student.repository';
 import { StudentCourseStatsWithStudent } from 'src/domain/teaching/types/student.type';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import {
+  type IStudentCourseStatsRepository,
+  STUDENT_COURSE_STATS_REPOSITORY,
+} from 'src/domain/teaching/interfaces/i-student-course-stats.repository';
 
 @Injectable()
 export class GetCourseRankingUseCase {
@@ -32,8 +32,8 @@ export class GetCourseRankingUseCase {
     private readonly teacherRepository: TeacherRepository,
     @Inject(SESSION_REPOSITORY)
     private readonly sessionRepository: SessionRepository,
-    @Inject(STUDENT_REPOSITORY)
-    private readonly studentRepository: StudentRepository,
+    @Inject(STUDENT_COURSE_STATS_REPOSITORY)
+    private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}
 
   async execute(courseId: string, user: AuthUser): Promise<CourseRanking[]> {
@@ -63,7 +63,9 @@ export class GetCourseRankingUseCase {
     }
 
     const studentStats =
-      await this.studentRepository.getStudentStatsByCourseId(courseId);
+      await this.studentCourseStatsRepository.getStudentStatsByCourseId(
+        courseId,
+      );
     const rankingWithRate = this.getRankingWithRate(studentStats);
     const statsSortedByRate = this.getStatsSortedByRate(rankingWithRate);
 

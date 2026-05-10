@@ -6,7 +6,7 @@ import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-per
 import { GetCourseValidatedQuestionsUseCase } from 'src/application/teaching/course/get-course-validated-questions.use-case';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/session/sessions-persistence.module';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
-import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
+import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/student/student-persistence.module';
 import { DeleteCourseUseCase } from 'src/application/teaching/course/delete-course.use-case';
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/question/question-persistence.module';
 import { UpdateCourseUseCase } from 'src/application/teaching/course/update-course.use-case';
@@ -16,6 +16,8 @@ import { GetCoursesSessionCountUseCase } from 'src/application/teaching/course/g
 import { GetSessionCoursesUseCase } from 'src/application/teaching/course/get-session-courses.use-case';
 import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
 import { CourseQuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/course-question/course-question-persistence.module';
+import { StudentCourseStatsPersistenceModule } from 'src/infrastructure/supabase/teaching/student-course-stats/student-course-states-persistence.module';
+import { StudentSessionPersistenceModule } from 'src/infrastructure/supabase/teaching/student-session/student-session-persistence.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { CourseQuestionPersistenceModule } from 'src/infrastructure/supabase/tea
     EstablishmentPersistenceModule,
     CourseFilePersistenceModule,
     CourseQuestionPersistenceModule,
+    StudentCourseStatsPersistenceModule,
+    StudentSessionPersistenceModule,
   ],
   controllers: [CourseController],
   providers: [
