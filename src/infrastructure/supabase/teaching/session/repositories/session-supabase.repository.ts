@@ -1,10 +1,12 @@
 import { Inject } from '@nestjs/common';
-import { SUPABASE_ADMIN } from '../../supabase.module';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { SUPABASE_ADMIN } from '../../../supabase.module';
 import {
   CreateSessionBody,
   Session,
+  SupabaseSession,
   UpdateSessionNameBody,
-} from '../../../../domain/teaching/types/session.type';
+} from 'src/domain/teaching/types/session.type';
 import { SessionMapper } from '../mappers/session.mapper';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
@@ -12,7 +14,7 @@ import { SessionRepository } from 'src/domain/teaching/interfaces/session.reposi
 export class SupabaseSessionRepository implements SessionRepository {
   constructor(
     @Inject(SUPABASE_ADMIN)
-    private readonly supabase: any,
+    private readonly supabase: SupabaseClient,
   ) {}
 
   async getSessionsByTeacherId(teacherId: string): Promise<Session[]> {
@@ -103,6 +105,6 @@ export class SupabaseSessionRepository implements SessionRepository {
       throw new ServerError(error.message);
     }
 
-    return data ? SessionMapper.toDomain(data) : null;
+    return data ? SessionMapper.toDomain(data as SupabaseSession) : null;
   }
 }

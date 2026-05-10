@@ -4,7 +4,7 @@ import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/co
 import { CreateCourseUseCase } from 'src/application/teaching/course/create-course.use-case';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { GetCourseValidatedQuestionsUseCase } from 'src/application/teaching/course/get-course-validated-questions.use-case';
-import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
+import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/session/sessions-persistence.module';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
 import { DeleteCourseUseCase } from 'src/application/teaching/course/delete-course.use-case';

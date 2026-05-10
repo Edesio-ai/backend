@@ -5,7 +5,7 @@ import { GetCourseRankingUseCase } from 'src/application/teaching/student-course
 import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/course/course-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
-import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
+import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/session/sessions-persistence.module';
 import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/teaching/student-course-stats/update-or-create-student-course-stats.use-case';
 
 @Module({

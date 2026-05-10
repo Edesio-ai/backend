@@ -8,8 +8,8 @@ import {
 } from 'src/domain/teaching/types/course.type';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { CourseMapper } from '../mappers/course.mapper';
-import { SessionMapper } from '../../mappers/session.mapper';
 import { CourseRepository } from 'src/domain/teaching/interfaces/course.repository';
+import { SessionMapper } from '../../session/mappers/session.mapper';
 
 export class CourseSupabaseRepository implements CourseRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
