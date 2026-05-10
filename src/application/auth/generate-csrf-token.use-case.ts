@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
-import { TOKEN_GENERATOR } from '../../domain/shared/security/interface/token-generator.provider';
-import type { TokenGeneratorProvider } from '../../domain/shared/security/interface/token-generator.provider';
+import { TOKEN_GENERATOR } from '../../domain/shared/security/contracts/i-token-generator.provider';
+import type { ITokenGeneratorProvider } from '../../domain/shared/security/contracts/i-token-generator.provider';
 
 export type CsrfTokenPayload = {
   csrfToken: string;
@@ -10,7 +10,7 @@ export type CsrfTokenPayload = {
 export class GenerateCsrfTokenUseCase {
   constructor(
     @Inject(TOKEN_GENERATOR)
-    private readonly tokenGenerator: TokenGeneratorProvider,
+    private readonly tokenGenerator: ITokenGeneratorProvider,
   ) {}
 
   execute(): CsrfTokenPayload {

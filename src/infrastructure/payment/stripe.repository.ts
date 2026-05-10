@@ -1,12 +1,12 @@
 import { Inject } from '@nestjs/common';
 import Stripe from 'stripe';
-import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
+import { IStripeClientProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
 import { STRIPE_CLIENT } from './stripe.module';
-import { StripeError } from '../../domain/billing/error';
 import { User } from 'src/domain/auth/types/auth.type';
-import { StripeSession } from 'src/domain/billing/billing.type';
+import { StripeSession } from 'src/domain/billing/types/billing.type';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 
-export class StripeRepository implements StripeClientInterface {
+export class StripeRepository implements IStripeClientProvider {
   constructor(
     @Inject(STRIPE_CLIENT)
     private readonly stripeClient: Stripe,
@@ -31,7 +31,7 @@ export class StripeRepository implements StripeClientInterface {
       };
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
-      throw new StripeError(`Error retrieving checkout session: ${message}`);
+      throw new ServerError(`Error retrieving checkout session: ${message}`);
     }
   }
 
@@ -45,7 +45,7 @@ export class StripeRepository implements StripeClientInterface {
       return customer.data;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
-      throw new StripeError(`Error searching customers: ${message}`);
+      throw new ServerError(`Error searching customers: ${message}`);
     }
   }
 
@@ -68,7 +68,7 @@ export class StripeRepository implements StripeClientInterface {
     } catch (sessionErr) {
       const message =
         sessionErr instanceof Error ? sessionErr.message : 'Unknown error';
-      throw new StripeError(`Error searching checkout sessions: ${message}`);
+      throw new ServerError(`Error searching checkout sessions: ${message}`);
     }
   }
 
@@ -82,7 +82,7 @@ export class StripeRepository implements StripeClientInterface {
       return subscriptions.data;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
-      throw new StripeError(`Error searching subscriptions: ${message}`);
+      throw new ServerError(`Error searching subscriptions: ${message}`);
     }
   }
 
@@ -119,7 +119,7 @@ export class StripeRepository implements StripeClientInterface {
       return { url: session.url! };
     } catch (error) {
       const message = error instanceof Error ? error.message : '';
-      throw new StripeError(`Error creating checkout session: ${message}`);
+      throw new ServerError(`Error creating checkout session: ${message}`);
     }
   }
 }

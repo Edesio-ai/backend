@@ -1,8 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { ExportCourseFileUseCase } from './export-course-file.use-case';
-import { CourseRepository } from '../../domain/teaching/interface/course.repository';
-import { FileRepository } from '../../domain/teaching/interface/file.repository';
-import { PdfExtractor } from '../../domain/pdf/contracts/pdf-extractor.interface';
+import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
+import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 
 describe('ExportCourseFileUseCase', () => {
   let fixtures: Fixtures;
@@ -18,7 +17,7 @@ describe('ExportCourseFileUseCase', () => {
       NotFoundException,
     );
     expect(
-      fixtures.courseRepository.getFileBufferFromStorage,
+      fixtures.courseFileRepository.getFileBufferFromStorage,
     ).not.toHaveBeenCalled();
   });
 
@@ -37,11 +36,11 @@ describe('ExportCourseFileUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(fixtures.fileRepository.getCourseFileById).toHaveBeenCalledWith(
-      fixtures.fileId,
-    );
     expect(
-      fixtures.courseRepository.getFileBufferFromStorage,
+      fixtures.courseFileRepository.getCourseFileById,
+    ).toHaveBeenCalledWith(fixtures.fileId);
+    expect(
+      fixtures.courseFileRepository.getFileBufferFromStorage,
     ).toHaveBeenCalledWith(fixtures.courseFile.fileUrl);
     expect(result).toEqual({
       buffer: fixtures.buffer,
@@ -77,43 +76,12 @@ class Fixtures {
   public readonly buffer = Buffer.from('pdf content');
   public readonly repositoryError = new Error('repository error');
 
-  public readonly pdfExtractor: jest.Mocked<PdfExtractor>;
-  public readonly fileRepository: jest.Mocked<FileRepository>;
-  public readonly courseRepository: jest.Mocked<CourseRepository>;
+  public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly useCase: ExportCourseFileUseCase;
 
   constructor() {
-    this.pdfExtractor = {
-      extractTextFromPdf: jest.fn(),
-      extractQuestionsToPdf: jest.fn(),
-    };
-    this.fileRepository = {
-      deleteFileById: jest.fn(),
-      getCourseFileById: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-    };
-    this.courseRepository = {
-      getCourseById: jest.fn(),
-      getCourseWithSessionById: jest.fn(),
-      getSessionCoursesBySessionId: jest.fn(),
-      getCoursesBySessionId: jest.fn(),
-      deleteCoursesFilesByCourseIds: jest.fn(),
-      deleteCoursesBySessionId: jest.fn(),
-      getSessionCoursesCount: jest.fn(),
-      createCourse: jest.fn(),
-      storeCourseFile: jest.fn(),
-      insertCourseFile: jest.fn(),
-      getCourseValidatedQuestions: jest.fn(),
-      getCourseFilesByCourseId: jest.fn(),
-      getFileBufferFromStorage: jest.fn(),
-      deleteCourseById: jest.fn(),
-      updateCourse: jest.fn(),
-    };
-    this.useCase = new ExportCourseFileUseCase(
-      this.pdfExtractor,
-      this.fileRepository,
-      this.courseRepository,
-    );
+    this.courseFileRepository = createMockCourseFileRepository();
+    this.useCase = new ExportCourseFileUseCase(this.courseFileRepository);
   }
 
   whenExecute() {
@@ -121,33 +89,35 @@ class Fixtures {
   }
 
   whenGetCourseFileByIdSucceeds() {
-    this.fileRepository.getCourseFileById.mockResolvedValue(this.courseFile);
+    this.courseFileRepository.getCourseFileById.mockResolvedValue(
+      this.courseFile,
+    );
   }
 
   whenGetCourseFileByIdReturnsNull() {
-    this.fileRepository.getCourseFileById.mockResolvedValue(null as any);
+    this.courseFileRepository.getCourseFileById.mockResolvedValue(null as any);
   }
 
   whenGetCourseFileByIdFails() {
-    this.fileRepository.getCourseFileById.mockRejectedValue(
+    this.courseFileRepository.getCourseFileById.mockRejectedValue(
       this.repositoryError,
     );
   }
 
   whenGetFileBufferSucceeds() {
-    this.courseRepository.getFileBufferFromStorage.mockResolvedValue(
+    this.courseFileRepository.getFileBufferFromStorage.mockResolvedValue(
       this.buffer,
     );
   }
 
   whenGetFileBufferReturnsNull() {
-    this.courseRepository.getFileBufferFromStorage.mockResolvedValue(
+    this.courseFileRepository.getFileBufferFromStorage.mockResolvedValue(
       null as any,
     );
   }
 
   whenGetFileBufferFails() {
-    this.courseRepository.getFileBufferFromStorage.mockRejectedValue(
+    this.courseFileRepository.getFileBufferFromStorage.mockRejectedValue(
       this.repositoryError,
     );
   }

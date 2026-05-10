@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PDF_EXTRACTOR } from 'src/domain/pdf/contracts/pdf-extractor.interface';
+import { PDF_EXTRACTOR } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
 import { PdfParseExtractor } from './pdf-extractor.repository';
 
 @Module({

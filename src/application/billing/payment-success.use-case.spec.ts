@@ -1,6 +1,6 @@
 import { PaymentSuccessUseCase } from './payment-success.use-case';
-import { StripeClientInterface } from '../../domain/billing/contracts/stripe-client.interface';
-import { StripeSession } from '../../domain/billing/billing.type';
+import { IStripeClientProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
+import { StripeSession } from '../../domain/billing/types/billing.type';
 
 describe('PaymentSuccessUseCase', () => {
   let fixtures: Fixtures;
@@ -29,7 +29,7 @@ describe('PaymentSuccessUseCase', () => {
 });
 
 class Fixtures {
-  public readonly paymentClient: jest.Mocked<StripeClientInterface>;
+  public readonly paymentClient: jest.Mocked<IStripeClientProvider>;
   public readonly paymentSuccessUseCase: PaymentSuccessUseCase;
 
   public readonly sessionId: string;

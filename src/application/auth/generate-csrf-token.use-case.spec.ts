@@ -1,5 +1,5 @@
 import { GenerateCsrfTokenUseCase } from './generate-csrf-token.use-case';
-import { TokenGeneratorProvider } from '../../domain/shared/security/interface/token-generator.provider';
+import { ITokenGeneratorProvider } from '../../domain/shared/security/contracts/i-token-generator.provider';
 
 describe('GenerateCsrfTokenUseCase', () => {
   let fixtures: Fixtures;
@@ -19,7 +19,7 @@ describe('GenerateCsrfTokenUseCase', () => {
 });
 
 class Fixtures {
-  public readonly tokenGenerator: jest.Mocked<TokenGeneratorProvider>;
+  public readonly tokenGenerator: jest.Mocked<ITokenGeneratorProvider>;
   public readonly generateCsrfTokenUseCase: GenerateCsrfTokenUseCase;
 
   public readonly generatedToken: string;

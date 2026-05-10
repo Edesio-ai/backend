@@ -1,5 +1,5 @@
 import { GenerateCompletionFeedbackUseCase } from './generate-completion-feedback.use-case';
-import { OpenaiRepository } from 'src/infrastructure/llm/openai/openai.repository';
+import { IOpenAiProvider } from 'src/infrastructure/llm/openai/openai.repository';
 
 describe('GenerateCompletionFeedbackUseCase', () => {
   let fixtures: Fixtures;
@@ -28,7 +28,7 @@ describe('GenerateCompletionFeedbackUseCase', () => {
 
 class Fixtures {
   public readonly openaiRepository: jest.Mocked<
-    Pick<OpenaiRepository, 'generateCompletionFeedback'>
+    Pick<IOpenAiProvider, 'generateCompletionFeedback'>
   >;
   public readonly useCase: GenerateCompletionFeedbackUseCase;
 
@@ -44,7 +44,7 @@ class Fixtures {
       generateCompletionFeedback: jest.fn(),
     };
     this.useCase = new GenerateCompletionFeedbackUseCase(
-      this.openaiRepository as unknown as OpenaiRepository,
+      this.openaiRepository as unknown as IOpenAiProvider,
     );
   }
 

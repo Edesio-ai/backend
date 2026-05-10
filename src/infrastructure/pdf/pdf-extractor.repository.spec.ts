@@ -1,5 +1,5 @@
 import { PdfParseExtractor } from './pdf-extractor.repository';
-import { Question } from 'src/domain/teaching/types/question.type';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 
 const mockGetText = jest.fn();
 const mockDestroy = jest.fn();

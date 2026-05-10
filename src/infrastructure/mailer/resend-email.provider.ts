@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
-import { EmailProviderInterface } from '../../domain/email/contract/email.interface';
+import { IEmailProvider } from '../../domain/email/contract/i-email.interface';
 import { RESEND_CLIENT } from './resend.module';
 import { buildWelcomeEmailTemplateData } from './templates/welcome/welcome-email.data';
 import { renderWelcomeEmailHtml } from './templates/welcome/welcome-email.renderer';
-import { EmailSendingError } from '../../domain/email/error/email.errors';
 import { buildProfesseurInvitationTemplateData } from './templates/invitation/professeur-invitation-email.data';
 import { renderProfesseurInvitationEmailHtml } from './templates/invitation/professeur-invitation-email.renderer';
+import { ServerError } from 'src/domain/shared/errors/global.errors';
 
 @Injectable()
-export class ResendEmailProvider implements EmailProviderInterface {
+export class ResendEmailProvider implements IEmailProvider {
   constructor(@Inject(RESEND_CLIENT) private readonly resend: Resend) {}
 
   public async sendProfesseurInvitation(
@@ -38,14 +38,18 @@ export class ResendEmailProvider implements EmailProviderInterface {
       });
 
       if (error) {
-        throw new EmailSendingError(error.message);
+        throw new ServerError(
+          `Error sending professeur invitation email: ${error.message}`,
+        );
       }
     } catch (err) {
-      if (err instanceof EmailSendingError) {
+      if (err instanceof ServerError) {
         throw err;
       }
       const message = err instanceof Error ? err.message : String(err);
-      throw new EmailSendingError(message);
+      throw new ServerError(
+        `Error sending professeur invitation email: ${message}`,
+      );
     }
   }
 
@@ -73,14 +77,14 @@ export class ResendEmailProvider implements EmailProviderInterface {
       });
 
       if (error) {
-        throw new EmailSendingError(error.message);
+        throw new ServerError(`Error sending welcome email: ${error.message}`);
       }
     } catch (err) {
-      if (err instanceof EmailSendingError) {
+      if (err instanceof ServerError) {
         throw err;
       }
       const message = err instanceof Error ? err.message : String(err);
-      throw new EmailSendingError(message);
+      throw new ServerError(`Error sending welcome email: ${message}`);
     }
   }
 }

@@ -1,5 +1,5 @@
 import { IsArray, IsNotEmpty, IsString } from 'class-validator';
-import { Question } from 'src/domain/teaching/types/question.type';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 
 export class ExportQuestionsDto {
   @IsArray()

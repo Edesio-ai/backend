@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
-import { TeacherModule } from './modules/teacher.module';
-import { CourseModule } from './modules/course.module';
-import { SessionModule } from './modules/session.module';
-import { EstablishmentModule } from './modules/establishment.module';
-import { QuestionModule } from './modules/question.module';
-import { FileModule } from './modules/file.module';
-import { StudentModule } from './modules/student.module';
+import { SessionModule } from './session/session.module';
+import { EstablishmentModule } from './establishment/establishment.module';
+import { QuestionModule } from './questions/question.module';
+import { CourseFileModule } from './course-file/course-file.module';
+import { CourseQuestionModule } from './course-questions/course-question.module';
+import { CourseModule } from './course/course.module';
+import { StudentCourseStatsModule } from './student-course-stats/student-course-stats.module';
+import { StudentModule } from './student/student.module';
+import { StudentSessionModule } from './student-session/student-session.module';
+import { TeacherModule } from './teacher/teacher.module';
 
 @Module({
   imports: [
@@ -14,8 +17,11 @@ import { StudentModule } from './modules/student.module';
     SessionModule,
     CourseModule,
     QuestionModule,
-    FileModule,
+    CourseFileModule,
     StudentModule,
+    CourseQuestionModule,
+    StudentCourseStatsModule,
+    StudentSessionModule,
   ],
 })
 export class TeachingModule {}

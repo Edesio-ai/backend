@@ -1,5 +1,5 @@
 import { StripeRepository } from './stripe.repository';
-import { StripeError } from '../../domain/billing/error';
+import { ServerError } from '../../domain/shared/errors/global.errors';
 
 describe('StripeRepository', () => {
   let fixtures: Fixtures;
@@ -17,12 +17,12 @@ describe('StripeRepository', () => {
     fixtures.thenReturnExpectedCustomers(result);
   });
 
-  it('should throw StripeError when getCustomerByEmail fails', async () => {
+  it('should throw ServerError when getCustomerByEmail fails', async () => {
     fixtures.whenCustomersListThrowsError();
 
     const promise = fixtures.whenGetCustomerByEmail();
 
-    await fixtures.thenThrowStripeErrorWithMessagePart(
+    await fixtures.thenThrowServerErrorWithMessagePart(
       promise,
       'Error searching customers',
     );
@@ -45,12 +45,12 @@ describe('StripeRepository', () => {
     expect(result).toBeNull();
   });
 
-  it('should throw StripeError when getCheckoutSessionByUserId fails', async () => {
+  it('should throw ServerError when getCheckoutSessionByUserId fails', async () => {
     fixtures.whenCheckoutSessionsListThrowsError();
 
     const promise = fixtures.whenGetCheckoutSessionByUserId();
 
-    await fixtures.thenThrowStripeErrorWithMessagePart(
+    await fixtures.thenThrowServerErrorWithMessagePart(
       promise,
       'Error searching checkout sessions',
     );
@@ -65,12 +65,12 @@ describe('StripeRepository', () => {
     fixtures.thenReturnExpectedSubscriptions(result);
   });
 
-  it('should throw StripeError when getSubscriptionsByCustomerId fails', async () => {
+  it('should throw ServerError when getSubscriptionsByCustomerId fails', async () => {
     fixtures.whenSubscriptionsListThrowsError();
 
     const promise = fixtures.whenGetSubscriptionsByCustomerId();
 
-    await fixtures.thenThrowStripeErrorWithMessagePart(
+    await fixtures.thenThrowServerErrorWithMessagePart(
       promise,
       'Error searching subscriptions',
     );
@@ -85,12 +85,12 @@ describe('StripeRepository', () => {
     fixtures.thenReturnMappedCheckoutSession(result);
   });
 
-  it('should throw StripeError when getCheckoutSession fails', async () => {
+  it('should throw ServerError when getCheckoutSession fails', async () => {
     fixtures.whenCheckoutSessionRetrieveThrowsError();
 
     const promise = fixtures.whenGetCheckoutSession();
 
-    await fixtures.thenThrowStripeErrorWithMessagePart(
+    await fixtures.thenThrowServerErrorWithMessagePart(
       promise,
       'Error retrieving checkout session',
     );
@@ -105,12 +105,12 @@ describe('StripeRepository', () => {
     fixtures.thenReturnCheckoutUrl(result);
   });
 
-  it('should throw StripeError when createCheckoutSession fails', async () => {
+  it('should throw ServerError when createCheckoutSession fails', async () => {
     fixtures.whenCreateCheckoutSessionThrowsError();
 
     const promise = fixtures.whenCreateCheckoutSession();
 
-    await fixtures.thenThrowStripeErrorWithMessagePart(
+    await fixtures.thenThrowServerErrorWithMessagePart(
       promise,
       'Error creating checkout session',
     );
@@ -269,11 +269,11 @@ class Fixtures {
     );
   }
 
-  async thenThrowStripeErrorWithMessagePart(
+  async thenThrowServerErrorWithMessagePart(
     promise: Promise<unknown>,
     messagePart: string,
   ) {
-    await expect(promise).rejects.toBeInstanceOf(StripeError);
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
     await expect(promise).rejects.toThrow(messagePart);
   }
 

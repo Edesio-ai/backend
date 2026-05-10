@@ -1,9 +1,9 @@
 import { Inject } from '@nestjs/common';
 import {
   PDF_EXTRACTOR,
-  type PdfExtractor,
-} from 'src/domain/pdf/contracts/pdf-extractor.interface';
-import { Question } from 'src/domain/teaching/types/question.type';
+  type IPdfExtractorProvider,
+} from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 
 export type ExportQuestionsBody = {
   questions: Question[];
@@ -14,7 +14,7 @@ export type ExportQuestionsBody = {
 export class ExportQuestionsUseCase {
   constructor(
     @Inject(PDF_EXTRACTOR)
-    private readonly pdfExtractor: PdfExtractor,
+    private readonly pdfExtractor: IPdfExtractorProvider,
   ) {}
 
   async execute(

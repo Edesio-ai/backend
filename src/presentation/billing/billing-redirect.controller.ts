@@ -1,7 +1,11 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
 import { type Response } from 'express';
 import { PaymentSuccessUseCase } from '../../application/billing/payment-success.use-case';
+import { Public } from '../auth/decorator/public.decorator';
+import { SkipCsrf } from '../auth/decorator/skip-csrf.decorator';
 
+@Public()
+@SkipCsrf()
 @Controller('billing/redirect')
 export class BillingRedirectController {
   constructor(private readonly paymentSuccessUseCase: PaymentSuccessUseCase) {}

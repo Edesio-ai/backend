@@ -2,8 +2,8 @@ import { Inject } from '@nestjs/common';
 
 import {
   AUTH_REPOSITORY,
-  type AuthRepository,
-} from '../../domain/auth/contract/auth.repository';
+  type IAuthRepository,
+} from '../../domain/auth/contracts/i-auth.repository';
 import {
   AuthUserWithSession,
   LoginBody,
@@ -12,7 +12,7 @@ import {
 export class LoginUseCase {
   constructor(
     @Inject(AUTH_REPOSITORY)
-    private readonly authRepository: AuthRepository,
+    private readonly authRepository: IAuthRepository,
   ) {}
 
   async execute(body: LoginBody): Promise<AuthUserWithSession> {

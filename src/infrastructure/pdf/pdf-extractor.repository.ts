@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PDFParse } from 'pdf-parse';
-import { type PdfExtractor } from 'src/domain/pdf/contracts/pdf-extractor.interface';
-import { Question } from 'src/domain/teaching/types/question.type';
+import { type IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 import { jsPDF } from 'jspdf';
 
 @Injectable()
-export class PdfParseExtractor implements PdfExtractor {
+export class PdfParseExtractor implements IPdfExtractorProvider {
   async extractTextFromPdf(data: Buffer): Promise<string> {
     const parser = new PDFParse({ data });
     try {

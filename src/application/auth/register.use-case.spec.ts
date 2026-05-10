@@ -1,7 +1,10 @@
 import { RegisterUseCase } from './register.use-case';
-import { AuthRepository } from '../../domain/auth/contract/auth.repository';
-import { EmailProviderInterface } from '../../domain/email/contract/email.interface';
+import { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
+import { IEmailProvider } from '../../domain/email/contract/i-email.interface';
 import { RegisterBody } from '../../domain/auth/types/auth.type';
+import type { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('RegisterUseCase', () => {
   let fixtures: Fixtures;
@@ -11,12 +14,12 @@ describe('RegisterUseCase', () => {
   });
 
   it('should create user then send welcome email for non-student role', async () => {
-    fixtures.whenCreateUserResolves();
+    fixtures.whenCreateAuthUserResolves();
     fixtures.whenSendWelcomeEmailResolves();
 
     await fixtures.whenExecuteWith(fixtures.teacherBody);
 
-    fixtures.thenCreateUserCalledWithTeacherMetadata();
+    fixtures.thenCreateAuthUserCalledWithTeacherMetadata();
     fixtures.thenSendWelcomeEmailCalledWith(
       fixtures.teacherBody.email,
       fixtures.teacherBody.firstname,
@@ -25,12 +28,12 @@ describe('RegisterUseCase', () => {
   });
 
   it('should add establishment in metadata for student role', async () => {
-    fixtures.whenCreateUserResolves();
+    fixtures.whenCreateAuthUserResolves();
     fixtures.whenSendWelcomeEmailResolves();
 
     await fixtures.whenExecuteWith(fixtures.studentBody);
 
-    fixtures.thenCreateUserCalledWithStudentMetadata();
+    fixtures.thenCreateAuthUserCalledWithStudentMetadata();
     fixtures.thenSendWelcomeEmailCalledWith(
       fixtures.studentBody.email,
       fixtures.studentBody.firstname,
@@ -39,7 +42,7 @@ describe('RegisterUseCase', () => {
   });
 
   it('should propagate repository error and not send email', async () => {
-    fixtures.whenCreateUserThrowsError();
+    fixtures.whenCreateAuthUserThrowsError();
 
     const promise = fixtures.whenExecuteWith(fixtures.teacherBody);
 
@@ -48,19 +51,21 @@ describe('RegisterUseCase', () => {
   });
 
   it('should propagate email provider error', async () => {
-    fixtures.whenCreateUserResolves();
+    fixtures.whenCreateAuthUserResolves();
     fixtures.whenSendWelcomeEmailThrowsError();
 
     const promise = fixtures.whenExecuteWith(fixtures.teacherBody);
 
     await fixtures.thenThrowEmailProviderError(promise);
-    fixtures.thenCreateUserCalledWithTeacherMetadata();
+    fixtures.thenCreateAuthUserCalledWithTeacherMetadata();
   });
 });
 
 class Fixtures {
-  public readonly authRepository: jest.Mocked<AuthRepository>;
-  public readonly emailProvider: jest.Mocked<EmailProviderInterface>;
+  public readonly authRepository: jest.Mocked<IAuthRepository>;
+  public readonly emailProvider: jest.Mocked<IEmailProvider>;
+  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly invitationTokenRepository: jest.Mocked<IInvitationTokenRepository>;
   public readonly registerUseCase: RegisterUseCase;
 
   public readonly repositoryError: Error;
@@ -71,12 +76,10 @@ class Fixtures {
 
   constructor() {
     this.authRepository = {
-      getInvitationPreview: jest.fn(),
-      createUser: jest.fn(),
+      createAuthUser: jest.fn(),
       loginUser: jest.fn(),
       validateToken: jest.fn(),
       logoutUser: jest.fn(),
-      createInvitationToken: jest.fn(),
     };
 
     this.emailProvider = {
@@ -84,9 +87,23 @@ class Fixtures {
       sendProfesseurInvitation: jest.fn(),
     };
 
+    this.teacherRepository = createMockTeacherRepository();
+
+    this.invitationTokenRepository = {
+      deleteInvitationToken: jest.fn(),
+      getInvitationByToken: jest.fn(),
+      markInvitationTokenAsUsed: jest.fn(),
+      getInvitationTokenByEstablishmentId: jest.fn(),
+      createInvitationToken: jest.fn(),
+      getInvitationPreview: jest.fn(),
+      updateTokenUsedAt: jest.fn(),
+    };
+
     this.registerUseCase = new RegisterUseCase(
       this.authRepository,
       this.emailProvider,
+      this.teacherRepository,
+      this.invitationTokenRepository,
     );
 
     this.repositoryError = new Error('DB down');
@@ -116,12 +133,16 @@ class Fixtures {
     return this.registerUseCase.execute(body);
   }
 
-  whenCreateUserResolves() {
-    this.authRepository.createUser.mockResolvedValue(undefined);
+  whenCreateAuthUserResolves() {
+    this.authRepository.createAuthUser.mockResolvedValue({
+      id: 'auth-u1',
+      email: 'ignored-in-test',
+      metadata: {},
+    });
   }
 
-  whenCreateUserThrowsError() {
-    this.authRepository.createUser.mockRejectedValue(this.repositoryError);
+  whenCreateAuthUserThrowsError() {
+    this.authRepository.createAuthUser.mockRejectedValue(this.repositoryError);
   }
 
   whenSendWelcomeEmailResolves() {
@@ -142,8 +163,8 @@ class Fixtures {
     await expect(promise).rejects.toBe(this.emailProviderError);
   }
 
-  thenCreateUserCalledWithTeacherMetadata() {
-    expect(this.authRepository.createUser).toHaveBeenCalledWith(
+  thenCreateAuthUserCalledWithTeacherMetadata() {
+    expect(this.authRepository.createAuthUser).toHaveBeenCalledWith(
       this.teacherBody.email,
       this.teacherBody.password,
       {
@@ -151,13 +172,14 @@ class Fixtures {
         firstname: this.teacherBody.firstname,
         lastname: this.teacherBody.lastname,
         acceptTerms: this.teacherBody.acceptTerms,
+        invitationToken: undefined,
       },
     );
-    expect(this.authRepository.createUser).toHaveBeenCalledTimes(1);
+    expect(this.authRepository.createAuthUser).toHaveBeenCalledTimes(1);
   }
 
-  thenCreateUserCalledWithStudentMetadata() {
-    expect(this.authRepository.createUser).toHaveBeenCalledWith(
+  thenCreateAuthUserCalledWithStudentMetadata() {
+    expect(this.authRepository.createAuthUser).toHaveBeenCalledWith(
       this.studentBody.email,
       this.studentBody.password,
       {
@@ -165,10 +187,11 @@ class Fixtures {
         firstname: this.studentBody.firstname,
         lastname: this.studentBody.lastname,
         acceptTerms: this.studentBody.acceptTerms,
+        invitationToken: undefined,
         establishment: this.studentBody.establishment,
       },
     );
-    expect(this.authRepository.createUser).toHaveBeenCalledTimes(1);
+    expect(this.authRepository.createAuthUser).toHaveBeenCalledTimes(1);
   }
 
   thenSendWelcomeEmailCalledWith(email: string, name: string, role: string) {

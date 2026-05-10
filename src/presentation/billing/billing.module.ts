@@ -7,8 +7,8 @@ import { CreateCheckoutSessionsUseCase } from '../../application/billing/create-
 import { SubscriptionPersistenceModule } from '../../infrastructure/supabase/subscription/student-persistence.module';
 import { BillingRedirectController } from './billing-redirect.controller';
 import { PaymentSuccessUseCase } from '../../application/billing/payment-success.use-case';
-import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
-import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
+import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
+import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 
 @Module({
   imports: [

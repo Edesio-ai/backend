@@ -2,7 +2,7 @@ import {
   getEvaluateAnswerSystemPrompt,
   getEvaluateAnswerUserPrompt,
 } from './evaluate-answer.prompt';
-import { EvaluateAnswerBody } from 'src/application/question/evaluate-answer.use-case';
+import { EvaluateAnswerBody } from 'src/application/llm/evaluate-answer.use-case';
 
 describe('evaluate-answer.prompt', () => {
   const body: EvaluateAnswerBody = {

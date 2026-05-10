@@ -1,0 +1,16 @@
+import { Module } from '@nestjs/common';
+import { STUDENT_REPOSITORY } from 'src/domain/teaching/student/contracts/I-student.repository';
+import { SupabaseModule } from '../../supabase.module';
+import { StudentSupabaseRepository } from './repositories/student-supabase.repository';
+
+@Module({
+  imports: [SupabaseModule],
+  providers: [
+    {
+      provide: STUDENT_REPOSITORY,
+      useClass: StudentSupabaseRepository,
+    },
+  ],
+  exports: [STUDENT_REPOSITORY],
+})
+export class StudentPersistenceModule {}

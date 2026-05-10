@@ -2,7 +2,7 @@ import {
   getGenerateQuestionSystemPrompt,
   getGenerateQuestionUserPrompt,
 } from './generate-question.prompt';
-import { QuestionGenerationConfig } from 'src/domain/teaching/types/question.type';
+import { QuestionGenerationConfig } from 'src/domain/teaching/question/types/question.type';
 
 describe('generate-question.prompt', () => {
   const config: QuestionGenerationConfig = {

@@ -1,5 +1,5 @@
 import { LogoutUseCase } from './logout.use-case';
-import { AuthRepository } from '../../domain/auth/contract/auth.repository';
+import { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
 
 describe('LogoutUseCase', () => {
   let fixtures: Fixtures;
@@ -27,7 +27,7 @@ describe('LogoutUseCase', () => {
 });
 
 class Fixtures {
-  public readonly authRepository: jest.Mocked<AuthRepository>;
+  public readonly authRepository: jest.Mocked<IAuthRepository>;
   public readonly logoutUseCase: LogoutUseCase;
 
   public readonly accessToken: string;
@@ -35,12 +35,10 @@ class Fixtures {
 
   constructor() {
     this.authRepository = {
-      getInvitationPreview: jest.fn(),
-      createUser: jest.fn(),
+      createAuthUser: jest.fn(),
       loginUser: jest.fn(),
       validateToken: jest.fn(),
       logoutUser: jest.fn(),
-      createInvitationToken: jest.fn(),
     };
 
     this.logoutUseCase = new LogoutUseCase(this.authRepository);

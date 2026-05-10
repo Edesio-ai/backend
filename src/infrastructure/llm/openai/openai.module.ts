@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OpenAI } from 'openai';
-import { OpenaiRepository } from './openai.repository';
-import { OPENAI_REPOSITORY } from 'src/domain/shared/llm/openai/contracts/opena-ai.repository';
+import { IOpenAiProvider } from './openai.repository';
+import { OPENAI_REPOSITORY } from 'src/domain/llm/openai/contracts/open-ai.provider';
 import { OPENAI_CLIENT } from './openai.constants';
 
 @Module({
@@ -18,7 +18,7 @@ import { OPENAI_CLIENT } from './openai.constants';
     },
     {
       provide: OPENAI_REPOSITORY,
-      useClass: OpenaiRepository,
+      useClass: IOpenAiProvider,
     },
   ],
   exports: [OPENAI_CLIENT, OPENAI_REPOSITORY],
