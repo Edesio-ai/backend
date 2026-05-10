@@ -11,7 +11,4 @@ export interface EstablishmentRepository {
     name: string,
     email: string,
   ): Promise<Establishment>;
-  getInvitationTokenByEstablishmentId(
-    establishmentId: string,
-  ): Promise<InvitationToken[]>;
 }

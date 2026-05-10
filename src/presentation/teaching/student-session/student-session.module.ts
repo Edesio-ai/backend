@@ -7,7 +7,7 @@ import { JoinSessionByCodeUseCase } from 'src/application/teaching/student-sessi
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
-import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
+import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
 
 @Module({

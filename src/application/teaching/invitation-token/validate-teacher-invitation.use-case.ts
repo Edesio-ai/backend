@@ -4,8 +4,8 @@ import {
   type TeacherRepository,
 } from 'src/domain/teaching/interfaces/teacher.repository';
 import {
-  TOKEN_REPOSITORY,
-  type TokenRepository,
+  INVITATION_TOKEN_REPOSITORY,
+  type IInvitationTokenRepository,
 } from 'src/domain/token/contract/token.repository';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import {
@@ -19,8 +19,8 @@ export class ValidateTeacherInvitationUseCase {
   constructor(
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: TeacherRepository,
-    @Inject(TOKEN_REPOSITORY)
-    private readonly tokenRepository: TokenRepository,
+    @Inject(INVITATION_TOKEN_REPOSITORY)
+    private readonly tokenRepository: IInvitationTokenRepository,
   ) {}
 
   async execute(

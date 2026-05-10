@@ -11,7 +11,7 @@ import { DeleteSessionUseCase } from 'src/application/teaching/session/delete-se
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/question-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/student-persistence.module';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/sessions-persistence.module';
-import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
+import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 import { GetSessionDetailsUseCase } from 'src/application/teaching/session/get-session-details.use-case';
 import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
 

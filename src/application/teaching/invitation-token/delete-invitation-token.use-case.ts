@@ -1,13 +1,13 @@
 import { Inject } from '@nestjs/common';
 import {
-  TOKEN_REPOSITORY,
-  type TokenRepository,
+  INVITATION_TOKEN_REPOSITORY,
+  type IInvitationTokenRepository,
 } from 'src/domain/token/contract/token.repository';
 
 export class DeleteInvitationTokenUseCase {
   constructor(
-    @Inject(TOKEN_REPOSITORY)
-    private readonly tokenRepository: TokenRepository,
+    @Inject(INVITATION_TOKEN_REPOSITORY)
+    private readonly tokenRepository: IInvitationTokenRepository,
   ) {}
 
   async execute(token: string): Promise<void> {

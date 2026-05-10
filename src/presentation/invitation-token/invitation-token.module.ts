@@ -2,9 +2,8 @@ import { Module } from '@nestjs/common';
 import { DeleteInvitationTokenUseCase } from 'src/application/teaching/invitation-token/delete-invitation-token.use-case';
 import { GetInvitationTokenUseCase } from 'src/application/teaching/invitation-token/get-invitation-token.use-case';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
-import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/establishment-persistence.module';
 import { InvitationTokenController } from './invitation-token.controller';
-import { TokenPersistenceModule } from 'src/infrastructure/supabase/token/token-persistence.module';
+import { InvitationTokenPersistenceModule } from 'src/infrastructure/supabase/invitation-token/invitation-token-persistence.module';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teaching/invitation-token/validate-teacher-invitation.use-case';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
 import { GetInvitationPreviewUseCase } from 'src/application/teaching/invitation-token/get-invitation-preview.use-case';
@@ -13,8 +12,7 @@ import { CreateInvitationTokenUseCase } from 'src/application/teaching/invitatio
 @Module({
   imports: [
     AuthPersistenceModule,
-    EstablishmentPersistenceModule,
-    TokenPersistenceModule,
+    InvitationTokenPersistenceModule,
     TeacherPersistenceModule,
   ],
   controllers: [InvitationTokenController],

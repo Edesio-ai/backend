@@ -5,6 +5,5 @@ export function createMockEstablishmentRepository(): jest.Mocked<EstablishmentRe
     createEstablishment: jest.fn(),
     getEstablishmentById: jest.fn(),
     getEstablishmentByUserId: jest.fn(),
-    getInvitationTokenByEstablishmentId: jest.fn(),
   };
 }

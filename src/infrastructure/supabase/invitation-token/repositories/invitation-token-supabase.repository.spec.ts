@@ -1,10 +1,10 @@
-import { TokenSupabaseRepository } from './token-supabase.repository';
+import { InvitationTokenSupabaseRepository } from './invtiation-token-supabase.repository';
 import {
   BadRequestError,
   ServerError,
 } from 'src/domain/shared/global/errors/global.errors';
 
-describe('TokenSupabaseRepository', () => {
+describe('InvitationTokenSupabaseRepository', () => {
   let fixtures: Fixtures;
 
   beforeEach(() => {
@@ -62,6 +62,33 @@ describe('TokenSupabaseRepository', () => {
     await fixtures.thenThrowBadRequestError(promise);
     fixtures.thenMarkInvitationTokenAsUsedQueryBuiltWithExpectedArguments();
   });
+
+  it('should return invitation tokens by establishment id when query succeeds', async () => {
+    fixtures.whenGetInvitationTokenByEstablishmentIdSucceeds();
+
+    const result = await fixtures.whenGetInvitationTokenByEstablishmentId();
+
+    fixtures.thenGetInvitationTokenByEstablishmentIdQueryBuiltWithExpectedArguments();
+    fixtures.thenReturnExpectedInvitationTokensByEstablishment(result);
+  });
+
+  it('should return empty array when establishment has no invitation tokens', async () => {
+    fixtures.whenGetInvitationTokenByEstablishmentIdReturnsEmpty();
+
+    const result = await fixtures.whenGetInvitationTokenByEstablishmentId();
+
+    fixtures.thenGetInvitationTokenByEstablishmentIdQueryBuiltWithExpectedArguments();
+    expect(result).toEqual([]);
+  });
+
+  it('should throw ServerError when get invitation tokens by establishment id fails', async () => {
+    fixtures.whenGetInvitationTokenByEstablishmentIdFails();
+
+    const promise = fixtures.whenGetInvitationTokenByEstablishmentId();
+
+    await fixtures.thenThrowServerError(promise);
+    fixtures.thenGetInvitationTokenByEstablishmentIdQueryBuiltWithExpectedArguments();
+  });
 });
 
 class Fixtures {
@@ -93,6 +120,27 @@ class Fixtures {
     assignedChatbots: 2,
   };
 
+  public readonly establishmentId = 'est-1';
+  public readonly invitationSupabaseRowNewer = {
+    ...this.invitationSupabaseRow,
+    id: 'invitation-id-2',
+    created_at: '2026-01-03T00:00:00.000Z',
+  };
+  public readonly expectedInvitationsByEstablishment = [
+    {
+      id: 'invitation-id-2',
+      establishmentId: 'est-1',
+      token: this.invitationToken,
+      invitedEmail: 'teacher@school.com',
+      expiresAt: '2099-01-01T00:00:00.000Z',
+      usedAt: null,
+      usedBy: null,
+      createdAt: '2026-01-03T00:00:00.000Z',
+      assignedChatbots: 2,
+    },
+    this.expectedInvitation,
+  ];
+
   private readonly eqMock = jest.fn();
   private readonly deleteMock = jest.fn(() => ({ eq: this.eqMock }));
   private readonly getSingleMock = jest.fn();
@@ -109,22 +157,30 @@ class Fixtures {
   private readonly markEqMock = jest.fn(() => ({ is: this.markIsMock }));
   private readonly markUpdateMock = jest.fn(() => ({ eq: this.markEqMock }));
 
+  private readonly listOrderMock = jest.fn();
+  private readonly listEqMock = jest.fn(() => ({ order: this.listOrderMock }));
+  private readonly listSelectMock = jest.fn(() => ({ eq: this.listEqMock }));
+
   private readonly fromMock = jest.fn((table: string) => {
     if (table !== 'invitation_tokens') return {};
     if (this.mode === 'delete') return { delete: this.deleteMock };
     if (this.mode === 'get') return { select: this.getSelectMock };
     if (this.mode === 'mark') return { update: this.markUpdateMock };
+    if (this.mode === 'listEstablishment')
+      return { select: this.listSelectMock };
     return {};
   });
-  private mode: 'delete' | 'get' | 'mark' = 'delete';
+  private mode: 'delete' | 'get' | 'mark' | 'listEstablishment' = 'delete';
 
-  public readonly repository: TokenSupabaseRepository;
+  public readonly repository: InvitationTokenSupabaseRepository;
 
   constructor() {
     const supabaseMock = {
       from: this.fromMock,
     };
-    this.repository = new TokenSupabaseRepository(supabaseMock as never);
+    this.repository = new InvitationTokenSupabaseRepository(
+      supabaseMock as never,
+    );
   }
 
   whenDeleteInvitationToken() {
@@ -142,6 +198,13 @@ class Fixtures {
     return this.repository.markInvitationTokenAsUsed(
       this.invitationTokenId,
       this.teacherId,
+    );
+  }
+
+  whenGetInvitationTokenByEstablishmentId() {
+    this.mode = 'listEstablishment';
+    return this.repository.getInvitationTokenByEstablishmentId(
+      this.establishmentId,
     );
   }
 
@@ -185,6 +248,27 @@ class Fixtures {
     });
   }
 
+  whenGetInvitationTokenByEstablishmentIdSucceeds() {
+    this.listOrderMock.mockResolvedValue({
+      data: [this.invitationSupabaseRowNewer, this.invitationSupabaseRow],
+      error: null,
+    });
+  }
+
+  whenGetInvitationTokenByEstablishmentIdReturnsEmpty() {
+    this.listOrderMock.mockResolvedValue({
+      data: [],
+      error: null,
+    });
+  }
+
+  whenGetInvitationTokenByEstablishmentIdFails() {
+    this.listOrderMock.mockResolvedValue({
+      data: null,
+      error: { message: 'list query failed' },
+    });
+  }
+
   async thenThrowServerError(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
@@ -221,5 +305,22 @@ class Fixtures {
 
   thenReturnExpectedInvitation(result: unknown) {
     expect(result).toEqual(this.expectedInvitation);
+  }
+
+  thenGetInvitationTokenByEstablishmentIdQueryBuiltWithExpectedArguments() {
+    expect(this.fromMock).toHaveBeenCalledWith('invitation_tokens');
+    expect(this.listSelectMock).toHaveBeenCalledWith('*');
+    expect(this.listEqMock).toHaveBeenCalledWith(
+      'establishment_id',
+      this.establishmentId,
+    );
+    expect(this.listOrderMock).toHaveBeenCalledWith('created_at', {
+      ascending: false,
+    });
+    expect(this.listOrderMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenReturnExpectedInvitationTokensByEstablishment(result: unknown) {
+    expect(result).toEqual(this.expectedInvitationsByEstablishment);
   }
 }

@@ -1,16 +1,15 @@
 import { Inject } from '@nestjs/common';
-
-import {
-  ESTABLISHMENT_REPOSITORY,
-  type EstablishmentRepository,
-} from 'src/domain/teaching/interfaces/establishment.repository';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { NotFoundError } from 'src/domain/shared/global/errors/global.errors';
+import {
+  INVITATION_TOKEN_REPOSITORY,
+  type IInvitationTokenRepository,
+} from 'src/domain/token/contract/token.repository';
 
 export class GetInvitationTokenUseCase {
   constructor(
-    @Inject(ESTABLISHMENT_REPOSITORY)
-    private readonly establishmentRepository: EstablishmentRepository,
+    @Inject(INVITATION_TOKEN_REPOSITORY)
+    private readonly invitationTokenRepository: IInvitationTokenRepository,
   ) {}
 
   async execute(establishmentId: string): Promise<InvitationToken[]> {
@@ -18,7 +17,7 @@ export class GetInvitationTokenUseCase {
       throw new NotFoundError('Establishment id not found');
     }
     const invitationTokens =
-      await this.establishmentRepository.getInvitationTokenByEstablishmentId(
+      await this.invitationTokenRepository.getInvitationTokenByEstablishmentId(
         establishmentId,
       );
     return invitationTokens;

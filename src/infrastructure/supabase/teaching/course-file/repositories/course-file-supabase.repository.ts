@@ -1,12 +1,11 @@
 import { ICourseFileRepository } from 'src/domain/teaching/interfaces/i-course-file.repository';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
-import { CourseFileMapper } from '../mappers/course-file.mapper';
 import {
   CourseFile,
   CourseFileUpload,
 } from 'src/domain/teaching/types/course.type';
-import { courseFileMapper } from '../../mappers/course-file.mapper';
+import { courseFileMapper } from '../mappers/course-file.mapper';
 
 export class CourseFileRepository implements ICourseFileRepository {
   constructor(private readonly supabase: SupabaseClient) {
@@ -168,7 +167,7 @@ export class CourseFileRepository implements ICourseFileRepository {
       throw new ServerError(error.message);
     }
 
-    return CourseFileMapper.fileUrlsToDomain(data);
+    return courseFileMapper.fileUrlsToDomain(data);
   }
 
   private async deleteCoursesFilesFromStorage(files: string[]): Promise<void> {

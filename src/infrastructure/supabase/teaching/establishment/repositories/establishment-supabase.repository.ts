@@ -1,11 +1,10 @@
 import { Inject } from '@nestjs/common';
 
-import { SUPABASE_ADMIN } from '../../supabase.module';
-import { Establishment } from '../../../../domain/teaching/types/establishment.type';
-import { InvitationToken } from '../../../../domain/auth/invitation.type';
-import { EstablishmentMapper } from '../mappers/establishment.mapper';
+import { SUPABASE_ADMIN } from '../../../supabase.module';
+import { Establishment } from 'src/domain/teaching/types/establishment.type';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
+import { EstablishmentMapper } from '../mappers/establishment.mapper';
 
 export class EstablishmentSupabaseRepository implements EstablishmentRepository {
   constructor(
@@ -66,26 +65,5 @@ export class EstablishmentSupabaseRepository implements EstablishmentRepository 
     }
 
     return EstablishmentMapper.toDomain(data);
-  }
-
-  async getInvitationTokenByEstablishmentId(
-    establishmentId: string,
-  ): Promise<InvitationToken[]> {
-    const { data, error } = await this.supabase
-      .from('invitation_tokens')
-      .select('*')
-      .eq('establishment_id', establishmentId)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error(
-        `An error occure while getting invitation token by establishment id: ${establishmentId}, error: ${error}`,
-      );
-      throw new ServerError(
-        `An error occure while getting invitation token by establishment id`,
-      );
-    }
-
-    return (data ?? []).map(EstablishmentMapper.invitationTokenToDomain);
   }
 }
