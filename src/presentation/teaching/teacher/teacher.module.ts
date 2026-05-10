@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
+import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
 import { GetTeacherByUserIdUseCase } from 'src/application/teaching/teacher/get-teacher-by-user-id.use-case';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { CreateTeacherUseCase } from 'src/application/teaching/teacher/create-teacher.use-case';

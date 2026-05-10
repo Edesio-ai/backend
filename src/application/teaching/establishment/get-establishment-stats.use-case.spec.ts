@@ -2,6 +2,8 @@ import { GetEstablishmentsStatsUseCase } from './get-establishment-stats.use-cas
 import { EstablishmentRepository } from 'src/domain/teaching/interfaces/establishment.repository';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/interfaces/i-student-session.repository';
+import type { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 
 describe('GetEstablishmentsStatsUseCase', () => {
@@ -34,6 +36,7 @@ class Fixtures {
   public readonly establishmentRepository: jest.Mocked<EstablishmentRepository>;
   public readonly teacherRepository: jest.Mocked<TeacherRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
+  public readonly sessionRepository: jest.Mocked<SessionRepository>;
   public readonly getEstablishmentsStatsUseCase: GetEstablishmentsStatsUseCase;
 
   public readonly userId: string;
@@ -52,18 +55,19 @@ class Fixtures {
     };
     this.teacherRepository = {
       getTeacherByEstablishmentId: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
       getTeacherByUserId: jest.fn(),
       linkTeacherToEstablishment: jest.fn(),
       createTeacher: jest.fn(),
       getTeacherByConditions: jest.fn(),
     };
     this.studentSessionRepository = createMockStudentSessionRepository();
+    this.sessionRepository = createMockSessionRepository();
 
     this.getEstablishmentsStatsUseCase = new GetEstablishmentsStatsUseCase(
       this.establishmentRepository,
       this.teacherRepository,
       this.studentSessionRepository,
+      this.sessionRepository,
     );
 
     this.userId = 'user-1';
@@ -137,7 +141,7 @@ class Fixtures {
     this.teacherRepository.getTeacherByEstablishmentId.mockResolvedValue(
       this.teachers,
     );
-    this.teacherRepository.getTeachersSessionsByIds.mockResolvedValue(
+    this.sessionRepository.getTeachersSessionsByIds.mockResolvedValue(
       this.sessions,
     );
     this.studentSessionRepository.getStudentsSessionsByIds.mockResolvedValue(
@@ -163,7 +167,7 @@ class Fixtures {
       this.teacherRepository.getTeacherByEstablishmentId,
     ).toHaveBeenCalledWith(this.establishment.id);
     expect(
-      this.teacherRepository.getTeachersSessionsByIds,
+      this.sessionRepository.getTeachersSessionsByIds,
     ).toHaveBeenCalledWith(['teacher-1', 'teacher-2']);
     expect(
       this.studentSessionRepository.getStudentsSessionsByIds,
@@ -175,7 +179,7 @@ class Fixtures {
       this.teacherRepository.getTeacherByEstablishmentId,
     ).not.toHaveBeenCalled();
     expect(
-      this.teacherRepository.getTeachersSessionsByIds,
+      this.sessionRepository.getTeachersSessionsByIds,
     ).not.toHaveBeenCalled();
     expect(
       this.studentSessionRepository.getStudentsSessionsByIds,

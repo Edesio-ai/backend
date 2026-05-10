@@ -123,6 +123,45 @@ describe('SupabaseSessionRepository', () => {
     await fixtures.thenThrowServerError(promise);
     fixtures.thenGetSessionByIdQueryBuilt();
   });
+
+  it('should return sessions for teacher ids', async () => {
+    fixtures.whenGetTeachersSessionsByIdsQuerySucceeds();
+
+    const result = await fixtures.whenGetTeachersSessionsByIds(
+      fixtures.teacherIdsForBulkQuery,
+    );
+
+    fixtures.thenGetTeachersSessionsByIdsQueryBuilt(
+      fixtures.teacherIdsForBulkQuery,
+    );
+    expect(result).toEqual(fixtures.expectedBulkTeachersSessions);
+  });
+
+  it('should use fallback uuid when teacher ids are empty', async () => {
+    fixtures.whenGetTeachersSessionsByIdsQuerySucceeds(
+      fixtures.sessionsSupabaseRows,
+    );
+
+    const result = await fixtures.whenGetTeachersSessionsByIds([]);
+
+    fixtures.thenGetTeachersSessionsByIdsQueryBuilt([
+      fixtures.fallbackTeacherIdForEmptyIn,
+    ]);
+    expect(result).toEqual(fixtures.expectedSessions);
+  });
+
+  it('should throw ServerError when getTeachersSessionsByIds fails', async () => {
+    fixtures.whenGetTeachersSessionsByIdsQueryFails();
+
+    const promise = fixtures.whenGetTeachersSessionsByIds(
+      fixtures.teacherIdsForBulkQuery,
+    );
+
+    await fixtures.thenThrowServerError(promise);
+    fixtures.thenGetTeachersSessionsByIdsQueryBuilt(
+      fixtures.teacherIdsForBulkQuery,
+    );
+  });
 });
 
 class Fixtures {
@@ -227,6 +266,46 @@ class Fixtures {
     createdAt: '2026-01-01T00:00:00.000Z',
   };
 
+  public readonly teacherIdsForBulkQuery = ['teacher-1', 'teacher-2'];
+  public readonly fallbackTeacherIdForEmptyIn =
+    '00000000-0000-0000-0000-000000000000';
+  public readonly bulkTeachersSessionsSupabaseRows = [
+    {
+      id: 'session-1',
+      teacher_id: 'teacher-1',
+      name: 'Cours 1',
+      code: 'ABCD',
+      language: 'francais' as const,
+      created_at: '2026-01-01T00:00:00.000Z',
+    },
+    {
+      id: 'session-2',
+      teacher_id: 'teacher-2',
+      name: 'Cours 2',
+      code: 'CDE',
+      language: 'anglais' as const,
+      created_at: '2026-01-05T00:00:00.000Z',
+    },
+  ];
+  public readonly expectedBulkTeachersSessions = [
+    {
+      id: 'session-1',
+      teacherId: 'teacher-1',
+      name: 'Cours 1',
+      code: 'ABCD',
+      language: 'francais' as const,
+      createdAt: '2026-01-01T00:00:00.000Z',
+    },
+    {
+      id: 'session-2',
+      teacherId: 'teacher-2',
+      name: 'Cours 2',
+      code: 'CDE',
+      language: 'anglais' as const,
+      createdAt: '2026-01-05T00:00:00.000Z',
+    },
+  ];
+
   private readonly byIdSingleMock = jest.fn();
   private readonly byIdEqMock = jest.fn(() => ({
     single: this.byIdSingleMock,
@@ -277,12 +356,25 @@ class Fixtures {
     eq: this.deleteIdEqMock,
   }));
 
-  private mode: 'list' | 'byCode' | 'byId' | 'create' | 'update' | 'delete' =
-    'list';
+  private readonly teachersSessionsInMock = jest.fn();
+  private readonly teachersSessionsSelectMock = jest.fn(() => ({
+    in: this.teachersSessionsInMock,
+  }));
+
+  private mode:
+    | 'list'
+    | 'byCode'
+    | 'byId'
+    | 'create'
+    | 'update'
+    | 'delete'
+    | 'byTeacherIds' = 'list';
   private readonly fromMock = jest.fn(() => {
     if (this.mode === 'list') return { select: this.listSelectMock };
     if (this.mode === 'byCode') return { select: this.byCodeSelectMock };
     if (this.mode === 'byId') return { select: this.byIdSelectMock };
+    if (this.mode === 'byTeacherIds')
+      return { select: this.teachersSessionsSelectMock };
     if (this.mode === 'create') return { insert: this.createInsertMock };
     if (this.mode === 'update') return { update: this.updateUpdateMock };
     return { delete: this.sessionDeleteMock };
@@ -331,6 +423,11 @@ class Fixtures {
   whenGetSessionById() {
     this.mode = 'byId';
     return this.repository.getSessionById(this.sessionIdForGetById);
+  }
+
+  whenGetTeachersSessionsByIds(teacherIds: string[]) {
+    this.mode = 'byTeacherIds';
+    return this.repository.getTeachersSessionsByIds(teacherIds);
   }
 
   whenSessionsQuerySucceeds() {
@@ -417,6 +514,22 @@ class Fixtures {
     this.byIdSingleMock.mockResolvedValue({
       data: null,
       error: { message: 'session by id failed' },
+    });
+  }
+
+  whenGetTeachersSessionsByIdsQuerySucceeds(
+    rows = this.bulkTeachersSessionsSupabaseRows,
+  ) {
+    this.teachersSessionsInMock.mockResolvedValue({
+      data: rows,
+      error: null,
+    });
+  }
+
+  whenGetTeachersSessionsByIdsQueryFails() {
+    this.teachersSessionsInMock.mockResolvedValue({
+      data: null,
+      error: { message: 'bulk sessions query failed' },
     });
   }
 
@@ -507,5 +620,16 @@ class Fixtures {
       this.sessionIdForGetById,
     );
     expect(this.byIdSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenGetTeachersSessionsByIdsQueryBuilt(expectedTeacherIdsForIn: string[]) {
+    expect(this.fromMock).toHaveBeenCalledWith('sessions');
+    expect(this.teachersSessionsSelectMock).toHaveBeenCalledWith(
+      'id, name, code, language, teacher_id, created_at',
+    );
+    expect(this.teachersSessionsInMock).toHaveBeenCalledWith(
+      'teacher_id',
+      expectedTeacherIdsForIn,
+    );
   }
 }

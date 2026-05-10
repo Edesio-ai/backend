@@ -12,7 +12,7 @@ import {
   User,
 } from '../../../../domain/auth/types/auth.type';
 import { Teacher } from '../../../../domain/teaching/types/teacher.type';
-import { TeacherMapper } from '../../teaching/mappers/teacher.mapper';
+import { TeacherMapper } from '../../teaching/teacher/mappers/teacher.mapper';
 import { UserMetadata } from '../../../../domain/auth/types/auth.type';
 import { SUPABASE_AUTH } from '../../supabase-auth.module';
 import { CreateInvitationTokenBody } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';

@@ -3,13 +3,14 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from '../../../supabase.module';
 import {
   CreateSessionBody,
-  Session,
   SupabaseSession,
+  Session,
   UpdateSessionNameBody,
 } from 'src/domain/teaching/types/session.type';
 import { SessionMapper } from '../mappers/session.mapper';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { SessionRepository } from 'src/domain/teaching/interfaces/session.repository';
+import { mapList } from 'src/infrastructure/supabase/common/mapper.util';
 
 export class SupabaseSessionRepository implements SessionRepository {
   constructor(
@@ -106,5 +107,24 @@ export class SupabaseSessionRepository implements SessionRepository {
     }
 
     return data ? SessionMapper.toDomain(data as SupabaseSession) : null;
+  }
+
+  public async getTeachersSessionsByIds(
+    teacherIds: string[],
+  ): Promise<Session[]> {
+    const { data, error } = await this.supabase
+      .from('sessions')
+      .select('id, name, code, language, teacher_id, created_at')
+      .in(
+        'teacher_id',
+        teacherIds.length > 0
+          ? teacherIds
+          : ['00000000-0000-0000-0000-000000000000'],
+      );
+
+    if (error) {
+      throw new ServerError(error.message);
+    }
+    return mapList(data ?? [], SessionMapper.toDomain);
   }
 }

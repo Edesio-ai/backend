@@ -16,4 +16,5 @@ export interface SessionRepository {
   ): Promise<Session>;
   deleteSessionByTeacherId(sessionId: string, teacherId: string): Promise<void>;
   getSessionById(sessionId: string): Promise<Session | null>;
+  getTeachersSessionsByIds(teacherIds: string[]): Promise<Session[]>;
 }

@@ -25,33 +25,6 @@ describe('TeacherSupabaseRepository', () => {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
   });
 
-  it('should return sessions for teacher ids', async () => {
-    fixtures.whenSessionsQueryReturnsData();
-
-    const result = await fixtures.whenGetTeachersSessionsByIds(
-      fixtures.teacherIds,
-    );
-
-    fixtures.thenSessionsQueryBuiltWithTeacherIds(fixtures.teacherIds);
-    fixtures.thenReturnExpectedSessions(result);
-  });
-
-  it('should use fallback uuid when teacher ids are empty', async () => {
-    fixtures.whenSessionsQueryReturnsData();
-
-    await fixtures.whenGetTeachersSessionsByIds([]);
-
-    fixtures.thenSessionsQueryBuiltWithFallbackId();
-  });
-
-  it('should throw TeacherSessionsNotFoundError when sessions query fails', async () => {
-    fixtures.whenSessionsQueryReturnsError();
-
-    const promise = fixtures.whenGetTeachersSessionsByIds(fixtures.teacherIds);
-
-    await fixtures.thenThrowTeacherServerError(promise);
-  });
-
   it('should return teacher by user id', async () => {
     fixtures.whenGetTeacherByUserIdReturnsData();
 
@@ -142,8 +115,6 @@ describe('TeacherSupabaseRepository', () => {
 
 class Fixtures {
   public readonly establishmentId = 'est-1';
-  public readonly teacherIds = ['teacher-1', 'teacher-2'];
-  public readonly fallbackId = '00000000-0000-0000-0000-000000000000';
   public readonly teachersSupabaseRows = [
     {
       id: 'teacher-1',
@@ -184,26 +155,6 @@ class Fixtures {
     availableChatbots: 1,
     supabaseUserId: 'user-1',
   };
-  public readonly sessionsSupabaseRows = [
-    {
-      id: 'session-1',
-      name: 'S1',
-      code: 'C1',
-      language: 'francais',
-      teacher_id: 'teacher-1',
-      created_at: '2026-01-01T00:00:00.000Z',
-    },
-  ];
-  public readonly expectedTeacherSessions = [
-    {
-      id: 'session-1',
-      name: 'S1',
-      code: 'C1',
-      language: 'francais',
-      teacherId: 'teacher-1',
-      createdAt: '2026-01-01T00:00:00.000Z',
-    },
-  ];
   public readonly invitationTokenId = 'token-1';
   public readonly establishmentIdToLink = 'est-2';
 
@@ -213,14 +164,6 @@ class Fixtures {
   }));
   private readonly teacherFromMock = jest.fn(() => ({
     select: this.teacherSelectMock,
-  }));
-
-  private readonly sessionsInMock = jest.fn();
-  private readonly sessionsSelectMock = jest.fn(() => ({
-    in: this.sessionsInMock,
-  }));
-  private readonly sessionsFromMock = jest.fn(() => ({
-    select: this.sessionsSelectMock,
   }));
 
   private readonly byUserMaybeSingleMock = jest.fn();
@@ -268,7 +211,6 @@ class Fixtures {
         return { select: this.conditionsSelectMock };
       return this.teacherFromMock();
     }
-    if (table === 'sessions') return this.sessionsFromMock();
     if (table === 'invitation_tokens') return this.rollbackFromMock();
     return {};
   });
@@ -299,10 +241,6 @@ class Fixtures {
 
   whenGetTeacherByEstablishmentId() {
     return this.repository.getTeacherByEstablishmentId(this.establishmentId);
-  }
-
-  whenGetTeachersSessionsByIds(ids: string[]) {
-    return this.repository.getTeachersSessionsByIds(ids);
   }
 
   whenGetTeacherByUserId() {
@@ -341,20 +279,6 @@ class Fixtures {
     this.teacherEqMock.mockResolvedValue({
       data: null,
       error: { message: 'teacher query failed' },
-    });
-  }
-
-  whenSessionsQueryReturnsData() {
-    this.sessionsInMock.mockResolvedValue({
-      data: this.sessionsSupabaseRows,
-      error: null,
-    });
-  }
-
-  whenSessionsQueryReturnsError() {
-    this.sessionsInMock.mockResolvedValue({
-      data: null,
-      error: { message: 'sessions query failed' },
     });
   }
 
@@ -418,26 +342,8 @@ class Fixtures {
     );
   }
 
-  thenSessionsQueryBuiltWithTeacherIds(ids: string[]) {
-    expect(this.fromMock).toHaveBeenCalledWith('sessions');
-    expect(this.sessionsSelectMock).toHaveBeenCalledWith(
-      'id, name, code, language, teacher_id, created_at',
-    );
-    expect(this.sessionsInMock).toHaveBeenCalledWith('teacher_id', ids);
-  }
-
-  thenSessionsQueryBuiltWithFallbackId() {
-    expect(this.sessionsInMock).toHaveBeenCalledWith('teacher_id', [
-      this.fallbackId,
-    ]);
-  }
-
   thenReturnExpectedTeachers(result: any) {
     expect(result).toEqual(this.expectedTeachers);
-  }
-
-  thenReturnExpectedSessions(result: any) {
-    expect(result).toEqual(this.expectedTeacherSessions);
   }
 
   thenGetTeacherByUserIdQueryBuiltWithExpectedArguments() {

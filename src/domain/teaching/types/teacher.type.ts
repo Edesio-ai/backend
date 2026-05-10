@@ -22,7 +22,7 @@ export type Teacher = {
 export type TeacherWithStats = Teacher & {
   sessionsCount: number;
   studentsCount: number;
-  sessions: TeacherSession[];
+  sessions: Session[];
 };
 
 /** Row from Supabase `sessions` when joined to teachers context. */
@@ -35,7 +35,7 @@ export type SupabaseTeacherSession = {
   created_at: string;
 };
 
-export type TeacherSession = {
+export type Session = {
   id: string;
   name: string;
   code: string;

@@ -2,7 +2,7 @@ import {
   SupabaseTeacher,
   SupabaseTeacherSession,
   Teacher,
-  TeacherSession,
+  Session,
 } from 'src/domain/teaching/types/teacher.type';
 
 type SupabaseTeacherInsert = {
@@ -24,7 +24,7 @@ export const TeacherMapper = {
     supabaseUserId: row.supabase_user_id ?? undefined,
   }),
 
-  sessionToDomain: (row: SupabaseTeacherSession): TeacherSession => ({
+  sessionToDomain: (row: SupabaseTeacherSession): Session => ({
     id: row.id,
     name: row.name,
     code: row.code,

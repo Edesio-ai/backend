@@ -8,5 +8,6 @@ export function createMockSessionRepository(): jest.Mocked<SessionRepository> {
     getSessionById: jest.fn(),
     getSessionsByTeacherId: jest.fn(),
     updateSessionName: jest.fn(),
+    getTeachersSessionsByIds: jest.fn(),
   };
 }

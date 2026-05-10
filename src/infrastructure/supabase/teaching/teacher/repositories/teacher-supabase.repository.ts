@@ -1,18 +1,15 @@
 import { Inject } from '@nestjs/common';
-import { SUPABASE_ADMIN } from '../../supabase.module';
-import {
-  Teacher,
-  TeacherSession,
-} from '../../../../domain/teaching/types/teacher.type';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { TeacherMapper } from '../mappers/teacher.mapper';
-import { mapList } from '../../common/mapper.util';
 import { ServerError } from 'src/domain/shared/global/errors/global.errors';
 import { TeacherRepository } from 'src/domain/teaching/interfaces/teacher.repository';
+import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
+import { Teacher } from 'src/domain/teaching/types/teacher.type';
 
 export class TeacherSupabaseRepository implements TeacherRepository {
   constructor(
     @Inject(SUPABASE_ADMIN)
-    private readonly supabase: any,
+    private readonly supabase: SupabaseClient,
   ) {}
 
   public async getTeacherByEstablishmentId(
@@ -27,25 +24,6 @@ export class TeacherSupabaseRepository implements TeacherRepository {
       throw new ServerError(error.message);
     }
     return (data ?? []).map(TeacherMapper.toDomain);
-  }
-
-  public async getTeachersSessionsByIds(
-    teacherIds: string[],
-  ): Promise<TeacherSession[]> {
-    const { data, error } = await this.supabase
-      .from('sessions')
-      .select('id, name, code, language, teacher_id, created_at')
-      .in(
-        'teacher_id',
-        teacherIds.length > 0
-          ? teacherIds
-          : ['00000000-0000-0000-0000-000000000000'],
-      );
-
-    if (error) {
-      throw new ServerError(error.message);
-    }
-    return mapList(data ?? [], TeacherMapper.sessionToDomain);
   }
 
   public async getTeacherByUserId(userId: string): Promise<Teacher | null> {

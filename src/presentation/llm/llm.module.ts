@@ -5,7 +5,7 @@ import { GenerateCompletionFeedbackUseCase } from 'src/application/llm/generate-
 import { OpenaiModule } from 'src/infrastructure/llm/openai/openai.module';
 import { GenerateQuestionUseCase } from 'src/application/llm/generate-question-use-case';
 import { EvaluateAnswerUseCase } from 'src/application/llm/evaluate-answer.use-case';
-import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/modules/teacher-persistence.module';
+import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
 import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/course/course-persistence.module';
 import { PdfModule } from 'src/infrastructure/pdf/pdf.module';
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/question/question-persistence.module';

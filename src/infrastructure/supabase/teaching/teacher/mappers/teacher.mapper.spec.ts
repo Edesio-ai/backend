@@ -20,7 +20,7 @@ describe('TeacherMapper', () => {
   });
 
   describe('sessionToDomain', () => {
-    it('maps sessions row to domain TeacherSession', () => {
+    it('maps sessions row to domain Session', () => {
       const result = fixtures.whenSessionToDomain();
 
       fixtures.thenReturnsExpectedTeacherSession(result);

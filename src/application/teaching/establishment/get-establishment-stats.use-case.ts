@@ -8,7 +8,7 @@ import {
 } from 'src/domain/teaching/interfaces/teacher.repository';
 import {
   Teacher,
-  TeacherSession,
+  Session,
   TeacherWithStats,
 } from 'src/domain/teaching/types/teacher.type';
 import {
@@ -20,6 +20,10 @@ import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
 } from 'src/domain/teaching/interfaces/i-student-session.repository';
+import {
+  SESSION_REPOSITORY,
+  type SessionRepository,
+} from 'src/domain/teaching/interfaces/session.repository';
 
 export class GetEstablishmentsStatsUseCase {
   constructor(
@@ -29,6 +33,8 @@ export class GetEstablishmentsStatsUseCase {
     private readonly teacherRepository: TeacherRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
     private readonly studentSessionRepository: IStudentSessionRepository,
+    @Inject(SESSION_REPOSITORY)
+    private readonly sessionRepository: SessionRepository,
   ) {}
 
   async execute(userId: string): Promise<EstablishmentStats> {
@@ -41,7 +47,7 @@ export class GetEstablishmentsStatsUseCase {
     const teachersIds = (teachers || []).map((t) => t.id);
 
     const teachersSessions =
-      await this.teacherRepository.getTeachersSessionsByIds(teachersIds);
+      await this.sessionRepository.getTeachersSessionsByIds(teachersIds);
     const teacherSessionIds = (teachersSessions || []).map((s) => s.id);
 
     const studentsSessions: StudentSession[] =
@@ -75,7 +81,7 @@ export class GetEstablishmentsStatsUseCase {
 
   private buildTeachersWithStats(
     teachers: Teacher[],
-    teachersSessions: TeacherSession[],
+    teachersSessions: Session[],
     studentCountPerSession: Record<string, number>,
   ): TeacherWithStats[] {
     return (teachers || []).map((teacher) => {
@@ -102,7 +108,7 @@ export class GetEstablishmentsStatsUseCase {
   private buildEstablishmentStats(
     establishment: Establishment,
     teachers: Teacher[],
-    teachersSessions: TeacherSession[],
+    teachersSessions: Session[],
     teachersWithStats: TeacherWithStats[],
     uniqueStudents: Set<string>,
   ): EstablishmentStats {
