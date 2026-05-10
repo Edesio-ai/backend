@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
-import { CourseRanking } from 'src/domain/teaching/course/types/course.type';
+import { CourseRanking } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { UpdateOrCreateStudentCourseStatsBodyDto } from './dtos/update-or-create-student-course-stats.dto';

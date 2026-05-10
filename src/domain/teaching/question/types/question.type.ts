@@ -1,5 +1,3 @@
-import { Language } from '../../course/types/course.type';
-
 export type QuestionType = 'single' | 'multiple' | 'open';
 
 export type SupabaseQuestion = {
@@ -12,15 +10,6 @@ export type SupabaseQuestion = {
   explanation: string | null;
   created_at: string;
   position_order: number | null;
-};
-
-export type GeneratedQuestion = {
-  type: QuestionType;
-  questionText: string;
-  keyConcepts: string[];
-  proposals: string[];
-  correctAnswers: string[];
-  explanation: string;
 };
 
 export type Question = {
@@ -45,7 +34,6 @@ export type CreateQuestionBody = {
   positionOrder?: number | null;
 };
 
-/** Champs modifiables côté domaine (camelCase), tous optionnels pour un PATCH. */
 export type QuestionUpdate = Partial<
   Pick<
     Question,
@@ -58,7 +46,6 @@ export type QuestionUpdate = Partial<
   >
 >;
 
-/** Ligne envoyée à Supabase `.update()` — colonnes snake_case uniquement. */
 export type SupabaseQuestionUpdate = Partial<
   Pick<
     SupabaseQuestion,
@@ -70,10 +57,3 @@ export type SupabaseQuestionUpdate = Partial<
     | 'position_order'
   >
 >;
-
-export type QuestionGenerationConfig = {
-  totalQuestions?: number;
-  singleCount?: number;
-  openedCount?: number;
-  language: Language;
-};

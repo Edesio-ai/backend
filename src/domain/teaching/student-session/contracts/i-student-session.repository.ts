@@ -2,7 +2,7 @@ import {
   SessionStudent,
   StudentJoinedSession,
   StudentSession,
-} from '../../student/type/student.type';
+} from '../types/student-session.type';
 
 export const STUDENT_SESSION_REPOSITORY = 'STUDENT_SESSION_REPOSITORY';
 

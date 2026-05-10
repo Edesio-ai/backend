@@ -8,7 +8,6 @@ import {
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   Teacher,
-  Session,
   TeacherWithStats,
 } from 'src/domain/teaching/teacher/types/teacher.type';
 import {
@@ -23,7 +22,8 @@ import {
   SESSION_REPOSITORY,
   type ISessionRepository,
 } from 'src/domain/teaching/session/contracts/i-session.repository';
-import { StudentSession } from 'src/domain/teaching/student/type/student.type';
+import { StudentSession } from 'src/domain/teaching/student-session/types/student-session.type';
+import { Session } from 'src/domain/teaching/session/types/session.type';
 
 export class GetEstablishmentsStatsUseCase {
   constructor(

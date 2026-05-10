@@ -1,4 +1,4 @@
-import { QuestionGenerationConfig } from 'src/domain/teaching/question/types/question.type';
+import { QuestionGenerationConfig } from 'src/domain/llm/types/openai.type';
 
 export const getGenerateQuestionSystemPrompt = (
   config: QuestionGenerationConfig,

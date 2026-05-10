@@ -24,8 +24,8 @@ import {
   COURSE_FILE_REPOSITORY,
   type ICourseFileRepository,
 } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
-import { StudentCourseStatsWithStudent } from 'src/domain/teaching/student/type/student.type';
-import { SessionDetails } from 'src/domain/teaching/course/types/course.type';
+import { StudentCourseStatsWithStudent } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
+import { SessionDetails } from 'src/domain/teaching/session/types/session.type';
 import {
   type IStudentCourseStatsRepository,
   STUDENT_COURSE_STATS_REPOSITORY,

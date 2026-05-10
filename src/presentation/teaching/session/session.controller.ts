@@ -19,7 +19,7 @@ import { GetSessionByCodeUseCase } from 'src/application/teaching/session/get-se
 import { DeleteSessionUseCase } from 'src/application/teaching/session/delete-session.use-case';
 import { CreateSessionBodyDto } from './dtos/create-session.dto';
 import { UpdateSessionBodyDto } from './dtos/uppdate-session-body.dto';
-import { SessionDetails } from 'src/domain/teaching/course/types/course.type';
+import { SessionDetails } from 'src/domain/teaching/session/types/session.type';
 import { GetSessionDetailsUseCase } from 'src/application/teaching/session/get-session-details.use-case';
 import { GetTeacherSessionsUseCase } from 'src/application/teaching/session/get-teacher-sessions.use-case';
 

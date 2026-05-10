@@ -1,9 +1,9 @@
 import {
   CreateQuestionBody,
-  GeneratedQuestion,
   Question,
   QuestionUpdate,
 } from '../types/question.type';
+import { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 
 export const QUESTIONS_REPOSITORY = 'QUESTIONS_REPOSITORY';
 

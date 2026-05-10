@@ -7,7 +7,7 @@ import { ServerError } from 'src/domain/shared/errors/global.errors';
 import type {
   StudentCourseStats,
   StudentCourseStatsWithStudent,
-} from 'src/domain/teaching/student/type/student.type';
+} from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 
 export class StudentCourseStatsSupabaseRepository implements IStudentCourseStatsRepository {
   constructor(

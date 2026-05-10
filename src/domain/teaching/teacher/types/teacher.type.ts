@@ -1,3 +1,5 @@
+import { Session } from '../../session/types/session.type';
+
 /** Row from Supabase `public.teachers`. */
 export type SupabaseTeacher = {
   id: string;
@@ -31,23 +33,4 @@ export type TeacherWithStats = Teacher & {
   sessionsCount: number;
   studentsCount: number;
   sessions: Session[];
-};
-
-/** Row from Supabase `sessions` when joined to teachers context. */
-export type SupabaseTeacherSession = {
-  id: string;
-  name: string;
-  code: string;
-  language: string;
-  teacher_id: string;
-  created_at: string;
-};
-
-export type Session = {
-  id: string;
-  name: string;
-  code: string;
-  language: string;
-  teacherId: string;
-  createdAt: string;
 };

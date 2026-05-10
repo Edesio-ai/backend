@@ -1,4 +1,4 @@
-import { SessionStudent } from 'src/domain/teaching/student/type/student.type';
+import { SessionStudent } from 'src/domain/teaching/student-session/types/student-session.type';
 import { Inject } from '@nestjs/common';
 import {
   STUDENT_REPOSITORY,

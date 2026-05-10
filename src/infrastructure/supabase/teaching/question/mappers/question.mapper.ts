@@ -1,11 +1,11 @@
 import {
   CreateQuestionBody,
-  GeneratedQuestion,
   Question,
   QuestionUpdate,
   SupabaseQuestion,
   SupabaseQuestionUpdate,
 } from 'src/domain/teaching/question/types/question.type';
+import { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 
 type SupabaseQuestionInsert = {
   course_id: string;

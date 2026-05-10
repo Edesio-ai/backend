@@ -4,12 +4,8 @@ import {
   COURSE_REPOSITORY,
   type ICourseRepository,
 } from 'src/domain/teaching/course/contracts/i-course.repository';
-import { CourseFile } from 'src/domain/teaching/course/types/course.type';
-import {
-  GeneratedQuestion,
-  Question,
-  QuestionGenerationConfig,
-} from 'src/domain/teaching/question/types/question.type';
+import { CourseFile } from 'src/domain/teaching/course-file/types/course-file.type';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 import {
   PDF_EXTRACTOR,
   type IPdfExtractorProvider,
@@ -36,6 +32,10 @@ import {
   QUESTIONS_REPOSITORY,
   type IQuestionsRepository,
 } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import {
+  GeneratedQuestion,
+  QuestionGenerationConfig,
+} from 'src/domain/llm/types/openai.type';
 
 export type GenerateQuestionBody = {
   courseId: string;

@@ -1,7 +1,7 @@
 import type {
   StudentCourseStats,
   StudentCourseStatsWithStudent,
-} from '../../student/type/student.type';
+} from '../types/student-course-stats.type';
 
 export const STUDENT_COURSE_STATS_REPOSITORY = Symbol(
   'STUDENT_COURSE_STATS_REPOSITORY',

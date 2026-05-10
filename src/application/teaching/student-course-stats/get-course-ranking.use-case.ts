@@ -6,7 +6,7 @@ import {
 import {
   CourseRanking,
   CourseRankingWithRate,
-} from 'src/domain/teaching/course/types/course.type';
+} from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   TEACHER_REPOSITORY,
@@ -16,7 +16,7 @@ import {
   SESSION_REPOSITORY,
   type ISessionRepository,
 } from 'src/domain/teaching/session/contracts/i-session.repository';
-import { StudentCourseStatsWithStudent } from 'src/domain/teaching/student/type/student.type';
+import { StudentCourseStatsWithStudent } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type IStudentCourseStatsRepository,

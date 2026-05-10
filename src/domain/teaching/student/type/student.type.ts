@@ -1,47 +1,3 @@
-import { SupabaseSession } from '../../session/types/session.type';
-import { Session } from '../../teacher/types/teacher.type';
-
-export type SupabaseStudentSession = {
-  session_id: string;
-  student_id: string;
-};
-
-export type StudentSession = {
-  sessionId: string;
-  studentId: string;
-};
-
-export type SupabaseStudentCourseStats = {
-  id: string;
-  course_id: string;
-  student_id: string;
-  attempted_questions: number;
-  correct_answers: number;
-  last_attempt_at: string;
-};
-export type SupabaseStudentCourseStatsWithStudent = Omit<
-  SupabaseStudentCourseStats,
-  'id' | 'course_id'
-> & {
-  students: Omit<SupabaseStudent, 'supabase_user_id' | 'created_at'>;
-};
-
-export type StudentCourseStats = {
-  id: string;
-  courseId: string;
-  studentId: string;
-  attemptedQuestions: number;
-  correctAnswers: number;
-  lastAttemptAt: string;
-};
-
-export type StudentCourseStatsWithStudent = Omit<
-  StudentCourseStats,
-  'id' | 'courseId'
-> & {
-  student: Omit<Student, 'supabaseUserId' | 'createdAt'>;
-};
-
 export type Student = {
   id: string;
   supabaseUserId: string;
@@ -66,42 +22,9 @@ export type SupabaseStudentInsert = Omit<
   'id' | 'created_at' | 'photo_url'
 >;
 
-/** Row from Supabase when selecting `joined_at, sessions (*)` on `student_sessions`. */
-export type SupabaseStudentJoinedSession = {
-  joined_at: string;
-  sessions: SupabaseSession | SupabaseSession[] | null;
-};
-
-export type StudentJoinedSession = Session & {
-  joinedAt: string;
-};
-
-export type SupabaseSessionStudent = {
-  joined_at: string;
-  students: Omit<SupabaseStudent, 'supabase_user_id' | 'created_at'>;
-};
-
-export type SessionStudent = Omit<Student, 'supabaseUserId' | 'createdAt'> & {
-  joinedAt: string;
-};
-
 export type StudentPhotoUpload = {
   buffer: Buffer;
   originalFileName: string;
   mimeType: string;
   byteLength: number;
 };
-
-export type insertStudentCourseStats = Omit<StudentCourseStats, 'id'>;
-export type supabaseInsertStudentCourseStats = Omit<
-  SupabaseStudentCourseStats,
-  'id'
->;
-export type UpdateStudentCourseStats = Omit<
-  StudentCourseStats,
-  'id' | 'courseId' | 'studentId' | 'lastAttemptAt'
->;
-export type supabaseUpdateStudentCourseStats = Omit<
-  SupabaseStudentCourseStats,
-  'id' | 'course_id' | 'student_id'
->;

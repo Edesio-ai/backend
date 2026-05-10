@@ -1,17 +1,13 @@
 import {
-  InvitationTokenPreview,
-  SupabaseInvitationToken,
-} from 'src/domain/auth/invitation.type';
-import {
   AuthTokenData,
   AuthUser,
-  Session,
+  SupabaseAuthSession,
   SupabaseUser,
   User,
 } from 'src/domain/auth/types/auth.type';
 
 export const AuthMapper = {
-  toAuthUser: (data: Session): AuthUser => ({
+  toAuthUser: (data: SupabaseAuthSession): AuthUser => ({
     id: data.session.user.id,
     email: data.session.user.email,
     emailConfirmedAt: data.session.user.email_confirmed_at,
@@ -23,7 +19,7 @@ export const AuthMapper = {
       invitationToken: data.session.user.user_metadata.invitationToken,
     },
   }),
-  toAuthTokenData: (data: Session): AuthTokenData => ({
+  toAuthTokenData: (data: SupabaseAuthSession): AuthTokenData => ({
     accessToken: data.session.access_token,
     refreshToken: data.session.refresh_token,
     expiresIn: data.session.expires_in,

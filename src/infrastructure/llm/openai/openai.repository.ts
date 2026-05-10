@@ -4,7 +4,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   GeneratedQuestion,
   QuestionGenerationConfig,
-} from 'src/domain/teaching/question/types/question.type';
+} from 'src/domain/llm/types/openai.type';
 import type { IOpenAiProvider as OpenaiRepositoryContract } from 'src/domain/llm/openai/contracts/open-ai.provider';
 import {
   getGenerateQuestionSystemPrompt,

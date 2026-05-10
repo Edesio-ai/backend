@@ -1,12 +1,16 @@
-export type SessionLanguage = 'francais' | 'anglais' | 'espagnol' | 'allemand';
+import { CourseFile } from '../../course-file/types/course-file.type';
+import { CourseWithSession } from '../../course/types/course.type';
+import { Question } from '../../question/types/question.type';
+import { CourseRanking } from '../../student-course-stats/types/student-course-stats.type';
 
-/** Row returned by Supabase for `public.sessions` (snake_case columns). */
+export type Language = 'francais' | 'anglais' | 'espagnol' | 'allemand';
+
 export type SupabaseSession = {
   id: string;
   teacher_id: string;
   name: string;
   code: string;
-  language: SessionLanguage;
+  language: Language;
   created_at: string;
 };
 
@@ -15,14 +19,14 @@ export type Session = {
   teacherId: string;
   name: string;
   code: string;
-  language: SessionLanguage;
+  language: Language;
   createdAt: string;
 };
 
 export type CreateSessionBody = {
   name: string;
   code: string;
-  language: SessionLanguage;
+  language: Language;
   teacherId: string;
 };
 
@@ -36,4 +40,11 @@ export type SupabaseSessionInsert = {
   name: string;
   code: string;
   language: string;
+};
+
+export type SessionDetails = {
+  course: Partial<CourseWithSession>;
+  questions: Partial<Question>[];
+  students: Partial<CourseRanking>[];
+  files: Partial<CourseFile>[];
 };

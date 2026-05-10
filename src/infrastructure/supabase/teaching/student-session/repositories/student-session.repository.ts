@@ -7,7 +7,7 @@ import type {
   SessionStudent,
   StudentJoinedSession,
   StudentSession,
-} from 'src/domain/teaching/student/type/student.type';
+} from 'src/domain/teaching/student-session/types/student-session.type';
 import { SUPABASE_ADMIN } from '../../../supabase.module';
 import { StudentSessionMapper } from '../mappers/student-session.mapper';
 

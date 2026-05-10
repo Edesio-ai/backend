@@ -1,8 +1,8 @@
 import { Inject } from '@nestjs/common';
 import {
-  CourseFileUpload,
   CourseFile,
-} from 'src/domain/teaching/course/types/course.type';
+  CourseFileUpload,
+} from 'src/domain/teaching/course-file/types/course-file.type';
 import {
   COURSE_FILE_REPOSITORY,
   type ICourseFileRepository,

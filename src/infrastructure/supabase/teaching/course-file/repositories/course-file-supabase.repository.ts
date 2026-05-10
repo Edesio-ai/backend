@@ -4,7 +4,7 @@ import { ServerError } from 'src/domain/shared/errors/global.errors';
 import {
   CourseFile,
   CourseFileUpload,
-} from 'src/domain/teaching/course/types/course.type';
+} from 'src/domain/teaching/course-file/types/course-file.type';
 import { courseFileMapper } from '../mappers/course-file.mapper';
 
 export class CourseFileRepository implements ICourseFileRepository {

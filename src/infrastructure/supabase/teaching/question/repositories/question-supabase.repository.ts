@@ -2,13 +2,13 @@ import { Inject } from '@nestjs/common';
 import { SUPABASE_ADMIN } from '../../../supabase.module';
 import {
   CreateQuestionBody,
-  GeneratedQuestion,
   Question,
   QuestionUpdate,
 } from 'src/domain/teaching/question/types/question.type';
 import { QuestionMapper } from '../mappers/question.mapper';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 
 export class QuestionSupabaseRepository implements IQuestionsRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}

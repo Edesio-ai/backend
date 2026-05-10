@@ -1,4 +1,4 @@
-import { CourseFile, CourseFileUpload } from '../../course/types/course.type';
+import { CourseFile, CourseFileUpload } from '../types/course-file.type';
 
 export const COURSE_FILE_REPOSITORY = Symbol('COURSE_FILE_REPOSITORY');
 

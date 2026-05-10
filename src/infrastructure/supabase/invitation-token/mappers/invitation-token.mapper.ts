@@ -5,7 +5,7 @@ import {
   SupabaseInvitationTokenInsert,
   SupabaseInvitationTokenRow,
 } from 'src/domain/auth/invitation.type';
-import { SupabaseInvitationTokenUpdate } from 'src/domain/auth/types/auth.type';
+import { SupabaseInvitationTokenUpdate } from 'src/domain/invitation-token/types/invitation-token.type';
 import { SupabaseTeacherInsert } from 'src/domain/teaching/teacher/types/teacher.type';
 
 export const invitationTokenMapper = {

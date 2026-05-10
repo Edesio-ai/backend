@@ -3,7 +3,7 @@ import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
 } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
-import { StudentJoinedSession } from 'src/domain/teaching/student/type/student.type';
+import { StudentJoinedSession } from 'src/domain/teaching/student-session/types/student-session.type';
 
 export class GetStudentJoinedSessionsUseCase {
   constructor(
