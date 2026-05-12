@@ -17,3 +17,12 @@ export type SupabaseCourseQuestion = {
   created_at: string;
   answered_at: string;
 };
+
+export type CourseQuestionToInsert = Pick<
+  CourseQuestion,
+  'courseId' | 'studentId' | 'questionText'
+>;
+export type SupabaseCourseQuestionToInsert = Pick<
+  SupabaseCourseQuestion,
+  'course_id' | 'student_id' | 'question_text'
+>;

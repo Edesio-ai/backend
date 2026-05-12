@@ -1,4 +1,7 @@
-import { CourseQuestion } from '../types/course-question.type';
+import {
+  CourseQuestion,
+  CourseQuestionToInsert,
+} from '../types/course-question.type';
 
 export const COURSE_QUESTION_REPOSITORY = Symbol('COURSE_QUESTION_REPOSITORY');
 
@@ -7,4 +10,7 @@ export interface ICourseQuestionRepository {
   deleteCourseQuestionsByCourseId(courseId: string): Promise<void>;
   getAnsweredQuestionCount(userId: string): Promise<number>;
   getCourseQuestionsByCourseId(courseId: string): Promise<CourseQuestion[]>;
+  createCourseQuestion(
+    courseQuestion: CourseQuestionToInsert,
+  ): Promise<CourseQuestion | null>;
 }
