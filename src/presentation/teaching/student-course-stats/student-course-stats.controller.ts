@@ -8,13 +8,13 @@ import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/teachin
 import { GetCourseRankingUseCase } from 'src/application/teaching/student-course-stats/get-course-ranking.use-case';
 
 @Controller('student-course-stats')
-@Roles('teacher')
 export class StudentCourseStatsController {
   constructor(
     private readonly getCourseRankingUseCase: GetCourseRankingUseCase,
     private readonly updateOrCreateStudentCourseStatsUseCase: UpdateOrCreateStudentCourseStatsUseCase,
   ) {}
 
+  @Roles('teacher', 'student')
   @Get('course/:courseId/ranking')
   async getCourseRanking(
     @Param('courseId') courseId: string,

@@ -79,7 +79,7 @@ export class GetSessionDetailsUseCase {
     const questions =
       await this.questionsRepository.getCourseQuestions(courseId);
     const students =
-      await this.studentCourseStatsRepository.getStudentStatsByCourseId(
+      await this.studentCourseStatsRepository.getStudentCourseStatsByCourseId(
         courseId,
       );
     const files =

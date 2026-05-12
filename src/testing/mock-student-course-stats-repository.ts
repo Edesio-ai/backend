@@ -2,7 +2,7 @@ import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-
 
 export function createMockStudentCourseStatsRepository(): jest.Mocked<IStudentCourseStatsRepository> {
   return {
-    getStudentStatsByCourseId: jest.fn(),
+    getStudentCourseStatsByCourseId: jest.fn(),
     deleteStudentCourseStatsByCourseId: jest.fn(),
     getStudentCourseStatsByStudentIdAndCourseId: jest.fn(),
     createStudentCourseStats: jest.fn(),

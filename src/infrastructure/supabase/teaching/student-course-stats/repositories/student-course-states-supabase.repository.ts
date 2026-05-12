@@ -15,24 +15,24 @@ export class StudentCourseStatsSupabaseRepository implements IStudentCourseStats
     private readonly supabase: SupabaseClient,
   ) {}
 
-  public async getStudentStatsByCourseId(
+  public async getStudentCourseStatsByCourseId(
     courseId: string,
   ): Promise<StudentCourseStatsWithStudent[]> {
     const { data, error } = await this.supabase
       .from('student_course_stats')
       .select(
         `
-                    student_id,
-                    attempted_questions,
-                    correct_answers,
-                    last_attempt_at,
-                    students (
-                    id,
-                    name,
-                    email,
-                    photo_url
-                    )
-                `,
+          student_id,
+          attempted_questions,
+          correct_answers,
+          last_attempt_at,
+          students (
+            id,
+            name,
+            email,
+            photo_url
+          )
+        `,
       )
       .eq('course_id', courseId);
 
