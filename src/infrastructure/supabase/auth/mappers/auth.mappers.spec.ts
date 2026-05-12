@@ -119,6 +119,7 @@ describe('AuthMapper', () => {
       expect(AuthMapper.SupabaseValidatedTokenUserToUser(user)).toEqual({
         id: 'uid-jwt',
         email: 'jwt@example.com',
+        emailConfirmedAt: '2026-01-01T00:00:00.000Z',
         metadata: {
           role: 'teacher',
           firstname: 'Marie',
