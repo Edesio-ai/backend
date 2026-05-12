@@ -17,7 +17,7 @@ import { SupabaseModule } from 'src/infrastructure/supabase/supabase.module';
     StudentPersistenceModule,
     CourseQuestionPersistenceModule,
     StudentSessionPersistenceModule,
-    SupabaseModule
+    SupabaseModule,
   ],
   controllers: [CourseQuestionsController],
   providers: [
