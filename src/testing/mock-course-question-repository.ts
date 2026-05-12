@@ -2,6 +2,7 @@ import type { ICourseQuestionRepository } from 'src/domain/teaching/course-quest
 
 export function createMockCourseQuestionRepository(): jest.Mocked<ICourseQuestionRepository> {
   return {
+    createCourseQuestion: jest.fn(),
     deleteCourseQuestionsByCourseId: jest.fn(),
     getAnsweredQuestionCount: jest.fn(),
     getCourseQuestionsByCourseId: jest.fn(),

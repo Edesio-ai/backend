@@ -1,4 +1,7 @@
-import { SupabaseCourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
+import {
+  CourseQuestionToInsert,
+  SupabaseCourseQuestion,
+} from 'src/domain/teaching/course-question/types/course-question.type';
 import { CourseQuestionMapper } from '../mappers/course-question.mapper';
 
 describe('CourseQuestionMapper', () => {
@@ -13,6 +16,22 @@ describe('CourseQuestionMapper', () => {
       const result = fixtures.whenToDomain();
 
       fixtures.thenReturnsExpectedCourseQuestion(result);
+    });
+  });
+
+  describe('toInsert', () => {
+    it('maps CourseQuestionToInsert to Supabase insert shape', () => {
+      const body: CourseQuestionToInsert = {
+        courseId: 'course-1',
+        studentId: 'student-1',
+        questionText: 'Question ?',
+      };
+
+      expect(CourseQuestionMapper.toInsert(body)).toEqual({
+        course_id: 'course-1',
+        student_id: 'student-1',
+        question_text: 'Question ?',
+      });
     });
   });
 });

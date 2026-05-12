@@ -99,6 +99,33 @@ describe('CourseQuestionSupabaseRepository', () => {
       fixtures.whenGetCourseQuestionsByCourseId(),
     ).rejects.toBeInstanceOf(ServerError);
   });
+
+  it('should create course question and return mapped row', async () => {
+    fixtures.whenCreateCourseQuestionSucceeds();
+
+    const result = await fixtures.whenCreateCourseQuestion();
+
+    expect(result).toEqual(fixtures.expectedCreatedCourseQuestion);
+    fixtures.thenCreateCourseQuestionQueryBuilt();
+  });
+
+  it('should return null when createCourseQuestion returns no row', async () => {
+    fixtures.whenCreateCourseQuestionReturnsNullData();
+
+    const result = await fixtures.whenCreateCourseQuestion();
+
+    expect(result).toBeNull();
+    fixtures.thenCreateCourseQuestionQueryBuilt();
+  });
+
+  it('should throw ServerError when createCourseQuestion fails', async () => {
+    fixtures.whenCreateCourseQuestionFails();
+
+    await expect(fixtures.whenCreateCourseQuestion()).rejects.toBeInstanceOf(
+      ServerError,
+    );
+    fixtures.thenCreateCourseQuestionQueryBuilt();
+  });
 });
 
 class Fixtures {
@@ -128,6 +155,32 @@ class Fixtures {
     },
   ];
 
+  public readonly courseQuestionToInsert = {
+    courseId: this.courseId,
+    studentId: this.studentId,
+    questionText: 'Nouvelle question',
+  };
+
+  public readonly insertedCourseQuestionSupabaseRow = {
+    id: 'cq-new',
+    course_id: this.courseId,
+    student_id: this.studentId,
+    question_text: this.courseQuestionToInsert.questionText,
+    answer: '',
+    created_at: '2026-01-03T00:00:00.000Z',
+    answered_at: '',
+  };
+
+  public readonly expectedCreatedCourseQuestion: CourseQuestion = {
+    id: 'cq-new',
+    courseId: this.courseId,
+    studentId: this.studentId,
+    questionText: this.courseQuestionToInsert.questionText,
+    answer: '',
+    createdAt: '2026-01-03T00:00:00.000Z',
+    answeredAt: '',
+  };
+
   private readonly countSelectMock: jest.Mock = jest.fn();
   private readonly countInMock: jest.Mock = jest.fn();
   private readonly countIsMock: jest.Mock = jest.fn();
@@ -144,16 +197,31 @@ class Fixtures {
 
   private readonly courseQuestionsListEqMock: jest.Mock = jest.fn();
 
-  private readonly fromMock = jest.fn((_table: string) => ({
-    select: (...selectArgs: unknown[]) => {
-      const options = selectArgs[1] as { head?: boolean } | undefined;
-      if (options?.head === true) {
-        return this.countSelectMock(...selectArgs);
-      }
-      return { eq: this.courseQuestionsListEqMock };
-    },
-    delete: this.courseQuestionsDeleteMock,
+  private readonly createSingleMock: jest.Mock = jest.fn();
+  private readonly createSelectMock: jest.Mock = jest.fn(() => ({
+    single: this.createSingleMock,
   }));
+  private readonly createInsertMock: jest.Mock = jest.fn(() => ({
+    select: this.createSelectMock,
+  }));
+
+  private createMode = false;
+
+  private readonly fromMock = jest.fn((_table: string) => {
+    if (this.createMode) {
+      return { insert: this.createInsertMock };
+    }
+    return {
+      select: (...selectArgs: unknown[]) => {
+        const options = selectArgs[1] as { head?: boolean } | undefined;
+        if (options?.head === true) {
+          return this.countSelectMock(...selectArgs);
+        }
+        return { eq: this.courseQuestionsListEqMock };
+      },
+      delete: this.courseQuestionsDeleteMock,
+    };
+  });
 
   public readonly repository: CourseQuestionSupabaseRepository;
 
@@ -182,6 +250,11 @@ class Fixtures {
 
   whenGetCourseQuestionsByCourseId() {
     return this.repository.getCourseQuestionsByCourseId(this.courseId);
+  }
+
+  whenCreateCourseQuestion() {
+    this.createMode = true;
+    return this.repository.createCourseQuestion(this.courseQuestionToInsert);
   }
 
   whenGetPendingCountSucceeds(count: number) {
@@ -245,6 +318,27 @@ class Fixtures {
     });
   }
 
+  whenCreateCourseQuestionSucceeds() {
+    this.createSingleMock.mockResolvedValue({
+      data: this.insertedCourseQuestionSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenCreateCourseQuestionReturnsNullData() {
+    this.createSingleMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+  }
+
+  whenCreateCourseQuestionFails() {
+    this.createSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'insert course_question failed' },
+    });
+  }
+
   thenGetPendingCountQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('course_questions');
     expect(this.countSelectMock).toHaveBeenCalledWith('*', {
@@ -280,5 +374,16 @@ class Fixtures {
       'course_id',
       this.courseId,
     );
+  }
+
+  thenCreateCourseQuestionQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('course_questions');
+    expect(this.createInsertMock).toHaveBeenCalledWith({
+      course_id: this.courseQuestionToInsert.courseId,
+      student_id: this.courseQuestionToInsert.studentId,
+      question_text: this.courseQuestionToInsert.questionText,
+    });
+    expect(this.createSelectMock).toHaveBeenCalledTimes(1);
+    expect(this.createSingleMock).toHaveBeenCalledTimes(1);
   }
 }

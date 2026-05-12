@@ -9,6 +9,7 @@ import { GetStudentCourseQuestionsUseCase } from 'src/application/teaching/cours
 import { CourseQuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/course-question/course-question-persistence.module';
 import { StudentSessionPersistenceModule } from 'src/infrastructure/supabase/teaching/student-session/student-session-persistence.module';
 import { SupabaseModule } from 'src/infrastructure/supabase/supabase.module';
+import { SendCourseQuestionUseCase } from 'src/application/teaching/course-question/send-course-question.use-case';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SupabaseModule } from 'src/infrastructure/supabase/supabase.module';
     GetPendingQuestionCountUseCase,
     GetAnsweredQuestionCountUseCase,
     GetStudentCourseQuestionsUseCase,
+    SendCourseQuestionUseCase,
   ],
 })
 export class CourseQuestionModule {}
