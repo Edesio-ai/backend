@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
@@ -9,6 +9,8 @@ import { CourseQuestion } from 'src/domain/teaching/course-question/types/course
 import { GetStudentCourseQuestionsUseCase } from 'src/application/teaching/course-question/get-student-course-questions.use-case';
 import { SendCourseQuestionBodyDto } from './dtos/send-course-question-body.dto';
 import { SendCourseQuestionUseCase } from 'src/application/teaching/course-question/send-course-question.use-case';
+import { AnswerCourseQuestionBodyDto } from './dtos/answer-course-question.dto';
+import { AnswerCourseQuestionUseCase } from 'src/application/teaching/course-question/answer-course-question.use-case';
 
 @Controller('course-question')
 @Roles('student')
@@ -18,6 +20,7 @@ export class CourseQuestionsController {
     private readonly getAnsweredQuestionsCountUseCase: GetAnsweredQuestionCountUseCase,
     private readonly getStudentCourseQuestionsUseCase: GetStudentCourseQuestionsUseCase,
     private readonly sendCourseQuestionUseCase: SendCourseQuestionUseCase,
+    private readonly answerCourseQuestionUseCase: AnswerCourseQuestionUseCase,
   ) {}
   @Roles('teacher')
   @Get('pending/:sessionId')
@@ -58,5 +61,18 @@ export class CourseQuestionsController {
       user,
     );
     return courseQuestion;
+  }
+
+  @Roles('teacher')
+  @Patch()
+  async answerCourseQuestion(
+    @CurrentUser() user: AuthUser,
+    @Body() body: AnswerCourseQuestionBodyDto,
+  ): Promise<CourseQuestion | null> {
+    const questions = await this.answerCourseQuestionUseCase.execute(
+      body,
+      user,
+    );
+    return questions;
   }
 }

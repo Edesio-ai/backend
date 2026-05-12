@@ -1,5 +1,6 @@
 import {
   CourseQuestion,
+  CourseQuestionAnswer,
   CourseQuestionToInsert,
 } from '../types/course-question.type';
 
@@ -12,5 +13,12 @@ export interface ICourseQuestionRepository {
   getCourseQuestionsByCourseId(courseId: string): Promise<CourseQuestion[]>;
   createCourseQuestion(
     courseQuestion: CourseQuestionToInsert,
+  ): Promise<CourseQuestion | null>;
+  getCourseQuestionByCourseId(
+    courseQuestionId: string,
+  ): Promise<CourseQuestion | null>;
+  updateCourseQuestion(
+    courseQuestionId: string,
+    updatePayload: CourseQuestionAnswer,
   ): Promise<CourseQuestion | null>;
 }

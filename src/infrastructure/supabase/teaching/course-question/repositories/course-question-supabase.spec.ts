@@ -126,6 +126,60 @@ describe('CourseQuestionSupabaseRepository', () => {
     );
     fixtures.thenCreateCourseQuestionQueryBuilt();
   });
+
+  it('should return mapped course question when getCourseQuestionByCourseId succeeds', async () => {
+    fixtures.whenGetCourseQuestionByCourseIdSucceeds();
+
+    const result = await fixtures.whenGetCourseQuestionByCourseId();
+
+    expect(result).toEqual(fixtures.expectedCourseQuestions[0]);
+    fixtures.thenGetCourseQuestionByCourseIdQueryBuilt();
+  });
+
+  it('should return null when getCourseQuestionByCourseId returns no row', async () => {
+    fixtures.whenGetCourseQuestionByCourseIdReturnsNullData();
+
+    const result = await fixtures.whenGetCourseQuestionByCourseId();
+
+    expect(result).toBeNull();
+    fixtures.thenGetCourseQuestionByCourseIdQueryBuilt();
+  });
+
+  it('should throw ServerError when getCourseQuestionByCourseId fails', async () => {
+    fixtures.whenGetCourseQuestionByCourseIdFails();
+
+    await expect(
+      fixtures.whenGetCourseQuestionByCourseId(),
+    ).rejects.toBeInstanceOf(ServerError);
+    fixtures.thenGetCourseQuestionByCourseIdQueryBuilt();
+  });
+
+  it('should update course question and return mapped row', async () => {
+    fixtures.whenUpdateCourseQuestionSucceeds();
+
+    const result = await fixtures.whenUpdateCourseQuestion();
+
+    expect(result).toEqual(fixtures.expectedCourseQuestions[0]);
+    fixtures.thenUpdateCourseQuestionQueryBuilt();
+  });
+
+  it('should return null when updateCourseQuestion returns no row', async () => {
+    fixtures.whenUpdateCourseQuestionReturnsNullData();
+
+    const result = await fixtures.whenUpdateCourseQuestion();
+
+    expect(result).toBeNull();
+    fixtures.thenUpdateCourseQuestionQueryBuilt();
+  });
+
+  it('should throw ServerError when updateCourseQuestion fails', async () => {
+    fixtures.whenUpdateCourseQuestionFails();
+
+    await expect(fixtures.whenUpdateCourseQuestion()).rejects.toBeInstanceOf(
+      ServerError,
+    );
+    fixtures.thenUpdateCourseQuestionQueryBuilt();
+  });
 });
 
 class Fixtures {
@@ -181,6 +235,13 @@ class Fixtures {
     answeredAt: '',
   };
 
+  public readonly courseQuestionId = 'cq-1';
+
+  public readonly answerPayload = {
+    answer: 'Réponse mise à jour',
+    answeredAt: '2026-05-10T16:00:00.000Z',
+  };
+
   private readonly countSelectMock: jest.Mock = jest.fn();
   private readonly countInMock: jest.Mock = jest.fn();
   private readonly countIsMock: jest.Mock = jest.fn();
@@ -206,10 +267,41 @@ class Fixtures {
   }));
 
   private createMode = false;
+  private getByIdMode = false;
+  private updateMode = false;
+
+  private readonly getByIdSingleMock: jest.Mock = jest.fn();
+  private readonly getByIdEqMock: jest.Mock = jest.fn(() => ({
+    single: this.getByIdSingleMock,
+  }));
+  private readonly getByIdSelectMock: jest.Mock = jest.fn(() => ({
+    eq: this.getByIdEqMock,
+  }));
+
+  private readonly updateSingleMock: jest.Mock = jest.fn();
+  private readonly updateSelectMock: jest.Mock = jest.fn(() => ({
+    single: this.updateSingleMock,
+  }));
+  private readonly updateEqMock: jest.Mock = jest.fn(() => ({
+    select: this.updateSelectMock,
+  }));
+  private readonly updateMutationMock: jest.Mock = jest.fn(() => ({
+    eq: this.updateEqMock,
+  }));
 
   private readonly fromMock = jest.fn((_table: string) => {
     if (this.createMode) {
       return { insert: this.createInsertMock };
+    }
+    if (this.getByIdMode) {
+      return {
+        select: this.getByIdSelectMock,
+      };
+    }
+    if (this.updateMode) {
+      return {
+        update: this.updateMutationMock,
+      };
     }
     return {
       select: (...selectArgs: unknown[]) => {
@@ -255,6 +347,19 @@ class Fixtures {
   whenCreateCourseQuestion() {
     this.createMode = true;
     return this.repository.createCourseQuestion(this.courseQuestionToInsert);
+  }
+
+  whenGetCourseQuestionByCourseId() {
+    this.getByIdMode = true;
+    return this.repository.getCourseQuestionByCourseId(this.courseQuestionId);
+  }
+
+  whenUpdateCourseQuestion() {
+    this.updateMode = true;
+    return this.repository.updateCourseQuestion(
+      this.courseQuestionId,
+      this.answerPayload,
+    );
   }
 
   whenGetPendingCountSucceeds(count: number) {
@@ -339,6 +444,48 @@ class Fixtures {
     });
   }
 
+  whenGetCourseQuestionByCourseIdSucceeds() {
+    this.getByIdSingleMock.mockResolvedValue({
+      data: this.courseQuestionSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenGetCourseQuestionByCourseIdReturnsNullData() {
+    this.getByIdSingleMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+  }
+
+  whenGetCourseQuestionByCourseIdFails() {
+    this.getByIdSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'get course_question failed' },
+    });
+  }
+
+  whenUpdateCourseQuestionSucceeds() {
+    this.updateSingleMock.mockResolvedValue({
+      data: this.courseQuestionSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenUpdateCourseQuestionReturnsNullData() {
+    this.updateSingleMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+  }
+
+  whenUpdateCourseQuestionFails() {
+    this.updateSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'update course_question failed' },
+    });
+  }
+
   thenGetPendingCountQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('course_questions');
     expect(this.countSelectMock).toHaveBeenCalledWith('*', {
@@ -385,5 +532,26 @@ class Fixtures {
     });
     expect(this.createSelectMock).toHaveBeenCalledTimes(1);
     expect(this.createSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenGetCourseQuestionByCourseIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('course_questions');
+    expect(this.getByIdSelectMock).toHaveBeenCalledWith('*');
+    expect(this.getByIdEqMock).toHaveBeenCalledWith(
+      'id',
+      this.courseQuestionId,
+    );
+    expect(this.getByIdSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenUpdateCourseQuestionQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('course_questions');
+    expect(this.updateMutationMock).toHaveBeenCalledWith({
+      answer: this.answerPayload.answer,
+      answered_at: this.answerPayload.answeredAt,
+    });
+    expect(this.updateEqMock).toHaveBeenCalledWith('id', this.courseQuestionId);
+    expect(this.updateSelectMock).toHaveBeenCalledWith();
+    expect(this.updateSingleMock).toHaveBeenCalledTimes(1);
   }
 }

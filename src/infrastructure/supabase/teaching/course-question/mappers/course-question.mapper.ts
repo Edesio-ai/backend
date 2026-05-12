@@ -1,7 +1,9 @@
 import {
   CourseQuestion,
+  CourseQuestionAnswer,
   CourseQuestionToInsert,
   SupabaseCourseQuestion,
+  SupabaseCourseQuestionAnswer,
   SupabaseCourseQuestionToInsert,
 } from 'src/domain/teaching/course-question/types/course-question.type';
 
@@ -22,5 +24,10 @@ export const CourseQuestionMapper = {
     course_id: courseQuestion.courseId,
     student_id: courseQuestion.studentId,
     question_text: courseQuestion.questionText,
+  }),
+
+  toAnswer: (answer: CourseQuestionAnswer): SupabaseCourseQuestionAnswer => ({
+    answer: answer.answer,
+    answered_at: answer.answeredAt,
   }),
 };
