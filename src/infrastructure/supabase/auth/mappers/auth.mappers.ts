@@ -35,6 +35,7 @@ export const AuthMapper = {
   SupabaseValidatedTokenUserToUser: (user: SupabaseUser): User => ({
     id: user.id,
     email: user.email,
+    emailConfirmedAt: user.email_confirmed_at,
     metadata: {
       role: user.user_metadata?.role,
       firstname: user.user_metadata?.firstname,

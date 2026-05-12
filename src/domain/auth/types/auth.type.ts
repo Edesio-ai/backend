@@ -82,5 +82,6 @@ export type AuthUser = {
 export type User = {
   id: string;
   email: string;
+  emailConfirmedAt?: string | null;
   metadata: UserMetadata;
 };
