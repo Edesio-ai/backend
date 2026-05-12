@@ -3,9 +3,14 @@ import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { ICourseQuestionRepository } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { CourseQuestionMapper } from '../mappers/course-question.mapper';
+import { Inject } from '@nestjs/common';
+import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
 
 export class CourseQuestionSupabaseRepository implements ICourseQuestionRepository {
-  constructor(private readonly supabase: SupabaseClient) {}
+  constructor(
+    @Inject(SUPABASE_ADMIN)
+    private readonly supabase: SupabaseClient,
+  ) {}
 
   async getPendingQuestionCount(courseIds: string[]): Promise<number> {
     const { count, error: countError } = await this.supabase

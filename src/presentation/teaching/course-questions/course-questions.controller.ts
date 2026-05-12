@@ -8,7 +8,7 @@ import { GetAnsweredQuestionCountUseCase } from 'src/application/teaching/course
 import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { GetStudentCourseQuestionsUseCase } from 'src/application/teaching/course-question/get-student-course-questions.use-case';
 
-@Controller('course-questions')
+@Controller('course-question')
 @Roles('teacher')
 export class CourseQuestionsController {
   constructor(
@@ -23,6 +23,7 @@ export class CourseQuestionsController {
     return { count: count ?? 0 };
   }
 
+  @Roles('student')
   @Get('answered')
   async getAnsweredQuestionsCount(
     @CurrentUser() user: AuthUser,
