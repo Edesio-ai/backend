@@ -11,8 +11,7 @@ import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
 
 export class CourseFileRepository implements ICourseFileRepository {
   constructor(
-    @Inject(SUPABASE_ADMIN)
-    private readonly supabase: SupabaseClient,
+    @Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient,
   ) {}
 
   public async deleteFileById(fileId: string): Promise<void> {
