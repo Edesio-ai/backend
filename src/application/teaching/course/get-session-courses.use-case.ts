@@ -26,7 +26,7 @@ import {
 } from 'src/domain/teaching/student/contracts/I-student.repository';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 
@@ -35,7 +35,7 @@ export class GetSessionCoursesUseCase {
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teachersRepository: TeacherRepository,
+    private readonly teachersRepository: ITeacherRepository,
     @Inject(SESSION_REPOSITORY)
     private readonly sessionRepository: ISessionRepository,
     @Inject(ESTABLISHMENT_REPOSITORY)

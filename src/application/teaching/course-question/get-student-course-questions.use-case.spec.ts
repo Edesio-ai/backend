@@ -6,13 +6,17 @@ import {
 } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import type { ICourseQuestionRepository } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
+import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
+import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
+import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GetStudentCourseQuestionsUseCase', () => {
   let fixtures: Fixtures;
@@ -149,6 +153,8 @@ class Fixtures {
   public readonly studentSessionRepository: ReturnType<
     typeof createMockStudentSessionRepository
   >;
+  public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
+  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly useCase: GetStudentCourseQuestionsUseCase;
 
   constructor() {
@@ -156,12 +162,16 @@ class Fixtures {
     this.studentRepository = createMockStudentRepository();
     this.courseRepository = createMockCourseRepository();
     this.studentSessionRepository = createMockStudentSessionRepository();
+    this.teacherRepository = createMockTeacherRepository();
+    this.sessionRepository = createMockSessionRepository();
 
     this.useCase = new GetStudentCourseQuestionsUseCase(
       this.courseQuestionRepository,
       this.studentRepository,
       this.courseRepository,
       this.studentSessionRepository,
+      this.teacherRepository,
+      this.sessionRepository,
     );
   }
 

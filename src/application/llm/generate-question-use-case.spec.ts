@@ -12,7 +12,7 @@ import { IOpenAiProvider } from 'src/domain/llm/openai/contracts/open-ai.provide
 import { IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
-import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 import {
   CourseFile,
@@ -206,7 +206,7 @@ class Fixtures {
   public readonly pdfExtractor: jest.Mocked<IPdfExtractorProvider>;
   public readonly openaiRepository: jest.Mocked<IOpenAiProvider>;
   public readonly questionRepository: jest.Mocked<IQuestionsRepository>;
-  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly useCase: GenerateQuestionUseCase;
 

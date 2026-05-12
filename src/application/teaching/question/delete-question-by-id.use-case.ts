@@ -15,7 +15,7 @@ import {
 } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class DeleteQuestionByIdUseCase {
     @Inject(COURSE_REPOSITORY)
     private readonly coursesRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teachersRepository: TeacherRepository,
+    private readonly teachersRepository: ITeacherRepository,
   ) {}
 
   async execute(questionId: string, user: AuthUser): Promise<boolean> {

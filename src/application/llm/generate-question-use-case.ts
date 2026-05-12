@@ -17,7 +17,7 @@ import {
 
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   ForbiddenError,
@@ -55,7 +55,7 @@ export class GenerateQuestionUseCase {
     @Inject(QUESTIONS_REPOSITORY)
     private readonly questionRepository: IQuestionsRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
     @Inject(COURSE_FILE_REPOSITORY)
     private readonly courseFileRepository: ICourseFileRepository,
   ) {}

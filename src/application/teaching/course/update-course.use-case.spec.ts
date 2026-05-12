@@ -8,7 +8,7 @@ import {
   UnauthorizedError,
 } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
-import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
@@ -136,7 +136,7 @@ class Fixtures {
   public readonly repositoryError = new Error('update failed');
 
   public readonly courseRepository: jest.Mocked<ICourseRepository>;
-  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly useCase: UpdateCourseUseCase;
 
   constructor() {

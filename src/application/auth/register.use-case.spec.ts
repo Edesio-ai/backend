@@ -2,7 +2,7 @@ import { RegisterUseCase } from './register.use-case';
 import { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
 import { IEmailProvider } from '../../domain/email/contract/i-email.interface';
 import { RegisterBody } from '../../domain/auth/types/auth.type';
-import type { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import type { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
@@ -64,7 +64,7 @@ describe('RegisterUseCase', () => {
 class Fixtures {
   public readonly authRepository: jest.Mocked<IAuthRepository>;
   public readonly emailProvider: jest.Mocked<IEmailProvider>;
-  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly invitationTokenRepository: jest.Mocked<IInvitationTokenRepository>;
   public readonly registerUseCase: RegisterUseCase;
 

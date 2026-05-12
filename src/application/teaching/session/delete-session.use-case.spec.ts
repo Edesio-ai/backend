@@ -2,7 +2,7 @@ import { DeleteSessionUseCase } from './delete-session.use-case';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
-import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
@@ -64,7 +64,7 @@ class Fixtures {
   public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly questionsRepository: jest.Mocked<IQuestionsRepository>;
   public readonly sessionRepository: jest.Mocked<ISessionRepository>;
-  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
   public readonly useCase: DeleteSessionUseCase;

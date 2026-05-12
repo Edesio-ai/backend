@@ -16,7 +16,7 @@ import {
 } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class RegisterUseCase {
     @Inject(EMAIL_PROVIDER)
     private readonly emailProvider: IEmailProvider,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
     @Inject(INVITATION_TOKEN_REPOSITORY)
     private readonly invitationTokenRepository: IInvitationTokenRepository,
   ) {}

@@ -4,7 +4,7 @@ import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
 
 export const TEACHER_REPOSITORY = Symbol('TEACHER_REPOSITORY');
 
-export interface TeacherRepository {
+export interface ITeacherRepository {
   linkTeacherToEstablishment(
     invitationTokenId: string,
     teacherId: string,

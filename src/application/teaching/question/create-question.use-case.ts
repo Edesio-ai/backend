@@ -12,7 +12,7 @@ import {
 } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 export interface CreateQuestionBody {
@@ -28,7 +28,7 @@ export class CreateQuestionUseCase {
     @Inject(QUESTIONS_REPOSITORY)
     private readonly questionsRepository: IQuestionsRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teachersRepository: TeacherRepository,
+    private readonly teachersRepository: ITeacherRepository,
     @Inject(COURSE_REPOSITORY)
     private readonly coursesRepository: ICourseRepository,
   ) {}

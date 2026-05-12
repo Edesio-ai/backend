@@ -4,7 +4,7 @@ import { type IEstablishmentRepository } from 'src/domain/teaching/establishment
 
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   Teacher,
@@ -30,7 +30,7 @@ export class GetEstablishmentsStatsUseCase {
     @Inject(ESTABLISHMENT_REPOSITORY)
     private readonly establishmentRepository: IEstablishmentRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
     private readonly studentSessionRepository: IStudentSessionRepository,
     @Inject(SESSION_REPOSITORY)

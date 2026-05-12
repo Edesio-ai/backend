@@ -10,7 +10,8 @@ import { CourseQuestionPersistenceModule } from 'src/infrastructure/supabase/tea
 import { StudentSessionPersistenceModule } from 'src/infrastructure/supabase/teaching/student-session/student-session-persistence.module';
 import { SupabaseModule } from 'src/infrastructure/supabase/supabase.module';
 import { SendCourseQuestionUseCase } from 'src/application/teaching/course-question/send-course-question.use-case';
-
+import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
+import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/session/sessions-persistence.module';
 @Module({
   imports: [
     AuthPersistenceModule,
@@ -19,6 +20,8 @@ import { SendCourseQuestionUseCase } from 'src/application/teaching/course-quest
     CourseQuestionPersistenceModule,
     StudentSessionPersistenceModule,
     SupabaseModule,
+    TeacherPersistenceModule,
+    SessionsPersistenceModule,
   ],
   controllers: [CourseQuestionsController],
   providers: [

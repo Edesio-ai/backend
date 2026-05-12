@@ -13,7 +13,7 @@ import {
 } from 'src/domain/teaching/session/contracts/i-session.repository';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
@@ -34,7 +34,7 @@ export class DeleteSessionUseCase {
     @Inject(SESSION_REPOSITORY)
     private readonly sessionRepository: ISessionRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
     @Inject(COURSE_FILE_REPOSITORY)
     private readonly courseFileRepository: ICourseFileRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)

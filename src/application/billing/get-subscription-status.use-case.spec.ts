@@ -3,7 +3,7 @@ import { User } from '../../domain/auth/types/auth.type';
 import { NotFoundError } from '../../domain/shared/errors/global.errors';
 import { IStripeClientProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
 import { IEstablishmentRepository } from '../../domain/teaching/establishment/contracts/i-establishment.repository';
-import { TeacherRepository } from '../../domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from '../../domain/teaching/teacher/contracts/teacher.repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GetSubscriptionStatusUseCase', () => {
@@ -69,7 +69,7 @@ describe('GetSubscriptionStatusUseCase', () => {
 
 class Fixtures {
   public readonly paymentClient: jest.Mocked<IStripeClientProvider>;
-  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly getSubscriptionStatusUseCase: GetSubscriptionStatusUseCase;
 
