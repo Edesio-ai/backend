@@ -201,7 +201,9 @@ class Fixtures {
   }
 
   whenCourseMissing() {
-    this.courseRepository.getCourseById.mockResolvedValue(null as unknown as Course);
+    this.courseRepository.getCourseById.mockResolvedValue(
+      null as unknown as Course,
+    );
   }
 
   whenStudentSessionMatchesEnrollment() {
