@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
@@ -11,6 +19,7 @@ import { SendCourseQuestionBodyDto } from './dtos/send-course-question-body.dto'
 import { SendCourseQuestionUseCase } from 'src/application/teaching/course-question/send-course-question.use-case';
 import { AnswerCourseQuestionBodyDto } from './dtos/answer-course-question.dto';
 import { AnswerCourseQuestionUseCase } from 'src/application/teaching/course-question/answer-course-question.use-case';
+import { DeleteCourseQuestionUseCase } from 'src/application/teaching/course-question/delete-course-question.use-case';
 
 @Controller('course-question')
 @Roles('student')
@@ -21,6 +30,7 @@ export class CourseQuestionsController {
     private readonly getStudentCourseQuestionsUseCase: GetStudentCourseQuestionsUseCase,
     private readonly sendCourseQuestionUseCase: SendCourseQuestionUseCase,
     private readonly answerCourseQuestionUseCase: AnswerCourseQuestionUseCase,
+    private readonly deleteCourseQuestionUseCase: DeleteCourseQuestionUseCase,
   ) {}
   @Roles('teacher')
   @Get('pending/:sessionId')
@@ -74,5 +84,14 @@ export class CourseQuestionsController {
       user,
     );
     return questions;
+  }
+
+  @Roles('teacher')
+  @Delete(':courseQuestionId')
+  async deleteCourseQuestion(
+    @CurrentUser() user: AuthUser,
+    @Param('courseQuestionId') courseQuestionId: string,
+  ): Promise<void> {
+    await this.deleteCourseQuestionUseCase.execute(courseQuestionId, user);
   }
 }

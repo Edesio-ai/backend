@@ -1,19 +1,24 @@
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { AnswerCourseQuestionUseCase } from 'src/application/teaching/course-question/answer-course-question.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import type { ICourseQuestionRepository } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
-import { Course } from 'src/domain/teaching/course/types/course.type';
-import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
-import { Session } from 'src/domain/teaching/session/types/session.type';
+import { CourseWithSession } from 'src/domain/teaching/course/types/course.type';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
 import { AnswerCourseQuestionBodyDto } from 'src/presentation/teaching/course-questions/dtos/answer-course-question.dto';
 import { createMockCourseQuestionRepository } from 'src/testing/mock-course-question-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
-import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
+
+/** Matches `select` in `answer-course-question.use-case.ts` (used for repository call assertions). */
+const ANSWER_COURSE_QUESTION_SELECT = `
+    id,
+    sessions:sessions!inner (
+        teacher_id
+    )
+    `;
 
 describe('AnswerCourseQuestionUseCase', () => {
   let fixtures: Fixtures;
@@ -29,11 +34,10 @@ describe('AnswerCourseQuestionUseCase', () => {
     jest.restoreAllMocks();
   });
 
-  it('should update course question when teacher exists and chain resolves', async () => {
+  it('should update course question when teacher owns the session', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseQuestionFound();
-    fixtures.whenCourseReturned();
-    fixtures.whenSessionReturned();
+    fixtures.whenCourseWithSessionReturned();
     fixtures.whenCourseQuestionsNonEmpty();
     fixtures.whenUpdateSucceeds();
 
@@ -46,15 +50,15 @@ describe('AnswerCourseQuestionUseCase', () => {
     expect(
       fixtures.courseQuestionRepository.getCourseQuestionByCourseId,
     ).toHaveBeenCalledWith(fixtures.body.courseQuestionId);
-    expect(fixtures.courseRepository.getCourseById).toHaveBeenCalledWith(
+    expect(
+      fixtures.courseRepository.getCourseWithSessionById,
+    ).toHaveBeenCalledWith(
       fixtures.courseQuestion.courseId,
-    );
-    expect(fixtures.sessionRepository.getSessionById).toHaveBeenCalledWith(
-      fixtures.course.sessionId,
+      ANSWER_COURSE_QUESTION_SELECT,
     );
     expect(
       fixtures.courseQuestionRepository.getCourseQuestionsByCourseId,
-    ).toHaveBeenCalledWith(fixtures.course.id);
+    ).toHaveBeenCalledWith(fixtures.courseWithSession.id);
     expect(
       fixtures.courseQuestionRepository.updateCourseQuestion,
     ).toHaveBeenCalledWith(fixtures.body.courseQuestionId, {
@@ -81,25 +85,15 @@ describe('AnswerCourseQuestionUseCase', () => {
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
       NotFoundException,
     );
-    expect(fixtures.courseRepository.getCourseById).not.toHaveBeenCalled();
+    expect(
+      fixtures.courseRepository.getCourseWithSessionById,
+    ).not.toHaveBeenCalled();
   });
 
-  it('should throw NotFoundException when course is missing', async () => {
+  it('should throw NotFoundException when course with session is missing', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseQuestionFound();
-    fixtures.whenCourseMissing();
-
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
-    expect(fixtures.sessionRepository.getSessionById).not.toHaveBeenCalled();
-  });
-
-  it('should throw NotFoundException when session is missing', async () => {
-    fixtures.whenTeacherFound();
-    fixtures.whenCourseQuestionFound();
-    fixtures.whenCourseReturned();
-    fixtures.whenSessionMissing();
+    fixtures.whenCourseWithSessionMissing();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
       NotFoundException,
@@ -109,11 +103,26 @@ describe('AnswerCourseQuestionUseCase', () => {
     ).not.toHaveBeenCalled();
   });
 
+  it('should throw ForbiddenException when teacher does not own the session', async () => {
+    fixtures.whenTeacherFound();
+    fixtures.whenCourseQuestionFound();
+    fixtures.whenCourseWithSessionWrongTeacher();
+
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
+    expect(
+      fixtures.courseQuestionRepository.getCourseQuestionsByCourseId,
+    ).not.toHaveBeenCalled();
+    expect(
+      fixtures.courseQuestionRepository.updateCourseQuestion,
+    ).not.toHaveBeenCalled();
+  });
+
   it('should throw NotFoundException when no course questions exist for course', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseQuestionFound();
-    fixtures.whenCourseReturned();
-    fixtures.whenSessionReturned();
+    fixtures.whenCourseWithSessionReturned();
     fixtures.whenCourseQuestionsEmpty();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
@@ -127,8 +136,7 @@ describe('AnswerCourseQuestionUseCase', () => {
   it('should propagate errors from updateCourseQuestion', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseQuestionFound();
-    fixtures.whenCourseReturned();
-    fixtures.whenSessionReturned();
+    fixtures.whenCourseWithSessionReturned();
     fixtures.whenCourseQuestionsNonEmpty();
     fixtures.whenUpdateFails();
 
@@ -141,7 +149,6 @@ describe('AnswerCourseQuestionUseCase', () => {
 class Fixtures {
   public readonly courseQuestionId = '550e8400-e29b-41d4-a716-446655440001';
   public readonly courseId = '550e8400-e29b-41d4-a716-446655440002';
-  public readonly sessionId = '550e8400-e29b-41d4-a716-446655440003';
 
   public readonly answeredAtIso = '2026-05-10T10:00:00.000Z';
 
@@ -177,21 +184,9 @@ class Fixtures {
     answeredAt: '',
   };
 
-  public readonly course: Course = {
+  public readonly courseWithSession: CourseWithSession = {
     id: this.courseId,
-    sessionId: this.sessionId,
-    title: 'Cours',
-    description: null,
-    createdAt: '2026-01-01T00:00:00.000Z',
-  };
-
-  public readonly session: Session = {
-    id: this.sessionId,
-    teacherId: this.teacher.id,
-    name: 'S1',
-    code: 'ABC123',
-    language: 'francais',
-    createdAt: '2026-01-01T00:00:00.000Z',
+    session: { teacherId: this.teacher.id },
   };
 
   public readonly updatedCourseQuestion: CourseQuestion = {
@@ -207,20 +202,17 @@ class Fixtures {
   public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly courseQuestionRepository: jest.Mocked<ICourseQuestionRepository>;
   public readonly courseRepository: jest.Mocked<ICourseRepository>;
-  public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly useCase: AnswerCourseQuestionUseCase;
 
   constructor() {
     this.teacherRepository = createMockTeacherRepository();
     this.courseQuestionRepository = createMockCourseQuestionRepository();
     this.courseRepository = createMockCourseRepository();
-    this.sessionRepository = createMockSessionRepository();
 
     this.useCase = new AnswerCourseQuestionUseCase(
       this.teacherRepository,
       this.courseQuestionRepository,
       this.courseRepository,
-      this.sessionRepository,
     );
   }
 
@@ -248,22 +240,23 @@ class Fixtures {
     );
   }
 
-  whenCourseReturned() {
-    this.courseRepository.getCourseById.mockResolvedValue(this.course);
-  }
-
-  whenCourseMissing() {
-    this.courseRepository.getCourseById.mockResolvedValue(
-      null as unknown as Course,
+  whenCourseWithSessionReturned() {
+    this.courseRepository.getCourseWithSessionById.mockResolvedValue(
+      this.courseWithSession,
     );
   }
 
-  whenSessionReturned() {
-    this.sessionRepository.getSessionById.mockResolvedValue(this.session);
+  whenCourseWithSessionMissing() {
+    this.courseRepository.getCourseWithSessionById.mockResolvedValue(
+      null as unknown as CourseWithSession,
+    );
   }
 
-  whenSessionMissing() {
-    this.sessionRepository.getSessionById.mockResolvedValue(null);
+  whenCourseWithSessionWrongTeacher() {
+    this.courseRepository.getCourseWithSessionById.mockResolvedValue({
+      id: this.courseId,
+      session: { teacherId: 'other-teacher-id' },
+    });
   }
 
   whenCourseQuestionsNonEmpty() {
