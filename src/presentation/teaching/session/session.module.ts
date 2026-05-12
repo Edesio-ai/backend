@@ -13,7 +13,7 @@ import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/s
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/session/sessions-persistence.module';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 import { GetSessionDetailsUseCase } from 'src/application/teaching/session/get-session-details.use-case';
-import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
+import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-persistence.repository';
 import { StudentSessionPersistenceModule } from 'src/infrastructure/supabase/teaching/student-session/student-session-persistence.module';
 import { StudentCourseStatsPersistenceModule } from 'src/infrastructure/supabase/teaching/student-course-stats/student-course-states-persistence.module';
 

@@ -9,7 +9,7 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/t
 import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/course/course-persistence.module';
 import { PdfModule } from 'src/infrastructure/pdf/pdf.module';
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/question/question-persistence.module';
-import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
+import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-persistence.repository';
 
 @Module({
   imports: [

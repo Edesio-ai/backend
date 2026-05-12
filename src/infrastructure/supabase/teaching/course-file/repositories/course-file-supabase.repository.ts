@@ -1,3 +1,4 @@
+import { Inject } from '@nestjs/common';
 import { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
@@ -6,10 +7,13 @@ import {
   CourseFileUpload,
 } from 'src/domain/teaching/course-file/types/course-file.type';
 import { courseFileMapper } from '../mappers/course-file.mapper';
+import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
 
 export class CourseFileRepository implements ICourseFileRepository {
-  constructor(private readonly supabase: SupabaseClient) {
-    this.supabase = supabase;
+  constructor(  
+    @Inject(SUPABASE_ADMIN)
+    private readonly supabase: SupabaseClient,
+  ) {
   }
 
   public async deleteFileById(fileId: string): Promise<void> {

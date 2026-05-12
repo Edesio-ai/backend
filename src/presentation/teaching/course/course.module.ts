@@ -14,7 +14,7 @@ import { ValidateCourseQuestionsUseCase } from 'src/application/teaching/course/
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 import { GetCoursesSessionCountUseCase } from 'src/application/teaching/course/get-courses-session-count.use-case';
 import { GetSessionCoursesUseCase } from 'src/application/teaching/course/get-session-courses.use-case';
-import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
+import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-persistence.repository';
 import { CourseQuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/course-question/course-question-persistence.module';
 import { StudentCourseStatsPersistenceModule } from 'src/infrastructure/supabase/teaching/student-course-stats/student-course-states-persistence.module';
 import { StudentSessionPersistenceModule } from 'src/infrastructure/supabase/teaching/student-session/student-session-persistence.module';

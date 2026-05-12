@@ -5,7 +5,7 @@ import { DeleteCourseFileUseCase } from 'src/application/teaching/course-file/de
 import { UploadCourseFileUseCase } from 'src/application/teaching/course-file/upload-course-file.use-case';
 import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/course/course-persistence.module';
 import { GetCourseFilesUseCase } from 'src/application/teaching/course-file/get-course-files.use-case';
-import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-supabase.repository';
+import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-persistence.repository';
 
 @Module({
   imports: [
