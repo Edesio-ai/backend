@@ -16,7 +16,7 @@ import { DeleteInvitationTokenUseCase } from 'src/application/teaching/invitatio
 import { CreateInvitationTokenUseCase } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
 
 @Roles('establishment')
-@Controller('invtation-token')
+@Controller('invitation-token')
 export class InvitationTokenController {
   constructor(
     private readonly deleteInvitationTokenUseCase: DeleteInvitationTokenUseCase,
