@@ -21,7 +21,7 @@ import { EmailModule } from './email/email.module';
     LlmModule,
     InvitationTokenModule,
     EmailModule,
-    InvitationTokenModule
+    InvitationTokenModule,
   ],
   controllers: [],
   providers: [],
