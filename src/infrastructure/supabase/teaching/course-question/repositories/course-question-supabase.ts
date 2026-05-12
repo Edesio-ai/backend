@@ -3,6 +3,7 @@ import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { ICourseQuestionRepository } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 import {
   CourseQuestion,
+  CourseQuestionAnswer,
   CourseQuestionToInsert,
 } from 'src/domain/teaching/course-question/types/course-question.type';
 import { CourseQuestionMapper } from '../mappers/course-question.mapper';
@@ -15,7 +16,7 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
     private readonly supabase: SupabaseClient,
   ) {}
 
-  async getPendingQuestionCount(courseIds: string[]): Promise<number> {
+  public async getPendingQuestionCount(courseIds: string[]): Promise<number> {
     const { count, error: countError } = await this.supabase
       .from('course_questions')
       .select('*', { count: 'exact', head: true })
@@ -52,7 +53,7 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
     }
   }
 
-  async getAnsweredQuestionCount(studentId: string): Promise<number> {
+  public async getAnsweredQuestionCount(studentId: string): Promise<number> {
     const { count, error } = await this.supabase
       .from('course_questions')
       .select('*', { count: 'exact', head: true })
@@ -71,7 +72,7 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
     return count ?? 0;
   }
 
-  async getCourseQuestionsByCourseId(
+  public async getCourseQuestionsByCourseId(
     courseId: string,
   ): Promise<CourseQuestion[]> {
     const { data, error } = await this.supabase
@@ -90,7 +91,7 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
 
     return data?.map(CourseQuestionMapper.toDomain) ?? [];
   }
-  async createCourseQuestion(
+  public async createCourseQuestion(
     courseQuestion: CourseQuestionToInsert,
   ): Promise<CourseQuestion | null> {
     const { data, error } = await this.supabase
@@ -103,6 +104,51 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
       console.error('error creating course question', courseQuestion, error);
       throw new ServerError(error.message);
     }
+    return data ? CourseQuestionMapper.toDomain(data) : null;
+  }
+
+  public async getCourseQuestionByCourseId(
+    courseQuestionId: string,
+  ): Promise<CourseQuestion | null> {
+    const { data, error } = await this.supabase
+      .from('course_questions')
+      .select('*')
+      .eq('id', courseQuestionId)
+      .single();
+
+    if (error) {
+      console.error(
+        'error getting course question by course id',
+        courseQuestionId,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+
+    return data ? CourseQuestionMapper.toDomain(data) : null;
+  }
+
+  public async updateCourseQuestion(
+    courseQuestionId: string,
+    updatePayload: CourseQuestionAnswer,
+  ): Promise<CourseQuestion | null> {
+    const { data, error } = await this.supabase
+      .from('course_questions')
+      .update(CourseQuestionMapper.toAnswer(updatePayload))
+      .eq('id', courseQuestionId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(
+        'error updating course question',
+        courseQuestionId,
+        updatePayload,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+
     return data ? CourseQuestionMapper.toDomain(data) : null;
   }
 }

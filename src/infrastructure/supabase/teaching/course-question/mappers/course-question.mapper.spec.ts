@@ -1,4 +1,5 @@
 import {
+  CourseQuestionAnswer,
   CourseQuestionToInsert,
   SupabaseCourseQuestion,
 } from 'src/domain/teaching/course-question/types/course-question.type';
@@ -31,6 +32,20 @@ describe('CourseQuestionMapper', () => {
         course_id: 'course-1',
         student_id: 'student-1',
         question_text: 'Question ?',
+      });
+    });
+  });
+
+  describe('toAnswer', () => {
+    it('maps CourseQuestionAnswer to Supabase answer columns', () => {
+      const payload: CourseQuestionAnswer = {
+        answer: 'La réponse du prof.',
+        answeredAt: '2026-05-10T14:30:00.000Z',
+      };
+
+      expect(CourseQuestionMapper.toAnswer(payload)).toEqual({
+        answer: payload.answer,
+        answered_at: payload.answeredAt,
       });
     });
   });
