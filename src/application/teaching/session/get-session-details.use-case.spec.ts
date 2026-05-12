@@ -239,13 +239,13 @@ class Fixtures {
   }
 
   whenStudentsFound() {
-    this.studentCourseStatsRepository.getStudentStatsByCourseId.mockResolvedValue(
+    this.studentCourseStatsRepository.getStudentCourseStatsByCourseId.mockResolvedValue(
       this.studentStats as any,
     );
   }
 
   whenNoStudentsFound() {
-    this.studentCourseStatsRepository.getStudentStatsByCourseId.mockResolvedValue(
+    this.studentCourseStatsRepository.getStudentCourseStatsByCourseId.mockResolvedValue(
       [],
     );
   }
@@ -293,7 +293,7 @@ class Fixtures {
       this.courseId,
     );
     expect(
-      this.studentCourseStatsRepository.getStudentStatsByCourseId,
+      this.studentCourseStatsRepository.getStudentCourseStatsByCourseId,
     ).toHaveBeenCalledWith(this.courseId);
     expect(
       this.courseFileRepository.getCourseFilesByCourseId,

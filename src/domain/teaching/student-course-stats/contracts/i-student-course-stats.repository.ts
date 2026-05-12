@@ -8,7 +8,7 @@ export const STUDENT_COURSE_STATS_REPOSITORY = Symbol(
 );
 
 export interface IStudentCourseStatsRepository {
-  getStudentStatsByCourseId(
+  getStudentCourseStatsByCourseId(
     courseId: string,
   ): Promise<StudentCourseStatsWithStudent[]>;
   deleteStudentCourseStatsByCourseId(courseId: string): Promise<void>;

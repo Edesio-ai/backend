@@ -22,6 +22,15 @@ import {
   type IStudentCourseStatsRepository,
   STUDENT_COURSE_STATS_REPOSITORY,
 } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
+import { Course } from 'src/domain/teaching/course/types/course.type';
+import {
+  type IStudentRepository,
+  STUDENT_REPOSITORY,
+} from 'src/domain/teaching/student/contracts/I-student.repository';
+import {
+  type IStudentSessionRepository,
+  STUDENT_SESSION_REPOSITORY,
+} from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 
 @Injectable()
 export class GetCourseRankingUseCase {
@@ -34,39 +43,41 @@ export class GetCourseRankingUseCase {
     private readonly sessionRepository: ISessionRepository,
     @Inject(STUDENT_COURSE_STATS_REPOSITORY)
     private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
+    @Inject(STUDENT_REPOSITORY)
+    private readonly studentRepository: IStudentRepository,
+    @Inject(STUDENT_SESSION_REPOSITORY)
+    private readonly studentSessionRepository: IStudentSessionRepository,
   ) {}
 
   async execute(courseId: string, user: AuthUser): Promise<CourseRanking[]> {
+    const { role } = user.metadata;
+
     const course = await this.courseRepository.getCourseById(courseId);
     if (!course) {
       throw new NotFoundError(`Course with id ${courseId} not found`);
     }
 
-    // We ony handle teacher role for now but in the future we will handle students too
-    const teacher = await this.teacherRepository.getTeacherByUserId(user.id);
-    if (!teacher) {
-      throw new NotFoundError(`Teacher with id ${user.id} not found`);
+    switch (role) {
+      case 'teacher': {
+        await this.checkTeacherAccess(course, user);
+        break;
+      }
+      case 'student': {
+        await this.checkStudentAccess(course, user);
+        break;
+      }
+      default: {
+        throw new ForbiddenException(
+          'You are not authorized to access this course',
+        );
+      }
     }
 
-    const session = await this.sessionRepository.getSessionById(
-      course.sessionId,
-    );
-
-    if (session && session.teacherId !== teacher.id) {
-      console.error('session teacher id does not match teacher id', {
-        sessionId: session.teacherId,
-        teacherId: teacher.id,
-      });
-      throw new ForbiddenException(
-        'You are not authorized to access this course',
-      );
-    }
-
-    const studentStats =
-      await this.studentCourseStatsRepository.getStudentStatsByCourseId(
+    const studentCourseStats =
+      await this.studentCourseStatsRepository.getStudentCourseStatsByCourseId(
         courseId,
       );
-    const rankingWithRate = this.getRankingWithRate(studentStats);
+    const rankingWithRate = this.getRankingWithRate(studentCourseStats);
     const statsSortedByRate = this.getStatsSortedByRate(rankingWithRate);
 
     return this.getRankingWithRank(statsSortedByRate);
@@ -112,5 +123,54 @@ export class GetCourseRankingUseCase {
         lastAttempt: row.lastAttemptAt,
       };
     });
+  }
+
+  private async checkTeacherAccess(
+    course: Course,
+    user: AuthUser,
+  ): Promise<void> {
+    const teacher = await this.teacherRepository.getTeacherByUserId(user.id);
+    if (!teacher) {
+      throw new NotFoundError(`Teacher with id ${user.id} not found`);
+    }
+
+    const session = await this.sessionRepository.getSessionById(
+      course.sessionId,
+    );
+
+    if (session && session.teacherId !== teacher.id) {
+      console.error('session teacher id does not match teacher id', {
+        sessionId: session.teacherId,
+        teacherId: teacher.id,
+      });
+      throw new ForbiddenException(
+        'You are not authorized to access this course',
+      );
+    }
+  }
+
+  private async checkStudentAccess(
+    course: Course,
+    user: AuthUser,
+  ): Promise<void> {
+    const student = await this.studentRepository.getStudentByUserId(user.id);
+    if (!student) {
+      throw new NotFoundError(`Student with id ${user.id} not found`);
+    }
+
+    const studentSession =
+      await this.studentSessionRepository.getStudentSessionBySessionId(
+        course.sessionId,
+      );
+
+    if (studentSession && studentSession.studentId !== student.id) {
+      console.error('session student id does not match student id', {
+        studentSessionId: studentSession.sessionId,
+        studentId: student.id,
+      });
+      throw new ForbiddenException(
+        'You are not authorized to access this course',
+      );
+    }
   }
 }

@@ -9,11 +9,11 @@ describe('StudentCourseStatsSupabaseRepository', () => {
     fixtures = new Fixtures();
   });
 
-  describe('getStudentStatsByCourseId', () => {
+  describe('getStudentCourseStatsByCourseId', () => {
     it('returns mapped stats with embedded students', async () => {
       fixtures.whenRankingQuerySucceeds();
 
-      const result = await fixtures.whenGetStudentStatsByCourseId();
+      const result = await fixtures.whengetStudentCourseStatsByCourseId();
 
       expect(result).toEqual(fixtures.expectedStatsWithStudent);
       fixtures.thenRankingSelectBuilt();
@@ -22,9 +22,9 @@ describe('StudentCourseStatsSupabaseRepository', () => {
     it('throws ServerError when query fails', async () => {
       fixtures.whenRankingQueryFails();
 
-      await expect(fixtures.whenGetStudentStatsByCourseId()).rejects.toThrow(
-        ServerError,
-      );
+      await expect(
+        fixtures.whengetStudentCourseStatsByCourseId(),
+      ).rejects.toThrow(ServerError);
     });
   });
 
@@ -298,8 +298,8 @@ class Fixtures {
     this.supabase.from.mockReturnValue({ update: this.updateMock });
   }
 
-  whenGetStudentStatsByCourseId() {
-    return this.repository.getStudentStatsByCourseId(this.courseId);
+  whengetStudentCourseStatsByCourseId() {
+    return this.repository.getStudentCourseStatsByCourseId(this.courseId);
   }
 
   whenDeleteStudentCourseStatsByCourseId() {
