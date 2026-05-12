@@ -15,7 +15,7 @@ import {
 } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 
@@ -24,7 +24,7 @@ export class ValidateCourseQuestionsUseCase {
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
     @Inject(QUESTIONS_REPOSITORY)
     private readonly questionsRepository: IQuestionsRepository,
   ) {}

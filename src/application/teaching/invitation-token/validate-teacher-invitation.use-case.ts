@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   INVITATION_TOKEN_REPOSITORY,
@@ -18,7 +18,7 @@ import {
 export class ValidateTeacherInvitationUseCase {
   constructor(
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
     @Inject(INVITATION_TOKEN_REPOSITORY)
     private readonly tokenRepository: IInvitationTokenRepository,
   ) {}

@@ -10,7 +10,7 @@ import { IEstablishmentRepository } from 'src/domain/teaching/establishment/cont
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
-import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
@@ -280,7 +280,7 @@ class Fixtures {
   public readonly coursesError = new Error('courses failed');
 
   public readonly courseRepository: jest.Mocked<ICourseRepository>;
-  public readonly teachersRepository: jest.Mocked<TeacherRepository>;
+  public readonly teachersRepository: jest.Mocked<ITeacherRepository>;
   public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly studentRepository: jest.Mocked<IStudentRepository>;

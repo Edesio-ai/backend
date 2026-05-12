@@ -6,7 +6,7 @@ import {
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   NotFoundError,
@@ -39,7 +39,7 @@ export class DeleteCourseUseCase {
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
     @Inject(COURSE_QUESTION_REPOSITORY)
     private readonly courseQuestionRepository: ICourseQuestionRepository,
     @Inject(STUDENT_REPOSITORY)

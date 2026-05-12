@@ -7,7 +7,7 @@ import {
 } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   COURSE_REPOSITORY,
@@ -31,7 +31,7 @@ export class GetCourseQuestionsUseCase {
     @Inject(QUESTIONS_REPOSITORY)
     private readonly questionsRepository: IQuestionsRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teachersRepository: TeacherRepository,
+    private readonly teachersRepository: ITeacherRepository,
     @Inject(COURSE_REPOSITORY)
     private readonly coursesRepository: ICourseRepository,
     @Inject(STUDENT_REPOSITORY)

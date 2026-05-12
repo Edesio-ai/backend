@@ -11,7 +11,7 @@ import { SendCourseQuestionBodyDto } from './dtos/send-course-question-body.dto'
 import { SendCourseQuestionUseCase } from 'src/application/teaching/course-question/send-course-question.use-case';
 
 @Controller('course-question')
-@Roles('teacher')
+@Roles('student')
 export class CourseQuestionsController {
   constructor(
     private readonly getPendingQuestionCountUseCase: GetPendingQuestionCountUseCase,
@@ -19,14 +19,13 @@ export class CourseQuestionsController {
     private readonly getStudentCourseQuestionsUseCase: GetStudentCourseQuestionsUseCase,
     private readonly sendCourseQuestionUseCase: SendCourseQuestionUseCase,
   ) {}
-
+  @Roles('teacher')
   @Get('pending/:sessionId')
   async getPendingQuestionsCount(@Param('sessionId') sessionId: string) {
     const count = await this.getPendingQuestionCountUseCase.execute(sessionId);
     return { count: count ?? 0 };
   }
 
-  @Roles('student')
   @Get('answered')
   async getAnsweredQuestionsCount(
     @CurrentUser() user: AuthUser,
@@ -36,7 +35,7 @@ export class CourseQuestionsController {
     return { answeredQuestionsCount };
   }
 
-  @Roles('student')
+  @Roles('student', 'teacher')
   @Get('course/:courseId')
   async getCourseQuestionsByCourseId(
     @Param('courseId') courseId: string,
@@ -49,7 +48,6 @@ export class CourseQuestionsController {
     return questions;
   }
 
-  @Roles('student')
   @Post()
   async sendCourseQuestion(
     @CurrentUser() user: AuthUser,

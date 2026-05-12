@@ -6,7 +6,7 @@ import {
 import { Session } from 'src/domain/teaching/session/types/session.type';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 
@@ -15,7 +15,7 @@ export class GetTeacherSessionsUseCase {
     @Inject(SESSION_REPOSITORY)
     private readonly sessionRepository: ISessionRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
   ) {}
 
   async execute(userId: string): Promise<Session[]> {

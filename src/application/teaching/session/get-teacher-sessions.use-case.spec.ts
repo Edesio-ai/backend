@@ -1,6 +1,6 @@
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
-import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { GetTeacherSessionsUseCase } from 'src/application/teaching/session/get-teacher-sessions.use-case';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
@@ -64,7 +64,7 @@ class Fixtures {
   ];
   public readonly sessionRepositoryError = new Error('sessions query failed');
 
-  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly useCase: GetTeacherSessionsUseCase;
 

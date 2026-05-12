@@ -6,7 +6,7 @@ import {
 } from '../../domain/billing/contracts/i-stripe-client.provider';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   ESTABLISHMENT_REPOSITORY,
@@ -20,7 +20,7 @@ export class GetSubscriptionStatusUseCase {
     @Inject(STRIPE_CLIENT_INTERFACE)
     private readonly paymentClient: IStripeClientProvider,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
     @Inject(ESTABLISHMENT_REPOSITORY)
     private readonly establishmentRepository: IEstablishmentRepository,
   ) {}

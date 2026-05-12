@@ -10,7 +10,7 @@ import {
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   SESSION_REPOSITORY,
@@ -38,7 +38,7 @@ export class GetCourseRankingUseCase {
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: ICourseRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
     @Inject(SESSION_REPOSITORY)
     private readonly sessionRepository: ISessionRepository,
     @Inject(STUDENT_COURSE_STATS_REPOSITORY)

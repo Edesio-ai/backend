@@ -4,7 +4,7 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
-import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 import { Session } from 'src/domain/teaching/session/types/session.type';
 import type { StudentCourseStatsWithStudent } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
@@ -229,7 +229,7 @@ class Fixtures {
   ];
 
   public readonly courseRepository: jest.Mocked<ICourseRepository>;
-  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly studentRepository: jest.Mocked<IStudentRepository>;

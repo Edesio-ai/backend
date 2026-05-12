@@ -6,7 +6,7 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { UnauthorizedError } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
-import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { Question } from 'src/domain/teaching/question/types/question.type';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockQuestionsRepository } from 'src/testing/mock-questions-repository';
@@ -105,7 +105,7 @@ class Fixtures {
   public readonly repositoryError = new Error('repository error');
 
   public readonly questionsRepository: jest.Mocked<IQuestionsRepository>;
-  public readonly teachersRepository: jest.Mocked<TeacherRepository>;
+  public readonly teachersRepository: jest.Mocked<ITeacherRepository>;
   public readonly coursesRepository: jest.Mocked<ICourseRepository>;
   public readonly useCase: CreateQuestionUseCase;
 

@@ -6,7 +6,7 @@ import {
 } from 'src/domain/teaching/student/contracts/I-student.repository';
 import {
   TEACHER_REPOSITORY,
-  type TeacherRepository,
+  type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   ForbiddenError,
@@ -31,7 +31,7 @@ export class GetSessionStudentUseCase {
     @Inject(STUDENT_REPOSITORY)
     private readonly studentRepository: IStudentRepository,
     @Inject(TEACHER_REPOSITORY)
-    private readonly teacherRepository: TeacherRepository,
+    private readonly teacherRepository: ITeacherRepository,
     @Inject(SESSION_REPOSITORY)
     private readonly sessionRepository: ISessionRepository,
     @Inject(ESTABLISHMENT_REPOSITORY)

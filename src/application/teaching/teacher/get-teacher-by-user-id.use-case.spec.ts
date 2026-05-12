@@ -1,5 +1,5 @@
 import { GetTeacherByUserIdUseCase } from './get-teacher-by-user-id.use-case';
-import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GetTeacherByUserIdUseCase', () => {
@@ -49,7 +49,7 @@ class Fixtures {
   };
   public readonly repositoryError = new Error('teacher query failed');
 
-  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly useCase: GetTeacherByUserIdUseCase;
 
   constructor() {

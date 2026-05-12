@@ -1,6 +1,6 @@
 import { GetSessionStudentUseCase } from './get-session-student.use-case';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
-import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import {
@@ -213,7 +213,7 @@ class Fixtures {
   ];
 
   public readonly studentRepository: jest.Mocked<IStudentRepository>;
-  public readonly teacherRepository: jest.Mocked<TeacherRepository>;
+  public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly studentSessionRepository: ReturnType<

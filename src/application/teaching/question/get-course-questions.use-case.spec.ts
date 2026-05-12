@@ -6,7 +6,7 @@ import {
 } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
-import { TeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
@@ -266,7 +266,7 @@ class Fixtures {
   public readonly questionsError = new Error('questions query failed');
 
   public readonly questionsRepository: jest.Mocked<IQuestionsRepository>;
-  public readonly teachersRepository: jest.Mocked<TeacherRepository>;
+  public readonly teachersRepository: jest.Mocked<ITeacherRepository>;
   public readonly coursesRepository: jest.Mocked<ICourseRepository>;
   public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
