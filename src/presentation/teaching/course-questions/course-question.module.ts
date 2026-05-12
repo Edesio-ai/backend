@@ -13,6 +13,7 @@ import { SendCourseQuestionUseCase } from 'src/application/teaching/course-quest
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/session/sessions-persistence.module';
 import { AnswerCourseQuestionUseCase } from 'src/application/teaching/course-question/answer-course-question.use-case';
+import { DeleteCourseQuestionUseCase } from 'src/application/teaching/course-question/delete-course-question.use-case';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AnswerCourseQuestionUseCase } from 'src/application/teaching/course-que
     GetStudentCourseQuestionsUseCase,
     SendCourseQuestionUseCase,
     AnswerCourseQuestionUseCase,
+    DeleteCourseQuestionUseCase,
   ],
 })
 export class CourseQuestionModule {}

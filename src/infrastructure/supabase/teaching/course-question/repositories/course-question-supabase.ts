@@ -151,4 +151,22 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
 
     return data ? CourseQuestionMapper.toDomain(data) : null;
   }
+
+  public async deleteCourseQuestionById(
+    courseQuestionId: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('course_questions')
+      .delete()
+      .eq('id', courseQuestionId);
+
+    if (error) {
+      console.error(
+        'error deleting course question by id',
+        courseQuestionId,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+  }
 }

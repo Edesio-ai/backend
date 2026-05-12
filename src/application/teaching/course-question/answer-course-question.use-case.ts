@@ -1,4 +1,4 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   COURSE_QUESTION_REPOSITORY,
@@ -14,10 +14,6 @@ import {
   COURSE_REPOSITORY,
   type ICourseRepository,
 } from 'src/domain/teaching/course/contracts/i-course.repository';
-import {
-  SESSION_REPOSITORY,
-  type ISessionRepository,
-} from 'src/domain/teaching/session/contracts/i-session.repository';
 
 export class AnswerCourseQuestionUseCase {
   constructor(
@@ -27,8 +23,6 @@ export class AnswerCourseQuestionUseCase {
     private readonly courseQuestionRepository: ICourseQuestionRepository,
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: ICourseRepository,
-    @Inject(SESSION_REPOSITORY)
-    private readonly sessionRepository: ISessionRepository,
   ) {}
 
   async execute(
@@ -45,28 +39,35 @@ export class AnswerCourseQuestionUseCase {
       await this.courseQuestionRepository.getCourseQuestionByCourseId(
         courseQuestionId,
       );
-
     if (!courseQuestion) {
       throw new NotFoundException('Course question not found');
     }
 
-    const course = await this.courseRepository.getCourseById(
-      courseQuestion.courseId,
-    );
-    if (!course) {
+    const select = `
+    id,
+    sessions:sessions!inner (
+        teacher_id
+    )
+    `;
+
+    const CourseWithSession =
+      await this.courseRepository.getCourseWithSessionById(
+        courseQuestion.courseId,
+        select,
+      );
+    if (!CourseWithSession) {
       throw new NotFoundException('Course not found');
     }
 
-    const session = await this.sessionRepository.getSessionById(
-      course.sessionId,
-    );
-    if (!session) {
-      throw new NotFoundException('Session not found');
+    if (CourseWithSession.session.teacherId !== teacher.id) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this course question',
+      );
     }
 
     const courseQuestions =
       await this.courseQuestionRepository.getCourseQuestionsByCourseId(
-        course.id,
+        CourseWithSession.id,
       );
     if (courseQuestions.length === 0) {
       throw new NotFoundException('No course questions found');

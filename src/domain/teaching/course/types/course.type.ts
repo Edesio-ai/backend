@@ -43,6 +43,7 @@ export type SupabaseCourseWithSession = {
 };
 
 export type CourseWithSession = Partial<Course> & {
+  id: string;
   session: Partial<Session>;
   teachers: Partial<Teacher>;
 };

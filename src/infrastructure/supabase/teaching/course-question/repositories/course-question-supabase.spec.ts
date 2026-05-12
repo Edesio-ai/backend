@@ -180,6 +180,23 @@ describe('CourseQuestionSupabaseRepository', () => {
     );
     fixtures.thenUpdateCourseQuestionQueryBuilt();
   });
+
+  it('should delete course question by id', async () => {
+    fixtures.whenDeleteCourseQuestionByIdSucceeds();
+
+    await fixtures.whenDeleteCourseQuestionById();
+
+    fixtures.thenDeleteCourseQuestionByIdQueryBuilt();
+  });
+
+  it('should throw ServerError when deleteCourseQuestionById fails', async () => {
+    fixtures.whenDeleteCourseQuestionByIdFails();
+
+    await expect(
+      fixtures.whenDeleteCourseQuestionById(),
+    ).rejects.toBeInstanceOf(ServerError);
+    fixtures.thenDeleteCourseQuestionByIdQueryBuilt();
+  });
 });
 
 class Fixtures {
@@ -269,6 +286,12 @@ class Fixtures {
   private createMode = false;
   private getByIdMode = false;
   private updateMode = false;
+  private deleteByIdMode = false;
+
+  private readonly deleteByIdEqMock: jest.Mock = jest.fn();
+  private readonly deleteByIdMock: jest.Mock = jest.fn(() => ({
+    eq: this.deleteByIdEqMock,
+  }));
 
   private readonly getByIdSingleMock: jest.Mock = jest.fn();
   private readonly getByIdEqMock: jest.Mock = jest.fn(() => ({
@@ -301,6 +324,11 @@ class Fixtures {
     if (this.updateMode) {
       return {
         update: this.updateMutationMock,
+      };
+    }
+    if (this.deleteByIdMode) {
+      return {
+        delete: this.deleteByIdMock,
       };
     }
     return {
@@ -360,6 +388,11 @@ class Fixtures {
       this.courseQuestionId,
       this.answerPayload,
     );
+  }
+
+  whenDeleteCourseQuestionById() {
+    this.deleteByIdMode = true;
+    return this.repository.deleteCourseQuestionById(this.courseQuestionId);
   }
 
   whenGetPendingCountSucceeds(count: number) {
@@ -486,6 +519,16 @@ class Fixtures {
     });
   }
 
+  whenDeleteCourseQuestionByIdSucceeds() {
+    this.deleteByIdEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenDeleteCourseQuestionByIdFails() {
+    this.deleteByIdEqMock.mockResolvedValue({
+      error: { message: 'delete course_question by id failed' },
+    });
+  }
+
   thenGetPendingCountQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('course_questions');
     expect(this.countSelectMock).toHaveBeenCalledWith('*', {
@@ -553,5 +596,14 @@ class Fixtures {
     expect(this.updateEqMock).toHaveBeenCalledWith('id', this.courseQuestionId);
     expect(this.updateSelectMock).toHaveBeenCalledWith();
     expect(this.updateSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenDeleteCourseQuestionByIdQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('course_questions');
+    expect(this.deleteByIdMock).toHaveBeenCalledTimes(1);
+    expect(this.deleteByIdEqMock).toHaveBeenCalledWith(
+      'id',
+      this.courseQuestionId,
+    );
   }
 }
