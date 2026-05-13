@@ -1,5 +1,6 @@
 import { LoginUseCase } from './login.use-case';
-import { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
+import type { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
+import { createMockAuthRepository } from 'src/testing/mock-auth-repository';
 import {
   AuthUserWithSession,
   LoginBody,
@@ -46,12 +47,7 @@ class Fixtures {
   public readonly authUserWithSession: AuthUserWithSession;
 
   constructor() {
-    this.authRepository = {
-      createAuthUser: jest.fn(),
-      loginUser: jest.fn(),
-      validateToken: jest.fn(),
-      logoutUser: jest.fn(),
-    };
+    this.authRepository = createMockAuthRepository();
 
     this.loginUseCase = new LoginUseCase(this.authRepository);
 

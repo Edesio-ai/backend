@@ -21,6 +21,7 @@ export type SupabaseStudentInsert = Omit<
   SupabaseStudent,
   'id' | 'created_at' | 'photo_url'
 >;
+export type UpdateStudentPayload = Pick<Student, 'name' | 'email'>;
 
 export type StudentPhotoUpload = {
   buffer: Buffer;

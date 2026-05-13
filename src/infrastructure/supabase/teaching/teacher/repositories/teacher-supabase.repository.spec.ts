@@ -68,6 +68,22 @@ describe('TeacherSupabaseRepository', () => {
     await fixtures.thenThrowTeacherServerError(promise);
   });
 
+  it('should update teacher by supabase user id', async () => {
+    fixtures.whenUpdateTeacherProfileSucceeds();
+
+    await fixtures.whenUpdateTeacherProfile();
+
+    fixtures.thenUpdateTeacherProfileQueryBuilt();
+  });
+
+  it('should throw ServerError when updateTeacher fails', async () => {
+    fixtures.whenUpdateTeacherProfileFails();
+
+    await expect(fixtures.whenUpdateTeacherProfile()).rejects.toBeInstanceOf(
+      ServerError,
+    );
+  });
+
   it('should link teacher to establishment', async () => {
     fixtures.whenLinkTeacherReturnsSuccess();
 
@@ -158,6 +174,11 @@ class Fixtures {
   public readonly invitationTokenId = 'token-1';
   public readonly establishmentIdToLink = 'est-2';
 
+  public readonly teacherProfilePayload = {
+    name: 'Prof Updated',
+    email: 'prof@school.com',
+  };
+
   private readonly teacherEqMock = jest.fn();
   private readonly teacherSelectMock = jest.fn(() => ({
     eq: this.teacherEqMock,
@@ -202,8 +223,15 @@ class Fixtures {
     update: this.rollbackUpdateMock,
   }));
 
+  private readonly teacherProfileEqMock = jest.fn();
+  private readonly teacherProfileUpdateMock = jest.fn(() => ({
+    eq: this.teacherProfileEqMock,
+  }));
+
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'teachers') {
+      if (this.updateTeacherProfileModeEnabled)
+        return { update: this.teacherProfileUpdateMock };
       if (this.linkModeEnabled) return this.linkFromMock();
       if (this.byUserModeEnabled) return this.byUserFromMock();
       if (this.createModeEnabled) return this.createFromMock();
@@ -220,6 +248,7 @@ class Fixtures {
   private createModeEnabled = false;
   private linkModeEnabled = false;
   private byConditionsModeEnabled = false;
+  private updateTeacherProfileModeEnabled = false;
 
   private readonly conditionsMaybeSingleMock = jest.fn();
   private readonly conditionsEqMock = jest.fn();
@@ -268,6 +297,14 @@ class Fixtures {
       this.invitationTokenId,
       this.teacherSupabaseRow.id,
       this.establishmentIdToLink,
+    );
+  }
+
+  whenUpdateTeacherProfile() {
+    this.updateTeacherProfileModeEnabled = true;
+    return this.repository.updateTeacher(
+      this.teacherSupabaseRow.supabase_user_id,
+      this.teacherProfilePayload,
     );
   }
 
@@ -330,6 +367,16 @@ class Fixtures {
 
   whenRollbackInvitationTokenSuccess() {
     this.rollbackEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenUpdateTeacherProfileSucceeds() {
+    this.teacherProfileEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenUpdateTeacherProfileFails() {
+    this.teacherProfileEqMock.mockResolvedValue({
+      error: { message: 'teacher profile update failed' },
+    });
   }
 
   async thenThrowTeacherServerError(promise: Promise<unknown>) {
@@ -396,6 +443,17 @@ class Fixtures {
   thenRollbackInvitationTokenNotCalled() {
     expect(this.rollbackUpdateMock).not.toHaveBeenCalled();
     expect(this.rollbackEqMock).not.toHaveBeenCalled();
+  }
+
+  thenUpdateTeacherProfileQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('teachers');
+    expect(this.teacherProfileUpdateMock).toHaveBeenCalledWith(
+      this.teacherProfilePayload,
+    );
+    expect(this.teacherProfileEqMock).toHaveBeenCalledWith(
+      'supabase_user_id',
+      this.teacherSupabaseRow.supabase_user_id,
+    );
   }
 
   thenReturnExpectedTeacher(result: any) {

@@ -1,10 +1,11 @@
 import { RegisterUseCase } from './register.use-case';
-import { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
+import type { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
 import { IEmailProvider } from '../../domain/email/contract/i-email.interface';
 import { RegisterBody } from '../../domain/auth/types/auth.type';
 import type { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
+import { createMockAuthRepository } from 'src/testing/mock-auth-repository';
 
 describe('RegisterUseCase', () => {
   let fixtures: Fixtures;
@@ -75,12 +76,7 @@ class Fixtures {
   public readonly studentBody: RegisterBody;
 
   constructor() {
-    this.authRepository = {
-      createAuthUser: jest.fn(),
-      loginUser: jest.fn(),
-      validateToken: jest.fn(),
-      logoutUser: jest.fn(),
-    };
+    this.authRepository = createMockAuthRepository();
 
     this.emailProvider = {
       sendWelcomeEmail: jest.fn(),

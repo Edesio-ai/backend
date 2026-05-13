@@ -1,6 +1,9 @@
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { User } from 'src/domain/auth/types/auth.type';
-import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
+import {
+  Teacher,
+  UpdateTeacherPayload,
+} from 'src/domain/teaching/teacher/types/teacher.type';
 
 export const TEACHER_REPOSITORY = Symbol('TEACHER_REPOSITORY');
 
@@ -24,4 +27,5 @@ export interface ITeacherRepository {
     adminData: User,
     invitationToken: InvitationToken,
   ): Promise<Teacher>;
+  updateTeacher(userId: string, payload: UpdateTeacherPayload): Promise<void>;
 }

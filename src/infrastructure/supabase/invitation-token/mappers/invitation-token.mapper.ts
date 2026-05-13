@@ -6,7 +6,6 @@ import {
   SupabaseInvitationTokenRow,
 } from 'src/domain/auth/invitation.type';
 import { SupabaseInvitationTokenUpdate } from 'src/domain/invitation-token/types/invitation-token.type';
-import { SupabaseTeacherInsert } from 'src/domain/teaching/teacher/types/teacher.type';
 
 export const invitationTokenMapper = {
   toDomain: (row: SupabaseInvitationTokenRow): InvitationToken => ({
@@ -30,20 +29,6 @@ export const invitationTokenMapper = {
       assigned_chatbots: body.assignedChatbots,
     };
   },
-
-  toInsertWithEstablishment: (
-    userId: string,
-    name: string,
-    email: string,
-    establishmentId: string,
-    availableChatbots: number,
-  ): SupabaseTeacherInsert => ({
-    supabase_user_id: userId,
-    name,
-    email: email.toLowerCase().trim(),
-    establishment_id: establishmentId,
-    available_chatbots: availableChatbots,
-  }),
 
   toPreview(
     data: {

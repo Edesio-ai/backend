@@ -2,6 +2,7 @@ import type { IStudentRepository } from 'src/domain/teaching/student/contracts/I
 
 export function createMockStudentRepository(): jest.Mocked<IStudentRepository> {
   return {
+    updateStudent: jest.fn(),
     createStudent: jest.fn(),
     getStudentByUserId: jest.fn(),
     getStudentsByIds: jest.fn(),

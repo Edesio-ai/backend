@@ -5,6 +5,7 @@ import { Establishment } from 'src/domain/teaching/establishment/types/establish
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import { EstablishmentMapper } from '../mappers/establishment.mapper';
+import { UpdateStudentPayload } from 'src/domain/teaching/student/type/student.type';
 
 export class EstablishmentSupabaseRepository implements IEstablishmentRepository {
   constructor(
@@ -65,5 +66,22 @@ export class EstablishmentSupabaseRepository implements IEstablishmentRepository
     }
 
     return EstablishmentMapper.toDomain(data);
+  }
+
+  async updateEstablishment(
+    userId: string,
+    payload: UpdateStudentPayload,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('establishment')
+      .update(payload)
+      .eq('supabase_user_id', userId);
+
+    if (error) {
+      console.error(
+        `An error occure while updating establishment: ${userId}, error: ${error}`,
+      );
+      throw new ServerError(`An error occure while updating establishment`);
+    }
   }
 }

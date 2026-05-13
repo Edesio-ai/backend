@@ -1,6 +1,7 @@
 import { Session } from '../../session/types/session.type';
 
-/** Row from Supabase `public.teachers`. */
+export type UpdateTeacherPayload = Pick<Teacher, 'name' | 'email'>;
+
 export type SupabaseTeacher = {
   id: string;
   name: string;

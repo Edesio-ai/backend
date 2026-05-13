@@ -14,6 +14,8 @@ export type Establishment = {
   createdAt: string;
 };
 
+export type UpdateEstablishmentPayload = Pick<Establishment, 'name' | 'email'>;
+
 export type EstablishmentStats = {
   establishment: Establishment;
   teachers: TeacherWithStats[];

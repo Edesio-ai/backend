@@ -8,7 +8,7 @@ import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { User } from 'src/domain/auth/types/auth.type';
 import { SUPABASE_AUTH } from 'src/infrastructure/supabase/supabase-auth.module';
-import { invitationTokenMapper } from 'src/infrastructure/supabase/invitation-token/mappers/invitation-token.mapper';
+import { UpdateTeacherPayload } from 'src/domain/teaching/teacher/types/teacher.type';
 
 export class TeacherSupabaseRepository implements ITeacherRepository {
   constructor(
@@ -116,7 +116,7 @@ export class TeacherSupabaseRepository implements ITeacherRepository {
     const { data, error } = await this.supabase
       .from('teachers')
       .insert(
-        invitationTokenMapper.toInsertWithEstablishment(
+        TeacherMapper.toInsertWithEstablishment(
           adminData.id,
           `${firstname} ${lastname}`,
           email,
@@ -133,5 +133,20 @@ export class TeacherSupabaseRepository implements ITeacherRepository {
     }
 
     return TeacherMapper.toDomain(data);
+  }
+
+  public async updateTeacher(
+    userId: string,
+    payload: UpdateTeacherPayload,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('teachers')
+      .update(payload)
+      .eq('supabase_user_id', userId);
+
+    if (error) {
+      console.error(`Error updating teacher ${userId}: ${error.message}`);
+      throw new ServerError(error.message);
+    }
   }
 }

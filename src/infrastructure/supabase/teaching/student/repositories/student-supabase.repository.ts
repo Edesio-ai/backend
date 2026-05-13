@@ -5,6 +5,7 @@ import { mapList } from '../../../common/mapper.util';
 import {
   InsertStudent,
   Student,
+  UpdateStudentPayload,
 } from 'src/domain/teaching/student/type/student.type';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
@@ -119,6 +120,23 @@ export class StudentSupabaseRepository implements IStudentRepository {
         error,
       );
       throw new ServerError(error.message);
+    }
+  }
+
+  public async updateStudent(
+    userId: string,
+    payload: UpdateStudentPayload,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('students')
+      .update(payload)
+      .eq('supabase_user_id', userId);
+
+    if (error) {
+      console.error(
+        `An error occure while updating student: ${userId}, error: ${error}`,
+      );
+      throw new ServerError(`An error occure while updating student`);
     }
   }
 }
