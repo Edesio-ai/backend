@@ -7,6 +7,7 @@ import { ExportModule } from './export/export.module';
 import { LlmModule } from './llm/llm.module';
 import { InvitationTokenModule } from './invitation-token/invitation-token.module';
 import { EmailModule } from './email/email.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { EmailModule } from './email/email.module';
     InvitationTokenModule,
     EmailModule,
     InvitationTokenModule,
+    ProfileModule,
   ],
   controllers: [],
   providers: [],

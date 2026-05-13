@@ -53,4 +53,17 @@ export const TeacherMapper = {
         value,
       ]),
     ),
+  toInsertWithEstablishment: (
+    userId: string,
+    name: string,
+    email: string,
+    establishmentId: string,
+    availableChatbots: number,
+  ): SupabaseTeacherInsert => ({
+    supabase_user_id: userId,
+    name,
+    email: email.toLowerCase().trim(),
+    establishment_id: establishmentId,
+    available_chatbots: availableChatbots,
+  }),
 };

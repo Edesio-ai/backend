@@ -8,5 +8,6 @@ export function createMockTeacherRepository(): jest.Mocked<ITeacherRepository> {
     getTeacherByEstablishmentId: jest.fn(),
     getTeacherByUserId: jest.fn(),
     linkTeacherToEstablishment: jest.fn(),
+    updateTeacher: jest.fn(),
   };
 }

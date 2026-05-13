@@ -1,5 +1,5 @@
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import type { Student } from '../type/student.type';
+import type { Student, UpdateStudentPayload } from '../type/student.type';
 
 export const STUDENT_REPOSITORY = Symbol('STUDENT_REPOSITORY');
 
@@ -9,4 +9,5 @@ export interface IStudentRepository {
   createStudent(user: AuthUser): Promise<Student>;
   storeStudentPhoto(buffer: Buffer, storagePath: string): Promise<string>;
   updateStudentPhoto(studentId: string, photoUrl: string): Promise<void>;
+  updateStudent(userId: string, payload: UpdateStudentPayload): Promise<void>;
 }

@@ -61,6 +61,23 @@ describe('EstablishmentSupabaseRepository', () => {
     await fixtures.thenThrowCreationFailed(promise);
     fixtures.thenCreateQueryBuiltWithExpectedArguments();
   });
+
+  it('should update establishment by supabase user id', async () => {
+    fixtures.whenUpdateEstablishmentSucceeds();
+
+    await fixtures.whenUpdateEstablishment();
+
+    fixtures.thenUpdateEstablishmentQueryBuilt();
+  });
+
+  it('should throw ServerError when updateEstablishment fails', async () => {
+    fixtures.whenUpdateEstablishmentFails();
+
+    const promise = fixtures.whenUpdateEstablishment();
+
+    await fixtures.thenThrowUpdateEstablishmentFailed(promise);
+    fixtures.thenUpdateEstablishmentQueryBuilt();
+  });
 });
 
 class Fixtures {
@@ -101,6 +118,11 @@ class Fixtures {
     createdAt: '2026-01-02T00:00:00.000Z',
   };
 
+  public readonly profilePayload = {
+    name: 'New Org Name',
+    email: 'owner@updated.io',
+  };
+
   private readonly singleMock = jest.fn();
   private readonly eqMock = jest.fn(() => ({ single: this.singleMock }));
   private readonly selectMock = jest.fn(() => ({ eq: this.eqMock }));
@@ -113,11 +135,17 @@ class Fixtures {
     select: this.createSelectMock,
   }));
 
+  private readonly updateEstablishmentEqMock = jest.fn();
+  private readonly updateEstablishmentMock = jest.fn(() => ({
+    eq: this.updateEstablishmentEqMock,
+  }));
+
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'establishment') {
       return {
         select: this.selectMock,
         insert: this.insertMock,
+        update: this.updateEstablishmentMock,
       };
     }
     return {};
@@ -150,6 +178,13 @@ class Fixtures {
     );
   }
 
+  whenUpdateEstablishment() {
+    return this.repository.updateEstablishment(
+      this.userId,
+      this.profilePayload,
+    );
+  }
+
   whenSupabaseReturnsData() {
     this.singleMock.mockResolvedValue({
       data: this.establishmentSupabaseRow,
@@ -178,11 +213,25 @@ class Fixtures {
     });
   }
 
+  whenUpdateEstablishmentSucceeds() {
+    this.updateEstablishmentEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenUpdateEstablishmentFails() {
+    this.updateEstablishmentEqMock.mockResolvedValue({
+      error: { message: 'establishment update failed' },
+    });
+  }
+
   async thenThrowNotFound(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
   async thenThrowCreationFailed(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBeInstanceOf(ServerError);
+  }
+
+  async thenThrowUpdateEstablishmentFailed(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
 
@@ -220,5 +269,16 @@ class Fixtures {
 
   thenReturnExpectedCreatedEstablishment(result: any) {
     expect(result).toEqual(this.expectedCreatedEstablishment);
+  }
+
+  thenUpdateEstablishmentQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('establishment');
+    expect(this.updateEstablishmentMock).toHaveBeenCalledWith(
+      this.profilePayload,
+    );
+    expect(this.updateEstablishmentEqMock).toHaveBeenCalledWith(
+      'supabase_user_id',
+      this.userId,
+    );
   }
 }

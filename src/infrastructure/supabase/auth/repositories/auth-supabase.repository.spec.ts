@@ -114,6 +114,37 @@ describe('AuthSupabaseRepository', () => {
       await fixtures.thenThrowUserCreationFailed(promise);
     });
   });
+
+  describe('updateAuthUser', () => {
+    let fixtures: UpdateAuthUserFixtures;
+
+    beforeEach(() => {
+      fixtures = new UpdateAuthUserFixtures();
+    });
+
+    it('should call admin.updateUserById with email and user_metadata', async () => {
+      fixtures.whenUpdateUserByIdSucceeds();
+
+      await fixtures.whenUpdateAuthUser();
+
+      expect(fixtures.updateUserByIdMock).toHaveBeenCalledWith(
+        fixtures.userId,
+        {
+          email: fixtures.metadata.email,
+          user_metadata: fixtures.metadata,
+        },
+      );
+      expect(fixtures.updateUserByIdMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should throw ServerError when updateUserById returns error', async () => {
+      fixtures.whenUpdateUserByIdFails();
+
+      await expect(fixtures.whenUpdateAuthUser()).rejects.toBeInstanceOf(
+        ServerError,
+      );
+    });
+  });
 });
 
 class LoginUserFixtures {
@@ -308,6 +339,49 @@ class CreateAuthUserFixtures {
   async thenThrowUserCreationFailed(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
     await expect(promise).rejects.toThrow('User creation failed');
+  }
+}
+
+class UpdateAuthUserFixtures {
+  public readonly userId = 'user-update-1';
+  public readonly metadata = {
+    role: 'teacher',
+    firstname: 'Ann',
+    lastname: 'Other',
+    email: 'new@school.com',
+  };
+
+  public readonly updateUserByIdMock = jest.fn();
+  public readonly sut: AuthSupabaseRepository;
+
+  constructor() {
+    const supabaseAuthMock = {
+      auth: {
+        admin: {
+          updateUserById: this.updateUserByIdMock,
+        },
+      },
+    };
+
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
+  }
+
+  whenUpdateAuthUser() {
+    return this.sut.updateAuthUser(this.userId, this.metadata);
+  }
+
+  whenUpdateUserByIdSucceeds() {
+    this.updateUserByIdMock.mockResolvedValue({
+      data: { user: {} },
+      error: null,
+    });
+  }
+
+  whenUpdateUserByIdFails() {
+    this.updateUserByIdMock.mockResolvedValue({
+      data: null,
+      error: { message: 'update user failed' },
+    });
   }
 }
 

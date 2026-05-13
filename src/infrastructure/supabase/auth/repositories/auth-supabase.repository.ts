@@ -84,4 +84,22 @@ export class AuthSupabaseRepository implements IAuthRepository {
     }
     return AuthMapper.AuthUserToUser(data.user);
   }
+
+  public async updateAuthUser(
+    userId: string,
+    metadata: UserMetadata,
+  ): Promise<void> {
+    const { error } = await this.supabaseAuth.auth.admin.updateUserById(
+      userId,
+      {
+        email: metadata.email,
+        user_metadata: metadata,
+      },
+    );
+
+    if (error) {
+      console.error(`Error updating user ${userId}: ${error.message}`);
+      throw new ServerError(error.message);
+    }
+  }
 }

@@ -2,8 +2,9 @@ import type { IEstablishmentRepository } from 'src/domain/teaching/establishment
 
 export function createMockEstablishmentRepository(): jest.Mocked<IEstablishmentRepository> {
   return {
-    createEstablishment: jest.fn(),
     getEstablishmentById: jest.fn(),
     getEstablishmentByUserId: jest.fn(),
+    createEstablishment: jest.fn(),
+    updateEstablishment: jest.fn(),
   };
 }

@@ -163,6 +163,32 @@ describe('StudentSupabaseRepository', () => {
       );
     });
   });
+
+  describe('updateStudent', () => {
+    it('updates name and email by supabase_user_id', async () => {
+      fixtures.whenUpdateStudentProfileSucceeds();
+
+      await fixtures.whenUpdateStudentProfile();
+
+      expect(fixtures.supabase.from).toHaveBeenCalledWith('students');
+      expect(fixtures.updateStudentProfileMock).toHaveBeenCalledWith({
+        name: 'Ann Other',
+        email: 'ann@school.com',
+      });
+      expect(fixtures.updateStudentProfileEqMock).toHaveBeenCalledWith(
+        'supabase_user_id',
+        fixtures.userId,
+      );
+    });
+
+    it('throws ServerError when update fails', async () => {
+      fixtures.whenUpdateStudentProfileFails();
+
+      await expect(fixtures.whenUpdateStudentProfile()).rejects.toBeInstanceOf(
+        ServerError,
+      );
+    });
+  });
 });
 
 class Fixtures {
@@ -233,6 +259,9 @@ class Fixtures {
   public readonly getPublicUrlMock = jest.fn();
   public readonly updateMock = jest.fn();
   public readonly eqMock = jest.fn();
+
+  public readonly updateStudentProfileMock = jest.fn();
+  public readonly updateStudentProfileEqMock = jest.fn();
 
   public repository: StudentSupabaseRepository;
 
@@ -372,6 +401,35 @@ class Fixtures {
 
   whenUpdateStudentPhoto() {
     return this.repository.updateStudentPhoto(this.studentId, this.photoUrl);
+  }
+
+  whenUpdateStudentProfile() {
+    return this.repository.updateStudent(this.userId, {
+      name: 'Ann Other',
+      email: 'ann@school.com',
+    });
+  }
+
+  whenUpdateStudentProfileSucceeds() {
+    this.updateStudentProfileEqMock.mockResolvedValue({ error: null });
+    this.updateStudentProfileMock.mockReturnValue({
+      eq: this.updateStudentProfileEqMock,
+    });
+    this.supabase.from.mockReturnValue({
+      update: this.updateStudentProfileMock,
+    });
+  }
+
+  whenUpdateStudentProfileFails() {
+    this.updateStudentProfileEqMock.mockResolvedValue({
+      error: { message: 'student profile update failed' },
+    });
+    this.updateStudentProfileMock.mockReturnValue({
+      eq: this.updateStudentProfileEqMock,
+    });
+    this.supabase.from.mockReturnValue({
+      update: this.updateStudentProfileMock,
+    });
   }
 
   thenGetStudentByUserIdChainBuilt() {

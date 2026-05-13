@@ -11,4 +11,5 @@ export interface IAuthRepository {
   loginUser(email: string, password: string): Promise<AuthUserWithSession>;
   validateToken(token: string): Promise<User>;
   logoutUser(accessToken: string): Promise<void>;
+  updateAuthUser(userId: string, metadata: UserMetadata): Promise<void>;
 }

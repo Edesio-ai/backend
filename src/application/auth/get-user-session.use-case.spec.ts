@@ -1,5 +1,6 @@
 import { GetUserSessionUseCase } from './get-user-session.use-case';
-import { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
+import type { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
+import { createMockAuthRepository } from 'src/testing/mock-auth-repository';
 import { User } from '../../domain/auth/types/auth.type';
 
 describe('GetUserSessionUseCase', () => {
@@ -37,12 +38,7 @@ class Fixtures {
   public readonly user: User;
 
   constructor() {
-    this.authRepository = {
-      createAuthUser: jest.fn(),
-      loginUser: jest.fn(),
-      validateToken: jest.fn(),
-      logoutUser: jest.fn(),
-    };
+    this.authRepository = createMockAuthRepository();
 
     this.getUserSessionUseCase = new GetUserSessionUseCase(this.authRepository);
 
