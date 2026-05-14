@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from '../../domain/auth/types/auth.type';
 import {
-  STRIPE_CLIENT_INTERFACE,
-  type IStripeClientProvider,
+  STRIPE_PROVIDER,
+  type IStripeProvider,
 } from '../../domain/billing/contracts/i-stripe-client.provider';
 import {
   TEACHER_REPOSITORY,
@@ -17,8 +17,8 @@ import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 @Injectable()
 export class GetSubscriptionStatusUseCase {
   constructor(
-    @Inject(STRIPE_CLIENT_INTERFACE)
-    private readonly paymentClient: IStripeClientProvider,
+    @Inject(STRIPE_PROVIDER)
+    private readonly stripeRepository: IStripeProvider,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: ITeacherRepository,
     @Inject(ESTABLISHMENT_REPOSITORY)
@@ -76,12 +76,12 @@ export class GetSubscriptionStatusUseCase {
       return { hasActiveSubscription: false, role };
     }
 
-    const customers = await this.paymentClient.getCustomerByEmail(email);
+    const customers = await this.stripeRepository.getCustomerByEmail(email);
 
     const customerId: string | null =
       customers.length > 0
         ? customers[0].id
-        : await this.paymentClient.getCheckoutSessionByUserId(id);
+        : await this.stripeRepository.getCheckoutSessionByUserId(id);
 
     if (!customerId) {
       return {
@@ -91,7 +91,7 @@ export class GetSubscriptionStatusUseCase {
     }
 
     const subscriptions =
-      await this.paymentClient.getSubscriptionsByCustomerId(customerId);
+      await this.stripeRepository.getSubscriptionsByCustomerId(customerId);
     const subscription = this.getSubscriptionStatus(subscriptions);
 
     const isActive =

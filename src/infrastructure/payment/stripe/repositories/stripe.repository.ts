@@ -1,12 +1,15 @@
 import { Inject } from '@nestjs/common';
 import Stripe from 'stripe';
-import { IStripeClientProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
-import { STRIPE_CLIENT } from './stripe.module';
+import { STRIPE_CLIENT } from '../stripe.module';
+import { type IStripeProvider } from 'src/domain/billing/contracts/i-stripe-client.provider';
 import { User } from 'src/domain/auth/types/auth.type';
-import { StripeSession } from 'src/domain/billing/types/billing.type';
+import {
+  StripeSession,
+  StripeSubscription,
+} from 'src/domain/billing/types/billing.type';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 
-export class StripeRepository implements IStripeClientProvider {
+export class StripeRepository implements IStripeProvider {
   constructor(
     @Inject(STRIPE_CLIENT)
     private readonly stripeClient: Stripe,
@@ -120,6 +123,88 @@ export class StripeRepository implements IStripeClientProvider {
     } catch (error) {
       const message = error instanceof Error ? error.message : '';
       throw new ServerError(`Error creating checkout session: ${message}`);
+    }
+  }
+
+  async getUserSubscription(email: string): Promise<StripeSubscription | null> {
+    try {
+      const customers = await this.stripeClient.customers.list({
+        email: email,
+        limit: 1,
+      });
+
+      if (customers.data.length === 0) {
+        return null;
+      }
+
+      const customerId = customers.data[0].id;
+
+      const subscriptions = await this.stripeClient.subscriptions.list({
+        customer: customerId,
+        status: 'all',
+        limit: 1,
+      });
+
+      if (subscriptions.data.length === 0) {
+        return null;
+      }
+
+      const subscription = subscriptions.data[0];
+      const productId = subscription.items.data[0]?.price?.product as string;
+
+      let productName = 'Abonnement';
+      let interval = 'month';
+
+      if (productId) {
+        try {
+          const product = await this.stripeClient.products.retrieve(productId);
+          productName = product.name;
+        } catch (e) {
+          console.error('Error fetching product:', e);
+        }
+      }
+
+      if (subscription.items.data[0]?.price?.recurring?.interval) {
+        interval = subscription.items.data[0].price.recurring.interval;
+      }
+
+      let last4: string | null = null;
+      let cardBrand: string | null = null;
+
+      if (subscription.default_payment_method) {
+        try {
+          const paymentMethod = await this.stripeClient.paymentMethods.retrieve(
+            subscription.default_payment_method as string,
+          );
+          if (paymentMethod.card) {
+            last4 = paymentMethod.card.last4;
+            cardBrand = paymentMethod.card.brand;
+          }
+        } catch (e) {
+          console.error('Error fetching payment method:', e);
+        }
+      }
+
+      const preview = await this.stripeClient.invoices.createPreview({
+        customer: customerId,
+        subscription: subscription.id,
+      });
+
+      return {
+        id: subscription.id,
+        status: subscription.status,
+        plan: productName,
+        interval: interval,
+        amount: subscription.items.data[0]?.price?.unit_amount || 0,
+        currency: subscription.items.data[0]?.price?.currency || 'eur',
+        currentPeriodEnd: (preview as any).period_end,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        last4,
+        cardBrand,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new ServerError(`Error searching subscriptions: ${message}`);
     }
   }
 }
