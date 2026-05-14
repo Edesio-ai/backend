@@ -9,6 +9,7 @@ import { BillingRedirectController } from './billing-redirect.controller';
 import { PaymentSuccessUseCase } from '../../application/billing/payment-success.use-case';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
+import { GetSubscriptionUseCase } from 'src/application/billing/get-subscription.use-case';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teac
     GetSubscriptionStatusUseCase,
     CreateCheckoutSessionsUseCase,
     PaymentSuccessUseCase,
+    GetSubscriptionUseCase,
   ],
 })
 export class BillingModule {}

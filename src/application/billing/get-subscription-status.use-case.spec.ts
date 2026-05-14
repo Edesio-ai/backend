@@ -1,7 +1,7 @@
 import { GetSubscriptionStatusUseCase } from './get-subscription-status.use-case';
 import { User } from '../../domain/auth/types/auth.type';
 import { NotFoundError } from '../../domain/shared/errors/global.errors';
-import { IStripeClientProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
+import { IStripeProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
 import { IEstablishmentRepository } from '../../domain/teaching/establishment/contracts/i-establishment.repository';
 import { ITeacherRepository } from '../../domain/teaching/teacher/contracts/teacher.repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
@@ -68,7 +68,7 @@ describe('GetSubscriptionStatusUseCase', () => {
 });
 
 class Fixtures {
-  public readonly paymentClient: jest.Mocked<IStripeClientProvider>;
+  public readonly paymentClient: jest.Mocked<IStripeProvider>;
   public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly getSubscriptionStatusUseCase: GetSubscriptionStatusUseCase;
@@ -98,6 +98,7 @@ class Fixtures {
 
   constructor() {
     this.paymentClient = {
+      getUserSubscription: jest.fn(),
       getCustomerByEmail: jest.fn(),
       getCheckoutSessionByUserId: jest.fn(),
       getSubscriptionsByCustomerId: jest.fn(),
@@ -109,6 +110,7 @@ class Fixtures {
       getEstablishmentById: jest.fn(),
       getEstablishmentByUserId: jest.fn(),
       createEstablishment: jest.fn(),
+      updateEstablishment: jest.fn(),
     };
 
     this.getSubscriptionStatusUseCase = new GetSubscriptionStatusUseCase(

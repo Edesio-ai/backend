@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { StripeSession } from '../../domain/billing/types/billing.type';
 import {
-  STRIPE_CLIENT_INTERFACE,
-  type IStripeClientProvider,
+  STRIPE_PROVIDER,
+  type IStripeProvider,
 } from '../../domain/billing/contracts/i-stripe-client.provider';
 
 @Injectable()
 export class PaymentSuccessUseCase {
   constructor(
-    @Inject(STRIPE_CLIENT_INTERFACE)
-    private readonly paymentClient: IStripeClientProvider,
+    @Inject(STRIPE_PROVIDER)
+    private readonly paymentClient: IStripeProvider,
   ) {}
 
   async execute(sessionId: string): Promise<StripeSession> {

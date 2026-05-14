@@ -1,5 +1,6 @@
+import { StripeSubscription } from 'src/domain/billing/types/billing.type';
 import { StripeRepository } from './stripe.repository';
-import { ServerError } from '../../domain/shared/errors/global.errors';
+import { ServerError } from '../../../../domain/shared/errors/global.errors';
 
 describe('StripeRepository', () => {
   let fixtures: Fixtures;
@@ -115,6 +116,73 @@ describe('StripeRepository', () => {
       'Error creating checkout session',
     );
   });
+
+  describe('getUserSubscription', () => {
+    it('should return mapped subscription with period_end from invoice preview', async () => {
+      fixtures.whenGetUserSubscriptionFullChainSucceeds();
+
+      const result = await fixtures.whenGetUserSubscription();
+
+      expect(result).toEqual(fixtures.expectedStripeSubscription);
+      expect(fixtures.subscriptionsListMock).toHaveBeenCalledWith({
+        customer: fixtures.customerId,
+        status: 'all',
+        limit: 1,
+      });
+      expect(fixtures.invoicesCreatePreviewMock).toHaveBeenCalledWith({
+        customer: fixtures.customerId,
+        subscription: fixtures.subscriptionRow.id,
+      });
+    });
+
+    it('should return null when customer is not found', async () => {
+      fixtures.whenCustomersListEmpty();
+
+      const result = await fixtures.whenGetUserSubscription();
+
+      expect(result).toBeNull();
+      expect(fixtures.subscriptionsListMock).not.toHaveBeenCalled();
+      expect(fixtures.invoicesCreatePreviewMock).not.toHaveBeenCalled();
+    });
+
+    it('should return null when subscription list is empty', async () => {
+      fixtures.whenCustomersListReturnsOneCustomer();
+      fixtures.whenSubscriptionsListEmpty();
+
+      const result = await fixtures.whenGetUserSubscription();
+
+      expect(result).toBeNull();
+      expect(fixtures.invoicesCreatePreviewMock).not.toHaveBeenCalled();
+    });
+
+    it('should omit card details when subscription has no default payment method', async () => {
+      fixtures.whenCustomersListReturnsOneCustomer();
+      fixtures.whenSubscriptionWithoutPaymentMethod();
+      fixtures.whenProductsRetrieveSucceeds();
+      fixtures.whenCreatePreviewSucceeds();
+
+      const result = await fixtures.whenGetUserSubscription();
+
+      expect(fixtures.paymentMethodsRetrieveMock).not.toHaveBeenCalled();
+      expect(result).toEqual({
+        ...fixtures.expectedStripeSubscription,
+        last4: null,
+        cardBrand: null,
+      });
+    });
+
+    it('should throw ServerError when createPreview fails', async () => {
+      fixtures.whenGetUserSubscriptionUntilPreview();
+      fixtures.whenCreatePreviewThrows();
+
+      const promise = fixtures.whenGetUserSubscription();
+
+      await fixtures.thenThrowServerErrorWithMessagePart(
+        promise,
+        'Error searching subscriptions',
+      );
+    });
+  });
 });
 
 class Fixtures {
@@ -123,7 +191,42 @@ class Fixtures {
   public readonly checkoutSessionsRetrieveMock = jest.fn();
   public readonly checkoutSessionsCreateMock = jest.fn();
   public readonly subscriptionsListMock = jest.fn();
+  public readonly productsRetrieveMock = jest.fn();
+  public readonly paymentMethodsRetrieveMock = jest.fn();
+  public readonly invoicesCreatePreviewMock = jest.fn();
   public readonly stripeRepository: StripeRepository;
+
+  public readonly subscriptionRow = {
+    id: 'sub_abc',
+    status: 'active',
+    cancel_at_period_end: false,
+    items: {
+      data: [
+        {
+          price: {
+            unit_amount: 29990,
+            currency: 'eur',
+            recurring: { interval: 'month' as const },
+            product: 'prod_setup',
+          },
+        },
+      ],
+    },
+    default_payment_method: 'pm_xyz',
+  };
+
+  public readonly expectedStripeSubscription: StripeSubscription = {
+    id: 'sub_abc',
+    status: 'active',
+    plan: 'Mode Etablissement',
+    interval: 'month',
+    amount: 29990,
+    currency: 'eur',
+    currentPeriodEnd: 1780857684,
+    cancelAtPeriodEnd: false,
+    last4: '4242',
+    cardBrand: 'visa',
+  };
 
   public readonly email = 'owner@school.com';
   public readonly userId = 'user-1';
@@ -163,6 +266,15 @@ class Fixtures {
       subscriptions: {
         list: this.subscriptionsListMock,
       },
+      products: {
+        retrieve: this.productsRetrieveMock,
+      },
+      paymentMethods: {
+        retrieve: this.paymentMethodsRetrieveMock,
+      },
+      invoices: {
+        createPreview: this.invoicesCreatePreviewMock,
+      },
     };
 
     this.stripeRepository = new StripeRepository(stripeClientMock as any);
@@ -189,6 +301,76 @@ class Fixtures {
       this.user as any,
       this.priceId,
       this.planType,
+    );
+  }
+
+  whenGetUserSubscription() {
+    return this.stripeRepository.getUserSubscription(this.email);
+  }
+
+  whenGetUserSubscriptionFullChainSucceeds() {
+    this.whenCustomersListReturnsOneCustomer();
+    this.subscriptionsListMock.mockResolvedValue({
+      data: [this.subscriptionRow],
+    });
+    this.whenProductsRetrieveSucceeds();
+    this.paymentMethodsRetrieveMock.mockResolvedValue({
+      card: { last4: '4242', brand: 'visa' },
+    });
+    this.whenCreatePreviewSucceeds();
+  }
+
+  whenCustomersListEmpty() {
+    this.customersListMock.mockResolvedValue({ data: [] });
+  }
+
+  whenCustomersListReturnsOneCustomer() {
+    this.customersListMock.mockResolvedValue({
+      data: [{ id: this.customerId }],
+    });
+  }
+
+  whenSubscriptionsListEmpty() {
+    this.subscriptionsListMock.mockResolvedValue({ data: [] });
+  }
+
+  whenSubscriptionWithoutPaymentMethod() {
+    this.subscriptionsListMock.mockResolvedValue({
+      data: [
+        {
+          ...this.subscriptionRow,
+          default_payment_method: null,
+        },
+      ],
+    });
+  }
+
+  whenProductsRetrieveSucceeds() {
+    this.productsRetrieveMock.mockResolvedValue({
+      name: this.expectedStripeSubscription.plan,
+    });
+  }
+
+  whenCreatePreviewSucceeds() {
+    this.invoicesCreatePreviewMock.mockResolvedValue({
+      period_end: this.expectedStripeSubscription.currentPeriodEnd,
+    });
+  }
+
+  whenGetUserSubscriptionUntilPreview() {
+    this.whenCustomersListReturnsOneCustomer();
+    this.subscriptionsListMock.mockResolvedValue({
+      data: [this.subscriptionRow],
+    });
+    this.whenProductsRetrieveSucceeds();
+    this.paymentMethodsRetrieveMock.mockResolvedValue({
+      card: { last4: '4242', brand: 'visa' },
+    });
+  }
+
+  whenCreatePreviewThrows() {
+    this.invoicesCreatePreviewMock.mockRejectedValue(
+      new Error('preview unavailable'),
     );
   }
 

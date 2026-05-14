@@ -5,12 +5,15 @@ import type { User } from '../../domain/auth/types/auth.type';
 import { CreateCheckoutSessionsUseCase } from '../../application/billing/create-checkout-session.use-case';
 import { CreateCheckoutSessionBodyDto } from './dtos/createCheckoutSession.dto';
 import { CurrentUser } from '../auth/decorator/current-user.decorator';
+import { GetSubscriptionUseCase } from 'src/application/billing/get-subscription.use-case';
+import { StripeSubscription } from 'src/domain/billing/types/billing.type';
 
 @Controller('billing')
 export class BillingController {
   constructor(
     private readonly getSubscriptionStatusUseCase: GetSubscriptionStatusUseCase,
     private readonly createCheckoutSessionUseCase: CreateCheckoutSessionsUseCase,
+    private readonly getSubscriptionUseCase: GetSubscriptionUseCase,
   ) {}
 
   @Get('subscription-status')
@@ -29,5 +32,13 @@ export class BillingController {
       planType,
       user,
     );
+  }
+
+  @Get('subscription')
+  async getSubscription(
+    @CurrentUser() user: User,
+  ): Promise<{ subscription: StripeSubscription | null }> {
+    const subscription = await this.getSubscriptionUseCase.execute(user);
+    return { subscription };
   }
 }

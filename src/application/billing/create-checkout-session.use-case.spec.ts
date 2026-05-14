@@ -1,5 +1,5 @@
 import { CreateCheckoutSessionsUseCase } from './create-checkout-session.use-case';
-import { IStripeClientProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
+import { IStripeProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
 import { SubscriptionRepository } from '../../domain/subscription/contracts/subscription.repository';
 import { User } from '../../domain/auth/types/auth.type';
 import { TokenUserNotFoundError } from '../../domain/auth/errors/auth.errors';
@@ -67,7 +67,7 @@ describe('CreateCheckoutSessionsUseCase', () => {
 
 class Fixtures {
   public readonly subscriptionRepository: jest.Mocked<SubscriptionRepository>;
-  public readonly paymentClient: jest.Mocked<IStripeClientProvider>;
+  public readonly paymentClient: jest.Mocked<IStripeProvider>;
   public readonly createCheckoutSessionsUseCase: CreateCheckoutSessionsUseCase;
 
   public readonly user: User;
@@ -82,6 +82,7 @@ class Fixtures {
       getUserSubscription: jest.fn(),
     };
     this.paymentClient = {
+      getUserSubscription: jest.fn(),
       getCustomerByEmail: jest.fn(),
       getCheckoutSessionByUserId: jest.fn(),
       getSubscriptionsByCustomerId: jest.fn(),

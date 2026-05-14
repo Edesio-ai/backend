@@ -6,16 +6,16 @@ import {
   type SubscriptionRepository,
 } from 'src/domain/subscription/contracts/subscription.repository';
 import {
-  STRIPE_CLIENT_INTERFACE,
-  type IStripeClientProvider,
+  STRIPE_PROVIDER,
+  type IStripeProvider,
 } from '../../domain/billing/contracts/i-stripe-client.provider';
 
 export class CreateCheckoutSessionsUseCase {
   constructor(
     @Inject(SUBSCRIPTION_REPOSITORY)
     private readonly subscriptionRepository: SubscriptionRepository,
-    @Inject(STRIPE_CLIENT_INTERFACE)
-    private readonly paymentClient: IStripeClientProvider,
+    @Inject(STRIPE_PROVIDER)
+    private readonly paymentClient: IStripeProvider,
   ) {}
 
   async execute(priceId: string, planType: string, user: User): Promise<any> {
