@@ -1,7 +1,7 @@
 import { GetSubscriptionUseCase } from './get-subscription.use-case';
-import type { IStripeProvider } from 'src/domain/billing/contracts/i-stripe-client.provider';
-import { StripeSubscription } from 'src/domain/billing/types/billing.type';
-import { AuthUser } from 'src/domain/auth/types/auth.type';
+import { IStripeProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
+import { StripeSubscription } from '../../domain/billing/types/billing.type';
+import { User } from '../../domain/auth/types/auth.type';
 
 describe('GetSubscriptionUseCase', () => {
   let fixtures: Fixtures;
@@ -10,15 +10,13 @@ describe('GetSubscriptionUseCase', () => {
     fixtures = new Fixtures();
   });
 
-  it('should delegate to stripe repository with user email', async () => {
+  it('should return subscription from stripe repository for user email', async () => {
     fixtures.whenStripeReturnsSubscription();
 
     const result = await fixtures.whenExecute();
 
-    expect(fixtures.stripeRepository.getUserSubscription).toHaveBeenCalledWith(
-      fixtures.user.email,
-    );
-    expect(result).toEqual(fixtures.subscription);
+    fixtures.thenGetUserSubscriptionCalledWithEmail();
+    fixtures.thenReturnsExpectedSubscription(result);
   });
 
   it('should return null when repository returns null', async () => {
@@ -26,40 +24,27 @@ describe('GetSubscriptionUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(result).toBeNull();
+    fixtures.thenReturnsNull(result);
+    fixtures.thenGetUserSubscriptionCalledWithEmail();
   });
 
-  it('should propagate repository errors', async () => {
-    const err = new Error('stripe unavailable');
-    fixtures.stripeRepository.getUserSubscription.mockRejectedValue(err);
+  it('should propagate repository error', async () => {
+    fixtures.whenStripeThrowsError();
 
-    await expect(fixtures.whenExecute()).rejects.toBe(err);
+    const promise = fixtures.whenExecute();
+
+    await fixtures.thenThrowRepositoryError(promise);
+    fixtures.thenGetUserSubscriptionCalledWithEmail();
   });
 });
 
 class Fixtures {
   public readonly stripeRepository: jest.Mocked<IStripeProvider>;
-  public readonly useCase: GetSubscriptionUseCase;
+  public readonly getSubscriptionUseCase: GetSubscriptionUseCase;
 
-  public readonly user: AuthUser = {
-    id: 'u-1',
-    email: 'bill@school.com',
-    emailConfirmedAt: '2026-01-01T00:00:00.000Z',
-    metadata: { role: 'establishment' },
-  };
-
-  public readonly subscription: StripeSubscription = {
-    id: 'sub_x',
-    status: 'active',
-    plan: 'Pro',
-    interval: 'month',
-    amount: 1000,
-    currency: 'eur',
-    currentPeriodEnd: 1780857684,
-    cancelAtPeriodEnd: false,
-    last4: '4242',
-    cardBrand: 'visa',
-  };
+  public readonly user: User;
+  public readonly subscription: StripeSubscription;
+  public readonly repositoryError: Error;
 
   constructor() {
     this.stripeRepository = {
@@ -71,11 +56,35 @@ class Fixtures {
       getCheckoutSession: jest.fn(),
     };
 
-    this.useCase = new GetSubscriptionUseCase(this.stripeRepository);
+    this.getSubscriptionUseCase = new GetSubscriptionUseCase(
+      this.stripeRepository,
+    );
+
+    this.user = {
+      id: 'u-1',
+      email: 'bill@school.com',
+      emailConfirmedAt: '2026-01-01T00:00:00.000Z',
+      metadata: { role: 'establishment' },
+    };
+
+    this.subscription = {
+      id: 'sub_x',
+      status: 'active',
+      plan: 'Pro',
+      interval: 'month',
+      amount: 1000,
+      currency: 'eur',
+      currentPeriodEnd: 1780857684,
+      cancelAtPeriodEnd: false,
+      last4: '4242',
+      cardBrand: 'visa',
+    };
+
+    this.repositoryError = new Error('stripe unavailable');
   }
 
   whenExecute() {
-    return this.useCase.execute(this.user);
+    return this.getSubscriptionUseCase.execute(this.user);
   }
 
   whenStripeReturnsSubscription() {
@@ -86,5 +95,30 @@ class Fixtures {
 
   whenStripeReturnsNull() {
     this.stripeRepository.getUserSubscription.mockResolvedValue(null);
+  }
+
+  whenStripeThrowsError() {
+    this.stripeRepository.getUserSubscription.mockRejectedValue(
+      this.repositoryError,
+    );
+  }
+
+  thenGetUserSubscriptionCalledWithEmail() {
+    expect(this.stripeRepository.getUserSubscription).toHaveBeenCalledWith(
+      this.user.email,
+    );
+    expect(this.stripeRepository.getUserSubscription).toHaveBeenCalledTimes(1);
+  }
+
+  thenReturnsExpectedSubscription(result: StripeSubscription | null) {
+    expect(result).toEqual(this.subscription);
+  }
+
+  thenReturnsNull(result: StripeSubscription | null) {
+    expect(result).toBeNull();
+  }
+
+  async thenThrowRepositoryError(promise: Promise<unknown>) {
+    await expect(promise).rejects.toBe(this.repositoryError);
   }
 }
