@@ -23,4 +23,5 @@ export type StripeSubscription = {
   cancelAtPeriodEnd: boolean;
   last4: string | null;
   cardBrand: string | null;
+  isEstablishmentSubscription?: boolean;
 };
