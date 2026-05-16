@@ -3,6 +3,8 @@ import { IStripeProvider } from '../../domain/billing/contracts/i-stripe-client.
 import { SubscriptionRepository } from '../../domain/subscription/contracts/subscription.repository';
 import { User } from '../../domain/auth/types/auth.type';
 import { TokenUserNotFoundError } from '../../domain/auth/errors/auth.errors';
+import { createMockStripeProvider } from 'src/testing/mock-stripe-provider';
+import { createMockSubscriptionRepository } from 'src/testing/mock-subscription-repository';
 
 describe('CreateCheckoutSessionsUseCase', () => {
   let fixtures: Fixtures;
@@ -78,19 +80,8 @@ class Fixtures {
   public readonly repositoryError: Error;
 
   constructor() {
-    this.subscriptionRepository = {
-      getUserSubscription: jest.fn(),
-    };
-    this.paymentClient = {
-      getUserSubscription: jest.fn(),
-      getCustomerByEmail: jest.fn(),
-      getCheckoutSessionByUserId: jest.fn(),
-      getSubscriptionsByCustomerId: jest.fn(),
-      createCheckoutSession: jest.fn(),
-      getCheckoutSession: jest.fn(),
-      cancelSubscription: jest.fn(),
-      reactivateSubscription: jest.fn(),
-    };
+    this.subscriptionRepository = createMockSubscriptionRepository();
+    this.paymentClient = createMockStripeProvider();
 
     this.createCheckoutSessionsUseCase = new CreateCheckoutSessionsUseCase(
       this.subscriptionRepository,

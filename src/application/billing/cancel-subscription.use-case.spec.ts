@@ -3,6 +3,8 @@ import { User } from '../../domain/auth/types/auth.type';
 import { IStripeProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
 import { CancelSubscription } from '../../domain/billing/types/billing.type';
 import { IEmailProvider } from '../../domain/email/contract/i-email.interface';
+import { createMockEmailProvider } from 'src/testing/mock-email-provider';
+import { createMockStripeProvider } from 'src/testing/mock-stripe-provider';
 
 describe('CancelSubscriptionUseCase', () => {
   let fixtures: Fixtures;
@@ -55,22 +57,9 @@ class Fixtures {
   public readonly emailError: Error;
 
   constructor() {
-    this.stripeRepository = {
-      getUserSubscription: jest.fn(),
-      getCustomerByEmail: jest.fn(),
-      getCheckoutSessionByUserId: jest.fn(),
-      getSubscriptionsByCustomerId: jest.fn(),
-      createCheckoutSession: jest.fn(),
-      getCheckoutSession: jest.fn(),
-      cancelSubscription: jest.fn(),
-      reactivateSubscription: jest.fn(),
-    };
+    this.stripeRepository = createMockStripeProvider();
 
-    this.emailProvider = {
-      sendWelcomeEmail: jest.fn(),
-      sendProfesseurInvitation: jest.fn(),
-      sendCancelSubscriptionEmail: jest.fn(),
-    };
+    this.emailProvider = createMockEmailProvider();
 
     this.cancelSubscriptionUseCase = new CancelSubscriptionUseCase(
       this.stripeRepository,

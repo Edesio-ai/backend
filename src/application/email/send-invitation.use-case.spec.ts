@@ -1,6 +1,7 @@
 import { SendInvitationUseCase } from './send-invitation.use-case';
 import { IEmailProvider } from '../../domain/email/contract/i-email.interface';
 import { EmailBody } from '../../domain/email/type/email.type';
+import { createMockEmailProvider } from 'src/testing/mock-email-provider';
 
 describe('SendInvitationUseCase', () => {
   let fixtures: Fixtures;
@@ -45,11 +46,7 @@ class Fixtures {
   public readonly emailProviderError: Error;
 
   constructor() {
-    this.emailProvider = {
-      sendWelcomeEmail: jest.fn(),
-      sendProfesseurInvitation: jest.fn(),
-      sendCancelSubscriptionEmail: jest.fn(),
-    };
+    this.emailProvider = createMockEmailProvider();
 
     this.sendInvitationUseCase = new SendInvitationUseCase(this.emailProvider);
 

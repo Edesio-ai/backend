@@ -12,6 +12,8 @@ import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
+import { createMockSessionRepository } from 'src/testing/mock-session-repository';
+import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 
 describe('GetSessionStudentUseCase', () => {
   let fixtures: Fixtures;
@@ -225,20 +227,8 @@ class Fixtures {
     this.studentRepository = createMockStudentRepository();
     this.studentSessionRepository = createMockStudentSessionRepository();
     this.teacherRepository = createMockTeacherRepository();
-    this.sessionRepository = {
-      getSessionsByTeacherId: jest.fn(),
-      getSessionByCode: jest.fn(),
-      createSession: jest.fn(),
-      updateSessionName: jest.fn(),
-      deleteSessionByTeacherId: jest.fn(),
-      getSessionById: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-    };
-    this.establishmentRepository = {
-      getEstablishmentById: jest.fn(),
-      getEstablishmentByUserId: jest.fn(),
-      createEstablishment: jest.fn(),
-    };
+    this.sessionRepository = createMockSessionRepository();
+    this.establishmentRepository = createMockEstablishmentRepository();
     this.useCase = new GetSessionStudentUseCase(
       this.studentRepository,
       this.teacherRepository,

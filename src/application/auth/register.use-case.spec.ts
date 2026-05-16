@@ -6,6 +6,8 @@ import type { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/t
 import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 import { createMockAuthRepository } from 'src/testing/mock-auth-repository';
+import { createMockEmailProvider } from 'src/testing/mock-email-provider';
+import { createMockInvitationTokenRepository } from 'src/testing/mock-invitation-token-repository';
 
 describe('RegisterUseCase', () => {
   let fixtures: Fixtures;
@@ -78,23 +80,11 @@ class Fixtures {
   constructor() {
     this.authRepository = createMockAuthRepository();
 
-    this.emailProvider = {
-      sendWelcomeEmail: jest.fn(),
-      sendProfesseurInvitation: jest.fn(),
-      sendCancelSubscriptionEmail: jest.fn(),
-    };
+    this.emailProvider = createMockEmailProvider();
 
     this.teacherRepository = createMockTeacherRepository();
 
-    this.invitationTokenRepository = {
-      deleteInvitationToken: jest.fn(),
-      getInvitationByToken: jest.fn(),
-      markInvitationTokenAsUsed: jest.fn(),
-      getInvitationTokenByEstablishmentId: jest.fn(),
-      createInvitationToken: jest.fn(),
-      getInvitationPreview: jest.fn(),
-      updateTokenUsedAt: jest.fn(),
-    };
+    this.invitationTokenRepository = createMockInvitationTokenRepository();
 
     this.registerUseCase = new RegisterUseCase(
       this.authRepository,

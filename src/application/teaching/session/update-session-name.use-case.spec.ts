@@ -1,5 +1,6 @@
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { UpdateSessionNameUseCase } from './update-session-name.use-case';
+import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 
 describe('UpdateSessionNameUseCase', () => {
   let fixtures: Fixtures;
@@ -46,15 +47,7 @@ class Fixtures {
   public readonly useCase: UpdateSessionNameUseCase;
 
   constructor() {
-    this.sessionRepository = {
-      getSessionsByTeacherId: jest.fn(),
-      getSessionByCode: jest.fn(),
-      createSession: jest.fn(),
-      updateSessionName: jest.fn(),
-      deleteSessionByTeacherId: jest.fn(),
-      getSessionById: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-    };
+    this.sessionRepository = createMockSessionRepository();
     this.useCase = new UpdateSessionNameUseCase(this.sessionRepository);
   }
 

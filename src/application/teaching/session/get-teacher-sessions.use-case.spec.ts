@@ -3,6 +3,7 @@ import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-sess
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { GetTeacherSessionsUseCase } from 'src/application/teaching/session/get-teacher-sessions.use-case';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
+import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 
 describe('GetTeacherSessionsUseCase', () => {
   let fixtures: Fixtures;
@@ -70,15 +71,7 @@ class Fixtures {
 
   constructor() {
     this.teacherRepository = createMockTeacherRepository();
-    this.sessionRepository = {
-      getSessionsByTeacherId: jest.fn(),
-      getSessionByCode: jest.fn(),
-      createSession: jest.fn(),
-      updateSessionName: jest.fn(),
-      deleteSessionByTeacherId: jest.fn(),
-      getSessionById: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-    };
+    this.sessionRepository = createMockSessionRepository();
     this.useCase = new GetTeacherSessionsUseCase(
       this.sessionRepository,
       this.teacherRepository,

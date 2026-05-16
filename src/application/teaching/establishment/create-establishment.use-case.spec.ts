@@ -4,6 +4,7 @@ import {
   CreateEstablishmentBody,
   Establishment,
 } from 'src/domain/teaching/establishment/types/establishment.type';
+import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 
 describe('CreateEstablishmentUseCase', () => {
   let fixtures: Fixtures;
@@ -40,11 +41,7 @@ class Fixtures {
   public readonly repositoryError: Error;
 
   constructor() {
-    this.establishmentRepository = {
-      getEstablishmentById: jest.fn(),
-      getEstablishmentByUserId: jest.fn(),
-      createEstablishment: jest.fn(),
-    };
+    this.establishmentRepository = createMockEstablishmentRepository();
 
     this.createEstablishmentUseCase = new CreateEstablishmentUseCase(
       this.establishmentRepository,

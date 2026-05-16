@@ -6,6 +6,7 @@ import { Establishment } from '../../domain/teaching/establishment/types/establi
 import { Teacher } from '../../domain/teaching/teacher/types/teacher.type';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
+import { createMockStripeProvider } from 'src/testing/mock-stripe-provider';
 
 describe('GetSubscriptionUseCase', () => {
   let fixtures: Fixtures;
@@ -122,16 +123,7 @@ class Fixtures {
   public readonly repositoryError: Error;
 
   constructor() {
-    this.stripeRepository = {
-      getUserSubscription: jest.fn(),
-      getCustomerByEmail: jest.fn(),
-      getCheckoutSessionByUserId: jest.fn(),
-      getSubscriptionsByCustomerId: jest.fn(),
-      createCheckoutSession: jest.fn(),
-      getCheckoutSession: jest.fn(),
-      cancelSubscription: jest.fn(),
-      reactivateSubscription: jest.fn(),
-    };
+    this.stripeRepository = createMockStripeProvider();
 
     this.teacherRepository = createMockTeacherRepository();
     this.establishmentRepository = createMockEstablishmentRepository();

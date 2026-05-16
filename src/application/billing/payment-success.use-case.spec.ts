@@ -1,6 +1,7 @@
 import { PaymentSuccessUseCase } from './payment-success.use-case';
 import type { IStripeProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
 import { StripeSession } from '../../domain/billing/types/billing.type';
+import { createMockStripeProvider } from 'src/testing/mock-stripe-provider';
 
 describe('PaymentSuccessUseCase', () => {
   let fixtures: Fixtures;
@@ -37,16 +38,7 @@ class Fixtures {
   public readonly paymentClientError: Error;
 
   constructor() {
-    this.paymentClient = {
-      getUserSubscription: jest.fn(),
-      getCustomerByEmail: jest.fn(),
-      getCheckoutSessionByUserId: jest.fn(),
-      getSubscriptionsByCustomerId: jest.fn(),
-      createCheckoutSession: jest.fn(),
-      getCheckoutSession: jest.fn(),
-      cancelSubscription: jest.fn(),
-      reactivateSubscription: jest.fn(),
-    };
+    this.paymentClient = createMockStripeProvider();
 
     this.paymentSuccessUseCase = new PaymentSuccessUseCase(this.paymentClient);
 

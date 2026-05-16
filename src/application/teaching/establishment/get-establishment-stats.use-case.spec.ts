@@ -6,6 +6,7 @@ import type { ISessionRepository } from 'src/domain/teaching/session/contracts/i
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
+import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 
 describe('GetEstablishmentsStatsUseCase', () => {
   let fixtures: Fixtures;
@@ -48,11 +49,7 @@ class Fixtures {
   public readonly repositoryError: Error;
 
   constructor() {
-    this.establishmentRepository = {
-      getEstablishmentById: jest.fn(),
-      getEstablishmentByUserId: jest.fn(),
-      createEstablishment: jest.fn(),
-    };
+    this.establishmentRepository = createMockEstablishmentRepository();
     this.teacherRepository = createMockTeacherRepository();
     this.studentSessionRepository = createMockStudentSessionRepository();
     this.sessionRepository = createMockSessionRepository();

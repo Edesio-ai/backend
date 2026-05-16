@@ -1,6 +1,7 @@
 import { ReactivateSubscriptionUseCase } from './reactivate-subscription.use-case';
 import { User } from '../../domain/auth/types/auth.type';
 import { IStripeProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
+import { createMockStripeProvider } from 'src/testing/mock-stripe-provider';
 
 describe('ReactivateSubscriptionUseCase', () => {
   let fixtures: Fixtures;
@@ -35,16 +36,7 @@ class Fixtures {
   public readonly stripeError: Error;
 
   constructor() {
-    this.stripeRepository = {
-      getUserSubscription: jest.fn(),
-      getCustomerByEmail: jest.fn(),
-      getCheckoutSessionByUserId: jest.fn(),
-      getSubscriptionsByCustomerId: jest.fn(),
-      createCheckoutSession: jest.fn(),
-      getCheckoutSession: jest.fn(),
-      cancelSubscription: jest.fn(),
-      reactivateSubscription: jest.fn(),
-    };
+    this.stripeRepository = createMockStripeProvider();
 
     this.reactivateSubscriptionUseCase = new ReactivateSubscriptionUseCase(
       this.stripeRepository,

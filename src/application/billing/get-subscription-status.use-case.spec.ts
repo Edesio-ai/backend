@@ -5,6 +5,8 @@ import { IStripeProvider } from '../../domain/billing/contracts/i-stripe-client.
 import { IEstablishmentRepository } from '../../domain/teaching/establishment/contracts/i-establishment.repository';
 import { ITeacherRepository } from '../../domain/teaching/teacher/contracts/teacher.repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
+import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
+import { createMockStripeProvider } from 'src/testing/mock-stripe-provider';
 
 describe('GetSubscriptionStatusUseCase', () => {
   let fixtures: Fixtures;
@@ -97,23 +99,9 @@ class Fixtures {
   };
 
   constructor() {
-    this.paymentClient = {
-      getUserSubscription: jest.fn(),
-      getCustomerByEmail: jest.fn(),
-      getCheckoutSessionByUserId: jest.fn(),
-      getSubscriptionsByCustomerId: jest.fn(),
-      createCheckoutSession: jest.fn(),
-      getCheckoutSession: jest.fn(),
-      cancelSubscription: jest.fn(),
-      reactivateSubscription: jest.fn(),
-    };
+    this.paymentClient = createMockStripeProvider();
     this.teacherRepository = createMockTeacherRepository();
-    this.establishmentRepository = {
-      getEstablishmentById: jest.fn(),
-      getEstablishmentByUserId: jest.fn(),
-      createEstablishment: jest.fn(),
-      updateEstablishment: jest.fn(),
-    };
+    this.establishmentRepository = createMockEstablishmentRepository();
 
     this.getSubscriptionStatusUseCase = new GetSubscriptionStatusUseCase(
       this.paymentClient,

@@ -12,6 +12,7 @@ import {
 } from 'src/domain/teaching/student/type/student.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
+import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 
 describe('JoinSessionByCodeUseCase', () => {
   let fixtures: Fixtures;
@@ -118,15 +119,7 @@ class Fixtures {
   constructor() {
     this.studentRepository = createMockStudentRepository();
     this.studentSessionRepository = createMockStudentSessionRepository();
-    this.sessionRepository = {
-      getSessionByCode: jest.fn(),
-      getSessionsByTeacherId: jest.fn(),
-      createSession: jest.fn(),
-      updateSessionName: jest.fn(),
-      deleteSessionByTeacherId: jest.fn(),
-      getSessionById: jest.fn(),
-      getTeachersSessionsByIds: jest.fn(),
-    };
+    this.sessionRepository = createMockSessionRepository();
     this.useCase = new JoinSessionByCodeUseCase(
       this.studentRepository,
       this.sessionRepository,
