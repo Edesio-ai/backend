@@ -25,3 +25,13 @@ export type StripeSubscription = {
   cardBrand: string | null;
   isEstablishmentSubscription?: boolean;
 };
+
+export type CancelSubscription = {
+  planName: string;
+  endDate: string;
+};
+
+export type CancelSubscriptionEmailParams = CancelSubscription & {
+  email: string;
+  firstname: string;
+};

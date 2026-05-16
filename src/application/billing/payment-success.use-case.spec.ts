@@ -44,6 +44,7 @@ class Fixtures {
       getSubscriptionsByCustomerId: jest.fn(),
       createCheckoutSession: jest.fn(),
       getCheckoutSession: jest.fn(),
+      cancelSubscription: jest.fn(),
     };
 
     this.paymentSuccessUseCase = new PaymentSuccessUseCase(this.paymentClient);

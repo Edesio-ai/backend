@@ -2,6 +2,7 @@ import { User } from 'src/domain/auth/types/auth.type';
 import {
   StripeSession,
   StripeSubscription,
+  CancelSubscription,
 } from 'src/domain/billing/types/billing.type';
 
 export const STRIPE_PROVIDER = Symbol('STRIPE_PROVIDER');
@@ -17,4 +18,5 @@ export interface IStripeProvider {
     planType: string,
   ): Promise<any>;
   getCheckoutSession(sessionId: string): Promise<StripeSession>;
+  cancelSubscription(user: User): Promise<CancelSubscription>;
 }

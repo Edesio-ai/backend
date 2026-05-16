@@ -6,8 +6,12 @@ import { User } from 'src/domain/auth/types/auth.type';
 import {
   StripeSession,
   StripeSubscription,
+  CancelSubscription,
 } from 'src/domain/billing/types/billing.type';
-import { ServerError } from 'src/domain/shared/errors/global.errors';
+import {
+  NotFoundError,
+  ServerError,
+} from 'src/domain/shared/errors/global.errors';
 
 export class StripeRepository implements IStripeProvider {
   constructor(
@@ -128,17 +132,13 @@ export class StripeRepository implements IStripeProvider {
 
   async getUserSubscription(email: string): Promise<StripeSubscription | null> {
     try {
-      const customers = await this.stripeClient.customers.list({
-        email: email,
-        limit: 1,
-      });
+      const customers = await this.getCustomerByEmail(email);
 
-      if (customers.data.length === 0) {
+      if (customers.length === 0) {
         return null;
       }
 
-      const customerId = customers.data[0].id;
-
+      const customerId = customers[0].id;
       const subscriptions = await this.stripeClient.subscriptions.list({
         customer: customerId,
         status: 'all',
@@ -185,10 +185,7 @@ export class StripeRepository implements IStripeProvider {
         }
       }
 
-      const preview = await this.stripeClient.invoices.createPreview({
-        customer: customerId,
-        subscription: subscription.id,
-      });
+      const preview = await this.getPreview(customerId, subscription.id);
 
       return {
         id: subscription.id,
@@ -197,7 +194,7 @@ export class StripeRepository implements IStripeProvider {
         interval: interval,
         amount: subscription.items.data[0]?.price?.unit_amount || 0,
         currency: subscription.items.data[0]?.price?.currency || 'eur',
-        currentPeriodEnd: (preview as any).period_end,
+        currentPeriodEnd: preview ? preview.period_end : subscription.cancel_at,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
         last4,
         cardBrand,
@@ -205,6 +202,79 @@ export class StripeRepository implements IStripeProvider {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       throw new ServerError(`Error searching subscriptions: ${message}`);
+    }
+  }
+
+  private async getPreview(
+    customerId: string,
+    subscriptionId: string,
+  ): Promise<any> {
+    try {
+      const preview = await this.stripeClient.invoices.createPreview({
+        customer: customerId,
+        subscription: subscriptionId,
+      });
+      return preview;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  public async cancelSubscription(user: User): Promise<CancelSubscription> {
+    try {
+      const customer = await this.getCustomerByEmail(user.email);
+      if (customer.length === 0) {
+        throw new NotFoundError('Customer not found');
+      }
+      const customerId = customer[0].id;
+
+      const subscriptions = await this.stripeClient.subscriptions.list({
+        customer: customerId,
+        status: 'active',
+        limit: 1,
+      });
+
+      if (subscriptions.data.length === 0) {
+        throw new NotFoundError('No active subscription found');
+      }
+
+      const subscriptionId = subscriptions.data[0].id;
+
+      const canceledSubscription = await this.stripeClient.subscriptions.update(
+        subscriptionId,
+        { cancel_at_period_end: true },
+      );
+
+      const productId = subscriptions.data[0].items.data[0]?.price
+        ?.product as string;
+
+      let planName = 'Abonnement Edesio';
+      if (productId) {
+        try {
+          const product = await this.stripeClient.products.retrieve(productId);
+          planName = product.name;
+        } catch (e) {
+          console.error('Error fetching product for email:', e);
+        }
+      }
+
+      const endTimestamp = (canceledSubscription as any).current_period_end;
+      const endDate = new Date(endTimestamp * 1000).toLocaleDateString(
+        'fr-FR',
+        {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        },
+      );
+
+      return {
+        planName,
+        endDate,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new ServerError(`Error canceling subscription: ${message}`);
     }
   }
 }

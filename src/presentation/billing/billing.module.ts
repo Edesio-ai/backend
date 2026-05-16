@@ -10,6 +10,8 @@ import { PaymentSuccessUseCase } from '../../application/billing/payment-success
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 import { GetSubscriptionUseCase } from 'src/application/billing/get-subscription.use-case';
+import { CancelSubscriptionUseCase } from 'src/application/billing/cancel-subscription.use-case';
+import { MailerModule } from 'src/infrastructure/mailer/mailer.module';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { GetSubscriptionUseCase } from 'src/application/billing/get-subscription
     SubscriptionPersistenceModule,
     TeacherPersistenceModule,
     EstablishmentPersistenceModule,
+    MailerModule,
   ],
   controllers: [BillingController, BillingRedirectController],
   providers: [
@@ -25,6 +28,7 @@ import { GetSubscriptionUseCase } from 'src/application/billing/get-subscription
     CreateCheckoutSessionsUseCase,
     PaymentSuccessUseCase,
     GetSubscriptionUseCase,
+    CancelSubscriptionUseCase,
   ],
 })
 export class BillingModule {}

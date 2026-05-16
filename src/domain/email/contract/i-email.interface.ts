@@ -1,3 +1,5 @@
+import { CancelSubscriptionEmailParams } from 'src/domain/billing/types/billing.type';
+
 export const EMAIL_PROVIDER = Symbol('EMAIL_PROVIDER_INTERFACE');
 
 export interface IEmailProvider {
@@ -7,5 +9,8 @@ export interface IEmailProvider {
     name: string,
     invitationToken: string,
     availableChatbots: number,
+  ): Promise<void>;
+  sendCancelSubscriptionEmail(
+    params: CancelSubscriptionEmailParams,
   ): Promise<void>;
 }

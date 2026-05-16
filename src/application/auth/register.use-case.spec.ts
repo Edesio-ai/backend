@@ -81,6 +81,7 @@ class Fixtures {
     this.emailProvider = {
       sendWelcomeEmail: jest.fn(),
       sendProfesseurInvitation: jest.fn(),
+      sendCancelSubscriptionEmail: jest.fn(),
     };
 
     this.teacherRepository = createMockTeacherRepository();
