@@ -295,6 +295,51 @@ describe('StripeRepository', () => {
       );
     });
   });
+
+  describe('getCustomerPortalUrl', () => {
+    const originalFrontendUrl = process.env.FRONTEND_URL;
+
+    beforeEach(() => {
+      process.env.FRONTEND_URL = 'https://app.portal.test';
+    });
+
+    afterEach(() => {
+      process.env.FRONTEND_URL = originalFrontendUrl;
+    });
+
+    it('should create billing portal session and return URL', async () => {
+      fixtures.whenCustomerPortalFlowSucceeds();
+
+      const result = await fixtures.whenGetCustomerPortalUrl();
+
+      fixtures.thenBillingPortalSessionCreatedWithExpectedArguments();
+      expect(result).toBe('https://billing.stripe.test/portal');
+    });
+
+    it('should throw ServerError when customer is not found', async () => {
+      fixtures.whenCustomersListEmpty();
+
+      const promise = fixtures.whenGetCustomerPortalUrl();
+
+      await fixtures.thenThrowServerErrorWithMessagePart(
+        promise,
+        'Customer not found',
+      );
+      fixtures.thenBillingPortalSessionCreateNotCalled();
+    });
+
+    it('should throw ServerError when portal session creation fails', async () => {
+      fixtures.whenCustomersListReturnsOneCustomer();
+      fixtures.whenBillingPortalSessionThrows();
+
+      const promise = fixtures.whenGetCustomerPortalUrl();
+
+      await fixtures.thenThrowServerErrorWithMessagePart(
+        promise,
+        'Error getting customer portal url',
+      );
+    });
+  });
 });
 
 class Fixtures {
@@ -307,6 +352,7 @@ class Fixtures {
   public readonly paymentMethodsRetrieveMock = jest.fn();
   public readonly invoicesCreatePreviewMock = jest.fn();
   public readonly subscriptionsUpdateMock = jest.fn();
+  public readonly billingPortalSessionsCreateMock = jest.fn();
   public readonly stripeRepository: StripeRepository;
 
   public readonly cancelDomainUser: User = {
@@ -401,6 +447,11 @@ class Fixtures {
       invoices: {
         createPreview: this.invoicesCreatePreviewMock,
       },
+      billingPortal: {
+        sessions: {
+          create: this.billingPortalSessionsCreateMock,
+        },
+      },
     };
 
     this.stripeRepository = new StripeRepository(stripeClientMock as any);
@@ -440,6 +491,23 @@ class Fixtures {
 
   whenReactivateSubscription() {
     return this.stripeRepository.reactivateSubscription(this.email);
+  }
+
+  whenGetCustomerPortalUrl() {
+    return this.stripeRepository.getCustomerPortalUrl(this.email);
+  }
+
+  whenCustomerPortalFlowSucceeds() {
+    this.whenCustomersListReturnsOneCustomer();
+    this.billingPortalSessionsCreateMock.mockResolvedValue({
+      url: 'https://billing.stripe.test/portal',
+    });
+  }
+
+  whenBillingPortalSessionThrows() {
+    this.billingPortalSessionsCreateMock.mockRejectedValue(
+      new Error('portal session failed'),
+    );
   }
 
   whenReactivateFlowSucceeds() {
@@ -780,6 +848,22 @@ class Fixtures {
 
   thenSubscriptionsUpdateNotCalled() {
     expect(this.subscriptionsUpdateMock).not.toHaveBeenCalled();
+  }
+
+  thenBillingPortalSessionCreatedWithExpectedArguments() {
+    expect(this.customersListMock).toHaveBeenCalledWith({
+      email: this.email,
+      limit: 1,
+    });
+    expect(this.billingPortalSessionsCreateMock).toHaveBeenCalledWith({
+      customer: this.customerId,
+      return_url: 'https://app.portal.test/profile',
+    });
+    expect(this.billingPortalSessionsCreateMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenBillingPortalSessionCreateNotCalled() {
+    expect(this.billingPortalSessionsCreateMock).not.toHaveBeenCalled();
   }
 
   thenReactivateSubscriptionStripeCallsSucceeded() {
