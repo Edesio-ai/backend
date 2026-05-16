@@ -258,7 +258,7 @@ export class StripeRepository implements IStripeProvider {
         }
       }
 
-      const endTimestamp = (canceledSubscription as any).current_period_end;
+      const endTimestamp = (canceledSubscription as any).cancel_at;
       const endDate = new Date(endTimestamp * 1000).toLocaleDateString(
         'fr-FR',
         {
@@ -275,6 +275,34 @@ export class StripeRepository implements IStripeProvider {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       throw new ServerError(`Error canceling subscription: ${message}`);
+    }
+  }
+
+  async reactivateSubscription(email: string): Promise<void> {
+    try {
+      const customer = await this.getCustomerByEmail(email);
+      if (customer.length === 0) {
+        throw new NotFoundError('Customer not found');
+      }
+      const customerId = customer[0].id;
+
+      const subscriptions = await this.stripeClient.subscriptions.list({
+        customer: customerId,
+        limit: 1,
+      });
+
+      if (subscriptions.data.length === 0) {
+        throw new NotFoundError('No active subscription found');
+      }
+
+      const subscriptionId = subscriptions.data[0].id;
+
+      await this.stripeClient.subscriptions.update(subscriptionId, {
+        cancel_at_period_end: false,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new ServerError(`Error reactivating subscription: ${message}`);
     }
   }
 }

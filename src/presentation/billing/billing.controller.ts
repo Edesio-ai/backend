@@ -11,6 +11,7 @@ import {
   StripeSubscription,
 } from 'src/domain/billing/types/billing.type';
 import { CancelSubscriptionUseCase } from 'src/application/billing/cancel-subscription.use-case';
+import { ReactivateSubscriptionUseCase } from 'src/application/billing/reactivate-subscription.use-case';
 
 @Controller('billing')
 export class BillingController {
@@ -19,6 +20,7 @@ export class BillingController {
     private readonly createCheckoutSessionUseCase: CreateCheckoutSessionsUseCase,
     private readonly getSubscriptionUseCase: GetSubscriptionUseCase,
     private readonly cancelSubscriptionUseCase: CancelSubscriptionUseCase,
+    private readonly reactivateSubscriptionUseCase: ReactivateSubscriptionUseCase,
   ) {}
 
   @Get('subscription-status')
@@ -52,5 +54,10 @@ export class BillingController {
     @CurrentUser() user: User,
   ): Promise<CancelSubscription> {
     return this.cancelSubscriptionUseCase.execute(user);
+  }
+
+  @Post('subscription/reactivate')
+  async reactivateSubscription(@CurrentUser() user: User): Promise<void> {
+    await this.reactivateSubscriptionUseCase.execute(user);
   }
 }

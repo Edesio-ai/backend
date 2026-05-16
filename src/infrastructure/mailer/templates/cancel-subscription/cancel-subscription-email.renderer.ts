@@ -5,7 +5,8 @@ export function renderCancelSubscriptionEmailHtml(
 ): string {
   const { planName, endDate, firstname } = data;
   const APP_URL = process.env.FRONTEND_URL || 'http://localhost:5000';
-  const LOGO_URL = `${APP_URL}/icon-192.png`;
+  const LOGO_URL = `${APP_URL}/edesio-logo-square.png`;
+
   return `
     <!DOCTYPE html>
     <html lang="fr">
