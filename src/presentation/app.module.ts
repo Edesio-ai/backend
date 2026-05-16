@@ -8,6 +8,7 @@ import { LlmModule } from './llm/llm.module';
 import { InvitationTokenModule } from './invitation-token/invitation-token.module';
 import { EmailModule } from './email/email.module';
 import { ProfileModule } from './profile/profile.module';
+import { SuggestionModule } from './suggestion/suggestion.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ProfileModule } from './profile/profile.module';
     EmailModule,
     InvitationTokenModule,
     ProfileModule,
+    SuggestionModule,
   ],
   controllers: [],
   providers: [],

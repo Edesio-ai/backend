@@ -1,5 +1,5 @@
 export const SUBSCRIPTION_REPOSITORY = Symbol('SUBSCRIPTION_REPOSITORY');
 
-export interface SubscriptionRepository {
+export interface ISubscriptionRepository {
   getUserSubscription(userId: string): Promise<any>;
 }

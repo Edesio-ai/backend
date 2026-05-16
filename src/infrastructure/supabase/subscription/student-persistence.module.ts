@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SUBSCRIPTION_REPOSITORY } from 'src/domain/subscription/contracts/subscription.repository';
+import { SUBSCRIPTION_REPOSITORY } from 'src/domain/subscription/contracts/i-subscription.repository';
 import { SupabaseModule } from '../supabase.module';
 import { SubscriptionSupabaseRepository } from './repositories/subscription-supabase.repository';
 
