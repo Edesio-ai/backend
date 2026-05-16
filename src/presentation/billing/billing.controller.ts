@@ -12,6 +12,7 @@ import {
 } from 'src/domain/billing/types/billing.type';
 import { CancelSubscriptionUseCase } from 'src/application/billing/cancel-subscription.use-case';
 import { ReactivateSubscriptionUseCase } from 'src/application/billing/reactivate-subscription.use-case';
+import { GetCustomerPortalUrlUseCase } from 'src/application/billing/get-custome-portal-url.use-case';
 
 @Controller('billing')
 export class BillingController {
@@ -21,6 +22,7 @@ export class BillingController {
     private readonly getSubscriptionUseCase: GetSubscriptionUseCase,
     private readonly cancelSubscriptionUseCase: CancelSubscriptionUseCase,
     private readonly reactivateSubscriptionUseCase: ReactivateSubscriptionUseCase,
+    private readonly getCustomerPortalUrlUseCase: GetCustomerPortalUrlUseCase,
   ) {}
 
   @Get('subscription-status')
@@ -59,5 +61,12 @@ export class BillingController {
   @Post('subscription/reactivate')
   async reactivateSubscription(@CurrentUser() user: User): Promise<void> {
     await this.reactivateSubscriptionUseCase.execute(user);
+  }
+
+  @Get('portal')
+  async getCustomePortalUrl(@CurrentUser() user: User): Promise<any> {
+    const url = await this.getCustomerPortalUrlUseCase.execute(user);
+
+    return { url };
   }
 }

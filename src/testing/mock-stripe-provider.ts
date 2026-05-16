@@ -10,5 +10,6 @@ export function createMockStripeProvider(): jest.Mocked<IStripeProvider> {
     getCheckoutSession: jest.fn(),
     cancelSubscription: jest.fn(),
     reactivateSubscription: jest.fn(),
+    getCustomerPortalUrl: jest.fn(),
   };
 }

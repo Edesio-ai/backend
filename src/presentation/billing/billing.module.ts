@@ -13,7 +13,7 @@ import { GetSubscriptionUseCase } from 'src/application/billing/get-subscription
 import { CancelSubscriptionUseCase } from 'src/application/billing/cancel-subscription.use-case';
 import { MailerModule } from 'src/infrastructure/mailer/mailer.module';
 import { ReactivateSubscriptionUseCase } from 'src/application/billing/reactivate-subscription.use-case';
-
+import { GetCustomerPortalUrlUseCase } from 'src/application/billing/get-custome-portal-url.use-case';
 @Module({
   imports: [
     PaymentModule,
@@ -31,6 +31,7 @@ import { ReactivateSubscriptionUseCase } from 'src/application/billing/reactivat
     GetSubscriptionUseCase,
     CancelSubscriptionUseCase,
     ReactivateSubscriptionUseCase,
+    GetCustomerPortalUrlUseCase,
   ],
 })
 export class BillingModule {}

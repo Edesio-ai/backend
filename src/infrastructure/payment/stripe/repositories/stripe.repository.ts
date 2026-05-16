@@ -305,4 +305,23 @@ export class StripeRepository implements IStripeProvider {
       throw new ServerError(`Error reactivating subscription: ${message}`);
     }
   }
+
+  public async getCustomerPortalUrl(email: string): Promise<string | null> {
+    try {
+      const customer = await this.getCustomerByEmail(email);
+      if (customer.length === 0) {
+        throw new NotFoundError('Customer not found');
+      }
+      const customerId = customer[0].id;
+
+      const portalUrl = await this.stripeClient.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: `${process.env.FRONTEND_URL}/profile`,
+      });
+      return portalUrl.url;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new ServerError(`Error getting customer portal url: ${message}`);
+    }
+  }
 }

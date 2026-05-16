@@ -20,4 +20,5 @@ export interface IStripeProvider {
   getCheckoutSession(sessionId: string): Promise<StripeSession>;
   cancelSubscription(user: User): Promise<CancelSubscription>;
   reactivateSubscription(email: string): Promise<void>;
+  getCustomerPortalUrl(email: string): Promise<string | null>;
 }
