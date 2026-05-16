@@ -3,7 +3,10 @@ import { ISuggestionRepository } from 'src/domain/suggestion/contracts/i-suggest
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import { Inject } from '@nestjs/common';
-import { Suggestion } from 'src/domain/suggestion/suggestion.type';
+import {
+  Suggestion,
+  SuggestionLikesCount,
+} from 'src/domain/suggestion/suggestion.type';
 import { SuggestionMapper } from '../mappers/suggestion.mapper';
 
 export class SuggestionSupabaseRepository implements ISuggestionRepository {
@@ -30,16 +33,50 @@ export class SuggestionSupabaseRepository implements ISuggestionRepository {
     return data?.map(SuggestionMapper.toDomain) ?? [];
   }
 
-  async getUserLikes(
-    userId: string,
-    suggestionIds: string[],
-  ): Promise<string[]> {
+  async getSuggestionLikesCountById(
+    suggestionId: string,
+  ): Promise<SuggestionLikesCount> {
     const { data, error } = await this.supabase
-      .from('suggestion_likes')
-      .select('suggestion_id')
-      .eq('user_id', userId)
-      .in('suggestion_id', suggestionIds);
+      .from('suggestions')
+      .select('id, likes_count')
+      .eq('id', suggestionId)
+      .single();
 
-    return data?.map(SuggestionMapper.toUserLike) ?? [];
+    if (error) {
+      console.error(
+        `Error fetching suggestion by id ${suggestionId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+
+    return SuggestionMapper.toLikesCount(data);
+  }
+
+  async decrementLike(suggestionId: string, likesCount: number): Promise<void> {
+    const { error } = await this.supabase
+      .from('suggestions')
+      .update(SuggestionMapper.decrementLikeToSupabase(likesCount))
+      .eq('id', suggestionId);
+
+    if (error) {
+      console.error(
+        `Error decrementing like for suggestion ${suggestionId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+  }
+
+  async incrementLike(suggestionId: string, likesCount: number): Promise<void> {
+    const { error } = await this.supabase
+      .from('suggestions')
+      .update(SuggestionMapper.incrementLikeToSupabase(likesCount))
+      .eq('id', suggestionId);
+
+    if (error) {
+      console.error(
+        `Error incrementing like for suggestion ${suggestionId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
   }
 }

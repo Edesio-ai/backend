@@ -1,7 +1,9 @@
 import {
   Suggestion,
   SupabaseSuggestion,
-  SupabaseUserLike,
+  SuggestionLikesCount,
+  SupabaseSuggestionLikesCount,
+  SupabaseCountLike,
 } from 'src/domain/suggestion/suggestion.type';
 
 export const SuggestionMapper = {
@@ -16,5 +18,17 @@ export const SuggestionMapper = {
     likesCount: data.likes_count,
     createdAt: data.created_at,
   }),
-  toUserLike: (data: SupabaseUserLike): string => data.suggestion_id,
+
+  toLikesCount: (data: SupabaseSuggestionLikesCount): SuggestionLikesCount => ({
+    id: data.id,
+    likesCount: data.likes_count,
+  }),
+
+  decrementLikeToSupabase: (likesCount: number): SupabaseCountLike => ({
+    likes_count: Math.max(0, (likesCount || 0) - 1),
+  }),
+
+  incrementLikeToSupabase: (likesCount: number): SupabaseCountLike => ({
+    likes_count: (likesCount || 0) + 1,
+  }),
 };

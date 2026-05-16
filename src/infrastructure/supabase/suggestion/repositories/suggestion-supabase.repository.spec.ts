@@ -44,22 +44,61 @@ describe('SuggestionSupabaseRepository', () => {
     });
   });
 
-  describe('getUserLikes', () => {
-    it('should return suggestion ids from likes rows', async () => {
-      fixtures.whenLikesQuerySucceeds();
+  describe('getSuggestionLikesCountById', () => {
+    it('should return mapped id and likesCount', async () => {
+      fixtures.whenLikesCountSingleSucceeds();
 
-      const result = await fixtures.whenGetUserLikes('user-a', ['x', 'y']);
+      const result = await fixtures.whenGetSuggestionLikesCountById('sg-1');
 
-      fixtures.thenLikesQueryChainBuilt('user-a', ['x', 'y']);
-      expect(result).toEqual(['x']);
+      fixtures.thenLikesCountQueryBuilt('sg-1');
+      expect(result).toEqual({ id: 'sg-1', likesCount: 7 });
     });
 
-    it('should return empty array when data is null', async () => {
-      fixtures.whenLikesQueryReturnsNullData();
+    it('should throw ServerError when single fails', async () => {
+      fixtures.whenLikesCountSingleFails('not found');
 
-      const result = await fixtures.whenGetUserLikes('user-b', ['z']);
+      const promise = fixtures.whenGetSuggestionLikesCountById('missing');
 
-      expect(result).toEqual([]);
+      await expect(promise).rejects.toBeInstanceOf(ServerError);
+      await expect(promise).rejects.toThrow('not found');
+    });
+  });
+
+  describe('decrementLike', () => {
+    it('should update suggestions row with decremented count', async () => {
+      fixtures.whenUpdateSucceeds();
+
+      await fixtures.whenDecrementLike('sg-1', 5);
+
+      fixtures.thenUpdateLikeBuilt('sg-1', { likes_count: 4 });
+    });
+
+    it('should throw ServerError when update fails', async () => {
+      fixtures.whenUpdateFails('write failed');
+
+      const promise = fixtures.whenDecrementLike('sg-1', 2);
+
+      await expect(promise).rejects.toBeInstanceOf(ServerError);
+      await expect(promise).rejects.toThrow('write failed');
+    });
+  });
+
+  describe('incrementLike', () => {
+    it('should update suggestions row with incremented count', async () => {
+      fixtures.whenUpdateSucceeds();
+
+      await fixtures.whenIncrementLike('sg-1', 3);
+
+      fixtures.thenUpdateLikeBuilt('sg-1', { likes_count: 4 });
+    });
+
+    it('should throw ServerError when update fails', async () => {
+      fixtures.whenUpdateFails('conflict');
+
+      const promise = fixtures.whenIncrementLike('sg-1', 1);
+
+      await expect(promise).rejects.toBeInstanceOf(ServerError);
+      await expect(promise).rejects.toThrow('conflict');
     });
   });
 });
@@ -86,13 +125,27 @@ class Fixtures {
   private readonly eqCategoryMock = jest.fn(() => ({
     order: this.orderLikesMock,
   }));
-  private readonly selectSuggestionsMock = jest.fn(() => ({
-    eq: this.eqCategoryMock,
+
+  private readonly singleMock = jest.fn();
+  private readonly eqSuggestionIdForSingleMock = jest.fn(() => ({
+    single: this.singleMock,
   }));
 
-  private readonly inMock = jest.fn();
-  private readonly eqUserMock = jest.fn(() => ({ in: this.inMock }));
-  private readonly selectLikesMock = jest.fn(() => ({ eq: this.eqUserMock }));
+  private readonly eqSuggestionIdForUpdateMock = jest.fn();
+
+  private readonly selectSuggestionsMock = jest.fn((cols: string) => {
+    if (cols === '*') {
+      return { eq: this.eqCategoryMock };
+    }
+    if (cols === 'id, likes_count') {
+      return { eq: this.eqSuggestionIdForSingleMock };
+    }
+    throw new Error(`unexpected select ${cols}`);
+  });
+
+  private readonly updateMock = jest.fn(() => ({
+    eq: this.eqSuggestionIdForUpdateMock,
+  }));
 
   private readonly fromMock = jest.fn();
 
@@ -100,13 +153,13 @@ class Fixtures {
 
   constructor() {
     this.fromMock.mockImplementation((table: string) => {
-      if (table === 'suggestions') {
-        return { select: this.selectSuggestionsMock };
+      if (table !== 'suggestions') {
+        throw new Error(`unexpected table ${table}`);
       }
-      if (table === 'suggestion_likes') {
-        return { select: this.selectLikesMock };
-      }
-      throw new Error(`unexpected table ${table}`);
+      return {
+        select: this.selectSuggestionsMock,
+        update: this.updateMock,
+      };
     });
 
     const supabaseMock = { from: this.fromMock };
@@ -117,8 +170,16 @@ class Fixtures {
     return this.repository.getSuggestions(category);
   }
 
-  whenGetUserLikes(userId: string, ids: string[]) {
-    return this.repository.getUserLikes(userId, ids);
+  whenGetSuggestionLikesCountById(id: string) {
+    return this.repository.getSuggestionLikesCountById(id);
+  }
+
+  whenDecrementLike(suggestionId: string, likesCount: number) {
+    return this.repository.decrementLike(suggestionId, likesCount);
+  }
+
+  whenIncrementLike(suggestionId: string, likesCount: number) {
+    return this.repository.incrementLike(suggestionId, likesCount);
   }
 
   whenSuggestionsQuerySucceeds() {
@@ -142,17 +203,27 @@ class Fixtures {
     });
   }
 
-  whenLikesQuerySucceeds() {
-    this.inMock.mockResolvedValue({
-      data: [{ suggestion_id: 'x' }],
+  whenLikesCountSingleSucceeds() {
+    this.singleMock.mockResolvedValue({
+      data: { id: 'sg-1', likes_count: 7 },
       error: null,
     });
   }
 
-  whenLikesQueryReturnsNullData() {
-    this.inMock.mockResolvedValue({
+  whenLikesCountSingleFails(message: string) {
+    this.singleMock.mockResolvedValue({
       data: null,
-      error: null,
+      error: { message },
+    });
+  }
+
+  whenUpdateSucceeds() {
+    this.eqSuggestionIdForUpdateMock.mockResolvedValue({ error: null });
+  }
+
+  whenUpdateFails(message: string) {
+    this.eqSuggestionIdForUpdateMock.mockResolvedValue({
+      error: { message },
     });
   }
 
@@ -168,10 +239,21 @@ class Fixtures {
     });
   }
 
-  thenLikesQueryChainBuilt(userId: string, ids: string[]) {
-    expect(this.fromMock).toHaveBeenCalledWith('suggestion_likes');
-    expect(this.selectLikesMock).toHaveBeenCalledWith('suggestion_id');
-    expect(this.eqUserMock).toHaveBeenCalledWith('user_id', userId);
-    expect(this.inMock).toHaveBeenCalledWith('suggestion_id', ids);
+  thenLikesCountQueryBuilt(suggestionId: string) {
+    expect(this.fromMock).toHaveBeenCalledWith('suggestions');
+    expect(this.selectSuggestionsMock).toHaveBeenCalledWith('id, likes_count');
+    expect(this.eqSuggestionIdForSingleMock).toHaveBeenCalledWith(
+      'id',
+      suggestionId,
+    );
+    expect(this.singleMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenUpdateLikeBuilt(suggestionId: string, payload: { likes_count: number }) {
+    expect(this.updateMock).toHaveBeenCalledWith(payload);
+    expect(this.eqSuggestionIdForUpdateMock).toHaveBeenCalledWith(
+      'id',
+      suggestionId,
+    );
   }
 }

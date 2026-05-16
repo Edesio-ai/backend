@@ -1,17 +1,29 @@
 import { CurrentUser } from '../auth/decorator/current-user.decorator';
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Post } from '@nestjs/common';
 import { GetSuggestionsUseCase } from 'src/application/suggestion/get-suggestions.use-case';
 import { type User } from 'src/domain/auth/types/auth.type';
+import { LikeSuggestionUseCase } from 'src/application/suggestion/like-suggestion.use-case';
 
 @Controller('suggestion')
 export class SuggestionController {
-  constructor(private readonly getSuggestionsUseCase: GetSuggestionsUseCase) {}
+  constructor(
+    private readonly getSuggestionsUseCase: GetSuggestionsUseCase,
+    private readonly likeSuggestionUseCase: LikeSuggestionUseCase,
+  ) {}
 
-  @Get(':category')
+  @Get('category/:category')
   async getSuggestions(
     @CurrentUser() user: User,
     @Param('category') category: string,
   ) {
     return this.getSuggestionsUseCase.execute(category, user);
+  }
+
+  @Post(':suggestionId/like')
+  async likeSuggestion(
+    @CurrentUser() user: User,
+    @Param('suggestionId') suggestionId: string,
+  ): Promise<{ liked: boolean; likesCount: number }> {
+    return this.likeSuggestionUseCase.execute(suggestionId, user);
   }
 }

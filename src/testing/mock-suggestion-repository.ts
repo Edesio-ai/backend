@@ -2,7 +2,9 @@ import type { ISuggestionRepository } from 'src/domain/suggestion/contracts/i-su
 
 export function createMockSuggestionRepository(): jest.Mocked<ISuggestionRepository> {
   return {
+    getSuggestionLikesCountById: jest.fn(),
     getSuggestions: jest.fn(),
-    getUserLikes: jest.fn(),
+    decrementLike: jest.fn(),
+    incrementLike: jest.fn(),
   };
 }
