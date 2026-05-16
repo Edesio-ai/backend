@@ -130,7 +130,7 @@ describe('StripeRepository', () => {
       expect(result).toEqual(fixtures.expectedStripeSubscription);
       expect(fixtures.subscriptionsListMock).toHaveBeenCalledWith({
         customer: fixtures.customerId,
-        status: 'all',
+        status: 'active',
         limit: 1,
       });
       expect(fixtures.invoicesCreatePreviewMock).toHaveBeenCalledWith({
