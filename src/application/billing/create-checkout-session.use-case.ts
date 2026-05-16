@@ -3,8 +3,8 @@ import { User } from '../../domain/auth/types/auth.type';
 import { TokenUserNotFoundError } from '../../domain/auth/errors/auth.errors';
 import {
   SUBSCRIPTION_REPOSITORY,
-  type SubscriptionRepository,
-} from 'src/domain/subscription/contracts/subscription.repository';
+  type ISubscriptionRepository,
+} from 'src/domain/subscription/contracts/i-subscription.repository';
 import {
   STRIPE_PROVIDER,
   type IStripeProvider,
@@ -13,7 +13,7 @@ import {
 export class CreateCheckoutSessionsUseCase {
   constructor(
     @Inject(SUBSCRIPTION_REPOSITORY)
-    private readonly subscriptionRepository: SubscriptionRepository,
+    private readonly subscriptionRepository: ISubscriptionRepository,
     @Inject(STRIPE_PROVIDER)
     private readonly paymentClient: IStripeProvider,
   ) {}

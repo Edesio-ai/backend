@@ -1,6 +1,6 @@
-import type { SubscriptionRepository } from 'src/domain/subscription/contracts/subscription.repository';
+import type { ISubscriptionRepository } from 'src/domain/subscription/contracts/i-subscription.repository';
 
-export function createMockSubscriptionRepository(): jest.Mocked<SubscriptionRepository> {
+export function createMockSubscriptionRepository(): jest.Mocked<ISubscriptionRepository> {
   return {
     getUserSubscription: jest.fn(),
   };
