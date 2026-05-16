@@ -48,6 +48,7 @@ class Fixtures {
     this.emailProvider = {
       sendWelcomeEmail: jest.fn(),
       sendProfesseurInvitation: jest.fn(),
+      sendCancelSubscriptionEmail: jest.fn(),
     };
 
     this.sendInvitationUseCase = new SendInvitationUseCase(this.emailProvider);

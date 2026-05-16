@@ -88,6 +88,7 @@ class Fixtures {
       getSubscriptionsByCustomerId: jest.fn(),
       createCheckoutSession: jest.fn(),
       getCheckoutSession: jest.fn(),
+      cancelSubscription: jest.fn(),
     };
 
     this.createCheckoutSessionsUseCase = new CreateCheckoutSessionsUseCase(

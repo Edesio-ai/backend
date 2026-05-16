@@ -1,4 +1,8 @@
-import { StripeSubscription } from 'src/domain/billing/types/billing.type';
+import { User } from 'src/domain/auth/types/auth.type';
+import {
+  CancelSubscription,
+  StripeSubscription,
+} from 'src/domain/billing/types/billing.type';
 import { StripeRepository } from './stripe.repository';
 import { ServerError } from '../../../../domain/shared/errors/global.errors';
 
@@ -171,15 +175,76 @@ describe('StripeRepository', () => {
       });
     });
 
-    it('should throw ServerError when createPreview fails', async () => {
+    it('should fall back when createPreview fails', async () => {
       fixtures.whenGetUserSubscriptionUntilPreview();
       fixtures.whenCreatePreviewThrows();
 
-      const promise = fixtures.whenGetUserSubscription();
+      const result = await fixtures.whenGetUserSubscription();
+
+      expect(fixtures.invoicesCreatePreviewMock).toHaveBeenCalledWith({
+        customer: fixtures.customerId,
+        subscription: fixtures.subscriptionRow.id,
+      });
+      expect(result).toEqual({
+        ...fixtures.expectedStripeSubscription,
+        currentPeriodEnd: undefined,
+      });
+    });
+  });
+
+  describe('cancelSubscription', () => {
+    it('should set cancel_at_period_end and return plan name with formatted end date', async () => {
+      fixtures.whenCancelSubscriptionSucceeds();
+
+      const result = await fixtures.whenCancelSubscription();
+
+      fixtures.thenCancelSubscriptionStripeCallsSucceeded();
+      expect(result).toEqual(fixtures.expectedCancelSubscription);
+    });
+
+    it('should throw ServerError when customer is not found', async () => {
+      fixtures.whenCustomersListEmpty();
+
+      const promise = fixtures.whenCancelSubscription();
 
       await fixtures.thenThrowServerErrorWithMessagePart(
         promise,
-        'Error searching subscriptions',
+        'Customer not found',
+      );
+      fixtures.thenSubscriptionsUpdateNotCalled();
+    });
+
+    it('should throw ServerError when no active subscription exists', async () => {
+      fixtures.whenCustomersListReturnsOneCustomer();
+      fixtures.whenCancelSubscriptionActiveListEmpty();
+
+      const promise = fixtures.whenCancelSubscription();
+
+      await fixtures.thenThrowServerErrorWithMessagePart(
+        promise,
+        'No active subscription found',
+      );
+      fixtures.thenSubscriptionsUpdateNotCalled();
+    });
+
+    it('should use default plan name when product retrieve fails', async () => {
+      fixtures.whenCancelSubscriptionSucceedsExceptProduct();
+
+      const result = await fixtures.whenCancelSubscription();
+
+      expect(result.planName).toBe('Abonnement Edesio');
+      expect(result.endDate).toBe(fixtures.expectedCancelSubscription.endDate);
+    });
+
+    it('should throw ServerError when subscription update fails', async () => {
+      fixtures.whenCancelSubscriptionUntilUpdate();
+      fixtures.whenSubscriptionsUpdateThrows();
+
+      const promise = fixtures.whenCancelSubscription();
+
+      await fixtures.thenThrowServerErrorWithMessagePart(
+        promise,
+        'Error canceling subscription',
       );
     });
   });
@@ -194,7 +259,20 @@ class Fixtures {
   public readonly productsRetrieveMock = jest.fn();
   public readonly paymentMethodsRetrieveMock = jest.fn();
   public readonly invoicesCreatePreviewMock = jest.fn();
+  public readonly subscriptionsUpdateMock = jest.fn();
   public readonly stripeRepository: StripeRepository;
+
+  public readonly cancelDomainUser: User = {
+    id: 'user-1',
+    email: 'owner@school.com',
+    emailConfirmedAt: '2026-01-01T00:00:00.000Z',
+    metadata: { role: 'establishment', firstname: 'Pat' },
+  };
+
+  public expectedCancelSubscription: CancelSubscription = {
+    planName: '',
+    endDate: '',
+  };
 
   public readonly subscriptionRow = {
     id: 'sub_abc',
@@ -265,6 +343,7 @@ class Fixtures {
       },
       subscriptions: {
         list: this.subscriptionsListMock,
+        update: this.subscriptionsUpdateMock,
       },
       products: {
         retrieve: this.productsRetrieveMock,
@@ -306,6 +385,86 @@ class Fixtures {
 
   whenGetUserSubscription() {
     return this.stripeRepository.getUserSubscription(this.email);
+  }
+
+  whenCancelSubscription() {
+    return this.stripeRepository.cancelSubscription(this.cancelDomainUser);
+  }
+
+  whenCancelSubscriptionSucceeds() {
+    const endTs = 1735689600;
+    this.whenCustomersListReturnsOneCustomer();
+    this.subscriptionsListMock.mockResolvedValue({
+      data: [
+        {
+          id: 'sub_cancel_1',
+          items: {
+            data: [{ price: { product: 'prod_cancel_x' } }],
+          },
+        },
+      ],
+    });
+    this.subscriptionsUpdateMock.mockResolvedValue({
+      current_period_end: endTs,
+    });
+    this.productsRetrieveMock.mockResolvedValue({ name: 'Offre Campus' });
+    this.expectedCancelSubscription = {
+      planName: 'Offre Campus',
+      endDate: new Date(endTs * 1000).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+    };
+  }
+
+  whenCancelSubscriptionActiveListEmpty() {
+    this.subscriptionsListMock.mockResolvedValue({ data: [] });
+  }
+
+  whenCancelSubscriptionSucceedsExceptProduct() {
+    const endTs = 1735689600;
+    this.whenCustomersListReturnsOneCustomer();
+    this.subscriptionsListMock.mockResolvedValue({
+      data: [
+        {
+          id: 'sub_cancel_1',
+          items: {
+            data: [{ price: { product: 'prod_cancel_x' } }],
+          },
+        },
+      ],
+    });
+    this.subscriptionsUpdateMock.mockResolvedValue({
+      current_period_end: endTs,
+    });
+    this.productsRetrieveMock.mockRejectedValue(new Error('product down'));
+    this.expectedCancelSubscription = {
+      planName: 'Abonnement Edesio',
+      endDate: new Date(endTs * 1000).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+    };
+  }
+
+  whenCancelSubscriptionUntilUpdate() {
+    this.whenCustomersListReturnsOneCustomer();
+    this.subscriptionsListMock.mockResolvedValue({
+      data: [
+        {
+          id: 'sub_cancel_1',
+          items: {
+            data: [{ price: { product: 'prod_cancel_x' } }],
+          },
+        },
+      ],
+    });
+  }
+
+  whenSubscriptionsUpdateThrows() {
+    this.subscriptionsUpdateMock.mockRejectedValue(new Error('update failed'));
   }
 
   whenGetUserSubscriptionFullChainSucceeds() {
@@ -538,5 +697,25 @@ class Fixtures {
 
   thenReturnCheckoutUrl(result: any) {
     expect(result).toEqual({ url: 'https://stripe.test/checkout' });
+  }
+
+  thenCancelSubscriptionStripeCallsSucceeded() {
+    expect(this.customersListMock).toHaveBeenCalledWith({
+      email: this.cancelDomainUser.email,
+      limit: 1,
+    });
+    expect(this.subscriptionsListMock).toHaveBeenCalledWith({
+      customer: this.customerId,
+      status: 'active',
+      limit: 1,
+    });
+    expect(this.subscriptionsUpdateMock).toHaveBeenCalledWith('sub_cancel_1', {
+      cancel_at_period_end: true,
+    });
+    expect(this.productsRetrieveMock).toHaveBeenCalledWith('prod_cancel_x');
+  }
+
+  thenSubscriptionsUpdateNotCalled() {
+    expect(this.subscriptionsUpdateMock).not.toHaveBeenCalled();
   }
 }

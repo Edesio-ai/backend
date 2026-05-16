@@ -129,6 +129,7 @@ class Fixtures {
       getSubscriptionsByCustomerId: jest.fn(),
       createCheckoutSession: jest.fn(),
       getCheckoutSession: jest.fn(),
+      cancelSubscription: jest.fn(),
     };
 
     this.teacherRepository = createMockTeacherRepository();

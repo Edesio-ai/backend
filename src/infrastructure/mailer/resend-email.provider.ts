@@ -7,6 +7,8 @@ import { renderWelcomeEmailHtml } from './templates/welcome/welcome-email.render
 import { buildProfesseurInvitationTemplateData } from './templates/invitation/professeur-invitation-email.data';
 import { renderProfesseurInvitationEmailHtml } from './templates/invitation/professeur-invitation-email.renderer';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
+import { CancelSubscriptionEmailParams } from 'src/domain/billing/types/billing.type';
+import { renderCancelSubscriptionEmailHtml } from './templates/cancel-subscription/cancel-subscription-email.renderer';
 
 @Injectable()
 export class ResendEmailProvider implements IEmailProvider {
@@ -85,6 +87,25 @@ export class ResendEmailProvider implements IEmailProvider {
       }
       const message = err instanceof Error ? err.message : String(err);
       throw new ServerError(`Error sending welcome email: ${message}`);
+    }
+  }
+  public async sendCancelSubscriptionEmail(
+    params: CancelSubscriptionEmailParams,
+  ): Promise<void> {
+    const { email } = params;
+    const html = renderCancelSubscriptionEmailHtml(params);
+
+    const { error } = await this.resend.emails.send({
+      from: 'Edesio <noreply@edesio.ai>',
+      to: [email],
+      subject: "Confirmation d'annulation de votre abonnement Edesio",
+      html,
+    });
+
+    if (error) {
+      throw new ServerError(
+        `Error sending cancellation email: ${error.message}`,
+      );
     }
   }
 }
