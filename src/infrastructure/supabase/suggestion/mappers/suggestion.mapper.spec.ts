@@ -1,7 +1,7 @@
 import { SuggestionMapper } from './suggestion.mapper';
 import {
   SupabaseSuggestion,
-  SupabaseUserLike,
+  SupabaseSuggestionLikesCount,
 } from 'src/domain/suggestion/suggestion.type';
 
 describe('SuggestionMapper', () => {
@@ -42,8 +42,32 @@ describe('SuggestionMapper', () => {
     expect(domain.userName).toBeNull();
   });
 
-  it('toUserLike maps suggestion_id to string id', () => {
-    const row: SupabaseUserLike = { suggestion_id: 'liked-sg' };
-    expect(SuggestionMapper.toUserLike(row)).toBe('liked-sg');
+  it('toLikesCount maps id and likes_count', () => {
+    const row: SupabaseSuggestionLikesCount = {
+      id: 'sg-2',
+      likes_count: 12,
+    };
+    expect(SuggestionMapper.toLikesCount(row)).toEqual({
+      id: 'sg-2',
+      likesCount: 12,
+    });
+  });
+
+  it('decrementLikeToSupabase floors at zero', () => {
+    expect(SuggestionMapper.decrementLikeToSupabase(3)).toEqual({
+      likes_count: 2,
+    });
+    expect(SuggestionMapper.decrementLikeToSupabase(0)).toEqual({
+      likes_count: 0,
+    });
+  });
+
+  it('incrementLikeToSupabase adds one', () => {
+    expect(SuggestionMapper.incrementLikeToSupabase(4)).toEqual({
+      likes_count: 5,
+    });
+    expect(SuggestionMapper.incrementLikeToSupabase(0)).toEqual({
+      likes_count: 1,
+    });
   });
 });

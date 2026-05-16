@@ -23,6 +23,9 @@ export type SupabaseSuggestion = {
   created_at: string;
 };
 
-export type SupabaseUserLike = {
-  suggestion_id: string;
-};
+export type SuggestionLikesCount = Pick<Suggestion, 'id' | 'likesCount'>;
+export type SupabaseSuggestionLikesCount = Pick<
+  SupabaseSuggestion,
+  'id' | 'likes_count'
+>;
+export type SupabaseCountLike = Pick<SupabaseSuggestion, 'likes_count'>;

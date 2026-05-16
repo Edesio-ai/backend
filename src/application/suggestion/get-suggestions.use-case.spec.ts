@@ -3,7 +3,9 @@ import { GetSuggestionsUseCase } from './get-suggestions.use-case';
 import { User } from '../../domain/auth/types/auth.type';
 import { Suggestion } from '../../domain/suggestion/suggestion.type';
 import { ISuggestionRepository } from '../../domain/suggestion/contracts/i-suggestion.repository';
+import { ISuggestionLikeRepository } from '../../domain/suggestion-like/contracts/suggestion-like.repository';
 import { createMockSuggestionRepository } from 'src/testing/mock-suggestion-repository';
+import { createMockSuggestionLikeRepository } from 'src/testing/mock-suggestion-like-repository';
 
 describe('GetSuggestionsUseCase', () => {
   let fixtures: Fixtures;
@@ -48,6 +50,7 @@ describe('GetSuggestionsUseCase', () => {
 
 class Fixtures {
   public readonly suggestionRepository: jest.Mocked<ISuggestionRepository>;
+  public readonly suggestionLikeRepository: jest.Mocked<ISuggestionLikeRepository>;
   public readonly useCase: GetSuggestionsUseCase;
 
   public readonly teacherUser: User;
@@ -56,7 +59,11 @@ class Fixtures {
 
   constructor() {
     this.suggestionRepository = createMockSuggestionRepository();
-    this.useCase = new GetSuggestionsUseCase(this.suggestionRepository);
+    this.suggestionLikeRepository = createMockSuggestionLikeRepository();
+    this.useCase = new GetSuggestionsUseCase(
+      this.suggestionRepository,
+      this.suggestionLikeRepository,
+    );
 
     this.teacherUser = {
       id: 'u-teacher',
@@ -106,12 +113,12 @@ class Fixtures {
     this.suggestionRepository.getSuggestions.mockResolvedValue(
       this.suggestions,
     );
-    this.suggestionRepository.getUserLikes.mockResolvedValue(['s1']);
+    this.suggestionLikeRepository.getUserLikes.mockResolvedValue(['s1']);
   }
 
   whenRepositoryReturnsEmptySuggestions() {
     this.suggestionRepository.getSuggestions.mockResolvedValue([]);
-    this.suggestionRepository.getUserLikes.mockResolvedValue([]);
+    this.suggestionLikeRepository.getUserLikes.mockResolvedValue([]);
   }
 
   async thenThrowsForbidden(promise: Promise<unknown>) {
@@ -123,7 +130,7 @@ class Fixtures {
 
   thenRepositoryNotCalled() {
     expect(this.suggestionRepository.getSuggestions).not.toHaveBeenCalled();
-    expect(this.suggestionRepository.getUserLikes).not.toHaveBeenCalled();
+    expect(this.suggestionLikeRepository.getUserLikes).not.toHaveBeenCalled();
   }
 
   thenGetSuggestionsCalledWith(category: string) {
@@ -134,11 +141,11 @@ class Fixtures {
   }
 
   thenGetUserLikesCalledWith(userId: string, ids: string[]) {
-    expect(this.suggestionRepository.getUserLikes).toHaveBeenCalledWith(
+    expect(this.suggestionLikeRepository.getUserLikes).toHaveBeenCalledWith(
       userId,
       ids,
     );
-    expect(this.suggestionRepository.getUserLikes).toHaveBeenCalledTimes(1);
+    expect(this.suggestionLikeRepository.getUserLikes).toHaveBeenCalledTimes(1);
   }
 
   thenReturnsSuggestionsWithLikeStatus(result: Suggestion[]) {
