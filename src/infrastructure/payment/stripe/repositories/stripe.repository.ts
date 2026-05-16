@@ -141,7 +141,7 @@ export class StripeRepository implements IStripeProvider {
       const customerId = customers[0].id;
       const subscriptions = await this.stripeClient.subscriptions.list({
         customer: customerId,
-        status: 'all',
+        status: 'active',
         limit: 1,
       });
 
