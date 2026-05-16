@@ -248,6 +248,53 @@ describe('StripeRepository', () => {
       );
     });
   });
+
+  describe('reactivateSubscription', () => {
+    it('should clear cancel_at_period_end on latest subscription', async () => {
+      fixtures.whenReactivateFlowSucceeds();
+
+      await fixtures.whenReactivateSubscription();
+
+      fixtures.thenReactivateSubscriptionStripeCallsSucceeded();
+    });
+
+    it('should throw ServerError when customer is not found', async () => {
+      fixtures.whenCustomersListEmpty();
+
+      const promise = fixtures.whenReactivateSubscription();
+
+      await fixtures.thenThrowServerErrorWithMessagePart(
+        promise,
+        'Customer not found',
+      );
+      fixtures.thenSubscriptionsUpdateNotCalled();
+    });
+
+    it('should throw ServerError when no subscription exists', async () => {
+      fixtures.whenCustomersListReturnsOneCustomer();
+      fixtures.whenReactivateSubscriptionsListEmpty();
+
+      const promise = fixtures.whenReactivateSubscription();
+
+      await fixtures.thenThrowServerErrorWithMessagePart(
+        promise,
+        'No active subscription found',
+      );
+      fixtures.thenSubscriptionsUpdateNotCalled();
+    });
+
+    it('should throw ServerError when subscription update fails', async () => {
+      fixtures.whenReactivateFlowSucceeds();
+      fixtures.whenSubscriptionsUpdateThrows();
+
+      const promise = fixtures.whenReactivateSubscription();
+
+      await fixtures.thenThrowServerErrorWithMessagePart(
+        promise,
+        'Error reactivating subscription',
+      );
+    });
+  });
 });
 
 class Fixtures {
@@ -391,6 +438,22 @@ class Fixtures {
     return this.stripeRepository.cancelSubscription(this.cancelDomainUser);
   }
 
+  whenReactivateSubscription() {
+    return this.stripeRepository.reactivateSubscription(this.email);
+  }
+
+  whenReactivateFlowSucceeds() {
+    this.whenCustomersListReturnsOneCustomer();
+    this.subscriptionsListMock.mockResolvedValue({
+      data: [{ id: 'sub_reactivate_1' }],
+    });
+    this.subscriptionsUpdateMock.mockResolvedValue({});
+  }
+
+  whenReactivateSubscriptionsListEmpty() {
+    this.subscriptionsListMock.mockResolvedValue({ data: [] });
+  }
+
   whenCancelSubscriptionSucceeds() {
     const endTs = 1735689600;
     this.whenCustomersListReturnsOneCustomer();
@@ -405,7 +468,7 @@ class Fixtures {
       ],
     });
     this.subscriptionsUpdateMock.mockResolvedValue({
-      current_period_end: endTs,
+      cancel_at: endTs,
     });
     this.productsRetrieveMock.mockResolvedValue({ name: 'Offre Campus' });
     this.expectedCancelSubscription = {
@@ -436,7 +499,7 @@ class Fixtures {
       ],
     });
     this.subscriptionsUpdateMock.mockResolvedValue({
-      current_period_end: endTs,
+      cancel_at: endTs,
     });
     this.productsRetrieveMock.mockRejectedValue(new Error('product down'));
     this.expectedCancelSubscription = {
@@ -717,5 +780,22 @@ class Fixtures {
 
   thenSubscriptionsUpdateNotCalled() {
     expect(this.subscriptionsUpdateMock).not.toHaveBeenCalled();
+  }
+
+  thenReactivateSubscriptionStripeCallsSucceeded() {
+    expect(this.customersListMock).toHaveBeenCalledWith({
+      email: this.email,
+      limit: 1,
+    });
+    expect(this.subscriptionsListMock).toHaveBeenCalledWith({
+      customer: this.customerId,
+      limit: 1,
+    });
+    expect(this.subscriptionsUpdateMock).toHaveBeenCalledWith(
+      'sub_reactivate_1',
+      {
+        cancel_at_period_end: false,
+      },
+    );
   }
 }

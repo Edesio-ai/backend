@@ -12,6 +12,7 @@ import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teac
 import { GetSubscriptionUseCase } from 'src/application/billing/get-subscription.use-case';
 import { CancelSubscriptionUseCase } from 'src/application/billing/cancel-subscription.use-case';
 import { MailerModule } from 'src/infrastructure/mailer/mailer.module';
+import { ReactivateSubscriptionUseCase } from 'src/application/billing/reactivate-subscription.use-case';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { MailerModule } from 'src/infrastructure/mailer/mailer.module';
     PaymentSuccessUseCase,
     GetSubscriptionUseCase,
     CancelSubscriptionUseCase,
+    ReactivateSubscriptionUseCase,
   ],
 })
 export class BillingModule {}

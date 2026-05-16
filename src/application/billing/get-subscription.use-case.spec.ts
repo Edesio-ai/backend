@@ -130,6 +130,7 @@ class Fixtures {
       createCheckoutSession: jest.fn(),
       getCheckoutSession: jest.fn(),
       cancelSubscription: jest.fn(),
+      reactivateSubscription: jest.fn(),
     };
 
     this.teacherRepository = createMockTeacherRepository();

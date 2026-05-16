@@ -25,7 +25,7 @@ describe('renderCancelSubscriptionEmailHtml', () => {
       expect(html).toContain('Bonjour Claire');
       expect(html).toContain('Offre Pro');
       expect(html).toContain('15 février 2026');
-      expect(html).toContain('https://app.edesio.test/icon-192.png');
+      expect(html).toContain('https://app.edesio.test/edesio-logo-square.png');
       expect(html).toContain('https://app.edesio.test/profil');
       expect(html).toContain('contact@edesio.ai');
     });
@@ -45,7 +45,7 @@ describe('renderCancelSubscriptionEmailHtml', () => {
     it('should fall back to localhost default for assets and CTA', () => {
       const html = renderCancelSubscriptionEmailHtml(params);
 
-      expect(html).toContain('http://localhost:5000/icon-192.png');
+      expect(html).toContain('http://localhost:5000/edesio-logo-square.png');
       expect(html).toContain('http://localhost:5000/profil');
     });
   });
