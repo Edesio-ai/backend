@@ -3,7 +3,7 @@ export type Suggestion = {
   userId: string;
   userEmail: string | null;
   userName: string | null;
-  category: string;
+  category: 'teacher' | 'student' | 'establishment' | 'standalone';
   title: string;
   content: string;
   likesCount: number;
@@ -16,7 +16,7 @@ export type SupabaseSuggestion = {
   user_id: string;
   user_email: string | null;
   user_name: string | null;
-  category: string;
+  category: 'teacher' | 'student' | 'establishment' | 'standalone';
   title: string;
   content: string;
   likes_count: number;
@@ -29,3 +29,11 @@ export type SupabaseSuggestionLikesCount = Pick<
   'id' | 'likes_count'
 >;
 export type SupabaseCountLike = Pick<SupabaseSuggestion, 'likes_count'>;
+export type SuggestionToInsert = Omit<
+  Suggestion,
+  'id' | 'createdAt' | 'userHasLiked'
+>;
+export type SupabaseSuggestionToInsert = Omit<
+  SupabaseSuggestion,
+  'id' | 'created_at'
+>;

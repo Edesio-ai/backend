@@ -4,10 +4,15 @@ import { GetSuggestionsUseCase } from 'src/application/suggestion/get-suggestion
 import { SuggestionPersistenceModule } from 'src/infrastructure/supabase/suggestion/suggestion-persistence.module';
 import { LikeSuggestionUseCase } from 'src/application/suggestion/like-suggestion.use-case';
 import { SuggestionLikePersistenceModule } from 'src/infrastructure/supabase/suggestion-like/suggestion-like-persistence.module';
+import { CreateSuggestionUseCase } from 'src/application/suggestion/create-suggestion.use-case';
 
 @Module({
   imports: [SuggestionPersistenceModule, SuggestionLikePersistenceModule],
   controllers: [SuggestionController],
-  providers: [GetSuggestionsUseCase, LikeSuggestionUseCase],
+  providers: [
+    GetSuggestionsUseCase,
+    LikeSuggestionUseCase,
+    CreateSuggestionUseCase,
+  ],
 })
 export class SuggestionModule {}

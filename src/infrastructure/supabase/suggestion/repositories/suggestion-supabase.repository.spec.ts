@@ -1,6 +1,7 @@
 import { SuggestionSupabaseRepository } from './suggestion-supabase.repository';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { SupabaseSuggestion } from 'src/domain/suggestion/suggestion.type';
+import { SuggestionMapper } from '../mappers/suggestion.mapper';
 
 describe('SuggestionSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -101,6 +102,31 @@ describe('SuggestionSupabaseRepository', () => {
       await expect(promise).rejects.toThrow('conflict');
     });
   });
+
+  describe('createSuggestion', () => {
+    it('should insert, select row and return mapped suggestion', async () => {
+      fixtures.whenInsertSingleSucceeds();
+
+      const result = await fixtures.whenCreateSuggestion();
+
+      fixtures.thenInsertSelectSingleChainBuilt();
+      expect(result).toMatchObject({
+        id: 'sg-new',
+        userId: 'u-new',
+        title: 'Hello',
+        likesCount: 0,
+      });
+    });
+
+    it('should throw ServerError when insert fails', async () => {
+      fixtures.whenInsertSingleFails('violates constraint');
+
+      const promise = fixtures.whenCreateSuggestion();
+
+      await expect(promise).rejects.toBeInstanceOf(ServerError);
+      await expect(promise).rejects.toThrow('violates constraint');
+    });
+  });
 });
 
 class Fixtures {
@@ -147,9 +173,27 @@ class Fixtures {
     eq: this.eqSuggestionIdForUpdateMock,
   }));
 
+  private readonly singleAfterInsertMock = jest.fn();
+  private readonly selectAfterInsertMock = jest.fn(() => ({
+    single: this.singleAfterInsertMock,
+  }));
+  private readonly insertSuggestionMock = jest.fn(() => ({
+    select: this.selectAfterInsertMock,
+  }));
+
   private readonly fromMock = jest.fn();
 
   public readonly repository: SuggestionSupabaseRepository;
+
+  public readonly insertPayload = {
+    userId: 'u-new',
+    userEmail: 'n@test.com',
+    userName: 'Noémie',
+    category: 'teacher' as const,
+    title: 'Hello',
+    content: 'World content',
+    likesCount: 0,
+  };
 
   constructor() {
     this.fromMock.mockImplementation((table: string) => {
@@ -159,6 +203,7 @@ class Fixtures {
       return {
         select: this.selectSuggestionsMock,
         update: this.updateMock,
+        insert: this.insertSuggestionMock,
       };
     });
 
@@ -182,10 +227,38 @@ class Fixtures {
     return this.repository.incrementLike(suggestionId, likesCount);
   }
 
+  whenCreateSuggestion() {
+    return this.repository.createSuggestion(this.insertPayload);
+  }
+
   whenSuggestionsQuerySucceeds() {
     this.orderCreatedAtMock.mockResolvedValue({
       data: this.rows,
       error: null,
+    });
+  }
+
+  whenInsertSingleSucceeds() {
+    this.singleAfterInsertMock.mockResolvedValue({
+      data: {
+        id: 'sg-new',
+        user_id: 'u-new',
+        user_email: 'n@test.com',
+        user_name: 'Noémie',
+        category: 'teacher',
+        title: 'Hello',
+        content: 'World content',
+        likes_count: 0,
+        created_at: '2026-03-01T08:00:00.000Z',
+      },
+      error: null,
+    });
+  }
+
+  whenInsertSingleFails(message: string) {
+    this.singleAfterInsertMock.mockResolvedValue({
+      data: null,
+      error: { message },
     });
   }
 
@@ -255,5 +328,14 @@ class Fixtures {
       'id',
       suggestionId,
     );
+  }
+
+  thenInsertSelectSingleChainBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('suggestions');
+    expect(this.insertSuggestionMock).toHaveBeenCalledWith(
+      SuggestionMapper.toInsert(this.insertPayload),
+    );
+    expect(this.selectAfterInsertMock).toHaveBeenCalledTimes(1);
+    expect(this.singleAfterInsertMock).toHaveBeenCalledTimes(1);
   }
 }

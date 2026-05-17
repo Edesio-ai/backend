@@ -4,9 +4,20 @@ import {
   SuggestionLikesCount,
   SupabaseSuggestionLikesCount,
   SupabaseCountLike,
+  SuggestionToInsert,
+  SupabaseSuggestionToInsert,
 } from 'src/domain/suggestion/suggestion.type';
 
 export const SuggestionMapper = {
+  toInsert: (body: SuggestionToInsert): SupabaseSuggestionToInsert => ({
+    user_id: body.userId,
+    user_email: body.userEmail,
+    user_name: body.userName,
+    category: body.category,
+    title: body.title,
+    content: body.content,
+    likes_count: body.likesCount,
+  }),
   toDomain: (data: SupabaseSuggestion): Suggestion => ({
     id: data.id,
     userId: data.user_id,

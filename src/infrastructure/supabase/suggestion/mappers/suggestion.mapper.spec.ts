@@ -2,9 +2,32 @@ import { SuggestionMapper } from './suggestion.mapper';
 import {
   SupabaseSuggestion,
   SupabaseSuggestionLikesCount,
+  SuggestionToInsert,
 } from 'src/domain/suggestion/suggestion.type';
 
 describe('SuggestionMapper', () => {
+  const insertBody: SuggestionToInsert = {
+    userId: 'u-1',
+    userEmail: 'x@test.com',
+    userName: 'Pat',
+    category: 'teacher',
+    title: 'Titre',
+    content: 'Texte',
+    likesCount: 0,
+  };
+
+  it('toInsert maps domain insert shape to Supabase columns', () => {
+    expect(SuggestionMapper.toInsert(insertBody)).toEqual({
+      user_id: 'u-1',
+      user_email: 'x@test.com',
+      user_name: 'Pat',
+      category: 'teacher',
+      title: 'Titre',
+      content: 'Texte',
+      likes_count: 0,
+    });
+  });
+
   const supabaseRow: SupabaseSuggestion = {
     id: 'sg-1',
     user_id: 'author-1',
