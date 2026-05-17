@@ -6,6 +6,7 @@ import { Inject } from '@nestjs/common';
 import {
   Suggestion,
   SuggestionLikesCount,
+  SuggestionToInsert,
 } from 'src/domain/suggestion/suggestion.type';
 import { SuggestionMapper } from '../mappers/suggestion.mapper';
 
@@ -78,5 +79,20 @@ export class SuggestionSupabaseRepository implements ISuggestionRepository {
       );
       throw new ServerError(error.message);
     }
+  }
+
+  async createSuggestion(body: SuggestionToInsert): Promise<Suggestion | null> {
+    const { data, error } = await this.supabase
+      .from('suggestions')
+      .insert(SuggestionMapper.toInsert(body))
+      .select()
+      .single();
+
+    if (error) {
+      console.error(`Error creating suggestion: ${error.message}`);
+      throw new ServerError(error.message);
+    }
+
+    return SuggestionMapper.toDomain(data);
   }
 }
