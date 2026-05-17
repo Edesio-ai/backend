@@ -7,5 +7,7 @@ export function createMockSuggestionRepository(): jest.Mocked<ISuggestionReposit
     decrementLike: jest.fn(),
     incrementLike: jest.fn(),
     createSuggestion: jest.fn(),
+    getSuggestionById: jest.fn(),
+    deleteSuggestion: jest.fn(),
   };
 }

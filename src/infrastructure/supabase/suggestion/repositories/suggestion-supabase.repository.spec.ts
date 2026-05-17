@@ -127,6 +127,50 @@ describe('SuggestionSupabaseRepository', () => {
       await expect(promise).rejects.toThrow('violates constraint');
     });
   });
+
+  describe('getSuggestionById', () => {
+    it('should return mapped suggestion when single succeeds', async () => {
+      fixtures.whenGetByIdSingleSucceeds();
+
+      const result = await fixtures.whenGetSuggestionById('sg-1');
+
+      fixtures.thenGetSuggestionByIdChainBuilt('sg-1');
+      expect(result).toMatchObject({
+        id: 'sg-1',
+        userId: 'u1',
+        title: 'T',
+        likesCount: 2,
+      });
+    });
+
+    it('should throw ServerError when single fails', async () => {
+      fixtures.whenGetByIdSingleFails('not found');
+
+      const promise = fixtures.whenGetSuggestionById('missing');
+
+      await expect(promise).rejects.toBeInstanceOf(ServerError);
+      await expect(promise).rejects.toThrow('not found');
+    });
+  });
+
+  describe('deleteSuggestion', () => {
+    it('should delete row by id when Supabase succeeds', async () => {
+      fixtures.whenDeleteSucceeds();
+
+      await fixtures.whenDeleteSuggestion('sg-9');
+
+      fixtures.thenDeleteSuggestionChainBuilt('sg-9');
+    });
+
+    it('should throw ServerError when delete fails', async () => {
+      fixtures.whenDeleteFails('rls violation');
+
+      const promise = fixtures.whenDeleteSuggestion('sg-9');
+
+      await expect(promise).rejects.toBeInstanceOf(ServerError);
+      await expect(promise).rejects.toThrow('rls violation');
+    });
+  });
 });
 
 class Fixtures {
@@ -148,9 +192,18 @@ class Fixtures {
   private readonly orderLikesMock = jest.fn(() => ({
     order: this.orderCreatedAtMock,
   }));
-  private readonly eqCategoryMock = jest.fn(() => ({
-    order: this.orderLikesMock,
-  }));
+  private readonly singleForGetByIdMock = jest.fn();
+  private readonly eqStarSelectMock = jest.fn(
+    (column: string, _value: string) => {
+      if (column === 'category') {
+        return { order: this.orderLikesMock };
+      }
+      if (column === 'id') {
+        return { single: this.singleForGetByIdMock };
+      }
+      throw new Error(`unexpected eq after select *: ${column}`);
+    },
+  );
 
   private readonly singleMock = jest.fn();
   private readonly eqSuggestionIdForSingleMock = jest.fn(() => ({
@@ -159,9 +212,14 @@ class Fixtures {
 
   private readonly eqSuggestionIdForUpdateMock = jest.fn();
 
+  private readonly eqSuggestionIdForDeleteMock = jest.fn();
+  private readonly deleteMock = jest.fn(() => ({
+    eq: this.eqSuggestionIdForDeleteMock,
+  }));
+
   private readonly selectSuggestionsMock = jest.fn((cols: string) => {
     if (cols === '*') {
-      return { eq: this.eqCategoryMock };
+      return { eq: this.eqStarSelectMock };
     }
     if (cols === 'id, likes_count') {
       return { eq: this.eqSuggestionIdForSingleMock };
@@ -204,6 +262,7 @@ class Fixtures {
         select: this.selectSuggestionsMock,
         update: this.updateMock,
         insert: this.insertSuggestionMock,
+        delete: this.deleteMock,
       };
     });
 
@@ -229,6 +288,14 @@ class Fixtures {
 
   whenCreateSuggestion() {
     return this.repository.createSuggestion(this.insertPayload);
+  }
+
+  whenGetSuggestionById(id: string) {
+    return this.repository.getSuggestionById(id);
+  }
+
+  whenDeleteSuggestion(id: string) {
+    return this.repository.deleteSuggestion(id);
   }
 
   whenSuggestionsQuerySucceeds() {
@@ -300,10 +367,34 @@ class Fixtures {
     });
   }
 
+  whenGetByIdSingleSucceeds() {
+    this.singleForGetByIdMock.mockResolvedValue({
+      data: this.rows[0],
+      error: null,
+    });
+  }
+
+  whenGetByIdSingleFails(message: string) {
+    this.singleForGetByIdMock.mockResolvedValue({
+      data: null,
+      error: { message },
+    });
+  }
+
+  whenDeleteSucceeds() {
+    this.eqSuggestionIdForDeleteMock.mockResolvedValue({ error: null });
+  }
+
+  whenDeleteFails(message: string) {
+    this.eqSuggestionIdForDeleteMock.mockResolvedValue({
+      error: { message },
+    });
+  }
+
   thenSuggestionsQueryChainBuilt(category: string) {
     expect(this.fromMock).toHaveBeenCalledWith('suggestions');
     expect(this.selectSuggestionsMock).toHaveBeenCalledWith('*');
-    expect(this.eqCategoryMock).toHaveBeenCalledWith('category', category);
+    expect(this.eqStarSelectMock).toHaveBeenCalledWith('category', category);
     expect(this.orderLikesMock).toHaveBeenCalledWith('likes_count', {
       ascending: false,
     });
@@ -337,5 +428,21 @@ class Fixtures {
     );
     expect(this.selectAfterInsertMock).toHaveBeenCalledTimes(1);
     expect(this.singleAfterInsertMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenGetSuggestionByIdChainBuilt(suggestionId: string) {
+    expect(this.fromMock).toHaveBeenCalledWith('suggestions');
+    expect(this.selectSuggestionsMock).toHaveBeenCalledWith('*');
+    expect(this.eqStarSelectMock).toHaveBeenCalledWith('id', suggestionId);
+    expect(this.singleForGetByIdMock).toHaveBeenCalledTimes(1);
+  }
+
+  thenDeleteSuggestionChainBuilt(suggestionId: string) {
+    expect(this.fromMock).toHaveBeenCalledWith('suggestions');
+    expect(this.deleteMock).toHaveBeenCalledTimes(1);
+    expect(this.eqSuggestionIdForDeleteMock).toHaveBeenCalledWith(
+      'id',
+      suggestionId,
+    );
   }
 }

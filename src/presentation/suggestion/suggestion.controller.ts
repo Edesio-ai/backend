@@ -1,11 +1,12 @@
 import { CurrentUser } from '../auth/decorator/current-user.decorator';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { GetSuggestionsUseCase } from 'src/application/suggestion/get-suggestions.use-case';
 import { type User } from 'src/domain/auth/types/auth.type';
 import { LikeSuggestionUseCase } from 'src/application/suggestion/like-suggestion.use-case';
 import { CreateSuggestionBodyDto } from './dtos/create-suggestion-body.dto';
 import { Suggestion } from 'src/domain/suggestion/suggestion.type';
 import { CreateSuggestionUseCase } from 'src/application/suggestion/create-suggestion.use-case';
+import { DeleteSuggestionUseCase } from 'src/application/suggestion/delete-suggestion.use-case';
 
 @Controller('suggestion')
 export class SuggestionController {
@@ -13,6 +14,7 @@ export class SuggestionController {
     private readonly getSuggestionsUseCase: GetSuggestionsUseCase,
     private readonly likeSuggestionUseCase: LikeSuggestionUseCase,
     private readonly createSuggestionUseCase: CreateSuggestionUseCase,
+    private readonly deleteSuggestionUseCase: DeleteSuggestionUseCase,
   ) {}
 
   @Get('category/:category')
@@ -37,5 +39,13 @@ export class SuggestionController {
     @Body() body: CreateSuggestionBodyDto,
   ): Promise<Suggestion | null> {
     return await this.createSuggestionUseCase.execute(body, user);
+  }
+
+  @Delete(':suggestionId')
+  async deleteSuggestion(
+    @CurrentUser() user: User,
+    @Param('suggestionId') suggestionId: string,
+  ): Promise<void> {
+    await this.deleteSuggestionUseCase.execute(suggestionId, user);
   }
 }
