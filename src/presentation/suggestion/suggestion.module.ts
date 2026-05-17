@@ -5,6 +5,7 @@ import { SuggestionPersistenceModule } from 'src/infrastructure/supabase/suggest
 import { LikeSuggestionUseCase } from 'src/application/suggestion/like-suggestion.use-case';
 import { SuggestionLikePersistenceModule } from 'src/infrastructure/supabase/suggestion-like/suggestion-like-persistence.module';
 import { CreateSuggestionUseCase } from 'src/application/suggestion/create-suggestion.use-case';
+import { DeleteSuggestionUseCase } from 'src/application/suggestion/delete-suggestion.use-case';
 
 @Module({
   imports: [SuggestionPersistenceModule, SuggestionLikePersistenceModule],
@@ -13,6 +14,7 @@ import { CreateSuggestionUseCase } from 'src/application/suggestion/create-sugge
     GetSuggestionsUseCase,
     LikeSuggestionUseCase,
     CreateSuggestionUseCase,
+    DeleteSuggestionUseCase,
   ],
 })
 export class SuggestionModule {}

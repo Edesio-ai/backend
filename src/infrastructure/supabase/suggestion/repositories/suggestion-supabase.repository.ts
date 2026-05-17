@@ -95,4 +95,35 @@ export class SuggestionSupabaseRepository implements ISuggestionRepository {
 
     return SuggestionMapper.toDomain(data);
   }
+
+  async getSuggestionById(suggestionId: string): Promise<Suggestion | null> {
+    const { data, error } = await this.supabase
+      .from('suggestions')
+      .select('*')
+      .eq('id', suggestionId)
+      .single();
+
+    if (error) {
+      console.error(
+        `Error fetching suggestion by id ${suggestionId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+
+    return SuggestionMapper.toDomain(data);
+  }
+
+  async deleteSuggestion(suggestionId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('suggestions')
+      .delete()
+      .eq('id', suggestionId);
+
+    if (error) {
+      console.error(
+        `Error deleting suggestion by id ${suggestionId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+  }
 }
