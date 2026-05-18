@@ -57,7 +57,12 @@ export class UpdateProfileUseCase {
       metadataUpdates.email = email.toLowerCase().trim();
     }
 
-    await this.authRepository.updateAuthUser(user.id, metadataUpdates);
+    const updateAuthUserPayload = {
+      email,
+      metadata: metadataUpdates,
+    };
+
+    await this.authRepository.updateAuthUser(user.id, updateAuthUserPayload);
 
     const payload = {
       name: `${firstname} ${lastname}`,

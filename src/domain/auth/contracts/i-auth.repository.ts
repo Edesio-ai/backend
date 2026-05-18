@@ -1,4 +1,9 @@
-import { UserMetadata, AuthUserWithSession, User } from '../types/auth.type';
+import {
+  UserMetadata,
+  AuthUserWithSession,
+  User,
+  UpdateAuthUserPayload,
+} from '../types/auth.type';
 
 export const AUTH_REPOSITORY = Symbol('AUTH_REPOSITORY');
 
@@ -11,5 +16,6 @@ export interface IAuthRepository {
   loginUser(email: string, password: string): Promise<AuthUserWithSession>;
   validateToken(token: string): Promise<User>;
   logoutUser(accessToken: string): Promise<void>;
-  updateAuthUser(userId: string, metadata: UserMetadata): Promise<void>;
+  updateAuthUser(userId: string, payload: UpdateAuthUserPayload): Promise<void>;
+  resetPasswordByEmail(email: string): Promise<void>;
 }

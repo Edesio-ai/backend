@@ -17,6 +17,8 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
 import { InvitationTokenPersistenceModule } from 'src/infrastructure/supabase/invitation-token/invitation-token-persistence.module';
+import { ResetPasswordUseCase } from 'src/application/auth/reset-password.use-case';
+import { UpdatePasswordUseCase } from 'src/application/auth/update-password.use-case';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { InvitationTokenPersistenceModule } from 'src/infrastructure/supabase/in
     LoginUseCase,
     GetUserSessionUseCase,
     LogoutUseCase,
+    ResetPasswordUseCase,
+    UpdatePasswordUseCase,
   ],
 })
 export class AuthModule {}

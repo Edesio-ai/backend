@@ -4,6 +4,7 @@ import {
   SupabaseAuthSession,
   SupabaseUser,
   User,
+  SupabaseUpdateAuthUserPayload,
 } from 'src/domain/auth/types/auth.type';
 
 export const AuthMapper = {
@@ -42,4 +43,20 @@ export const AuthMapper = {
       lastname: user.user_metadata?.lastname,
     },
   }),
+  toUpdateAuthUser: (
+    payload: Partial<AuthUser>,
+  ): SupabaseUpdateAuthUserPayload => {
+    const { email, metadata, password } = payload;
+    const UpdateAuthUserPayload: SupabaseUpdateAuthUserPayload = {};
+    if (email) {
+      UpdateAuthUserPayload.email = email;
+    }
+    if (metadata) {
+      UpdateAuthUserPayload.user_metadata = metadata;
+    }
+    if (password) {
+      UpdateAuthUserPayload.password = password;
+    }
+    return UpdateAuthUserPayload;
+  },
 };

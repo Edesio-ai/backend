@@ -77,6 +77,7 @@ export type AuthUser = {
   email: string;
   emailConfirmedAt?: string | null;
   metadata: UserMetadata;
+  password?: string;
 };
 
 export type User = {
@@ -84,4 +85,12 @@ export type User = {
   email: string;
   emailConfirmedAt?: string | null;
   metadata: UserMetadata;
+};
+
+export type UpdateAuthUserPayload = Partial<AuthUser>;
+
+export type SupabaseUpdateAuthUserPayload = {
+  email?: string;
+  user_metadata?: UserMetadata;
+  password?: string;
 };
