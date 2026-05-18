@@ -25,10 +25,13 @@ describe('UpdateProfileUseCase', () => {
     expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalledWith(
       fixtures.userId,
       {
-        role: 'teacher',
-        firstname: 'Ann',
-        lastname: 'Other',
-        email: 'new@school.com',
+        email: 'NEW@School.com ',
+        metadata: {
+          role: 'teacher',
+          firstname: 'Ann',
+          lastname: 'Other',
+          email: 'new@school.com',
+        },
       },
     );
     expect(fixtures.teacherRepository.updateTeacher).toHaveBeenCalledWith(
@@ -88,9 +91,12 @@ describe('UpdateProfileUseCase', () => {
     expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalledWith(
       fixtures.userId,
       {
-        role: 'teacher',
-        firstname: 'Ann',
-        lastname: 'Other',
+        email: 'same@school.com',
+        metadata: {
+          role: 'teacher',
+          firstname: 'Ann',
+          lastname: 'Other',
+        },
       },
     );
   });

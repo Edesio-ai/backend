@@ -159,4 +159,28 @@ describe('AuthMapper', () => {
       });
     });
   });
+
+  describe('toUpdateAuthUser', () => {
+    it('maps password only', () => {
+      expect(AuthMapper.toUpdateAuthUser({ password: 'NewSecure1!' })).toEqual({
+        password: 'NewSecure1!',
+      });
+    });
+
+    it('maps email and user_metadata when provided', () => {
+      expect(
+        AuthMapper.toUpdateAuthUser({
+          email: 'x@y.com',
+          metadata: { firstname: 'A', role: 'teacher' },
+        }),
+      ).toEqual({
+        email: 'x@y.com',
+        user_metadata: { firstname: 'A', role: 'teacher' },
+      });
+    });
+
+    it('returns empty object when no recognized fields are set', () => {
+      expect(AuthMapper.toUpdateAuthUser({})).toEqual({});
+    });
+  });
 });

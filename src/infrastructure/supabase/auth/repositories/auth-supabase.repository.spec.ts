@@ -1,4 +1,5 @@
 import { AuthSupabaseRepository } from './auth-supabase.repository';
+import { AuthMapper } from '../mappers/auth.mappers';
 import {
   BadRequestError,
   ServerError,
@@ -129,10 +130,19 @@ describe('AuthSupabaseRepository', () => {
 
       expect(fixtures.updateUserByIdMock).toHaveBeenCalledWith(
         fixtures.userId,
-        {
-          email: fixtures.metadata.email,
-          user_metadata: fixtures.metadata,
-        },
+        AuthMapper.toUpdateAuthUser(fixtures.profilePayload),
+      );
+      expect(fixtures.updateUserByIdMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call admin.updateUserById with password when updating password', async () => {
+      fixtures.whenUpdateUserByIdSucceeds();
+
+      await fixtures.whenUpdateAuthUserPassword();
+
+      expect(fixtures.updateUserByIdMock).toHaveBeenCalledWith(
+        fixtures.userId,
+        AuthMapper.toUpdateAuthUser({ password: fixtures.newPassword }),
       );
       expect(fixtures.updateUserByIdMock).toHaveBeenCalledTimes(1);
     });
@@ -143,6 +153,43 @@ describe('AuthSupabaseRepository', () => {
       await expect(fixtures.whenUpdateAuthUser()).rejects.toBeInstanceOf(
         ServerError,
       );
+    });
+  });
+
+  describe('resetPasswordByEmail', () => {
+    let fixtures: ResetPasswordByEmailFixtures;
+    let originalFrontendUrl: string | undefined;
+
+    beforeEach(() => {
+      originalFrontendUrl = process.env.FRONTEND_URL;
+      process.env.FRONTEND_URL = 'http://localhost:3000';
+      fixtures = new ResetPasswordByEmailFixtures();
+    });
+
+    afterEach(() => {
+      if (originalFrontendUrl === undefined) {
+        delete process.env.FRONTEND_URL;
+      } else {
+        process.env.FRONTEND_URL = originalFrontendUrl;
+      }
+    });
+
+    it('should call resetPasswordForEmail with redirectTo built from FRONTEND_URL', async () => {
+      fixtures.whenResetPasswordForEmailSucceeds();
+
+      await fixtures.whenResetPasswordByEmail();
+
+      fixtures.thenResetPasswordForEmailCalledWithRedirect();
+    });
+
+    it('should throw ServerError when resetPasswordForEmail returns error', async () => {
+      fixtures.whenResetPasswordForEmailFails();
+
+      const promise = fixtures.whenResetPasswordByEmail();
+
+      await expect(promise).rejects.toBeInstanceOf(ServerError);
+      await expect(promise).rejects.toThrow('rate limited');
+      expect(fixtures.resetPasswordForEmailMock).toHaveBeenCalledTimes(1);
     });
   });
 });
@@ -344,12 +391,16 @@ class CreateAuthUserFixtures {
 
 class UpdateAuthUserFixtures {
   public readonly userId = 'user-update-1';
-  public readonly metadata = {
-    role: 'teacher',
-    firstname: 'Ann',
-    lastname: 'Other',
+  public readonly profilePayload = {
     email: 'new@school.com',
+    metadata: {
+      role: 'teacher',
+      firstname: 'Ann',
+      lastname: 'Other',
+    },
   };
+
+  public readonly newPassword = 'NewSecure1!ExtraLong';
 
   public readonly updateUserByIdMock = jest.fn();
   public readonly sut: AuthSupabaseRepository;
@@ -367,7 +418,11 @@ class UpdateAuthUserFixtures {
   }
 
   whenUpdateAuthUser() {
-    return this.sut.updateAuthUser(this.userId, this.metadata);
+    return this.sut.updateAuthUser(this.userId, this.profilePayload);
+  }
+
+  whenUpdateAuthUserPassword() {
+    return this.sut.updateAuthUser(this.userId, { password: this.newPassword });
   }
 
   whenUpdateUserByIdSucceeds() {
@@ -426,5 +481,42 @@ class LogoutUserFixtures {
   async thenThrowLogoutError(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
     await expect(promise).rejects.toThrow('logout failed');
+  }
+}
+
+class ResetPasswordByEmailFixtures {
+  public readonly email = 'user@school.com';
+  public readonly resetPasswordForEmailMock = jest.fn();
+  public readonly sut: AuthSupabaseRepository;
+
+  constructor() {
+    const supabaseAuthMock = {
+      auth: {
+        resetPasswordForEmail: this.resetPasswordForEmailMock,
+      },
+    };
+
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
+  }
+
+  whenResetPasswordByEmail() {
+    return this.sut.resetPasswordByEmail(this.email);
+  }
+
+  whenResetPasswordForEmailSucceeds() {
+    this.resetPasswordForEmailMock.mockResolvedValue({ error: null });
+  }
+
+  whenResetPasswordForEmailFails() {
+    this.resetPasswordForEmailMock.mockResolvedValue({
+      error: { message: 'rate limited' },
+    });
+  }
+
+  thenResetPasswordForEmailCalledWithRedirect() {
+    expect(this.resetPasswordForEmailMock).toHaveBeenCalledWith(this.email, {
+      redirectTo: 'http://localhost:3000/reset-password',
+    });
+    expect(this.resetPasswordForEmailMock).toHaveBeenCalledTimes(1);
   }
 }

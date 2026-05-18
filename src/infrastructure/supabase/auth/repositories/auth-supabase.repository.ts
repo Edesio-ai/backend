@@ -4,6 +4,7 @@ import { IAuthRepository } from '../../../../domain/auth/contracts/i-auth.reposi
 import { TokenUserNotFoundError } from '../../../../domain/auth/errors/auth.errors';
 import {
   AuthUserWithSession,
+  UpdateAuthUserPayload,
   User,
 } from '../../../../domain/auth/types/auth.type';
 import { UserMetadata } from '../../../../domain/auth/types/auth.type';
@@ -87,18 +88,31 @@ export class AuthSupabaseRepository implements IAuthRepository {
 
   public async updateAuthUser(
     userId: string,
-    metadata: UserMetadata,
+    payload: UpdateAuthUserPayload,
   ): Promise<void> {
     const { error } = await this.supabaseAuth.auth.admin.updateUserById(
       userId,
-      {
-        email: metadata.email,
-        user_metadata: metadata,
-      },
+      AuthMapper.toUpdateAuthUser(payload),
     );
 
     if (error) {
       console.error(`Error updating user ${userId}: ${error.message}`);
+      throw new ServerError(error.message);
+    }
+  }
+
+  public async resetPasswordByEmail(email: string): Promise<void> {
+    const { error } = await this.supabaseAuth.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo: `${process.env.FRONTEND_URL}/reset-password`,
+      },
+    );
+
+    if (error) {
+      console.error(
+        `Error resetting password for email ${email}: ${error.message}`,
+      );
       throw new ServerError(error.message);
     }
   }

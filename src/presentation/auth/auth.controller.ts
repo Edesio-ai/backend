@@ -9,11 +9,17 @@ import { LogoutUseCase } from '../../application/auth/logout.use-case';
 import {
   AuthUser,
   GetUserSessionResponse,
+  type User,
 } from '../../domain/auth/types/auth.type';
 import { RegisterBody } from './dto/register-body.dto';
 import { LoginBodyDto } from './dto/login-body.dto';
 import { Public } from './decorator/public.decorator';
 import { SkipCsrf } from './decorator/skip-csrf.decorator';
+import { ResetPasswordBodyDto } from './dto/reset-password-body.dto';
+import { ResetPasswordUseCase } from 'src/application/auth/reset-password.use-case';
+import { UpdatePasswordBodyDto } from './dto/update-password-body.dto';
+import { UpdatePasswordUseCase } from 'src/application/auth/update-password.use-case';
+import { CurrentUser } from './decorator/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -23,11 +29,14 @@ export class AuthController {
     private readonly getUserSessionUseCase: GetUserSessionUseCase,
     private readonly generateCsrfTokenUseCase: GenerateCsrfTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
+    private readonly resetPasswordUseCase: ResetPasswordUseCase,
+    private readonly updatePasswordUseCase: UpdatePasswordUseCase,
   ) {}
 
   @Get('session')
   async getUserSession(@Req() req: Request): Promise<GetUserSessionResponse> {
-    const token = req.cookies?.access_token;
+    const token =
+      req.cookies?.access_token ?? req.headers?.authorization?.split(' ')[1];
     if (!token) {
       return {
         user: null,
@@ -108,5 +117,23 @@ export class AuthController {
     res.clearCookie('csrf_token', { ...cookieOpts, httpOnly: false });
 
     return { success: true };
+  }
+
+  @Public()
+  @SkipCsrf()
+  @Post('reset-password')
+  async resetPassword(@Body() body: ResetPasswordBodyDto): Promise<void> {
+    await this.resetPasswordUseCase.execute(body.email);
+    return;
+  }
+
+  @SkipCsrf()
+  @Post('update-password')
+  async changePassword(
+    @Body() body: UpdatePasswordBodyDto,
+    @CurrentUser() user: User,
+  ): Promise<void> {
+    await this.updatePasswordUseCase.execute(user.id, body.password);
+    return;
   }
 }
