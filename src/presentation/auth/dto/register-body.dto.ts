@@ -14,8 +14,8 @@ import {
 export class RegisterBody {
   @IsString()
   @IsNotEmpty()
-  @IsIn(['teacher', 'establishment', 'student', 'standalone'])
-  role: 'teacher' | 'establishment' | 'student' | 'standalone';
+  @IsIn(['teacher', 'establishment', 'student', 'self-learner'])
+  role: 'teacher' | 'establishment' | 'student' | 'self-learner';
 
   @IsEmail()
   @IsNotEmpty()
