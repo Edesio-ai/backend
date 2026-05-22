@@ -70,7 +70,7 @@ export type GetUserSessionResponse = {
   role: Role | null;
 };
 
-export type Role = 'teacher' | 'establishment' | 'student' | 'standalone';
+export type Role = 'teacher' | 'establishment' | 'student' | 'self-learner';
 
 export type AuthUser = {
   id: string;

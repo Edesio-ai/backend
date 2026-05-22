@@ -22,6 +22,6 @@ export class CreateSuggestionBodyDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsIn(['teacher', 'student', 'establishment', 'standalone'])
+  @IsIn(['teacher', 'student', 'establishment', 'self-learner'])
   category: Suggestion['category'];
 }

@@ -7,14 +7,14 @@ const ROLE_LABELS: Record<WelcomeEmailRole, string> = {
   teacher: 'Teacher',
   student: 'Student',
   establishment: 'Establishment',
-  standalone: 'Standalone',
+  'self-learner': 'Self-learner',
 };
 
 const DASHBOARD_PATHS: Record<WelcomeEmailRole, string> = {
   teacher: '/teacher',
   student: '/student',
   establishment: '/establishment',
-  standalone: '/standalone',
+  'self-learner': '/self-learner',
 };
 
 const QUICK_START_ITEMS: Record<WelcomeEmailRole, string[]> = {
@@ -30,7 +30,7 @@ const QUICK_START_ITEMS: Record<WelcomeEmailRole, string[]> = {
     'Consultez les statistiques globales de votre etablissement',
     "Gerez les codes d'invitation pour les nouveaux professeurs",
   ],
-  standalone: [
+  'self-learner': [
     'Creez vos propres cours et ajoutez du contenu',
     'Uploadez vos documents PDF',
     "Generez des questions avec l'IA",
@@ -48,7 +48,8 @@ const ROLE_ALIASES: Record<string, WelcomeEmailRole> = {
   teacher: 'teacher',
   student: 'student',
   establishment: 'establishment',
-  standalone: 'standalone',
+  'self-learner': 'self-learner',
+  selflearner: 'self-learner',
 };
 
 export function buildWelcomeEmailTemplateData(params: {

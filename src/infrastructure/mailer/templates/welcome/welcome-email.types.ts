@@ -2,7 +2,7 @@ export type WelcomeEmailRole =
   | 'teacher'
   | 'student'
   | 'establishment'
-  | 'standalone';
+  | 'self-learner';
 
 export type WelcomeEmailTemplateData = {
   name: string;

@@ -3,7 +3,7 @@ export type Suggestion = {
   userId: string;
   userEmail: string | null;
   userName: string | null;
-  category: 'teacher' | 'student' | 'establishment' | 'standalone';
+  category: 'teacher' | 'student' | 'establishment' | 'self-learner';
   title: string;
   content: string;
   likesCount: number;
@@ -16,7 +16,7 @@ export type SupabaseSuggestion = {
   user_id: string;
   user_email: string | null;
   user_name: string | null;
-  category: 'teacher' | 'student' | 'establishment' | 'standalone';
+  category: 'teacher' | 'student' | 'establishment' | 'self-learner';
   title: string;
   content: string;
   likes_count: number;

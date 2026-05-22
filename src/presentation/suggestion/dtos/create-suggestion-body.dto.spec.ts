@@ -15,6 +15,14 @@ describe('CreateSuggestionBodyDto', () => {
     expect(errors).toHaveLength(0);
   });
 
+  it('accepts self-learner category', async () => {
+    const dto = Object.assign(valid(), { category: 'self-learner' });
+
+    const errors = await validate(dto);
+
+    expect(errors).toHaveLength(0);
+  });
+
   it('rejects title shorter than minimum length', async () => {
     const dto = Object.assign(valid(), { title: 'ab' });
 

@@ -4,7 +4,7 @@ backend/
 │   │   ├── auth/
 │   │   ├── teaching/
 │   │   ├── establishment/
-│   │   ├── standalone/
+│   │   ├── self-learner/
 │   │   ├── billing/
 │   │   ├── contact/
 │   │   └── shared/
@@ -12,7 +12,7 @@ backend/
 │   │   ├── auth/
 │   │   ├── teaching/
 │   │   ├── establishment/
-│   │   ├── standalone/
+│   │   ├── self-learner/
 │   │   ├── billing/
 │   │   └── contact/
 │   ├── interfaces/
@@ -31,7 +31,7 @@ backend/
 │   │   ├── auth/
 │   │   ├── teaching/
 │   │   ├── establishment/
-│   │   ├── standalone/
+│   │   ├── self-learner/
 │   │   ├── billing/
 │   │   ├── contact/
 │   │   └── app.module.ts
