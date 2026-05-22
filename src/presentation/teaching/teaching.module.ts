@@ -9,6 +9,7 @@ import { StudentCourseStatsModule } from './student-course-stats/student-course-
 import { StudentModule } from './student/student.module';
 import { StudentSessionModule } from './student-session/student-session.module';
 import { TeacherModule } from './teacher/teacher.module';
+import { SelfLearnerModule } from './self-learner/self-learner.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TeacherModule } from './teacher/teacher.module';
     CourseQuestionModule,
     StudentCourseStatsModule,
     StudentSessionModule,
+    SelfLearnerModule,
   ],
 })
 export class TeachingModule {}
