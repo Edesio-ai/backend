@@ -141,6 +141,62 @@ describe('SelfLearnerCourseFileRepository', () => {
       );
     });
   });
+
+  describe('getSelfLearnerCourseFileById', () => {
+    let fixtures: GetByIdFixtures;
+
+    beforeEach(() => {
+      fixtures = new GetByIdFixtures();
+    });
+
+    it('returns mapped row when single succeeds', async () => {
+      fixtures.whenSingleReturnsRow();
+
+      const result = await fixtures.whenGetById();
+
+      expect(result).toEqual(
+        selfLearnerCourseFileMapper.toDomain(fixtures.row),
+      );
+      fixtures.thenGetByIdChainBuilt(fixtures.fileId);
+    });
+
+    it('throws ServerError when Supabase reports error', async () => {
+      fixtures.whenSingleFails('no rows');
+
+      await expect(fixtures.whenGetById()).rejects.toBeInstanceOf(ServerError);
+    });
+  });
+
+  describe('deleteSelfLearnerCourseFileById', () => {
+    let fixtures: DeleteByIdFixtures;
+
+    beforeEach(() => {
+      fixtures = new DeleteByIdFixtures();
+    });
+
+    it('runs delete constrained by primary id', async () => {
+      fixtures.whenDeleteSucceeds();
+
+      await fixtures.whenDeleteById();
+
+      expect(fixtures.fromMock).toHaveBeenCalledWith(
+        'self_learner_course_files',
+      );
+      expect(fixtures.deleteMock).toHaveBeenCalledTimes(1);
+      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith(
+        'id',
+        fixtures.fileId,
+      );
+    });
+
+    it('throws ServerError when delete fails', async () => {
+      fixtures.whenDeleteFails('rls');
+
+      await expect(fixtures.whenDeleteById()).rejects.toBeInstanceOf(
+        ServerError,
+      );
+    });
+  });
 });
 
 class UploadFixtures {
@@ -338,6 +394,96 @@ class DeleteFilesFixtures {
     return this.repository.deleteSelfLearnerCourseFilesByCourseId(
       this.courseId,
     );
+  }
+
+  whenDeleteSucceeds() {
+    this.eqAfterDeleteMock.mockResolvedValue({ error: null });
+    this.deleteMock.mockReturnValue({ eq: this.eqAfterDeleteMock });
+    this.fromMock.mockReturnValue({ delete: this.deleteMock });
+  }
+
+  whenDeleteFails(message: string) {
+    this.eqAfterDeleteMock.mockResolvedValue({
+      error: { message },
+    });
+    this.deleteMock.mockReturnValue({ eq: this.eqAfterDeleteMock });
+    this.fromMock.mockReturnValue({ delete: this.deleteMock });
+  }
+}
+
+class GetByIdFixtures {
+  public readonly fileId = 'file-by-id';
+
+  public readonly row = {
+    id: this.fileId,
+    course_id: 'c-own',
+    file_url: 'self-learner/c-own/x.pdf',
+    file_name: 'x.pdf',
+    created_at: '2026-01-07T12:00:00.000Z',
+  };
+
+  public readonly fromMock = jest.fn();
+  public readonly selectMock = jest.fn();
+  public readonly eqMock = jest.fn();
+  public readonly singleMock = jest.fn();
+
+  public readonly repository: SelfLearnerCourseFileRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerCourseFileRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenGetById() {
+    return this.repository.getSelfLearnerCourseFileById(this.fileId);
+  }
+
+  whenSingleReturnsRow() {
+    this.singleMock.mockResolvedValue({
+      data: this.row,
+      error: null,
+    });
+    this.eqMock.mockReturnValue({ single: this.singleMock });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  whenSingleFails(message: string) {
+    this.singleMock.mockResolvedValue({
+      data: null,
+      error: { message },
+    });
+    this.eqMock.mockReturnValue({ single: this.singleMock });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  thenGetByIdChainBuilt(fileId: string) {
+    expect(this.fromMock).toHaveBeenCalledWith('self_learner_course_files');
+    expect(this.selectMock).toHaveBeenCalledWith('*');
+    expect(this.eqMock).toHaveBeenCalledWith('id', fileId);
+    expect(this.singleMock).toHaveBeenCalledTimes(1);
+  }
+}
+
+class DeleteByIdFixtures {
+  public readonly fileId = 'file-del-single';
+
+  public readonly fromMock = jest.fn();
+  public readonly deleteMock = jest.fn();
+  public readonly eqAfterDeleteMock = jest.fn();
+
+  public readonly repository: SelfLearnerCourseFileRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerCourseFileRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenDeleteById() {
+    return this.repository.deleteSelfLearnerCourseFileById(this.fileId);
   }
 
   whenDeleteSucceeds() {
