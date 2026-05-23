@@ -125,6 +125,38 @@ describe('SelfLearnerCourseRepository', () => {
       await expect(fixtures.whenGetById()).rejects.toBeInstanceOf(ServerError);
     });
   });
+
+  describe('updateSelfLearnerCourse', () => {
+    let fixtures: UpdateFixtures;
+
+    beforeEach(() => {
+      fixtures = new UpdateFixtures();
+    });
+
+    it('runs update mapped payload then returns domain row', async () => {
+      fixtures.whenUpdateSucceeds();
+
+      const result = await fixtures.whenUpdate();
+
+      expect(fixtures.updateMock).toHaveBeenCalledWith(
+        SelfLearnerCourseMapper.toUpdate(fixtures.patch),
+      );
+      expect(fixtures.eqAfterUpdateMock).toHaveBeenCalledWith(
+        'id',
+        fixtures.courseId,
+      );
+      expect(fixtures.singleAfterUpdateMock).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(
+        SelfLearnerCourseMapper.toDomain(fixtures.updatedRow),
+      );
+    });
+
+    it('throws ServerError when Supabase rejects update', async () => {
+      fixtures.whenUpdateFails('rls');
+
+      await expect(fixtures.whenUpdate()).rejects.toBeInstanceOf(ServerError);
+    });
+  });
 });
 
 class ListFixtures {
@@ -329,6 +361,74 @@ class CreateFixtures {
       select: this.selectAfterInsertMock,
     });
     this.fromMock.mockReturnValue({ insert: this.insertMock });
+  }
+}
+
+class UpdateFixtures {
+  public readonly courseId = 'c-up';
+
+  public readonly patch = {
+    title: 'Revised',
+    description: 'nouvelle',
+    textContent: 'texte',
+  };
+
+  public readonly updatedRow = {
+    id: this.courseId,
+    self_learner_id: 'sl-1',
+    title: this.patch.title,
+    description: this.patch.description,
+    text_content: this.patch.textContent,
+    language: 'francais' as const,
+    created_at: '2026-01-04T00:00:00.000Z',
+  };
+
+  public readonly fromMock = jest.fn();
+  public readonly updateMock = jest.fn();
+  public readonly eqAfterUpdateMock = jest.fn();
+  public readonly selectAfterUpdateMock = jest.fn();
+  public readonly singleAfterUpdateMock = jest.fn();
+
+  public readonly repository: SelfLearnerCourseRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerCourseRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenUpdate() {
+    return this.repository.updateSelfLearnerCourse(this.courseId, this.patch);
+  }
+
+  whenUpdateSucceeds() {
+    this.singleAfterUpdateMock.mockResolvedValue({
+      data: this.updatedRow,
+      error: null,
+    });
+    this.selectAfterUpdateMock.mockReturnValue({
+      single: this.singleAfterUpdateMock,
+    });
+    this.eqAfterUpdateMock.mockReturnValue({
+      select: this.selectAfterUpdateMock,
+    });
+    this.updateMock.mockReturnValue({ eq: this.eqAfterUpdateMock });
+    this.fromMock.mockReturnValue({ update: this.updateMock });
+  }
+
+  whenUpdateFails(message: string) {
+    this.singleAfterUpdateMock.mockResolvedValue({
+      data: null,
+      error: { message },
+    });
+    this.selectAfterUpdateMock.mockReturnValue({
+      single: this.singleAfterUpdateMock,
+    });
+    this.eqAfterUpdateMock.mockReturnValue({
+      select: this.selectAfterUpdateMock,
+    });
+    this.updateMock.mockReturnValue({ eq: this.eqAfterUpdateMock });
+    this.fromMock.mockReturnValue({ update: this.updateMock });
   }
 }
 

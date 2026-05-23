@@ -14,7 +14,7 @@ import { SelfLearnerCourseFile } from 'src/domain/teaching/self-learner-course-f
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { type AuthUser } from 'src/domain/auth/types/auth.type';
-import { GetSelfLearnerCourseFilesUseCase } from 'src/application/teaching/self-learner-course-file/get-self-learer-course-file.use-case';
+import { GetSelfLearnerCourseFilesUseCase } from 'src/application/teaching/self-learner-course-file/get-self-learner-course-files.use-case';
 
 @Roles('self-learner')
 @Controller('self-learner-course-file')

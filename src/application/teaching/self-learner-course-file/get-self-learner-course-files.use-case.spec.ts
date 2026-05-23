@@ -2,7 +2,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
-import { GetSelfLearnerCourseFilesUseCase } from './get-self-learer-course-file.use-case';
+import { GetSelfLearnerCourseFilesUseCase } from './get-self-learner-course-files.use-case';
 import type { ISelfLearnerCourseFileRepository } from 'src/domain/teaching/self-learner-course-file/contracts/i-self-learner-course-file.repository';
 import type { SelfLearnerCourseFile } from 'src/domain/teaching/self-learner-course-file/types/self-learner-course-file.type';
 import type { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-learner-course/contracts/i-self-learner-course.repository';

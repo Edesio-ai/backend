@@ -3,6 +3,8 @@ import {
   SelfLearnerCourseInsertPayload,
   SelfLearnerCourseInsertSupabase,
   SelfLearnerCourseSupabase,
+  SelfLearnerCourseUpdateSupabase,
+  UpdateSelfLearnerCoursePayload,
 } from 'src/domain/teaching/self-learner-course/types/self-learner-course.type';
 
 export class SelfLearnerCourseMapper {
@@ -27,5 +29,24 @@ export class SelfLearnerCourseMapper {
       language: data.language,
       createdAt: data.created_at,
     };
+  }
+  static toUpdate(
+    payload: UpdateSelfLearnerCoursePayload,
+  ): SelfLearnerCourseUpdateSupabase {
+    const supabasePayload: SelfLearnerCourseUpdateSupabase = {};
+
+    if (payload.title) {
+      supabasePayload.title = payload.title;
+    }
+
+    if (payload.description) {
+      supabasePayload.description = payload.description;
+    }
+
+    if (payload.textContent) {
+      supabasePayload.text_content = payload.textContent;
+    }
+
+    return supabasePayload;
   }
 }

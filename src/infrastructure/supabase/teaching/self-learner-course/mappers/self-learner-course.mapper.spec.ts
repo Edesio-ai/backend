@@ -44,4 +44,33 @@ describe('SelfLearnerCourseMapper', () => {
       });
     });
   });
+
+  describe('toUpdate', () => {
+    it('maps title when provided', () => {
+      expect(SelfLearnerCourseMapper.toUpdate({ title: 'Neuf' })).toEqual({
+        title: 'Neuf',
+      });
+    });
+
+    it('maps description and textContent when provided', () => {
+      expect(
+        SelfLearnerCourseMapper.toUpdate({
+          description: 'suite',
+          textContent: 'contenu',
+        }),
+      ).toEqual({
+        description: 'suite',
+        text_content: 'contenu',
+      });
+    });
+
+    it('omits keys for missing or falsy titles', () => {
+      expect(
+        SelfLearnerCourseMapper.toUpdate({
+          description: '',
+          language: undefined,
+        }),
+      ).toEqual({});
+    });
+  });
 });
