@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -15,6 +16,7 @@ import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { type AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetSelfLearnerCourseFilesUseCase } from 'src/application/teaching/self-learner-course-file/get-self-learner-course-files.use-case';
+import { DeleteSelfLearnerCourseFileUseCase } from 'src/application/teaching/self-learner-course-file/delete-self-learner-course-file.use-case';
 
 @Roles('self-learner')
 @Controller('self-learner-course-file')
@@ -22,6 +24,7 @@ export class SelfLearnerCourseFileController {
   constructor(
     private readonly uploadSelfLearnerCourseFileUseCase: UploadSelfLearnerCourseFileUseCase,
     private readonly getSelfLearnerCourseFilesUseCase: GetSelfLearnerCourseFilesUseCase,
+    private readonly deleteSelfLearnerCourseFileUseCase: DeleteSelfLearnerCourseFileUseCase,
   ) {}
 
   @UseInterceptors(FileInterceptor('file'))
@@ -57,6 +60,17 @@ export class SelfLearnerCourseFileController {
     return await this.getSelfLearnerCourseFilesUseCase.execute(
       user.id,
       courseId,
+    );
+  }
+
+  @Delete('/:fileId')
+  async deleteSelfLearnerCourseFile(
+    @CurrentUser() user: AuthUser,
+    @Param('fileId') fileId: string,
+  ): Promise<void> {
+    return await this.deleteSelfLearnerCourseFileUseCase.execute(
+      user.id,
+      fileId,
     );
   }
 }

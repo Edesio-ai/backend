@@ -6,5 +6,7 @@ export function createMockSelfLearnerCourseFileRepository(): jest.Mocked<ISelfLe
     getSelfLearnerCourseFiles: jest.fn(),
     getSelfLearnerCourseFilesUrls: jest.fn(),
     deleteSelfLearnerCourseFilesByCourseId: jest.fn(),
+    getSelfLearnerCourseFileById: jest.fn(),
+    deleteSelfLearnerCourseFileById: jest.fn(),
   };
 }

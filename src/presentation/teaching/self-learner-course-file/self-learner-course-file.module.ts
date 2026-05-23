@@ -6,6 +6,7 @@ import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teachin
 import { SelfLearnerCoursePersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner-course/self-learner-course-persistence.module';
 import { GetSelfLearnerCourseFilesUseCase } from 'src/application/teaching/self-learner-course-file/get-self-learner-course-files.use-case';
 import { SelfLearnerPersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner/self-learner-persistence.module';
+import { DeleteSelfLearnerCourseFileUseCase } from 'src/application/teaching/self-learner-course-file/delete-self-learner-course-file.use-case';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SelfLearnerPersistenceModule } from 'src/infrastructure/supabase/teachi
   providers: [
     UploadSelfLearnerCourseFileUseCase,
     GetSelfLearnerCourseFilesUseCase,
+    DeleteSelfLearnerCourseFileUseCase,
   ],
 })
 export class SelfLearnerCourseFileModule {}
