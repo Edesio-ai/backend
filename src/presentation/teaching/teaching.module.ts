@@ -10,6 +10,7 @@ import { StudentModule } from './student/student.module';
 import { StudentSessionModule } from './student-session/student-session.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { SelfLearnerModule } from './self-learner/self-learner.module';
+import { SelfLearnerCourseModule } from './self-learner-course/self-learner-course.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SelfLearnerModule } from './self-learner/self-learner.module';
     StudentCourseStatsModule,
     StudentSessionModule,
     SelfLearnerModule,
+    SelfLearnerCourseModule,
   ],
 })
 export class TeachingModule {}

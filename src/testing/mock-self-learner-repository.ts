@@ -2,7 +2,7 @@ import type { ISelfLearnerRepository } from 'src/domain/teaching/self-learner/co
 
 export function createMockSelfLearnerRepository(): jest.Mocked<ISelfLearnerRepository> {
   return {
-    getSelfLearneByUserId: jest.fn(),
+    getSelfLearnerByUserId: jest.fn(),
     createSelfLearner: jest.fn(),
   };
 }

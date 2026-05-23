@@ -15,7 +15,7 @@ export class SelfLearnerRepository implements ISelfLearnerRepository {
     private readonly supabase: SupabaseClient,
   ) {}
 
-  public async getSelfLearneByUserId(
+  public async getSelfLearnerByUserId(
     userId: string,
   ): Promise<SelfLearner | null> {
     const { data, error } = await this.supabase
