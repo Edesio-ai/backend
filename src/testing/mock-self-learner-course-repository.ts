@@ -3,5 +3,7 @@ import type { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-lear
 export function createMockSelfLearnerCourseRepository(): jest.Mocked<ISelfLearnerCourseRepository> {
   return {
     getSelfLearnerCourses: jest.fn(),
+    getSelfLearnerCoursesCount: jest.fn(),
+    createSelfLearnerCourse: jest.fn(),
   };
 }

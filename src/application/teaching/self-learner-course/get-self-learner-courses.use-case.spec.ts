@@ -79,8 +79,10 @@ class Fixtures {
     {
       id: 'c-1',
       selfLearnerId: this.selfLearner.id,
-      name: 'Mon cours',
-      email: '',
+      title: 'Mon cours',
+      description: null,
+      textContent: null,
+      language: 'francais',
       createdAt: '2026-01-02T00:00:00.000Z',
     },
   ];
