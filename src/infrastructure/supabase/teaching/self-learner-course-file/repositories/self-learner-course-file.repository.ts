@@ -115,4 +115,21 @@ export class SelfLearnerCourseFileRepository implements ISelfLearnerCourseFileRe
       throw new ServerError(error.message);
     }
   }
+
+  public async getSelfLearnerCourseFileSignedUrl(
+    fileUrl: string,
+  ): Promise<string | null> {
+    const { data, error } = await this.supabase.storage
+      .from('courses-pdf')
+      .createSignedUrl(fileUrl, 3600);
+
+    if (error) {
+      console.error(
+        `Error getting self learner course file signed url: ${fileUrl}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+
+    return data.signedUrl ?? null;
+  }
 }
