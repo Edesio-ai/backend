@@ -17,4 +17,5 @@ export interface ISelfLearnerCourseRepository {
     courseId: string,
     payload: UpdateSelfLearnerCoursePayload,
   ): Promise<SelfLearnerCourse>;
+  deleteSelfLearnerCourse(courseId: string): Promise<void>;
 }

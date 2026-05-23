@@ -23,4 +23,7 @@ export const selfLearnerCourseFileMapper = {
       file_name: payload.fileName,
     };
   },
+  toCourseFilesUrls: (data: any): string[] => {
+    return data.map((row: any) => row.file_url);
+  },
 };

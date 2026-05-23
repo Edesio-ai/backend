@@ -7,5 +7,6 @@ export function createMockSelfLearnerCourseRepository(): jest.Mocked<ISelfLearne
     createSelfLearnerCourse: jest.fn().mockResolvedValue(null),
     getSelfLearnerCourseById: jest.fn().mockResolvedValue(null),
     updateSelfLearnerCourse: jest.fn().mockResolvedValue(null),
+    deleteSelfLearnerCourse: jest.fn().mockResolvedValue(undefined),
   };
 }

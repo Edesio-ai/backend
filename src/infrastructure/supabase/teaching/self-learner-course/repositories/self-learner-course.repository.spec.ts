@@ -157,6 +157,35 @@ describe('SelfLearnerCourseRepository', () => {
       await expect(fixtures.whenUpdate()).rejects.toBeInstanceOf(ServerError);
     });
   });
+
+  describe('deleteSelfLearnerCourse', () => {
+    let fixtures: DeleteCourseFixtures;
+
+    beforeEach(() => {
+      fixtures = new DeleteCourseFixtures();
+    });
+
+    it('deletes row scoped by course id', async () => {
+      fixtures.whenDeleteSucceeds();
+
+      await fixtures.whenDeleteCourse();
+
+      expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_courses');
+      expect(fixtures.deleteMock).toHaveBeenCalledTimes(1);
+      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith(
+        'id',
+        fixtures.courseId,
+      );
+    });
+
+    it('throws ServerError when Supabase rejects delete', async () => {
+      fixtures.whenDeleteFails('rls');
+
+      await expect(fixtures.whenDeleteCourse()).rejects.toBeInstanceOf(
+        ServerError,
+      );
+    });
+  });
 });
 
 class ListFixtures {
@@ -497,5 +526,39 @@ class GetByIdFixtures {
     expect(this.selectMock).toHaveBeenCalledWith('*');
     expect(this.eqMock).toHaveBeenCalledWith('id', courseId);
     expect(this.singleMock).toHaveBeenCalledTimes(1);
+  }
+}
+
+class DeleteCourseFixtures {
+  public readonly courseId = 'c-del-repo';
+
+  public readonly fromMock = jest.fn();
+  public readonly deleteMock = jest.fn();
+  public readonly eqAfterDeleteMock = jest.fn();
+
+  public readonly repository: SelfLearnerCourseRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerCourseRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenDeleteCourse() {
+    return this.repository.deleteSelfLearnerCourse(this.courseId);
+  }
+
+  whenDeleteSucceeds() {
+    this.eqAfterDeleteMock.mockResolvedValue({ error: null });
+    this.deleteMock.mockReturnValue({ eq: this.eqAfterDeleteMock });
+    this.fromMock.mockReturnValue({ delete: this.deleteMock });
+  }
+
+  whenDeleteFails(message: string) {
+    this.eqAfterDeleteMock.mockResolvedValue({
+      error: { message },
+    });
+    this.deleteMock.mockReturnValue({ eq: this.eqAfterDeleteMock });
+    this.fromMock.mockReturnValue({ delete: this.deleteMock });
   }
 }

@@ -106,4 +106,18 @@ export class SelfLearnerCourseRepository implements ISelfLearnerCourseRepository
     }
     return SelfLearnerCourseMapper.toDomain(data);
   }
+
+  async deleteSelfLearnerCourse(courseId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('self_learner_courses')
+      .delete()
+      .eq('id', courseId);
+
+    if (error) {
+      console.error(
+        `Error deleting self learner course ${courseId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+  }
 }

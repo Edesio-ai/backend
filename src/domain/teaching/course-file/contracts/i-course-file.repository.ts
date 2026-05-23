@@ -3,6 +3,7 @@ import { CourseFile, CourseFileUpload } from '../types/course-file.type';
 export const COURSE_FILE_REPOSITORY = Symbol('COURSE_FILE_REPOSITORY');
 
 export interface ICourseFileRepository {
+  deleteFileFromStorage(fileUrl: string): Promise<void>;
   getFileBufferFromStorage(filePath: string): Promise<Buffer>;
   getCourseFilesByCourseId(courseId: string): Promise<CourseFile[]>;
   insertCourseFile(

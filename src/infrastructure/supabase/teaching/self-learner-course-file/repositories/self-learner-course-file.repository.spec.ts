@@ -65,6 +65,82 @@ describe('SelfLearnerCourseFileRepository', () => {
       await expect(fixtures.whenList()).rejects.toBeInstanceOf(ServerError);
     });
   });
+
+  describe('getSelfLearnerCourseFilesUrls', () => {
+    let fixtures: UrlsFixtures;
+
+    beforeEach(() => {
+      fixtures = new UrlsFixtures();
+    });
+
+    it('maps file_url rows to string array', async () => {
+      fixtures.whenUrlsQuerySucceeds([
+        { file_url: 'u1.pdf' },
+        { file_url: 'u2.pdf' },
+      ]);
+
+      await expect(fixtures.whenGetUrls()).resolves.toEqual([
+        'u1.pdf',
+        'u2.pdf',
+      ]);
+
+      expect(fixtures.fromMock).toHaveBeenCalledWith(
+        'self_learner_course_files',
+      );
+      expect(fixtures.selectMock).toHaveBeenCalledWith('file_url');
+      expect(fixtures.eqMock).toHaveBeenCalledWith(
+        'course_id',
+        fixtures.courseId,
+      );
+    });
+
+    it('returns empty when data is null', async () => {
+      fixtures.whenUrlsReturnsNullData();
+
+      await expect(fixtures.whenGetUrls()).resolves.toEqual([]);
+      expect(fixtures.eqMock).toHaveBeenCalledWith(
+        'course_id',
+        fixtures.courseId,
+      );
+    });
+
+    it('throws ServerError when query fails', async () => {
+      fixtures.whenUrlsFails('down');
+
+      await expect(fixtures.whenGetUrls()).rejects.toBeInstanceOf(ServerError);
+    });
+  });
+
+  describe('deleteSelfLearnerCourseFilesByCourseId', () => {
+    let fixtures: DeleteFilesFixtures;
+
+    beforeEach(() => {
+      fixtures = new DeleteFilesFixtures();
+    });
+
+    it('runs delete constrained by course_id', async () => {
+      fixtures.whenDeleteSucceeds();
+
+      await fixtures.whenDeleteFiles();
+
+      expect(fixtures.fromMock).toHaveBeenCalledWith(
+        'self_learner_course_files',
+      );
+      expect(fixtures.deleteMock).toHaveBeenCalledTimes(1);
+      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith(
+        'course_id',
+        fixtures.courseId,
+      );
+    });
+
+    it('throws ServerError when delete fails', async () => {
+      fixtures.whenDeleteFails('rls');
+
+      await expect(fixtures.whenDeleteFiles()).rejects.toBeInstanceOf(
+        ServerError,
+      );
+    });
+  });
 });
 
 class UploadFixtures {
@@ -199,5 +275,82 @@ class ListFixtures {
     expect(this.orderMock).toHaveBeenCalledWith('created_at', {
       ascending: false,
     });
+  }
+}
+
+class UrlsFixtures {
+  public readonly courseId = 'c-urls-1';
+
+  public readonly fromMock = jest.fn();
+  public readonly selectMock = jest.fn();
+  public readonly eqMock = jest.fn();
+
+  public readonly repository: SelfLearnerCourseFileRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerCourseFileRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenGetUrls() {
+    return this.repository.getSelfLearnerCourseFilesUrls(this.courseId);
+  }
+
+  whenUrlsQuerySucceeds(rows: { file_url: string }[]) {
+    this.eqMock.mockResolvedValue({ data: rows, error: null });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  whenUrlsReturnsNullData() {
+    this.eqMock.mockResolvedValue({ data: null, error: null });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  whenUrlsFails(message: string) {
+    this.eqMock.mockResolvedValue({
+      data: null,
+      error: { message },
+    });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+}
+
+class DeleteFilesFixtures {
+  public readonly courseId = 'c-del-files';
+
+  public readonly fromMock = jest.fn();
+  public readonly deleteMock = jest.fn();
+  public readonly eqAfterDeleteMock = jest.fn();
+
+  public readonly repository: SelfLearnerCourseFileRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerCourseFileRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenDeleteFiles() {
+    return this.repository.deleteSelfLearnerCourseFilesByCourseId(
+      this.courseId,
+    );
+  }
+
+  whenDeleteSucceeds() {
+    this.eqAfterDeleteMock.mockResolvedValue({ error: null });
+    this.deleteMock.mockReturnValue({ eq: this.eqAfterDeleteMock });
+    this.fromMock.mockReturnValue({ delete: this.deleteMock });
+  }
+
+  whenDeleteFails(message: string) {
+    this.eqAfterDeleteMock.mockResolvedValue({
+      error: { message },
+    });
+    this.deleteMock.mockReturnValue({ eq: this.eqAfterDeleteMock });
+    this.fromMock.mockReturnValue({ delete: this.deleteMock });
   }
 }
