@@ -50,4 +50,37 @@ export class SelfLearnerCourseFileRepository implements ISelfLearnerCourseFileRe
       ? data.map((row) => selfLearnerCourseFileMapper.toDomain(row))
       : [];
   }
+
+  public async getSelfLearnerCourseFilesUrls(
+    courseId: string,
+  ): Promise<string[]> {
+    const { data, error } = await this.supabase
+      .from('self_learner_course_files')
+      .select('file_url')
+      .eq('course_id', courseId);
+
+    if (error) {
+      console.error(
+        `Error getting self learner course files urls for course ${courseId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+    return data ? selfLearnerCourseFileMapper.toCourseFilesUrls(data) : [];
+  }
+
+  public async deleteSelfLearnerCourseFilesByCourseId(
+    courseId: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('self_learner_course_files')
+      .delete()
+      .eq('course_id', courseId);
+
+    if (error) {
+      console.error(
+        `Error deleting self learner course files by course id: ${courseId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+  }
 }

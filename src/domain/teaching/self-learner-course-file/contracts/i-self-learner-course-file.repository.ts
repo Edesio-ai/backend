@@ -11,4 +11,6 @@ export interface ISelfLearnerCourseFileRepository {
     payload: SelfLearnerCourseFileInsertPayload,
   ): Promise<SelfLearnerCourseFile>;
   getSelfLearnerCourseFiles(courseId: string): Promise<SelfLearnerCourseFile[]>;
+  getSelfLearnerCourseFilesUrls(courseId: string): Promise<string[]>;
+  deleteSelfLearnerCourseFilesByCourseId(courseId: string): Promise<void>;
 }

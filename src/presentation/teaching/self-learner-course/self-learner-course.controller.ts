@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { GetSelfLearnerCoursesUseCase } from 'src/application/teaching/self-learner-course/get-self-learner-courses.use-case';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
@@ -9,6 +17,7 @@ import { CreateSelfLearnerCourseBodyDto } from './dtos/create-self-learner-cours
 import { CreateSelfLearnerCourseUseCase } from 'src/application/teaching/self-learner-course/create-self-learner-course.use-case';
 import { UpdateSelfLearnerCourseBodyDto } from './dtos/update-self-learner-course-body.dto';
 import { UpdateSelfLearnerCourseUseCase } from 'src/application/teaching/self-learner-course/update-self-learner-course.use-case';
+import { DeleteSelfLearnerCourseUseCase } from 'src/application/teaching/self-learner-course/delete-self-learner-course.use-case';
 
 @Roles('self-learner')
 @Controller('self-learner-course')
@@ -18,6 +27,7 @@ export class SelfLearnerCourseController {
     private readonly getSelfLearnerCoursesCountUseCase: GetSelfLearnerCoursesCountUseCase,
     private readonly createSelfLearnerCourseUseCase: CreateSelfLearnerCourseUseCase,
     private readonly updateSelfLearnerCourseUseCase: UpdateSelfLearnerCourseUseCase,
+    private readonly deleteSelfLearnerCourseUseCase: DeleteSelfLearnerCourseUseCase,
   ) {}
 
   @Get()
@@ -53,5 +63,13 @@ export class SelfLearnerCourseController {
       courseId,
       body,
     );
+  }
+
+  @Delete(':courseId')
+  async deleteSelfLearnerCourse(
+    @CurrentUser() user: AuthUser,
+    @Param('courseId') courseId: string,
+  ): Promise<void> {
+    return await this.deleteSelfLearnerCourseUseCase.execute(user.id, courseId);
   }
 }

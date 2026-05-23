@@ -2,6 +2,7 @@ import type { ICourseFileRepository } from 'src/domain/teaching/course-file/cont
 
 export function createMockCourseFileRepository(): jest.Mocked<ICourseFileRepository> {
   return {
+    deleteFileFromStorage: jest.fn(),
     deleteFileById: jest.fn(),
     getCourseFileById: jest.fn(),
     deleteCoursesFilesByCourseIds: jest.fn(),
