@@ -13,6 +13,6 @@ export class GetSelfLearnerUseCase {
   ) {}
 
   async execute(user: AuthUser): Promise<SelfLearner | null> {
-    return await this.selfLearnerRepository.getSelfLearneByUserId(user.id);
+    return await this.selfLearnerRepository.getSelfLearnerByUserId(user.id);
   }
 }

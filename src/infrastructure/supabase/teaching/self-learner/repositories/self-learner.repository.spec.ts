@@ -11,7 +11,7 @@ describe('SelfLearnerRepository', () => {
     fixtures = new Fixtures();
   });
 
-  describe('getSelfLearneByUserId', () => {
+  describe('getSelfLearnerByUserId', () => {
     it('returns mapped self-learner when row exists', async () => {
       fixtures.whenMaybeSingleReturnsRow();
 
@@ -113,7 +113,7 @@ class Fixtures {
   }
 
   whenGetByUserId() {
-    return this.repository.getSelfLearneByUserId(this.userId);
+    return this.repository.getSelfLearnerByUserId(this.userId);
   }
 
   whenCreate() {

@@ -16,7 +16,7 @@ describe('GetSelfLearnerUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(fixtures.repository.getSelfLearneByUserId).toHaveBeenCalledWith(
+    expect(fixtures.repository.getSelfLearnerByUserId).toHaveBeenCalledWith(
       fixtures.user.id,
     );
     expect(result).toEqual(fixtures.learner);
@@ -27,7 +27,7 @@ describe('GetSelfLearnerUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(fixtures.repository.getSelfLearneByUserId).toHaveBeenCalledWith(
+    expect(fixtures.repository.getSelfLearnerByUserId).toHaveBeenCalledWith(
       fixtures.user.id,
     );
     expect(result).toBeNull();
@@ -35,7 +35,7 @@ describe('GetSelfLearnerUseCase', () => {
 
   it('should propagate repository errors', async () => {
     const err = new Error('query failed');
-    fixtures.repository.getSelfLearneByUserId.mockRejectedValue(err);
+    fixtures.repository.getSelfLearnerByUserId.mockRejectedValue(err);
 
     await expect(fixtures.whenExecute()).rejects.toBe(err);
   });
@@ -70,10 +70,10 @@ class Fixtures {
   }
 
   whenLearnerFound() {
-    this.repository.getSelfLearneByUserId.mockResolvedValue(this.learner);
+    this.repository.getSelfLearnerByUserId.mockResolvedValue(this.learner);
   }
 
   whenLearnerNotFound() {
-    this.repository.getSelfLearneByUserId.mockResolvedValue(null);
+    this.repository.getSelfLearnerByUserId.mockResolvedValue(null);
   }
 }
