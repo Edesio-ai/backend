@@ -197,6 +197,41 @@ describe('SelfLearnerCourseFileRepository', () => {
       );
     });
   });
+
+  describe('getSelfLearnerCourseFileSignedUrl', () => {
+    let fixtures: SignedUrlFixtures;
+
+    beforeEach(() => {
+      fixtures = new SignedUrlFixtures();
+    });
+
+    it('uses courses-pdf bucket with one hour TTL', async () => {
+      fixtures.whenCreateSignedUrlSucceeds('https://signed.example/x');
+
+      const result = await fixtures.whenGetSignedUrl();
+
+      expect(fixtures.storageFromMock).toHaveBeenCalledWith('courses-pdf');
+      expect(fixtures.createSignedUrlMock).toHaveBeenCalledWith(
+        fixtures.fileUrl,
+        3600,
+      );
+      expect(result).toBe('https://signed.example/x');
+    });
+
+    it('returns null when Supabase omits signedUrl', async () => {
+      fixtures.whenCreateSignedUrlReturnsEmptySignedUrlField();
+
+      await expect(fixtures.whenGetSignedUrl()).resolves.toBeNull();
+    });
+
+    it('throws ServerError when createSignedUrl fails', async () => {
+      fixtures.whenCreateSignedUrlFails('permission');
+
+      await expect(fixtures.whenGetSignedUrl()).rejects.toBeInstanceOf(
+        ServerError,
+      );
+    });
+  });
 });
 
 class UploadFixtures {
@@ -498,5 +533,54 @@ class DeleteByIdFixtures {
     });
     this.deleteMock.mockReturnValue({ eq: this.eqAfterDeleteMock });
     this.fromMock.mockReturnValue({ delete: this.deleteMock });
+  }
+}
+
+class SignedUrlFixtures {
+  public readonly fileUrl = 'self-learner/c-1/readme.pdf';
+
+  public readonly storageFromMock = jest.fn();
+  public readonly createSignedUrlMock = jest.fn();
+
+  public readonly repository: SelfLearnerCourseFileRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerCourseFileRepository({
+      storage: { from: this.storageFromMock },
+    } as unknown as SupabaseClient);
+  }
+
+  whenGetSignedUrl() {
+    return this.repository.getSelfLearnerCourseFileSignedUrl(this.fileUrl);
+  }
+
+  whenCreateSignedUrlSucceeds(signedUrl: string) {
+    this.createSignedUrlMock.mockResolvedValue({
+      data: { signedUrl },
+      error: null,
+    });
+    this.storageFromMock.mockReturnValue({
+      createSignedUrl: this.createSignedUrlMock,
+    });
+  }
+
+  whenCreateSignedUrlReturnsEmptySignedUrlField() {
+    this.createSignedUrlMock.mockResolvedValue({
+      data: {},
+      error: null,
+    });
+    this.storageFromMock.mockReturnValue({
+      createSignedUrl: this.createSignedUrlMock,
+    });
+  }
+
+  whenCreateSignedUrlFails(message: string) {
+    this.createSignedUrlMock.mockResolvedValue({
+      data: null,
+      error: { message },
+    });
+    this.storageFromMock.mockReturnValue({
+      createSignedUrl: this.createSignedUrlMock,
+    });
   }
 }

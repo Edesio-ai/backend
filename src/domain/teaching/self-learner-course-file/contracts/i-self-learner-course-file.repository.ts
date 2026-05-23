@@ -15,4 +15,5 @@ export interface ISelfLearnerCourseFileRepository {
   deleteSelfLearnerCourseFilesByCourseId(courseId: string): Promise<void>;
   getSelfLearnerCourseFileById(fileId: string): Promise<SelfLearnerCourseFile>;
   deleteSelfLearnerCourseFileById(fileId: string): Promise<void>;
+  getSelfLearnerCourseFileSignedUrl(fileUrl: string): Promise<string | null>;
 }

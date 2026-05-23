@@ -17,6 +17,7 @@ import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decora
 import { type AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetSelfLearnerCourseFilesUseCase } from 'src/application/teaching/self-learner-course-file/get-self-learner-course-files.use-case';
 import { DeleteSelfLearnerCourseFileUseCase } from 'src/application/teaching/self-learner-course-file/delete-self-learner-course-file.use-case';
+import { GetSelfLearnerCourseFileSignedUrlUseCase } from 'src/application/teaching/self-learner-course-file/get-self-learner-course-file-signed-url.use-case';
 
 @Roles('self-learner')
 @Controller('self-learner-course-file')
@@ -25,6 +26,7 @@ export class SelfLearnerCourseFileController {
     private readonly uploadSelfLearnerCourseFileUseCase: UploadSelfLearnerCourseFileUseCase,
     private readonly getSelfLearnerCourseFilesUseCase: GetSelfLearnerCourseFilesUseCase,
     private readonly deleteSelfLearnerCourseFileUseCase: DeleteSelfLearnerCourseFileUseCase,
+    private readonly getSelfLearnerCourseFileSignedUrlUseCase: GetSelfLearnerCourseFileSignedUrlUseCase,
   ) {}
 
   @UseInterceptors(FileInterceptor('file'))
@@ -72,5 +74,18 @@ export class SelfLearnerCourseFileController {
       user.id,
       fileId,
     );
+  }
+
+  @Get('/:fileId/signed-url')
+  async getSelfLearnerCourseFileSignedUrl(
+    @Param('fileId') fileId: string,
+    @CurrentUser() user: AuthUser,
+  ): Promise<{ signedUrl: string | null }> {
+    const signedUrl =
+      await this.getSelfLearnerCourseFileSignedUrlUseCase.execute(
+        user.id,
+        fileId,
+      );
+    return { signedUrl };
   }
 }

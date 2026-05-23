@@ -8,5 +8,6 @@ export function createMockSelfLearnerCourseFileRepository(): jest.Mocked<ISelfLe
     deleteSelfLearnerCourseFilesByCourseId: jest.fn(),
     getSelfLearnerCourseFileById: jest.fn(),
     deleteSelfLearnerCourseFileById: jest.fn(),
+    getSelfLearnerCourseFileSignedUrl: jest.fn(),
   };
 }
