@@ -11,7 +11,7 @@ import { StudentSessionModule } from './student-session/student-session.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { SelfLearnerModule } from './self-learner/self-learner.module';
 import { SelfLearnerCourseModule } from './self-learner-course/self-learner-course.module';
-import { SelfLearningCourseFileModule } from './self-learner-course-file/self-learner-course-file.module';
+import { SelfLearnerCourseFileModule } from './self-learner-course-file/self-learner-course-file.module';
 
 @Module({
   imports: [
@@ -27,7 +27,7 @@ import { SelfLearningCourseFileModule } from './self-learner-course-file/self-le
     StudentSessionModule,
     SelfLearnerModule,
     SelfLearnerCourseModule,
-    SelfLearningCourseFileModule,
+    SelfLearnerCourseFileModule,
   ],
 })
 export class TeachingModule {}

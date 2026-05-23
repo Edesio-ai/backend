@@ -67,4 +67,22 @@ export class SelfLearnerCourseRepository implements ISelfLearnerCourseRepository
     }
     return SelfLearnerCourseMapper.toDomain(data);
   }
+
+  public async getSelfLearnerCourseById(
+    courseId: string,
+  ): Promise<SelfLearnerCourse | null> {
+    const { data, error } = await this.supabase
+      .from('self_learner_courses')
+      .select('*')
+      .eq('id', courseId)
+      .single();
+
+    if (error) {
+      console.error(
+        `Error getting self learner course by id ${courseId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+    return data ? SelfLearnerCourseMapper.toDomain(data) : null;
+  }
 }

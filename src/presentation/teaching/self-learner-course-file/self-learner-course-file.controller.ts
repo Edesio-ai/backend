@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Param,
   Post,
   UploadedFile,
@@ -10,11 +11,17 @@ import { BadRequestError } from 'src/domain/shared/errors/global.errors';
 import { CourseFileUpload } from 'src/domain/teaching/course-file/types/course-file.type';
 import { UploadSelfLearnerCourseFileUseCase } from 'src/application/teaching/self-learner-course-file/upload-self-learner-course-file.use-case';
 import { SelfLearnerCourseFile } from 'src/domain/teaching/self-learner-course-file/types/self-learner-course-file.type';
+import { Roles } from 'src/presentation/auth/decorator/role.decorator';
+import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
+import { type AuthUser } from 'src/domain/auth/types/auth.type';
+import { GetSelfLearnerCourseFilesUseCase } from 'src/application/teaching/self-learner-course-file/get-self-learer-course-file.use-case';
 
+@Roles('self-learner')
 @Controller('self-learner-course-file')
 export class SelfLearnerCourseFileController {
   constructor(
     private readonly uploadSelfLearnerCourseFileUseCase: UploadSelfLearnerCourseFileUseCase,
+    private readonly getSelfLearnerCourseFilesUseCase: GetSelfLearnerCourseFilesUseCase,
   ) {}
 
   @UseInterceptors(FileInterceptor('file'))
@@ -40,5 +47,16 @@ export class SelfLearnerCourseFileController {
     );
 
     return { data };
+  }
+
+  @Get('self-learner-course/:courseId')
+  async getSelfLearnerCourseFiles(
+    @CurrentUser() user: AuthUser,
+    @Param('courseId') courseId: string,
+  ): Promise<SelfLearnerCourseFile[]> {
+    return await this.getSelfLearnerCourseFilesUseCase.execute(
+      user.id,
+      courseId,
+    );
   }
 }

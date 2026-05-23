@@ -96,6 +96,35 @@ describe('SelfLearnerCourseRepository', () => {
       await expect(fixtures.whenCreate()).rejects.toBeInstanceOf(ServerError);
     });
   });
+
+  describe('getSelfLearnerCourseById', () => {
+    let fixtures: GetByIdFixtures;
+
+    beforeEach(() => {
+      fixtures = new GetByIdFixtures();
+    });
+
+    it('returns mapped course when single succeeds', async () => {
+      fixtures.whenSingleReturnsRow();
+
+      const result = await fixtures.whenGetById();
+
+      fixtures.thenGetByIdChainBuilt(fixtures.courseId);
+      expect(result).toEqual(SelfLearnerCourseMapper.toDomain(fixtures.row));
+    });
+
+    it('returns null when data is null without error', async () => {
+      fixtures.whenSingleReturnsEmpty();
+
+      await expect(fixtures.whenGetById()).resolves.toBeNull();
+    });
+
+    it('throws ServerError when Supabase reports error', async () => {
+      fixtures.whenSingleFails('no rows');
+
+      await expect(fixtures.whenGetById()).rejects.toBeInstanceOf(ServerError);
+    });
+  });
 });
 
 class ListFixtures {
@@ -300,5 +329,73 @@ class CreateFixtures {
       select: this.selectAfterInsertMock,
     });
     this.fromMock.mockReturnValue({ insert: this.insertMock });
+  }
+}
+
+class GetByIdFixtures {
+  public readonly courseId = 'course-by-id';
+
+  public readonly row = {
+    id: this.courseId,
+    self_learner_id: 'sl-99',
+    title: 'T',
+    description: null,
+    text_content: null,
+    language: 'francais' as const,
+    created_at: '2026-01-01T00:00:00.000Z',
+  };
+
+  public readonly fromMock = jest.fn();
+  public readonly selectMock = jest.fn();
+  public readonly eqMock = jest.fn();
+  public readonly singleMock = jest.fn();
+
+  public readonly repository: SelfLearnerCourseRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerCourseRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenGetById() {
+    return this.repository.getSelfLearnerCourseById(this.courseId);
+  }
+
+  whenSingleReturnsRow() {
+    this.singleMock.mockResolvedValue({
+      data: this.row,
+      error: null,
+    });
+    this.eqMock.mockReturnValue({ single: this.singleMock });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  whenSingleReturnsEmpty() {
+    this.singleMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+    this.eqMock.mockReturnValue({ single: this.singleMock });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  whenSingleFails(message: string) {
+    this.singleMock.mockResolvedValue({
+      data: null,
+      error: { message },
+    });
+    this.eqMock.mockReturnValue({ single: this.singleMock });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  thenGetByIdChainBuilt(courseId: string) {
+    expect(this.fromMock).toHaveBeenCalledWith('self_learner_courses');
+    expect(this.selectMock).toHaveBeenCalledWith('*');
+    expect(this.eqMock).toHaveBeenCalledWith('id', courseId);
+    expect(this.singleMock).toHaveBeenCalledTimes(1);
   }
 }
