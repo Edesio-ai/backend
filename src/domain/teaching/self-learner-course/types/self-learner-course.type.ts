@@ -28,3 +28,13 @@ export type SelfLearnerCourseInsertSupabase = Omit<
   SelfLearnerCourseSupabase,
   'id' | 'created_at'
 >;
+
+export type UpdateSelfLearnerCoursePayload = Omit<
+  Partial<SelfLearnerCourse>,
+  'id' | 'createdAt' | 'selfLearnerId'
+>;
+
+export type SelfLearnerCourseUpdateSupabase = Omit<
+  Partial<SelfLearnerCourseSupabase>,
+  'id' | 'created_at' | 'self_learner_id'
+>;

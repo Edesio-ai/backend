@@ -5,6 +5,7 @@ import { SelfLearnerCoursePersistenceModule } from 'src/infrastructure/supabase/
 import { SelfLearnerPersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner/self-learner-persistence.module';
 import { GetSelfLearnerCoursesCountUseCase } from 'src/application/teaching/self-learner-course/get-self-learner-courses-count.use-case';
 import { CreateSelfLearnerCourseUseCase } from 'src/application/teaching/self-learner-course/create-self-learner-course.use-case';
+import { UpdateSelfLearnerCourseUseCase } from 'src/application/teaching/self-learner-course/update-self-learner-course.use-case';
 
 @Module({
   imports: [SelfLearnerCoursePersistenceModule, SelfLearnerPersistenceModule],
@@ -13,6 +14,7 @@ import { CreateSelfLearnerCourseUseCase } from 'src/application/teaching/self-le
     GetSelfLearnerCoursesUseCase,
     GetSelfLearnerCoursesCountUseCase,
     CreateSelfLearnerCourseUseCase,
+    UpdateSelfLearnerCourseUseCase,
   ],
 })
 export class SelfLearnerCourseModule {}

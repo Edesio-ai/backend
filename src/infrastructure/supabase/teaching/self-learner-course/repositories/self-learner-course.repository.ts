@@ -4,6 +4,7 @@ import { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-learner-c
 import {
   SelfLearnerCourse,
   SelfLearnerCourseInsertPayload,
+  UpdateSelfLearnerCoursePayload,
 } from 'src/domain/teaching/self-learner-course/types/self-learner-course.type';
 import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
@@ -84,5 +85,25 @@ export class SelfLearnerCourseRepository implements ISelfLearnerCourseRepository
       throw new ServerError(error.message);
     }
     return data ? SelfLearnerCourseMapper.toDomain(data) : null;
+  }
+
+  async updateSelfLearnerCourse(
+    courseId: string,
+    payload: UpdateSelfLearnerCoursePayload,
+  ): Promise<SelfLearnerCourse> {
+    const { data, error } = await this.supabase
+      .from('self_learner_courses')
+      .update(SelfLearnerCourseMapper.toUpdate(payload))
+      .eq('id', courseId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(
+        `Error updating self learner course ${courseId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+    return SelfLearnerCourseMapper.toDomain(data);
   }
 }
