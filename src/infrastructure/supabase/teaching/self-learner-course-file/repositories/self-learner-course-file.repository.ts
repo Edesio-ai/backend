@@ -30,4 +30,24 @@ export class SelfLearnerCourseFileRepository implements ISelfLearnerCourseFileRe
 
     return selfLearnerCourseFileMapper.toDomain(data);
   }
+
+  public async getSelfLearnerCourseFiles(
+    courseId: string,
+  ): Promise<SelfLearnerCourseFile[]> {
+    const { data, error } = await this.supabase
+      .from('self_learner_course_files')
+      .select('*')
+      .eq('course_id', courseId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(
+        `Error getting self learner course files for course ${courseId}: ${error.message}`,
+      );
+      throw new ServerError(error.message);
+    }
+    return data
+      ? data.map((row) => selfLearnerCourseFileMapper.toDomain(row))
+      : [];
+  }
 }

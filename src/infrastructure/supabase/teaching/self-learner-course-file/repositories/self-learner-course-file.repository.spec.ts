@@ -4,34 +4,70 @@ import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { selfLearnerCourseFileMapper } from '../mappers/self-learner-course-file.mapper';
 
 describe('SelfLearnerCourseFileRepository', () => {
-  let fixtures: Fixtures;
+  describe('uploadSelfLearnerCourseFile', () => {
+    let fixtures: UploadFixtures;
 
-  beforeEach(() => {
-    fixtures = new Fixtures();
+    beforeEach(() => {
+      fixtures = new UploadFixtures();
+    });
+
+    it('inserts mapped payload and returns domain row', async () => {
+      fixtures.whenInsertSucceeds();
+
+      const result = await fixtures.whenUpload();
+
+      expect(result).toEqual(
+        selfLearnerCourseFileMapper.toDomain(fixtures.supabaseRow),
+      );
+      expect(fixtures.insertMock).toHaveBeenCalledWith(
+        selfLearnerCourseFileMapper.toInsert(fixtures.payload),
+      );
+      expect(fixtures.singleAfterInsertMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('throws ServerError when insert fails', async () => {
+      fixtures.whenInsertFails('violates FK');
+
+      await expect(fixtures.whenUpload()).rejects.toBeInstanceOf(ServerError);
+    });
   });
 
-  it('inserts mapped payload and returns domain row', async () => {
-    fixtures.whenInsertSucceeds();
+  describe('getSelfLearnerCourseFiles', () => {
+    let fixtures: ListFixtures;
 
-    const result = await fixtures.whenUpload();
+    beforeEach(() => {
+      fixtures = new ListFixtures();
+    });
 
-    expect(result).toEqual(
-      selfLearnerCourseFileMapper.toDomain(fixtures.supabaseRow),
-    );
-    expect(fixtures.insertMock).toHaveBeenCalledWith(
-      selfLearnerCourseFileMapper.toInsert(fixtures.payload),
-    );
-    expect(fixtures.singleAfterInsertMock).toHaveBeenCalledTimes(1);
-  });
+    it('maps rows when query succeeds', async () => {
+      fixtures.whenListSucceedsWithRows([fixtures.rows[0]]);
 
-  it('throws ServerError when insert fails', async () => {
-    fixtures.whenInsertFails('violates FK');
+      const result = await fixtures.whenList();
 
-    await expect(fixtures.whenUpload()).rejects.toBeInstanceOf(ServerError);
+      expect(result).toEqual([
+        selfLearnerCourseFileMapper.toDomain(fixtures.rows[0]),
+      ]);
+      fixtures.thenListChainBuilt(fixtures.courseId);
+    });
+
+    it('returns empty array when data is null', async () => {
+      fixtures.whenListReturnsNull();
+
+      const result = await fixtures.whenList();
+
+      expect(result).toEqual([]);
+      fixtures.thenListChainBuilt(fixtures.courseId);
+    });
+
+    it('throws ServerError when query fails', async () => {
+      fixtures.whenListFails('down');
+
+      await expect(fixtures.whenList()).rejects.toBeInstanceOf(ServerError);
+    });
   });
 });
 
-class Fixtures {
+class UploadFixtures {
   public readonly payload = {
     courseId: 'c-1',
     fileUrl: 'self-learner/c-1/doc.pdf',
@@ -89,5 +125,79 @@ class Fixtures {
       select: this.selectAfterInsertMock,
     });
     this.fromMock.mockReturnValue({ insert: this.insertMock });
+  }
+}
+
+class ListFixtures {
+  public readonly courseId = 'c-list-1';
+
+  public readonly rows = [
+    {
+      id: 'f-2',
+      course_id: this.courseId,
+      file_url: 'a/b.pdf',
+      file_name: 'b.pdf',
+      created_at: '2026-01-03T12:00:00.000Z',
+    },
+    {
+      id: 'f-1',
+      course_id: this.courseId,
+      file_url: 'a/c.pdf',
+      file_name: 'c.pdf',
+      created_at: '2026-01-02T12:00:00.000Z',
+    },
+  ];
+
+  public readonly fromMock = jest.fn();
+  public readonly selectMock = jest.fn();
+  public readonly eqMock = jest.fn();
+  public readonly orderMock = jest.fn();
+
+  public readonly repository: SelfLearnerCourseFileRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerCourseFileRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenList() {
+    return this.repository.getSelfLearnerCourseFiles(this.courseId);
+  }
+
+  whenListSucceedsWithRows(rows: typeof this.rows) {
+    this.orderMock.mockResolvedValue({
+      data: rows,
+      error: null,
+    });
+    this.eqMock.mockReturnValue({ order: this.orderMock });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  whenListReturnsNull() {
+    this.orderMock.mockResolvedValue({ data: null, error: null });
+    this.eqMock.mockReturnValue({ order: this.orderMock });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  whenListFails(message: string) {
+    this.orderMock.mockResolvedValue({
+      data: null,
+      error: { message },
+    });
+    this.eqMock.mockReturnValue({ order: this.orderMock });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  thenListChainBuilt(courseId: string) {
+    expect(this.fromMock).toHaveBeenCalledWith('self_learner_course_files');
+    expect(this.selectMock).toHaveBeenCalledWith('*');
+    expect(this.eqMock).toHaveBeenCalledWith('course_id', courseId);
+    expect(this.orderMock).toHaveBeenCalledWith('created_at', {
+      ascending: false,
+    });
   }
 }

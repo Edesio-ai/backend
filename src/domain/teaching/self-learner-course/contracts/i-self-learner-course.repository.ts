@@ -11,4 +11,5 @@ export interface ISelfLearnerCourseRepository {
   createSelfLearnerCourse(
     payload: SelfLearnerCourseInsertPayload,
   ): Promise<SelfLearnerCourse>;
+  getSelfLearnerCourseById(courseId: string): Promise<SelfLearnerCourse | null>;
 }

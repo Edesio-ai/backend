@@ -2,8 +2,9 @@ import type { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-lear
 
 export function createMockSelfLearnerCourseRepository(): jest.Mocked<ISelfLearnerCourseRepository> {
   return {
-    getSelfLearnerCourses: jest.fn(),
-    getSelfLearnerCoursesCount: jest.fn(),
-    createSelfLearnerCourse: jest.fn(),
+    getSelfLearnerCourses: jest.fn().mockResolvedValue([]),
+    getSelfLearnerCoursesCount: jest.fn().mockResolvedValue(0),
+    createSelfLearnerCourse: jest.fn().mockResolvedValue(null),
+    getSelfLearnerCourseById: jest.fn().mockResolvedValue(null),
   };
 }
