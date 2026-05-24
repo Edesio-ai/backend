@@ -3,5 +3,6 @@ import type { ISelfLearnerQuestionRepository } from 'src/domain/teaching/self-le
 export function createMockSelfLearnerQuestionRepository(): jest.Mocked<ISelfLearnerQuestionRepository> {
   return {
     deleteSelfLearnerQuestionsByCourseId: jest.fn(),
+    getSelfLearnerQuestions: jest.fn(),
   };
 }
