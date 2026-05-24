@@ -11,8 +11,9 @@ import { GenerateQuestionUseCase } from 'src/application/llm/generate-question-u
 import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
 import { EvaluateAnswerDto } from './dtos/evaluate-answer.dto';
 import { EvaluateAnswerUseCase } from 'src/application/llm/evaluate-answer.use-case';
+import { SelfLearnerQuestion } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
 
-@Roles('student')
+@Roles('teacher', 'self-learner')
 @Controller('llm')
 export class LlmController {
   constructor(
@@ -33,7 +34,10 @@ export class LlmController {
   async generateQuestion(
     @CurrentUser() user: AuthUser,
     @Body() body: GenerateQuestionDto,
-  ): Promise<{ questions: Question[]; questionCount: number }> {
+  ): Promise<{
+    questions: Question[] | SelfLearnerQuestion[];
+    questionCount: number;
+  }> {
     const questions = await this.generateQuestionUseCase.execute(body, user);
     return {
       questions,

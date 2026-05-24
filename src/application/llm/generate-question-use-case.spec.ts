@@ -8,22 +8,28 @@ import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
+import type { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 import { IOpenAiProvider } from 'src/domain/llm/openai/contracts/open-ai.provider';
 import { IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
-import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
-import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 import {
   CourseFile,
   CourseWithSession,
 } from 'src/domain/teaching/course/types/course.type';
-import {
-  GeneratedQuestion,
-  Question,
-} from 'src/domain/teaching/question/types/question.type';
+import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import { Question } from 'src/domain/teaching/question/types/question.type';
+import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import type { ISelfLearnerCourseFileRepository } from 'src/domain/teaching/self-learner-course-file/contracts/i-self-learner-course-file.repository';
+import type { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-learner-course/contracts/i-self-learner-course.repository';
+import type { ISelfLearnerQuestionRepository } from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
+import type { ISelfLearnerRepository } from 'src/domain/teaching/self-learner/contracts/i-self-learner.repository';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
+import { createMockSelfLearnerCourseFileRepository } from 'src/testing/mock-self-learner-course-file-repository';
+import { createMockSelfLearnerCourseRepository } from 'src/testing/mock-self-learner-course-repository';
+import { createMockSelfLearnerQuestionRepository } from 'src/testing/mock-self-learner-question-repository';
+import { createMockSelfLearnerRepository } from 'src/testing/mock-self-learner-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GenerateQuestionUseCase', () => {
@@ -208,6 +214,10 @@ class Fixtures {
   public readonly questionRepository: jest.Mocked<IQuestionsRepository>;
   public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
+  public readonly selfLearnerRepository: jest.Mocked<ISelfLearnerRepository>;
+  public readonly selfLearnerCourseRepository: jest.Mocked<ISelfLearnerCourseRepository>;
+  public readonly selfLearnerCourseFileRepository: jest.Mocked<ISelfLearnerCourseFileRepository>;
+  public readonly selfLearnerQuestionRepository: jest.Mocked<ISelfLearnerQuestionRepository>;
   public readonly useCase: GenerateQuestionUseCase;
 
   constructor() {
@@ -234,6 +244,12 @@ class Fixtures {
     this.teacherRepository = createMockTeacherRepository();
 
     this.courseFileRepository = createMockCourseFileRepository();
+    this.selfLearnerRepository = createMockSelfLearnerRepository();
+    this.selfLearnerCourseRepository = createMockSelfLearnerCourseRepository();
+    this.selfLearnerCourseFileRepository =
+      createMockSelfLearnerCourseFileRepository();
+    this.selfLearnerQuestionRepository =
+      createMockSelfLearnerQuestionRepository();
 
     this.useCase = new GenerateQuestionUseCase(
       this.courseRepository,
@@ -242,6 +258,10 @@ class Fixtures {
       this.questionRepository,
       this.teacherRepository,
       this.courseFileRepository,
+      this.selfLearnerRepository,
+      this.selfLearnerCourseRepository,
+      this.selfLearnerCourseFileRepository,
+      this.selfLearnerQuestionRepository,
     );
   }
 

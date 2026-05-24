@@ -1,6 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { SelfLearnerQuestionRepository } from './self-learner-question.repository';
+import type { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
+import { SelfLearnerQuestionRepository } from './self-learner-question.repository';
 import { selfLearnerQuestionMapper } from '../mappers/self-learner-question.mapper';
 
 describe('SelfLearnerQuestionRepository', () => {
@@ -64,6 +65,46 @@ describe('SelfLearnerQuestionRepository', () => {
       await expect(fixtures.whenList()).rejects.toBeInstanceOf(ServerError);
     });
   });
+
+  describe('insertSelfLearnerQuestions', () => {
+    let fixtures: InsertFixtures;
+
+    beforeEach(() => {
+      fixtures = new InsertFixtures();
+    });
+
+    it('inserts mapped payloads and maps returned rows', async () => {
+      fixtures.whenInsertSucceedsWithRows([fixtures.returnedRows[0]]);
+
+      const result = await fixtures.whenInsert();
+
+      expect(fixtures.insertMock).toHaveBeenCalledWith(
+        selfLearnerQuestionMapper.generatedToInserts(
+          fixtures.generatedQuestions,
+          fixtures.courseId,
+        ),
+      );
+      expect(result).toEqual([
+        selfLearnerQuestionMapper.toDomain(fixtures.returnedRows[0]),
+      ]);
+      expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_questions');
+      expect(fixtures.selectAfterInsertMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns empty array when insert response has no data', async () => {
+      fixtures.whenInsertReturnsEmptyData();
+
+      const result = await fixtures.whenInsert();
+
+      expect(result).toEqual([]);
+    });
+
+    it('throws ServerError when insert fails', async () => {
+      fixtures.whenInsertFails('violates FK');
+
+      await expect(fixtures.whenInsert()).rejects.toBeInstanceOf(ServerError);
+    });
+  });
 });
 
 class DeleteFixtures {
@@ -110,7 +151,7 @@ class ListFixtures {
       type: 'single' as const,
       question_text: 'Une réponse ?',
       proposals: ['A', 'B'],
-      correct_answer: ['A'],
+      correct_answers: ['A'],
       explanation: 'Parce que',
       created_at: new Date('2026-02-01T10:00:00.000Z'),
     },
@@ -120,7 +161,7 @@ class ListFixtures {
       type: 'open' as const,
       question_text: 'Réponse libre ?',
       proposals: [],
-      correct_answer: [],
+      correct_answers: [],
       explanation: 'OK',
       created_at: new Date('2026-02-02T11:00:00.000Z'),
     },
@@ -177,5 +218,85 @@ class ListFixtures {
     expect(this.orderMock).toHaveBeenCalledWith('created_at', {
       ascending: true,
     });
+  }
+}
+
+class InsertFixtures {
+  public readonly courseId = 'course-insert-q';
+
+  public readonly generatedQuestions: GeneratedQuestion[] = [
+    {
+      type: 'single',
+      questionText: 'Q1?',
+      keyConcepts: ['k'],
+      proposals: ['A', 'B'],
+      correctAnswers: ['A'],
+      explanation: 'e1',
+    },
+  ];
+
+  public readonly returnedRows = [
+    {
+      id: 'q-new-1',
+      course_id: this.courseId,
+      type: 'single' as const,
+      question_text: 'Q1?',
+      proposals: ['A', 'B'],
+      correct_answers: ['A'],
+      explanation: 'e1',
+      created_at: new Date('2026-03-01T09:00:00.000Z'),
+    },
+  ];
+
+  public readonly fromMock = jest.fn();
+  public readonly insertMock = jest.fn();
+  public readonly selectAfterInsertMock = jest.fn();
+
+  public readonly repository: SelfLearnerQuestionRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerQuestionRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenInsert() {
+    return this.repository.insertSelfLearnerQuestions(
+      this.generatedQuestions,
+      this.courseId,
+    );
+  }
+
+  whenInsertSucceedsWithRows(rows: typeof this.returnedRows) {
+    this.selectAfterInsertMock.mockResolvedValue({
+      data: rows,
+      error: null,
+    });
+    this.insertMock.mockReturnValue({
+      select: this.selectAfterInsertMock,
+    });
+    this.fromMock.mockReturnValue({ insert: this.insertMock });
+  }
+
+  whenInsertReturnsEmptyData() {
+    this.selectAfterInsertMock.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+    this.insertMock.mockReturnValue({
+      select: this.selectAfterInsertMock,
+    });
+    this.fromMock.mockReturnValue({ insert: this.insertMock });
+  }
+
+  whenInsertFails(message: string) {
+    this.selectAfterInsertMock.mockResolvedValue({
+      data: null,
+      error: { message },
+    });
+    this.insertMock.mockReturnValue({
+      select: this.selectAfterInsertMock,
+    });
+    this.fromMock.mockReturnValue({ insert: this.insertMock });
   }
 }

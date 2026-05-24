@@ -5,6 +5,7 @@ import { ISelfLearnerQuestionRepository } from 'src/domain/teaching/self-learner
 import { SelfLearnerQuestion } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
 import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
 import { selfLearnerQuestionMapper } from '../mappers/self-learner-question.mapper';
+import { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 
 export class SelfLearnerQuestionRepository implements ISelfLearnerQuestionRepository {
   constructor(
@@ -40,6 +41,26 @@ export class SelfLearnerQuestionRepository implements ISelfLearnerQuestionReposi
     if (error) {
       console.error(
         `Error getting self learner questions by course id: ${courseId}`,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+
+    return data?.map(selfLearnerQuestionMapper.toDomain) ?? [];
+  }
+
+  public async insertSelfLearnerQuestions(
+    questions: GeneratedQuestion[],
+    courseId: string,
+  ): Promise<SelfLearnerQuestion[]> {
+    const { data, error } = await this.supabase
+      .from('self_learner_questions')
+      .insert(selfLearnerQuestionMapper.generatedToInserts(questions, courseId))
+      .select();
+
+    if (error) {
+      console.error(
+        `Error inserting self learner questions by course id: ${courseId}`,
         error,
       );
       throw new ServerError(error.message);

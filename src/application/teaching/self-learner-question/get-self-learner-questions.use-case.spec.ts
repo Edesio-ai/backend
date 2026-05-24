@@ -99,7 +99,7 @@ class Fixtures {
       type: 'single',
       questionText: '?',
       proposals: ['x'],
-      correctAnswer: ['x'],
+      correctAnswers: ['x'],
       explanation: 'e',
       createdAt: new Date('2026-01-03T00:00:00.000Z'),
     },
