@@ -36,6 +36,23 @@ import {
   GeneratedQuestion,
   QuestionGenerationConfig,
 } from 'src/domain/llm/types/openai.type';
+import {
+  SELF_LEARNER_REPOSITORY,
+  type ISelfLearnerRepository,
+} from 'src/domain/teaching/self-learner/contracts/i-self-learner.repository';
+import {
+  type ISelfLearnerCourseRepository,
+  SELF_LEARNER_COURSE_REPOSITORY,
+} from 'src/domain/teaching/self-learner-course/contracts/i-self-learner-course.repository';
+import {
+  type ISelfLearnerCourseFileRepository,
+  SELF_LEARNER_COURSE_FILE_REPOSITORY,
+} from 'src/domain/teaching/self-learner-course-file/contracts/i-self-learner-course-file.repository';
+import {
+  type ISelfLearnerQuestionRepository,
+  SELF_LEARNER_QUESTION_REPOSITORY,
+} from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
+import { SelfLearnerQuestion } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
 
 export type GenerateQuestionBody = {
   courseId: string;
@@ -58,17 +75,78 @@ export class GenerateQuestionUseCase {
     private readonly teacherRepository: ITeacherRepository,
     @Inject(COURSE_FILE_REPOSITORY)
     private readonly courseFileRepository: ICourseFileRepository,
+    @Inject(SELF_LEARNER_REPOSITORY)
+    private readonly selfLearnerRepository: ISelfLearnerRepository,
+    @Inject(SELF_LEARNER_COURSE_REPOSITORY)
+    private readonly selfLearnerCourseRepository: ISelfLearnerCourseRepository,
+    @Inject(SELF_LEARNER_COURSE_FILE_REPOSITORY)
+    private readonly selfLearnerCourseFileRepository: ISelfLearnerCourseFileRepository,
+    @Inject(SELF_LEARNER_QUESTION_REPOSITORY)
+    private readonly selfLearnerQuestionRepository: ISelfLearnerQuestionRepository,
   ) {}
 
   async execute(
     body: GenerateQuestionBody,
     user: AuthUser,
-  ): Promise<Question[]> {
+  ): Promise<Question[] | SelfLearnerQuestion[]> {
     const { courseId } = body;
+    const role = user.metadata.role;
 
-    const teacher = await this.teacherRepository.getTeacherByUserId(user.id);
+    const { combinedText, config } =
+      role === 'teacher'
+        ? await this.getTeacherGenerationConfig(user.id, body)
+        : await this.getSelfLearnerGenerationConfig(user.id, body);
+
+    const questions = await this.openaiRepository.generateQuestions(
+      combinedText,
+      config,
+    );
+    if (!questions || questions.length === 0) {
+      throw new BadRequestError('Failed to generate questions');
+    }
+
+    if (role === 'teacher') {
+      await this.questionRepository.deleteCourseQuizQuestions(courseId);
+    } else {
+      await this.selfLearnerQuestionRepository.deleteSelfLearnerQuestionsByCourseId(
+        courseId,
+      );
+    }
+
+    const multipleQuestions = questions.filter((q) => q.type === 'single');
+    const openQuestions = questions.filter((q) => q.type === 'open');
+
+    const alternatedQuestions: GeneratedQuestion[] = [];
+    const maxLength = Math.max(multipleQuestions.length, openQuestions.length);
+
+    for (let i = 0; i < maxLength; i++) {
+      if (i < multipleQuestions.length)
+        alternatedQuestions.push(multipleQuestions[i]);
+      if (i < openQuestions.length) alternatedQuestions.push(openQuestions[i]);
+    }
+
+    const insertedQuestions =
+      role === 'teacher'
+        ? await this.questionRepository.insertQuestions(
+            alternatedQuestions,
+            courseId,
+          )
+        : await this.selfLearnerQuestionRepository.insertSelfLearnerQuestions(
+            alternatedQuestions,
+            courseId,
+          );
+
+    return insertedQuestions;
+  }
+
+  private async getTeacherGenerationConfig(
+    userId: string,
+    body: GenerateQuestionBody,
+  ): Promise<{ combinedText: string; config: QuestionGenerationConfig }> {
+    const { courseId, totalQuestions, singleCount, openedCount } = body;
+    const teacher = await this.teacherRepository.getTeacherByUserId(userId);
     if (!teacher) {
-      throw new NotFoundError(`Teacher with id ${user.id} not found`);
+      throw new NotFoundError(`Teacher with id ${userId} not found`);
     }
 
     const select = '*, sessions:sessions!inner(language, teacher_id)';
@@ -86,41 +164,57 @@ export class GenerateQuestionUseCase {
 
     const contentText = courseWithSession.contentText || '';
     const combinedText = await this.getCombinedText(contentText, courseFiles);
-
-    const config: QuestionGenerationConfig = {
-      totalQuestions: body.totalQuestions,
-      singleCount: body.singleCount,
-      openedCount: body.openedCount,
-      language,
-    };
-
-    const questions = await this.openaiRepository.generateQuestions(
+    return {
       combinedText,
-      config,
-    );
-    if (!questions || questions.length === 0) {
-      throw new BadRequestError('Failed to generate questions');
+      config: {
+        totalQuestions,
+        singleCount,
+        openedCount,
+        language,
+      },
+    };
+  }
+  private async getSelfLearnerGenerationConfig(
+    userId: string,
+    body: GenerateQuestionBody,
+  ): Promise<{ combinedText: string; config: QuestionGenerationConfig }> {
+    const { courseId, totalQuestions, singleCount, openedCount } = body;
+
+    const selfLearner =
+      await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
+    if (!selfLearner) {
+      throw new NotFoundError(`Self learner with id ${userId} not found`);
     }
 
-    await this.questionRepository.deleteCourseQuizQuestions(courseId);
-
-    const multipleQuestions = questions.filter((q) => q.type === 'single');
-    const openQuestions = questions.filter((q) => q.type === 'open');
-
-    const alternatedQuestions: GeneratedQuestion[] = [];
-    const maxLength = Math.max(multipleQuestions.length, openQuestions.length);
-
-    for (let i = 0; i < maxLength; i++) {
-      if (i < multipleQuestions.length)
-        alternatedQuestions.push(multipleQuestions[i]);
-      if (i < openQuestions.length) alternatedQuestions.push(openQuestions[i]);
+    const selfLearnerCourse =
+      await this.selfLearnerCourseRepository.getSelfLearnerCourseById(courseId);
+    if (!selfLearnerCourse) {
+      throw new NotFoundError(
+        `Self learner course with id ${courseId} not found`,
+      );
     }
 
-    const insertedQuestions = await this.questionRepository.insertQuestions(
-      alternatedQuestions,
-      courseId,
-    );
-    return insertedQuestions;
+    if (selfLearnerCourse.selfLearnerId !== selfLearner.id) {
+      throw new ForbiddenError('You are not authorized to modify this course');
+    }
+
+    const language = selfLearnerCourse.language || 'francais';
+    const courseFiles =
+      await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFiles(
+        courseId,
+      );
+    const contentText = selfLearnerCourse.textContent || '';
+    const combinedText = await this.getCombinedText(contentText, courseFiles);
+
+    return {
+      combinedText,
+      config: {
+        totalQuestions,
+        singleCount,
+        openedCount,
+        language,
+      },
+    };
   }
 
   private async getCombinedText(

@@ -4,7 +4,7 @@ export type SelfLearnerQuestion = {
   type: 'single' | 'multiple' | 'open';
   questionText: string;
   proposals: string[];
-  correctAnswer: string[];
+  correctAnswers: string[];
   explanation: string;
   createdAt: Date;
 };
@@ -15,7 +15,12 @@ export type SelfLearnerQuestionSupabase = {
   type: 'single' | 'multiple' | 'open';
   question_text: string;
   proposals: string[];
-  correct_answer: string[];
+  correct_answers: string[];
   explanation: string;
   created_at: Date;
 };
+
+export type SelfLearnerQuestionInsert = Omit<
+  SelfLearnerQuestionSupabase,
+  'id' | 'created_at'
+>;

@@ -10,11 +10,19 @@ import { CoursePersistenceModule } from 'src/infrastructure/supabase/teaching/co
 import { PdfModule } from 'src/infrastructure/pdf/pdf.module';
 import { QuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/question/question-persistence.module';
 import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-persistence.repository';
+import { SelfLearnerPersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner/self-learner-persistence.module';
+import { SelfLearnerCoursePersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner-course/self-learner-course-persistence.module';
+import { SelfLearnerCourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner-course-file/self-learner-course-file-persistence.module';
+import { SelfLearnerQuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner-question/self-learner-question-persistence.module';
 
 @Module({
   imports: [
     AuthPersistenceModule,
     TeacherPersistenceModule,
+    SelfLearnerPersistenceModule,
+    SelfLearnerCoursePersistenceModule,
+    SelfLearnerCourseFilePersistenceModule,
+    SelfLearnerQuestionPersistenceModule,
     OpenaiModule,
     CourseFilePersistenceModule,
     CoursePersistenceModule,
