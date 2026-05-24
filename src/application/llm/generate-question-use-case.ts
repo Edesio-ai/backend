@@ -105,11 +105,13 @@ export class GenerateQuestionUseCase {
       throw new BadRequestError('Failed to generate questions');
     }
 
-    role === 'teacher'
-      ? await this.questionRepository.deleteCourseQuizQuestions(courseId)
-      : await this.selfLearnerQuestionRepository.deleteSelfLearnerQuestionsByCourseId(
-          courseId,
-        );
+    if (role === 'teacher') {
+      await this.questionRepository.deleteCourseQuizQuestions(courseId);
+    } else {
+      await this.selfLearnerQuestionRepository.deleteSelfLearnerQuestionsByCourseId(
+        courseId,
+      );
+    }
 
     const multipleQuestions = questions.filter((q) => q.type === 'single');
     const openQuestions = questions.filter((q) => q.type === 'open');

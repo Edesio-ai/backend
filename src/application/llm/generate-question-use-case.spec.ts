@@ -23,6 +23,7 @@ import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teache
 import type { ISelfLearnerCourseFileRepository } from 'src/domain/teaching/self-learner-course-file/contracts/i-self-learner-course-file.repository';
 import type { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-learner-course/contracts/i-self-learner-course.repository';
 import type { ISelfLearnerQuestionRepository } from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
+import type { SelfLearnerQuestion } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
 import type { ISelfLearnerRepository } from 'src/domain/teaching/self-learner/contracts/i-self-learner.repository';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
@@ -141,6 +142,33 @@ describe('GenerateQuestionUseCase', () => {
     expect(insertCall[2].type).toBe('single');
     expect(insertCall[3].type).toBe('open');
   });
+
+  it('deletes then inserts via self learner question persistence when actor is self-learner', async () => {
+    fixtures.whenSelfLearnerActor();
+    fixtures.whenSelfLearnerCourseReady();
+    fixtures.whenOpenAiReturnsQuestions();
+    fixtures.selfLearnerQuestionRepository.deleteSelfLearnerQuestionsByCourseId.mockResolvedValue(
+      undefined,
+    );
+    fixtures.selfLearnerQuestionRepository.insertSelfLearnerQuestions.mockResolvedValue(
+      fixtures.insertedSelfLearnerQuestions,
+    );
+
+    const result = await fixtures.whenExecute();
+
+    expect(
+      fixtures.questionRepository.deleteCourseQuizQuestions,
+    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepository.insertQuestions).not.toHaveBeenCalled();
+    expect(
+      fixtures.selfLearnerQuestionRepository
+        .deleteSelfLearnerQuestionsByCourseId,
+    ).toHaveBeenCalledWith(fixtures.body.courseId);
+    expect(
+      fixtures.selfLearnerQuestionRepository.insertSelfLearnerQuestions,
+    ).toHaveBeenCalledWith(expect.any(Array), fixtures.body.courseId);
+    expect(result).toEqual(fixtures.insertedSelfLearnerQuestions);
+  });
 });
 
 class Fixtures {
@@ -179,6 +207,19 @@ class Fixtures {
       explanation: null,
       createdAt: '2026-01-01T00:00:00.000Z',
       positionOrder: 1,
+    },
+  ];
+
+  public readonly insertedSelfLearnerQuestions: SelfLearnerQuestion[] = [
+    {
+      id: 'slq-1',
+      courseId: this.body.courseId,
+      type: 'single',
+      questionText: 'Q1 ?',
+      proposals: ['A', 'B'],
+      correctAnswers: ['A'],
+      explanation: '',
+      createdAt: new Date('2026-01-05T12:00:00.000Z'),
     },
   ];
 
@@ -347,6 +388,34 @@ class Fixtures {
     );
     this.questionRepository.insertQuestions.mockResolvedValue(
       this.insertedQuestions,
+    );
+  }
+
+  whenSelfLearnerActor() {
+    (this.user.metadata as { role: string }).role = 'self-learner';
+  }
+
+  whenSelfLearnerCourseReady() {
+    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue({
+      id: 'sl-77',
+      supabaseUserId: this.user.id,
+      name: 'Apprenant',
+      email: 'sl@test.com',
+      createdAt: '2026-01-04T10:00:00.000Z',
+    });
+    this.selfLearnerCourseRepository.getSelfLearnerCourseById.mockResolvedValue(
+      {
+        id: this.body.courseId,
+        selfLearnerId: 'sl-77',
+        title: 'Cours perso',
+        description: null,
+        textContent: 'Contenu du cours perso',
+        language: 'francais',
+        createdAt: '2026-01-04T12:00:00.000Z',
+      },
+    );
+    this.selfLearnerCourseFileRepository.getSelfLearnerCourseFiles.mockResolvedValue(
+      [],
     );
   }
 }
