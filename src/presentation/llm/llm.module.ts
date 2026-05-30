@@ -14,6 +14,7 @@ import { SelfLearnerPersistenceModule } from 'src/infrastructure/supabase/teachi
 import { SelfLearnerCoursePersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner-course/self-learner-course-persistence.module';
 import { SelfLearnerCourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner-course-file/self-learner-course-file-persistence.module';
 import { SelfLearnerQuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner-question/self-learner-question-persistence.module';
+import { GenerateSelfLearnerQuestionUseCase } from 'src/application/llm/generate-self-learner-question.use-case';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { SelfLearnerQuestionPersistenceModule } from 'src/infrastructure/supabas
     GenerateCompletionFeedbackUseCase,
     GenerateQuestionUseCase,
     EvaluateAnswerUseCase,
+    GenerateSelfLearnerQuestionUseCase,
   ],
 })
 export class LlmModule {}
