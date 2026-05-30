@@ -134,4 +134,21 @@ export class SelfLearnerQuestionRepository implements ISelfLearnerQuestionReposi
 
     return selfLearnerQuestionMapper.toDomain(data);
   }
+
+  public async deleteSelfLearnerQuestionById(
+    questionId: string,
+  ): Promise<void> {
+    const { error } = await this.supabase
+      .from('self_learner_questions')
+      .delete()
+      .eq('id', questionId);
+
+    if (error) {
+      console.error(
+        `Error deleting self learner question by id: ${questionId}`,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+  }
 }

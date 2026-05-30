@@ -106,6 +106,33 @@ describe('SelfLearnerQuestionRepository', () => {
     });
   });
 
+  describe('deleteSelfLearnerQuestionById', () => {
+    let fixtures: DeleteByIdFixtures;
+
+    beforeEach(() => {
+      fixtures = new DeleteByIdFixtures();
+    });
+
+    it('calls delete scoped by id', async () => {
+      fixtures.whenDeleteSucceeds();
+
+      await fixtures.whenDelete();
+
+      expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_questions');
+      expect(fixtures.deleteMock).toHaveBeenCalledTimes(1);
+      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith(
+        'id',
+        fixtures.questionId,
+      );
+    });
+
+    it('throws ServerError when delete fails', async () => {
+      fixtures.whenDeleteFails('rls');
+
+      await expect(fixtures.whenDelete()).rejects.toBeInstanceOf(ServerError);
+    });
+  });
+
   describe('getSelfLearnerQuestionById', () => {
     let fixtures: GetByIdFixtures;
 
@@ -385,6 +412,38 @@ class InsertFixtures {
       select: this.selectAfterInsertMock,
     });
     this.fromMock.mockReturnValue({ insert: this.insertMock });
+  }
+}
+
+class DeleteByIdFixtures {
+  public readonly questionId = 'q-del-by-id';
+
+  public readonly fromMock = jest.fn();
+  public readonly deleteMock = jest.fn();
+  public readonly eqAfterDeleteMock = jest.fn();
+
+  public readonly repository: SelfLearnerQuestionRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerQuestionRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenDelete() {
+    return this.repository.deleteSelfLearnerQuestionById(this.questionId);
+  }
+
+  whenDeleteSucceeds() {
+    this.eqAfterDeleteMock.mockResolvedValue({ error: null });
+    this.deleteMock.mockReturnValue({ eq: this.eqAfterDeleteMock });
+    this.fromMock.mockReturnValue({ delete: this.deleteMock });
+  }
+
+  whenDeleteFails(message: string) {
+    this.eqAfterDeleteMock.mockResolvedValue({ error: { message } });
+    this.deleteMock.mockReturnValue({ eq: this.eqAfterDeleteMock });
+    this.fromMock.mockReturnValue({ delete: this.deleteMock });
   }
 }
 

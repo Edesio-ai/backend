@@ -26,4 +26,5 @@ export interface ISelfLearnerQuestionRepository {
     questionId: string,
     payload: UpdateSelfLearnerQuestionPayload,
   ): Promise<SelfLearnerQuestion>;
+  deleteSelfLearnerQuestionById(questionId: string): Promise<void>;
 }
