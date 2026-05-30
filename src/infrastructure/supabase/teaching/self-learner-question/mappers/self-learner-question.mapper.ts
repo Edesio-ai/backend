@@ -4,6 +4,8 @@ import {
   SelfLearnerQuestionInsert,
   SelfLearnerQuestionInsertSupabase,
   SelfLearnerQuestionSupabase,
+  SelfLearnerQuestionUpdateSupabase,
+  UpdateSelfLearnerQuestionPayload,
 } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
 
 export const selfLearnerQuestionMapper = {
@@ -42,6 +44,14 @@ export const selfLearnerQuestionMapper = {
       proposals: payload.proposals,
       correct_answers: payload.correctAnswers,
       explanation: payload.explanation,
+    };
+  },
+  toUpdate: (
+    payload: UpdateSelfLearnerQuestionPayload,
+  ): SelfLearnerQuestionUpdateSupabase => {
+    return {
+      question_text: payload.questionText,
+      correct_answers: payload.correctAnswers,
     };
   },
 };
