@@ -5,5 +5,6 @@ export function createMockSelfLearnerQuestionRepository(): jest.Mocked<ISelfLear
     deleteSelfLearnerQuestionsByCourseId: jest.fn(),
     getSelfLearnerQuestions: jest.fn(),
     insertSelfLearnerQuestions: jest.fn(),
+    createSelfLearnerQuestion: jest.fn(),
   };
 }
