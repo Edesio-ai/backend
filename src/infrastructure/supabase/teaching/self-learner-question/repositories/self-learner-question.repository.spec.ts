@@ -106,6 +106,64 @@ describe('SelfLearnerQuestionRepository', () => {
     });
   });
 
+  describe('getSelfLearnerQuestionById', () => {
+    let fixtures: GetByIdFixtures;
+
+    beforeEach(() => {
+      fixtures = new GetByIdFixtures();
+    });
+
+    it('selects single row by id and maps to domain', async () => {
+      fixtures.whenGetByIdSucceeds();
+
+      const result = await fixtures.whenGetById();
+
+      expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_questions');
+      expect(fixtures.selectMock).toHaveBeenCalledWith('*');
+      expect(fixtures.eqMock).toHaveBeenCalledWith('id', fixtures.questionId);
+      expect(fixtures.singleMock).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(
+        selfLearnerQuestionMapper.toDomain(fixtures.returnedRow),
+      );
+    });
+
+    it('throws ServerError when Supabase returns error', async () => {
+      fixtures.whenGetByIdFails('not found');
+
+      await expect(fixtures.whenGetById()).rejects.toBeInstanceOf(ServerError);
+    });
+  });
+
+  describe('updateSelfLearnerQuestion', () => {
+    let fixtures: UpdateFixtures;
+
+    beforeEach(() => {
+      fixtures = new UpdateFixtures();
+    });
+
+    it('updates scoped by id and returns mapped row', async () => {
+      fixtures.whenUpdateSucceeds();
+
+      const result = await fixtures.whenUpdate();
+
+      expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_questions');
+      expect(fixtures.updateMock).toHaveBeenCalledWith(
+        selfLearnerQuestionMapper.toUpdate(fixtures.payload),
+      );
+      expect(fixtures.eqMock).toHaveBeenCalledWith('id', fixtures.questionId);
+      expect(fixtures.singleAfterSelectMock).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(
+        selfLearnerQuestionMapper.toDomain(fixtures.returnedRow),
+      );
+    });
+
+    it('throws ServerError when Supabase returns error', async () => {
+      fixtures.whenUpdateFails('rls');
+
+      await expect(fixtures.whenUpdate()).rejects.toBeInstanceOf(ServerError);
+    });
+  });
+
   describe('createSelfLearnerQuestion', () => {
     let fixtures: CreateFixtures;
 
@@ -327,6 +385,119 @@ class InsertFixtures {
       select: this.selectAfterInsertMock,
     });
     this.fromMock.mockReturnValue({ insert: this.insertMock });
+  }
+}
+
+class GetByIdFixtures {
+  public readonly questionId = 'q-by-id-1';
+
+  public readonly returnedRow = {
+    id: this.questionId,
+    course_id: 'course-getbyid',
+    type: 'single' as const,
+    question_text: 'Une question ?',
+    proposals: ['A', 'B'],
+    correct_answers: ['A'],
+    explanation: 'parce que',
+    created_at: new Date('2026-04-01T10:00:00.000Z'),
+  };
+
+  public readonly fromMock = jest.fn();
+  public readonly selectMock = jest.fn();
+  public readonly eqMock = jest.fn();
+  public readonly singleMock = jest.fn();
+
+  public readonly repository: SelfLearnerQuestionRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerQuestionRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenGetById() {
+    return this.repository.getSelfLearnerQuestionById(this.questionId);
+  }
+
+  whenGetByIdSucceeds() {
+    this.singleMock.mockResolvedValue({ data: this.returnedRow, error: null });
+    this.eqMock.mockReturnValue({ single: this.singleMock });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+
+  whenGetByIdFails(message: string) {
+    this.singleMock.mockResolvedValue({ data: null, error: { message } });
+    this.eqMock.mockReturnValue({ single: this.singleMock });
+    this.selectMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ select: this.selectMock });
+  }
+}
+
+class UpdateFixtures {
+  public readonly questionId = 'q-upd-1';
+
+  public readonly payload = {
+    questionText: 'Question modifiée ?',
+    correctAnswers: ['B'],
+  };
+
+  public readonly returnedRow = {
+    id: this.questionId,
+    course_id: 'course-upd',
+    type: 'single' as const,
+    question_text: this.payload.questionText,
+    proposals: ['A', 'B'],
+    correct_answers: this.payload.correctAnswers,
+    explanation: 'expl',
+    created_at: new Date('2026-04-02T10:00:00.000Z'),
+  };
+
+  public readonly fromMock = jest.fn();
+  public readonly updateMock = jest.fn();
+  public readonly eqMock = jest.fn();
+  public readonly selectAfterEqMock = jest.fn();
+  public readonly singleAfterSelectMock = jest.fn();
+
+  public readonly repository: SelfLearnerQuestionRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerQuestionRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenUpdate() {
+    return this.repository.updateSelfLearnerQuestion(
+      this.questionId,
+      this.payload,
+    );
+  }
+
+  whenUpdateSucceeds() {
+    this.singleAfterSelectMock.mockResolvedValue({
+      data: this.returnedRow,
+      error: null,
+    });
+    this.selectAfterEqMock.mockReturnValue({
+      single: this.singleAfterSelectMock,
+    });
+    this.eqMock.mockReturnValue({ select: this.selectAfterEqMock });
+    this.updateMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ update: this.updateMock });
+  }
+
+  whenUpdateFails(message: string) {
+    this.singleAfterSelectMock.mockResolvedValue({
+      data: null,
+      error: { message },
+    });
+    this.selectAfterEqMock.mockReturnValue({
+      single: this.singleAfterSelectMock,
+    });
+    this.eqMock.mockReturnValue({ select: this.selectAfterEqMock });
+    this.updateMock.mockReturnValue({ eq: this.eqMock });
+    this.fromMock.mockReturnValue({ update: this.updateMock });
   }
 }
 

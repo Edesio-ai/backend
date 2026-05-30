@@ -101,4 +101,18 @@ describe('selfLearnerQuestionMapper', () => {
       });
     });
   });
+
+  describe('toUpdate', () => {
+    it('maps update payload to snake_case Supabase fields', () => {
+      expect(
+        selfLearnerQuestionMapper.toUpdate({
+          questionText: 'Question modifiée ?',
+          correctAnswers: ['B', 'C'],
+        }),
+      ).toEqual({
+        question_text: 'Question modifiée ?',
+        correct_answers: ['B', 'C'],
+      });
+    });
+  });
 });

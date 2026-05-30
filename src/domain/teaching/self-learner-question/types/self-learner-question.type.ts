@@ -29,3 +29,12 @@ export type SelfLearnerQuestionInsertSupabase = Omit<
   SelfLearnerQuestionSupabase,
   'id' | 'created_at'
 >;
+
+export type UpdateSelfLearnerQuestionPayload = Pick<
+  SelfLearnerQuestion,
+  'questionText' | 'correctAnswers'
+>;
+export type SelfLearnerQuestionUpdateSupabase = Pick<
+  SelfLearnerQuestionSupabase,
+  'question_text' | 'correct_answers'
+>;
