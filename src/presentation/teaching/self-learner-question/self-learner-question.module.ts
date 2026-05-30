@@ -6,6 +6,7 @@ import { SelfLearnerCoursePersistenceModule } from 'src/infrastructure/supabase/
 import { SelfLearnerQuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner-question/self-learner-question-persistence.module';
 import { CreateSelfLearnerQuestionUseCase } from 'src/application/teaching/self-learner-question/create-self-learner-question.use-case';
 import { UpdateSelfLearnerQuestionUseCase } from 'src/application/teaching/self-learner-question/update-self-learner-question.use-case';
+import { DeleteSelfLearnerQuestionUseCase } from 'src/application/teaching/self-learner-question/delete-self-learner-question.use-case';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UpdateSelfLearnerQuestionUseCase } from 'src/application/teaching/self-
     GetSelfLearnerQuestionsUseCase,
     CreateSelfLearnerQuestionUseCase,
     UpdateSelfLearnerQuestionUseCase,
+    DeleteSelfLearnerQuestionUseCase,
   ],
 })
 export class SelfLearnerQuestionModule {}

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { type AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetSelfLearnerQuestionsUseCase } from 'src/application/teaching/self-learner-question/get-self-learner-questions.use-case';
@@ -7,6 +15,7 @@ import { CreateSelfLearnerQuestionsBodyDto } from './dto/create-self-learner-que
 import { CreateSelfLearnerQuestionUseCase } from 'src/application/teaching/self-learner-question/create-self-learner-question.use-case';
 import { UpdateSelfLearnerQuestionBodyDto } from './dto/update-self-learner-question-body.dto';
 import { UpdateSelfLearnerQuestionUseCase } from 'src/application/teaching/self-learner-question/update-self-learner-question.use-case';
+import { DeleteSelfLearnerQuestionUseCase } from 'src/application/teaching/self-learner-question/delete-self-learner-question.use-case';
 
 @Controller('self-learner-question')
 export class SelfLearnerQuestionController {
@@ -14,6 +23,7 @@ export class SelfLearnerQuestionController {
     private readonly getSelfLearnerQuestionsUseCase: GetSelfLearnerQuestionsUseCase,
     private readonly createSelfLearnerQuestionUseCase: CreateSelfLearnerQuestionUseCase,
     private readonly updateSelfLearnerQuestionUseCase: UpdateSelfLearnerQuestionUseCase,
+    private readonly deleteSelfLearnerQuestionUseCase: DeleteSelfLearnerQuestionUseCase,
   ) {}
 
   @Get('self-learner-course/:courseId')
@@ -47,6 +57,17 @@ export class SelfLearnerQuestionController {
       questionId,
       body,
       user,
+    );
+  }
+
+  @Delete(':questionId')
+  async deleteSelfLearnerQuestion(
+    @Param('questionId') questionId: string,
+    @CurrentUser() user: AuthUser,
+  ): Promise<void> {
+    return await this.deleteSelfLearnerQuestionUseCase.execute(
+      user,
+      questionId,
     );
   }
 }
