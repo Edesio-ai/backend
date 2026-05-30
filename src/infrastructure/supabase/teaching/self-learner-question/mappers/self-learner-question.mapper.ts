@@ -2,6 +2,7 @@ import { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 import {
   SelfLearnerQuestion,
   SelfLearnerQuestionInsert,
+  SelfLearnerQuestionInsertSupabase,
   SelfLearnerQuestionSupabase,
 } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
 
@@ -21,7 +22,7 @@ export const selfLearnerQuestionMapper = {
   generatedToInserts: (
     questions: GeneratedQuestion[],
     courseId: string,
-  ): SelfLearnerQuestionInsert[] => {
+  ): SelfLearnerQuestionInsertSupabase[] => {
     return questions.map((q) => ({
       course_id: courseId,
       type: q.type,
@@ -30,5 +31,17 @@ export const selfLearnerQuestionMapper = {
       correct_answers: q.correctAnswers ?? null,
       explanation: q.explanation ?? null,
     }));
+  },
+  toInsert: (
+    payload: SelfLearnerQuestionInsert,
+  ): SelfLearnerQuestionInsertSupabase => {
+    return {
+      course_id: payload.courseId,
+      type: payload.type,
+      question_text: payload.questionText,
+      proposals: payload.proposals,
+      correct_answers: payload.correctAnswers,
+      explanation: payload.explanation,
+    };
   },
 };

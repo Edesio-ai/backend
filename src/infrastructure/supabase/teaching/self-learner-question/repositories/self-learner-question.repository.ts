@@ -2,7 +2,10 @@ import { Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { ISelfLearnerQuestionRepository } from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
-import { SelfLearnerQuestion } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
+import {
+  SelfLearnerQuestion,
+  SelfLearnerQuestionInsert,
+} from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
 import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
 import { selfLearnerQuestionMapper } from '../mappers/self-learner-question.mapper';
 import { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
@@ -67,5 +70,25 @@ export class SelfLearnerQuestionRepository implements ISelfLearnerQuestionReposi
     }
 
     return data?.map(selfLearnerQuestionMapper.toDomain) ?? [];
+  }
+
+  public async createSelfLearnerQuestion(
+    payload: SelfLearnerQuestionInsert,
+  ): Promise<SelfLearnerQuestion> {
+    const { data, error } = await this.supabase
+      .from('self_learner_questions')
+      .insert(selfLearnerQuestionMapper.toInsert(payload))
+      .select()
+      .single();
+
+    if (error) {
+      console.error(
+        `Error creating self learner question: ${error.message}`,
+        error,
+      );
+      throw new ServerError(error.message);
+    }
+
+    return selfLearnerQuestionMapper.toDomain(data);
   }
 }

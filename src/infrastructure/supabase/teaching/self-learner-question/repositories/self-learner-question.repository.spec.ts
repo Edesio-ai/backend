@@ -105,6 +105,35 @@ describe('SelfLearnerQuestionRepository', () => {
       await expect(fixtures.whenInsert()).rejects.toBeInstanceOf(ServerError);
     });
   });
+
+  describe('createSelfLearnerQuestion', () => {
+    let fixtures: CreateFixtures;
+
+    beforeEach(() => {
+      fixtures = new CreateFixtures();
+    });
+
+    it('inserts mapped payload via toInsert and returns mapped row', async () => {
+      fixtures.whenCreateSucceeds();
+
+      const result = await fixtures.whenCreate();
+
+      expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_questions');
+      expect(fixtures.insertMock).toHaveBeenCalledWith(
+        selfLearnerQuestionMapper.toInsert(fixtures.payload),
+      );
+      expect(fixtures.singleAfterSelectMock).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(
+        selfLearnerQuestionMapper.toDomain(fixtures.returnedRow),
+      );
+    });
+
+    it('throws ServerError when Supabase returns error', async () => {
+      fixtures.whenCreateFails('unique violation');
+
+      await expect(fixtures.whenCreate()).rejects.toBeInstanceOf(ServerError);
+    });
+  });
 });
 
 class DeleteFixtures {
@@ -293,6 +322,73 @@ class InsertFixtures {
     this.selectAfterInsertMock.mockResolvedValue({
       data: null,
       error: { message },
+    });
+    this.insertMock.mockReturnValue({
+      select: this.selectAfterInsertMock,
+    });
+    this.fromMock.mockReturnValue({ insert: this.insertMock });
+  }
+}
+
+class CreateFixtures {
+  public readonly payload = {
+    courseId: 'c-create',
+    type: 'single' as const,
+    questionText: 'Quelle est la réponse ?',
+    proposals: ['A', 'B'],
+    correctAnswers: ['A'],
+    explanation: 'Parce que A',
+  };
+
+  public readonly returnedRow = {
+    id: 'sq-new-1',
+    course_id: this.payload.courseId,
+    type: this.payload.type,
+    question_text: this.payload.questionText,
+    proposals: this.payload.proposals,
+    correct_answers: this.payload.correctAnswers,
+    explanation: this.payload.explanation,
+    created_at: new Date('2026-03-10T08:00:00.000Z'),
+  };
+
+  public readonly fromMock = jest.fn();
+  public readonly insertMock = jest.fn();
+  public readonly selectAfterInsertMock = jest.fn();
+  public readonly singleAfterSelectMock = jest.fn();
+
+  public readonly repository: SelfLearnerQuestionRepository;
+
+  constructor() {
+    this.repository = new SelfLearnerQuestionRepository({
+      from: this.fromMock,
+    } as unknown as SupabaseClient);
+  }
+
+  whenCreate() {
+    return this.repository.createSelfLearnerQuestion(this.payload);
+  }
+
+  whenCreateSucceeds() {
+    this.singleAfterSelectMock.mockResolvedValue({
+      data: this.returnedRow,
+      error: null,
+    });
+    this.selectAfterInsertMock.mockReturnValue({
+      single: this.singleAfterSelectMock,
+    });
+    this.insertMock.mockReturnValue({
+      select: this.selectAfterInsertMock,
+    });
+    this.fromMock.mockReturnValue({ insert: this.insertMock });
+  }
+
+  whenCreateFails(message: string) {
+    this.singleAfterSelectMock.mockResolvedValue({
+      data: null,
+      error: { message },
+    });
+    this.selectAfterInsertMock.mockReturnValue({
+      single: this.singleAfterSelectMock,
     });
     this.insertMock.mockReturnValue({
       select: this.selectAfterInsertMock,

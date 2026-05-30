@@ -21,6 +21,11 @@ export type SelfLearnerQuestionSupabase = {
 };
 
 export type SelfLearnerQuestionInsert = Omit<
+  SelfLearnerQuestion,
+  'id' | 'createdAt'
+>;
+
+export type SelfLearnerQuestionInsertSupabase = Omit<
   SelfLearnerQuestionSupabase,
   'id' | 'created_at'
 >;

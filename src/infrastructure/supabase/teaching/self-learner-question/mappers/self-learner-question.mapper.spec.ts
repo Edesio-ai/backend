@@ -79,4 +79,26 @@ describe('selfLearnerQuestionMapper', () => {
       ]);
     });
   });
+
+  describe('toInsert', () => {
+    it('maps domain insert payload to snake_case Supabase row', () => {
+      expect(
+        selfLearnerQuestionMapper.toInsert({
+          courseId: 'c-ins',
+          type: 'multiple',
+          questionText: 'Plusieurs réponses ?',
+          proposals: ['X', 'Y'],
+          correctAnswers: ['X', 'Y'],
+          explanation: 'car',
+        }),
+      ).toEqual({
+        course_id: 'c-ins',
+        type: 'multiple',
+        question_text: 'Plusieurs réponses ?',
+        proposals: ['X', 'Y'],
+        correct_answers: ['X', 'Y'],
+        explanation: 'car',
+      });
+    });
+  });
 });
