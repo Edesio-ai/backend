@@ -25,6 +25,7 @@ export class LlmController {
     private readonly generateSelfLearnerQuestionUseCase: GenerateSelfLearnerQuestionUseCase,
   ) {}
 
+  @Roles('student', 'teacher', 'self-learner')
   @Post('completion-feedback')
   async generateCompletionFeedback(
     @Body() body: GenerateCompletionFeedbackBodyDto,
@@ -47,7 +48,7 @@ export class LlmController {
       questionCount: questions.length,
     };
   }
-  @Roles('student', 'teacher')
+  @Roles('student', 'teacher', 'self-learner')
   @Post('evaluate-answer')
   async evaluateAnswer(
     @Body() body: EvaluateAnswerDto,
@@ -55,6 +56,7 @@ export class LlmController {
     return await this.evaluateAnswerUseCase.execute(body);
   }
 
+  @Roles('self-learner')
   @Post(
     'generate-self-learner-question/self-learner-course/:selfLearnerCourseId',
   )
