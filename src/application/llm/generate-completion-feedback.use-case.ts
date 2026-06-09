@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
-import { OPENAI_REPOSITORY } from 'src/domain/llm/openai/contracts/open-ai.provider';
-import { IOpenAiProvider } from 'src/infrastructure/llm/openai/openai.repository';
+import type { ILlmProvider } from 'src/domain/llm/contracts/I-llm.provider';
+import { LLM_REPOSITORY } from 'src/domain/llm/contracts/I-llm.provider';
 
 export type GenerateCompletionFeedbackBody = {
   total: number;
@@ -11,11 +11,11 @@ export type GenerateCompletionFeedbackBody = {
 
 export class GenerateCompletionFeedbackUseCase {
   constructor(
-    @Inject(OPENAI_REPOSITORY)
-    private readonly openaiRepository: IOpenAiProvider,
+    @Inject(LLM_REPOSITORY)
+    private readonly mistralRepository: ILlmProvider,
   ) {}
 
   async execute(body: GenerateCompletionFeedbackBody): Promise<string> {
-    return await this.openaiRepository.generateCompletionFeedback(body);
+    return await this.mistralRepository.generateCompletionFeedback(body);
   }
 }

@@ -9,14 +9,12 @@ import {
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
 import type { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
-import { IOpenAiProvider } from 'src/domain/llm/openai/contracts/open-ai.provider';
+import { ILlmProvider } from 'src/domain/llm/contracts/I-llm.provider';
 import { IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
-import {
-  CourseFile,
-  CourseWithSession,
-} from 'src/domain/teaching/course/types/course.type';
+import type { CourseFile } from 'src/domain/teaching/course-file/types/course-file.type';
+import type { CourseWithSession } from 'src/domain/teaching/course/types/course.type';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import { Question } from 'src/domain/teaching/question/types/question.type';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
@@ -251,7 +249,7 @@ class Fixtures {
 
   public readonly courseRepository: jest.Mocked<ICourseRepository>;
   public readonly pdfExtractor: jest.Mocked<IPdfExtractorProvider>;
-  public readonly openaiRepository: jest.Mocked<IOpenAiProvider>;
+  public readonly openaiRepository: jest.Mocked<ILlmProvider>;
   public readonly questionRepository: jest.Mocked<IQuestionsRepository>;
   public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;

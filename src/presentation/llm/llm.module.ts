@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { LlmController } from './llm.controller';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { GenerateCompletionFeedbackUseCase } from 'src/application/llm/generate-completion-feedback.use-case';
-import { OpenaiModule } from 'src/infrastructure/llm/openai/openai.module';
 import { GenerateQuestionUseCase } from 'src/application/llm/generate-question-use-case';
 import { EvaluateAnswerUseCase } from 'src/application/llm/evaluate-answer.use-case';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
@@ -15,6 +14,7 @@ import { SelfLearnerCoursePersistenceModule } from 'src/infrastructure/supabase/
 import { SelfLearnerCourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner-course-file/self-learner-course-file-persistence.module';
 import { SelfLearnerQuestionPersistenceModule } from 'src/infrastructure/supabase/teaching/self-learner-question/self-learner-question-persistence.module';
 import { GenerateSelfLearnerQuestionUseCase } from 'src/application/llm/generate-self-learner-question.use-case';
+import { MistralModule } from 'src/infrastructure/llm/mistral/mistral.module';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { GenerateSelfLearnerQuestionUseCase } from 'src/application/llm/generate
     SelfLearnerCoursePersistenceModule,
     SelfLearnerCourseFilePersistenceModule,
     SelfLearnerQuestionPersistenceModule,
-    OpenaiModule,
+    MistralModule,
     CourseFilePersistenceModule,
     CoursePersistenceModule,
     PdfModule,

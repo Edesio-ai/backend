@@ -1,11 +1,9 @@
-import { OpenAI } from 'openai';
-import { OPENAI_CLIENT } from './openai.constants';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   GeneratedQuestion,
   QuestionGenerationConfig,
 } from 'src/domain/llm/types/openai.type';
-import type { IOpenAiProvider as OpenaiRepositoryContract } from 'src/domain/llm/openai/contracts/open-ai.provider';
+import type { ILlmProvider as MistralRepositoryContract } from 'src/domain/llm/contracts/I-llm.provider';
 import {
   getGenerateQuestionSystemPrompt,
   getGenerateQuestionUserPrompt,
@@ -20,12 +18,14 @@ import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
 import { GenerateCompletionFeedbackBody } from 'src/application/llm/generate-completion-feedback.use-case';
 import { getGenerateCompletionFeedbackSystemPrompt } from './prompts/generate-completion-feedback.prompt';
 import { getGenerateCompletionFeedbackUserPrompt } from './prompts/generate-completion-feedback.prompt';
+import { MISTRAL_CLIENT } from './mistral.constants';
+import { Mistral } from '@mistralai/mistralai';
 
 @Injectable()
-export class IOpenAiProvider implements OpenaiRepositoryContract {
+export class MistralProvider implements MistralRepositoryContract {
   constructor(
-    @Inject(OPENAI_CLIENT)
-    private readonly openai: OpenAI,
+    @Inject(MISTRAL_CLIENT)
+    private readonly mistral: Mistral,
   ) {}
 
   public async generateQuestions(
@@ -52,18 +52,18 @@ export class IOpenAiProvider implements OpenaiRepositoryContract {
       existingQuestionsContext,
     );
 
-    const response = await this.openai.chat.completions.create({
-      model: 'gpt-4o',
+    const response = await this.mistral.chat.complete({
+      model: 'mistral-large-latest',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
       temperature: 0.7,
-      max_tokens: 6000,
-      response_format: { type: 'json_object' },
+      maxTokens: 6000,
+      responseFormat: { type: 'json_object' },
     });
 
-    const content = response.choices[0]?.message?.content;
+    const content = response.choices[0]?.message?.content as string;
 
     if (!content) {
       throw new ServerError('No response from OpenAI');
@@ -78,18 +78,18 @@ export class IOpenAiProvider implements OpenaiRepositoryContract {
     const systemPrompt = getEvaluateAnswerSystemPrompt();
     const userPrompt = getEvaluateAnswerUserPrompt(body);
 
-    const response = await this.openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+    const response = await this.mistral.chat.complete({
+      model: 'mistral-small-latest',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
       temperature: 0.3,
-      max_tokens: 500,
-      response_format: { type: 'json_object' },
+      maxTokens: 500,
+      responseFormat: { type: 'json_object' },
     });
 
-    const content = response.choices[0]?.message?.content;
+    const content = response.choices[0]?.message?.content as string;
     if (!content) {
       throw new ServerError('No response from OpenAI');
     }
@@ -130,18 +130,18 @@ export class IOpenAiProvider implements OpenaiRepositoryContract {
         percent,
       );
 
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
+      const response = await this.mistral.chat.complete({
+        model: 'mistral-small-latest',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
         temperature: 0.7,
-        max_tokens: 150,
+        maxTokens: 150,
       });
 
       const feedback =
-        response.choices[0]?.message?.content?.trim() ||
+        (response.choices[0]?.message?.content as string) ||
         'Bravo pour avoir terminé ce quiz !';
       return feedback;
     } catch (error) {

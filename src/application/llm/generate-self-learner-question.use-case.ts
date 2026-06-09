@@ -39,9 +39,9 @@ import {
 } from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
 import { QuestionGenerationConfig } from 'src/domain/llm/types/openai.type';
 import {
-  type IOpenAiProvider,
-  OPENAI_REPOSITORY,
-} from 'src/domain/llm/openai/contracts/open-ai.provider';
+  type ILlmProvider,
+  LLM_REPOSITORY,
+} from 'src/domain/llm/contracts/I-llm.provider';
 
 export class GenerateSelfLearnerQuestionUseCase {
   constructor(
@@ -57,8 +57,8 @@ export class GenerateSelfLearnerQuestionUseCase {
     private readonly pdfExtractor: IPdfExtractorProvider,
     @Inject(SELF_LEARNER_QUESTION_REPOSITORY)
     private readonly selfLearnerQuestionRepository: ISelfLearnerQuestionRepository,
-    @Inject(OPENAI_REPOSITORY)
-    private readonly openaiRepository: IOpenAiProvider,
+    @Inject(LLM_REPOSITORY)
+    private readonly mistralRepository: ILlmProvider,
   ) {}
 
   async execute(
@@ -116,7 +116,7 @@ export class GenerateSelfLearnerQuestionUseCase {
       language: language,
     };
 
-    const generatedQuestion = await this.openaiRepository.generateQuestions(
+    const generatedQuestion = await this.mistralRepository.generateQuestions(
       combinedText,
       questionConfig,
       existingQuestionTexts,

@@ -1,5 +1,5 @@
 import { courseFileMapper } from './course-file.mapper';
-import { SupabaseCourseFile } from 'src/domain/teaching/course/types/course.type';
+import { SupabaseCourseFile } from 'src/domain/teaching/course-file/types/course-file.type';
 
 describe('courseFileMapper', () => {
   let fixtures: Fixtures;

@@ -5,7 +5,7 @@ import {
   UnauthorizedError,
 } from 'src/domain/shared/errors/global.errors';
 import type { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
-import type { IOpenAiProvider } from 'src/domain/llm/openai/contracts/open-ai.provider';
+import type { ILlmProvider } from 'src/domain/llm/contracts/I-llm.provider';
 import type { IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
 import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 import type { ISelfLearnerCourseFileRepository } from 'src/domain/teaching/self-learner-course-file/contracts/i-self-learner-course-file.repository';
@@ -38,7 +38,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
 
     const result = await fixtures.whenExecute('single');
 
-    expect(fixtures.openaiRepo.generateQuestions).toHaveBeenCalledWith(
+    expect(fixtures.mistralRepo.generateQuestions).toHaveBeenCalledWith(
       fixtures.course.textContent,
       expect.objectContaining({
         totalQuestions: 1,
@@ -70,7 +70,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
 
     await fixtures.whenExecute('open');
 
-    expect(fixtures.openaiRepo.generateQuestions).toHaveBeenCalledWith(
+    expect(fixtures.mistralRepo.generateQuestions).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({ singleCount: 0, openedCount: 1 }),
       expect.any(Array),
@@ -90,7 +90,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
 
     await fixtures.whenExecute('single');
 
-    expect(fixtures.openaiRepo.generateQuestions).toHaveBeenCalledWith(
+    expect(fixtures.mistralRepo.generateQuestions).toHaveBeenCalledWith(
       expect.any(String),
       expect.any(Object),
       ['Question déjà posée'],
@@ -114,7 +114,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
 
     await fixtures.whenExecute('single');
 
-    expect(fixtures.openaiRepo.generateQuestions).toHaveBeenCalledWith(
+    expect(fixtures.mistralRepo.generateQuestions).toHaveBeenCalledWith(
       expect.stringContaining('Texte PDF'),
       expect.any(Object),
       expect.any(Array),
@@ -173,7 +173,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
     await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(
       NotFoundError,
     );
-    expect(fixtures.openaiRepo.generateQuestions).not.toHaveBeenCalled();
+    expect(fixtures.mistralRepo.generateQuestions).not.toHaveBeenCalled();
   });
 
   it('throws NotFoundError when course is missing', async () => {
@@ -183,7 +183,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
     await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(
       NotFoundError,
     );
-    expect(fixtures.openaiRepo.generateQuestions).not.toHaveBeenCalled();
+    expect(fixtures.mistralRepo.generateQuestions).not.toHaveBeenCalled();
   });
 
   it('throws UnauthorizedError when course belongs to another learner', async () => {
@@ -196,7 +196,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
     await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(
       UnauthorizedError,
     );
-    expect(fixtures.openaiRepo.generateQuestions).not.toHaveBeenCalled();
+    expect(fixtures.mistralRepo.generateQuestions).not.toHaveBeenCalled();
   });
 });
 
@@ -272,7 +272,7 @@ class Fixtures {
   public readonly pdfExtractor: jest.Mocked<IPdfExtractorProvider>;
   public readonly selfLearnerQuestionRepo: jest.Mocked<ISelfLearnerQuestionRepository>;
   public readonly questionRepo: jest.Mocked<ISelfLearnerQuestionRepository>;
-  public readonly openaiRepo: jest.Mocked<IOpenAiProvider>;
+  public readonly mistralRepo: jest.Mocked<ILlmProvider>;
   public readonly useCase: GenerateSelfLearnerQuestionUseCase;
 
   constructor() {
@@ -287,7 +287,7 @@ class Fixtures {
     };
     this.selfLearnerQuestionRepo = createMockSelfLearnerQuestionRepository();
     this.questionRepo = this.selfLearnerQuestionRepo;
-    this.openaiRepo = {
+    this.mistralRepo = {
       generateQuestions: jest.fn(),
       evaluateAnswer: jest.fn(),
       generateCompletionFeedback: jest.fn(),
@@ -300,7 +300,7 @@ class Fixtures {
       this.courseFileRepo,
       this.pdfExtractor,
       this.selfLearnerQuestionRepo,
-      this.openaiRepo,
+      this.mistralRepo,
     );
   }
 
@@ -331,6 +331,6 @@ class Fixtures {
   }
 
   whenOpenAiGenerates(questions: GeneratedQuestion[]) {
-    this.openaiRepo.generateQuestions.mockResolvedValue(questions);
+    this.mistralRepo.generateQuestions.mockResolvedValue(questions);
   }
 }
