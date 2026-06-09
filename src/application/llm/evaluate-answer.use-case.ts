@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IOpenAiProvider } from 'src/infrastructure/llm/openai/openai.repository';
-import { OPENAI_REPOSITORY } from 'src/domain/llm/openai/contracts/open-ai.provider';
+import type { ILlmProvider } from 'src/domain/llm/contracts/I-llm.provider';
+import { LLM_REPOSITORY } from 'src/domain/llm/contracts/I-llm.provider';
 import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
 
 export interface EvaluateAnswerBody {
@@ -13,8 +13,8 @@ export interface EvaluateAnswerBody {
 @Injectable()
 export class EvaluateAnswerUseCase {
   constructor(
-    @Inject(OPENAI_REPOSITORY)
-    private readonly openaiRepository: IOpenAiProvider,
+    @Inject(LLM_REPOSITORY)
+    private readonly mistralRepository: ILlmProvider,
   ) {}
 
   async execute(body: EvaluateAnswerBody): Promise<EvaluateAnswerResponse> {
@@ -34,7 +34,7 @@ export class EvaluateAnswerUseCase {
       };
     }
 
-    return await this.openaiRepository.evaluateAnswer(body);
+    return await this.mistralRepository.evaluateAnswer(body);
   }
 
   private normalizeString(string: string): string {

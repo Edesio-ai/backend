@@ -11,9 +11,9 @@ import {
   type IPdfExtractorProvider,
 } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
 import {
-  OPENAI_REPOSITORY,
-  type IOpenAiProvider,
-} from 'src/domain/llm/openai/contracts/open-ai.provider';
+  LLM_REPOSITORY,
+  type ILlmProvider,
+} from 'src/domain/llm/contracts/I-llm.provider';
 
 import {
   TEACHER_REPOSITORY,
@@ -67,8 +67,8 @@ export class GenerateQuestionUseCase {
     private readonly courseRepository: ICourseRepository,
     @Inject(PDF_EXTRACTOR)
     private readonly pdfExtractor: IPdfExtractorProvider,
-    @Inject(OPENAI_REPOSITORY)
-    private readonly openaiRepository: IOpenAiProvider,
+    @Inject(LLM_REPOSITORY)
+    private readonly mistralRepository: ILlmProvider,
     @Inject(QUESTIONS_REPOSITORY)
     private readonly questionRepository: IQuestionsRepository,
     @Inject(TEACHER_REPOSITORY)
@@ -97,7 +97,7 @@ export class GenerateQuestionUseCase {
         ? await this.getTeacherGenerationConfig(user.id, body)
         : await this.getSelfLearnerGenerationConfig(user.id, body);
 
-    const questions = await this.openaiRepository.generateQuestions(
+    const questions = await this.mistralRepository.generateQuestions(
       combinedText,
       config,
     );

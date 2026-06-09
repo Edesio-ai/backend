@@ -77,7 +77,6 @@ export const getEvaluateAnswerUserPrompt = (
   const { questionText, correctAnswer, explanation, answer } = body;
   return `
         QUESTION: ${questionText}
-
         RÉPONSE ATTENDUE: ${correctAnswer}
         ${explanation ? `\nCONTEXTE DU COURS:\n${explanation}\n` : ''}
         RÉPONSE DE L'ÉLÈVE: ${answer}
