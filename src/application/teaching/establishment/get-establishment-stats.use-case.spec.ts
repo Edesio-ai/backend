@@ -1,4 +1,5 @@
 import { GetEstablishmentsStatsUseCase } from './get-establishment-stats.use-case';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
@@ -22,6 +23,15 @@ describe('GetEstablishmentsStatsUseCase', () => {
 
     fixtures.thenRepositoriesCalledInExpectedOrder();
     fixtures.thenReturnExpectedStats(result);
+  });
+
+  it('should throw NotFoundError when establishment is not found', async () => {
+    fixtures.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(
+      null,
+    );
+
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
+    fixtures.thenDownstreamRepositoriesNotCalled();
   });
 
   it('should propagate repository error when establishment lookup fails', async () => {

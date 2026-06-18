@@ -5,7 +5,7 @@ export const ESTABLISHMENT_REPOSITORY = Symbol('ESTABLISHMENT_REPOSITORY');
 
 export interface IEstablishmentRepository {
   getEstablishmentById(establishmentId: string): Promise<Establishment>;
-  getEstablishmentByUserId(userId: string): Promise<Establishment>;
+  getEstablishmentByUserId(userId: string): Promise<Establishment | null>;
   createEstablishment(
     supabaseUserId: string,
     name: string,

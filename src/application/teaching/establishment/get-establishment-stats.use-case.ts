@@ -24,6 +24,7 @@ import {
 } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { StudentSession } from 'src/domain/teaching/student-session/types/student-session.type';
 import { Session } from 'src/domain/teaching/session/types/session.type';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 
 export class GetEstablishmentsStatsUseCase {
   constructor(
@@ -41,9 +42,14 @@ export class GetEstablishmentsStatsUseCase {
     const establishment =
       await this.establishmentRepository.getEstablishmentByUserId(userId);
 
+    if (!establishment) {
+      throw new NotFoundError(`Establishment not found`);
+    }
+
     const teachers = await this.teacherRepository.getTeacherByEstablishmentId(
       establishment.id,
     );
+
     const teachersIds = (teachers || []).map((t) => t.id);
 
     const teachersSessions =
