@@ -31,14 +31,16 @@ export class EstablishmentSupabaseRepository implements IEstablishmentRepository
     return EstablishmentMapper.toDomain(data);
   }
 
-  async getEstablishmentByUserId(userId: string): Promise<Establishment> {
+  async getEstablishmentByUserId(
+    userId: string,
+  ): Promise<Establishment | null> {
     const { data, error } = await this.supabase
       .from('establishment')
       .select('*')
       .eq('supabase_user_id', userId)
-      .single();
+      .maybeSingle();
 
-    if (error || !data) {
+    if (error) {
       console.error(
         `An error occure while getting establishment by user id: ${userId}, error: ${error}`,
       );
@@ -46,7 +48,7 @@ export class EstablishmentSupabaseRepository implements IEstablishmentRepository
         `An error occure while getting establishment by user id`,
       );
     }
-    return EstablishmentMapper.toDomain(data);
+    return data ? EstablishmentMapper.toDomain(data) : null;
   }
 
   async createEstablishment(

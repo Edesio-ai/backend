@@ -17,6 +17,15 @@ describe('EstablishmentSupabaseRepository', () => {
     fixtures.thenReturnExpectedEstablishment(result);
   });
 
+  it('should return null when no establishment found for userId', async () => {
+    fixtures.whenSupabaseReturnsNoRow();
+
+    const result = await fixtures.whenGetEstablishmentByUserId();
+
+    expect(result).toBeNull();
+    fixtures.thenQueryBuiltWithExpectedArguments();
+  });
+
   it('should return establishment by id when query succeeds', async () => {
     fixtures.whenSupabaseReturnsData();
 
@@ -124,7 +133,11 @@ class Fixtures {
   };
 
   private readonly singleMock = jest.fn();
-  private readonly eqMock = jest.fn(() => ({ single: this.singleMock }));
+  private readonly maybeSingleMock = jest.fn();
+  private readonly eqMock = jest.fn(() => ({
+    single: this.singleMock,
+    maybeSingle: this.maybeSingleMock,
+  }));
   private readonly selectMock = jest.fn(() => ({ eq: this.eqMock }));
 
   private readonly createSingleMock = jest.fn();
@@ -190,10 +203,22 @@ class Fixtures {
       data: this.establishmentSupabaseRow,
       error: null,
     });
+    this.maybeSingleMock.mockResolvedValue({
+      data: this.establishmentSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenSupabaseReturnsNoRow() {
+    this.maybeSingleMock.mockResolvedValue({ data: null, error: null });
   }
 
   whenSupabaseReturnsError() {
     this.singleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'no rows' },
+    });
+    this.maybeSingleMock.mockResolvedValue({
       data: null,
       error: { message: 'no rows' },
     });
@@ -239,7 +264,7 @@ class Fixtures {
     expect(this.fromMock).toHaveBeenCalledWith('establishment');
     expect(this.selectMock).toHaveBeenCalledWith('*');
     expect(this.eqMock).toHaveBeenCalledWith('supabase_user_id', this.userId);
-    expect(this.singleMock).toHaveBeenCalledTimes(1);
+    expect(this.maybeSingleMock).toHaveBeenCalledTimes(1);
   }
 
   thenGetByIdQueryBuiltWithExpectedArguments() {
