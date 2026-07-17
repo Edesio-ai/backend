@@ -14,6 +14,7 @@ import { GetInvitationPreviewUseCase } from 'src/application/teaching/invitation
 import { CreateInvitationTokenBodyDto } from './dtos/create-invitation-token.dto';
 import { DeleteInvitationTokenUseCase } from 'src/application/teaching/invitation-token/delete-invitation-token.use-case';
 import { CreateInvitationTokenUseCase } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
+import { Public } from '../auth/decorator/public.decorator';
 
 @Roles('establishment')
 @Controller('invitation-token')
@@ -43,6 +44,7 @@ export class InvitationTokenController {
     return tokens;
   }
 
+  @Public()
   @Get('preview/:token')
   async getInvitationPreview(
     @Param() params: GetInvitationPreviewParamsDto,

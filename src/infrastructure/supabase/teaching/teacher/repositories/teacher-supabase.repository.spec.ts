@@ -127,6 +127,25 @@ describe('TeacherSupabaseRepository', () => {
 
     await expect(promise).rejects.toBeInstanceOf(ServerError);
   });
+
+  it('should create teacher with invitation token', async () => {
+    fixtures.whenCreateTeacherWithInvitationReturnsData();
+
+    const result = await fixtures.whenCreateTeacherWithInvitationToken();
+
+    fixtures.thenCreateTeacherWithInvitationQueryBuilt();
+    expect(result).toEqual(fixtures.expectedTeacherWithEstablishment);
+    expect(fixtures.deleteUserMock).not.toHaveBeenCalled();
+  });
+
+  it('should delete auth user and throw ServerError when createTeacherWithInvitationToken fails', async () => {
+    fixtures.whenCreateTeacherWithInvitationReturnsError();
+
+    await expect(
+      fixtures.whenCreateTeacherWithInvitationToken(),
+    ).rejects.toBeInstanceOf(ServerError);
+    expect(fixtures.deleteUserMock).toHaveBeenCalledWith(fixtures.authUser.id);
+  });
 });
 
 class Fixtures {
@@ -174,10 +193,55 @@ class Fixtures {
   public readonly invitationTokenId = 'token-1';
   public readonly establishmentIdToLink = 'est-2';
 
+  public readonly authUser = {
+    id: 'auth-u1',
+    email: 'prof1@school.com',
+    metadata: {
+      role: 'teacher' as const,
+      firstname: 'Prof',
+      lastname: '1',
+      acceptTerms: true,
+    },
+  };
+
+  public readonly invitationToken = {
+    id: 'inv-1',
+    establishmentId: this.establishmentId,
+    token: 'tok-abc',
+    invitedEmail: 'prof1@school.com',
+    expiresAt: '2026-12-31T00:00:00.000Z',
+    usedAt: null,
+    usedBy: null,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    assignedChatbots: 3,
+  };
+
+  public readonly teacherWithEstablishmentSupabaseRow = {
+    id: 'teacher-1',
+    name: 'Prof 1',
+    email: 'prof1@school.com',
+    created_at: '2026-01-01T00:00:00.000Z',
+    establishment_id: this.establishmentId,
+    available_chatbots: 3,
+    supabase_user_id: 'auth-u1',
+  };
+
+  public readonly expectedTeacherWithEstablishment = {
+    id: 'teacher-1',
+    name: 'Prof 1',
+    email: 'prof1@school.com',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    establishmentId: this.establishmentId,
+    availableChatbots: 3,
+    supabaseUserId: 'auth-u1',
+  };
+
   public readonly teacherProfilePayload = {
     name: 'Prof Updated',
     email: 'prof@school.com',
   };
+
+  public readonly deleteUserMock = jest.fn();
 
   private readonly teacherEqMock = jest.fn();
   private readonly teacherSelectMock = jest.fn(() => ({
@@ -265,9 +329,17 @@ class Fixtures {
     const supabaseMock = {
       from: this.fromMock,
     };
+    const supabaseAuthMock = {
+      from: this.fromMock,
+      auth: {
+        admin: {
+          deleteUser: this.deleteUserMock,
+        },
+      },
+    };
     this.repository = new TeacherSupabaseRepository(
       supabaseMock as any,
-      supabaseMock as any,
+      supabaseAuthMock as any,
     );
   }
 
@@ -502,5 +574,41 @@ class Fixtures {
     );
     expect(this.conditionsEqMock).toHaveBeenCalledTimes(2);
     expect(this.conditionsMaybeSingleMock).toHaveBeenCalledTimes(1);
+  }
+
+  whenCreateTeacherWithInvitationToken() {
+    this.createModeEnabled = true;
+    return this.repository.createTeacherWithInvitationToken(
+      this.authUser,
+      this.invitationToken,
+    );
+  }
+
+  whenCreateTeacherWithInvitationReturnsData() {
+    this.createSingleMock.mockResolvedValue({
+      data: this.teacherWithEstablishmentSupabaseRow,
+      error: null,
+    });
+  }
+
+  whenCreateTeacherWithInvitationReturnsError() {
+    this.createSingleMock.mockResolvedValue({
+      data: null,
+      error: { message: 'create teacher with invitation failed' },
+    });
+    this.deleteUserMock.mockResolvedValue(undefined);
+  }
+
+  thenCreateTeacherWithInvitationQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('teachers');
+    expect(this.createInsertMock).toHaveBeenCalledWith({
+      supabase_user_id: this.authUser.id,
+      name: 'Prof 1',
+      email: this.authUser.email,
+      establishment_id: this.invitationToken.establishmentId,
+      available_chatbots: this.invitationToken.assignedChatbots,
+    });
+    expect(this.createSelectMock).toHaveBeenCalledTimes(1);
+    expect(this.createSingleMock).toHaveBeenCalledTimes(1);
   }
 }
