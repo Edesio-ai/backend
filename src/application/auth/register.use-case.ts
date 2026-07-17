@@ -18,6 +18,7 @@ import {
   TEACHER_REPOSITORY,
   type ITeacherRepository,
 } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { BadRequestError } from 'src/domain/shared/errors/global.errors';
 
 @Injectable()
 export class RegisterUseCase {
@@ -44,6 +45,19 @@ export class RegisterUseCase {
       invitationToken,
     } = body;
 
+    const token = invitationToken
+      ? await this.invitationTokenRepository.getInvitationByToken(
+          invitationToken,
+        )
+      : null;
+
+    if (!token) {
+      throw new BadRequestError('Invalid invitation token');
+    }
+    if (token.invitedEmail !== email) {
+      throw new BadRequestError('Email mismatch');
+    }
+
     const metadata: UserMetadata = {
       role,
       firstname,
@@ -61,14 +75,15 @@ export class RegisterUseCase {
       password,
       metadata,
     );
-    if (metadata.invitationToken) {
+
+    if (token) {
       const teacher =
         await this.teacherRepository.createTeacherWithInvitationToken(
           authUser,
-          metadata.invitationToken,
+          token,
         );
       await this.invitationTokenRepository.updateTokenUsedAt(
-        metadata.invitationToken.id,
+        token.id,
         teacher.id,
       );
     }
