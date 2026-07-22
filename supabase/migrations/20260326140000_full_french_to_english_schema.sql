@@ -299,9 +299,19 @@ $$;
 
 -- ---------------------------------------------------------------------------
 -- 3) Data normalization for enum-like text values still in French
+--    Drop legacy CHECKs first — updating to English values would otherwise fail.
 -- ---------------------------------------------------------------------------
 do $$
 begin
+  if to_regclass('public.suggestions') is not null then
+    alter table public.suggestions drop constraint if exists suggestions_category_check;
+  end if;
+
+  if to_regclass('public.self_learner_courses') is not null then
+    alter table public.self_learner_courses drop constraint if exists autodidacte_cours_langue_check;
+    alter table public.self_learner_courses drop constraint if exists self_learner_courses_language_check;
+  end if;
+
   if to_regclass('public.suggestions') is not null and exists (
     select 1 from information_schema.columns
     where table_schema='public' and table_name='suggestions' and column_name='category'
