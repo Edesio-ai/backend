@@ -18,97 +18,111 @@ describe('RegisterUseCase', () => {
     fixtures = new Fixtures();
   });
 
-  it('throws BadRequestError when invitation token is missing', async () => {
-    await expect(
-      fixtures.whenExecuteWith(fixtures.teacherBodyWithoutToken),
-    ).rejects.toBeInstanceOf(BadRequestError);
-    expect(
-      fixtures.invitationTokenRepository.getInvitationByToken,
-    ).not.toHaveBeenCalled();
-    expect(fixtures.authRepository.createAuthUser).not.toHaveBeenCalled();
-  });
+  describe('without invitation token', () => {
+    it('creates auth user then sends welcome email', async () => {
+      fixtures.whenCreateAuthUserResolves();
+      fixtures.whenSendWelcomeEmailResolves();
 
-  it('throws BadRequestError when invitation token is not found', async () => {
-    fixtures.whenInvitationTokenMissing();
+      await fixtures.whenExecuteWith(fixtures.teacherBodyWithoutToken);
 
-    await expect(
-      fixtures.whenExecuteWith(fixtures.teacherBody),
-    ).rejects.toBeInstanceOf(BadRequestError);
-    expect(fixtures.authRepository.createAuthUser).not.toHaveBeenCalled();
-  });
-
-  it('throws BadRequestError when invited email does not match', async () => {
-    fixtures.whenInvitationTokenResolves({
-      ...fixtures.invitationToken,
-      invitedEmail: 'other@school.com',
+      fixtures.thenCreateAuthUserCalledWithTeacherMetadataWithoutToken();
+      fixtures.thenInvitationFlowNotUsed();
+      fixtures.thenSendWelcomeEmailCalledWith(
+        fixtures.teacherBodyWithoutToken.email,
+        fixtures.teacherBodyWithoutToken.firstname,
+        fixtures.teacherBodyWithoutToken.role,
+      );
     });
 
-    await expect(
-      fixtures.whenExecuteWith(fixtures.teacherBody),
-    ).rejects.toBeInstanceOf(BadRequestError);
-    expect(fixtures.authRepository.createAuthUser).not.toHaveBeenCalled();
-  });
+    it('adds establishment in metadata for student role', async () => {
+      fixtures.whenCreateAuthUserResolves();
+      fixtures.whenSendWelcomeEmailResolves();
 
-  it('creates auth user, teacher from invitation, marks token used, then sends welcome email', async () => {
-    fixtures.whenInvitationTokenResolves();
-    fixtures.whenCreateAuthUserResolves();
-    fixtures.whenCreateTeacherWithInvitationResolves();
-    fixtures.whenUpdateTokenUsedAtResolves();
-    fixtures.whenSendWelcomeEmailResolves();
+      await fixtures.whenExecuteWith(fixtures.studentBodyWithoutToken);
 
-    await fixtures.whenExecuteWith(fixtures.teacherBody);
-
-    fixtures.thenCreateAuthUserCalledWithTeacherMetadata();
-    fixtures.thenCreateTeacherWithInvitationCalled();
-    fixtures.thenUpdateTokenUsedAtCalled();
-    fixtures.thenSendWelcomeEmailCalledWith(
-      fixtures.teacherBody.email,
-      fixtures.teacherBody.firstname,
-      fixtures.teacherBody.role,
-    );
-  });
-
-  it('adds establishment in metadata for student role', async () => {
-    fixtures.whenInvitationTokenResolves({
-      ...fixtures.invitationToken,
-      invitedEmail: fixtures.studentBody.email,
+      fixtures.thenCreateAuthUserCalledWithStudentMetadataWithoutToken();
+      fixtures.thenInvitationFlowNotUsed();
+      fixtures.thenSendWelcomeEmailCalledWith(
+        fixtures.studentBodyWithoutToken.email,
+        fixtures.studentBodyWithoutToken.firstname,
+        fixtures.studentBodyWithoutToken.role,
+      );
     });
-    fixtures.whenCreateAuthUserResolves();
-    fixtures.whenCreateTeacherWithInvitationResolves();
-    fixtures.whenUpdateTokenUsedAtResolves();
-    fixtures.whenSendWelcomeEmailResolves();
 
-    await fixtures.whenExecuteWith(fixtures.studentBody);
+    it('propagates repository error and does not send email', async () => {
+      fixtures.whenCreateAuthUserThrowsError();
 
-    fixtures.thenCreateAuthUserCalledWithStudentMetadata();
-    fixtures.thenSendWelcomeEmailCalledWith(
-      fixtures.studentBody.email,
-      fixtures.studentBody.firstname,
-      fixtures.studentBody.role,
-    );
+      const promise = fixtures.whenExecuteWith(
+        fixtures.teacherBodyWithoutToken,
+      );
+
+      await fixtures.thenThrowRepositoryError(promise);
+      fixtures.thenSendWelcomeEmailNotCalled();
+    });
+
+    it('propagates email provider error', async () => {
+      fixtures.whenCreateAuthUserResolves();
+      fixtures.whenSendWelcomeEmailThrowsError();
+
+      const promise = fixtures.whenExecuteWith(
+        fixtures.teacherBodyWithoutToken,
+      );
+
+      await fixtures.thenThrowEmailProviderError(promise);
+      fixtures.thenCreateAuthUserCalledWithTeacherMetadataWithoutToken();
+    });
   });
 
-  it('propagates repository error and does not send email', async () => {
-    fixtures.whenInvitationTokenResolves();
-    fixtures.whenCreateAuthUserThrowsError();
+  describe('with invitation token', () => {
+    it('throws BadRequestError when invitation token is not found', async () => {
+      fixtures.whenInvitationTokenMissing();
 
-    const promise = fixtures.whenExecuteWith(fixtures.teacherBody);
+      await expect(
+        fixtures.whenExecuteWith(fixtures.teacherBody),
+      ).rejects.toBeInstanceOf(BadRequestError);
+      expect(fixtures.authRepository.createAuthUser).not.toHaveBeenCalled();
+    });
 
-    await fixtures.thenThrowRepositoryError(promise);
-    fixtures.thenSendWelcomeEmailNotCalled();
-  });
+    it('throws BadRequestError when invited email does not match', async () => {
+      fixtures.whenInvitationTokenResolves({
+        ...fixtures.invitationToken,
+        invitedEmail: 'other@school.com',
+      });
 
-  it('propagates email provider error', async () => {
-    fixtures.whenInvitationTokenResolves();
-    fixtures.whenCreateAuthUserResolves();
-    fixtures.whenCreateTeacherWithInvitationResolves();
-    fixtures.whenUpdateTokenUsedAtResolves();
-    fixtures.whenSendWelcomeEmailThrowsError();
+      await expect(
+        fixtures.whenExecuteWith(fixtures.teacherBody),
+      ).rejects.toBeInstanceOf(BadRequestError);
+      expect(fixtures.authRepository.createAuthUser).not.toHaveBeenCalled();
+    });
 
-    const promise = fixtures.whenExecuteWith(fixtures.teacherBody);
+    it('creates auth user, teacher from invitation, marks token used, then sends welcome email', async () => {
+      fixtures.whenInvitationTokenResolves();
+      fixtures.whenCreateAuthUserResolves();
+      fixtures.whenCreateTeacherWithInvitationResolves();
+      fixtures.whenUpdateTokenUsedAtResolves();
+      fixtures.whenSendWelcomeEmailResolves();
 
-    await fixtures.thenThrowEmailProviderError(promise);
-    fixtures.thenCreateAuthUserCalledWithTeacherMetadata();
+      await fixtures.whenExecuteWith(fixtures.teacherBody);
+
+      fixtures.thenCreateAuthUserCalledWithTeacherMetadata();
+      fixtures.thenCreateTeacherWithInvitationCalled();
+      fixtures.thenUpdateTokenUsedAtCalled();
+      fixtures.thenSendWelcomeEmailCalledWith(
+        fixtures.teacherBody.email,
+        fixtures.teacherBody.firstname,
+        fixtures.teacherBody.role,
+      );
+    });
+
+    it('propagates repository error and does not send email', async () => {
+      fixtures.whenInvitationTokenResolves();
+      fixtures.whenCreateAuthUserThrowsError();
+
+      const promise = fixtures.whenExecuteWith(fixtures.teacherBody);
+
+      await fixtures.thenThrowRepositoryError(promise);
+      fixtures.thenSendWelcomeEmailNotCalled();
+    });
   });
 });
 
@@ -125,7 +139,7 @@ class Fixtures {
   public readonly invitationToken: InvitationToken;
   public readonly teacherBody: RegisterBody;
   public readonly teacherBodyWithoutToken: RegisterBody;
-  public readonly studentBody: RegisterBody;
+  public readonly studentBodyWithoutToken: RegisterBody;
   public readonly authUser = {
     id: 'auth-u1',
     email: 'teacher@school.com',
@@ -193,7 +207,7 @@ class Fixtures {
       acceptTerms: true,
     };
 
-    this.studentBody = {
+    this.studentBodyWithoutToken = {
       role: 'student',
       email: 'student@school.com',
       password: 'secret123',
@@ -201,7 +215,6 @@ class Fixtures {
       lastname: 'Durand',
       acceptTerms: true,
       establishment: 'Edesio Academy',
-      invitationToken: this.invitationToken.token,
     };
   }
 
@@ -259,6 +272,37 @@ class Fixtures {
     await expect(promise).rejects.toBe(this.emailProviderError);
   }
 
+  thenCreateAuthUserCalledWithTeacherMetadataWithoutToken() {
+    expect(this.authRepository.createAuthUser).toHaveBeenCalledWith(
+      this.teacherBodyWithoutToken.email,
+      this.teacherBodyWithoutToken.password,
+      {
+        role: 'teacher',
+        firstname: this.teacherBodyWithoutToken.firstname,
+        lastname: this.teacherBodyWithoutToken.lastname,
+        acceptTerms: this.teacherBodyWithoutToken.acceptTerms,
+        invitationToken: undefined,
+      },
+    );
+    expect(this.authRepository.createAuthUser).toHaveBeenCalledTimes(1);
+  }
+
+  thenCreateAuthUserCalledWithStudentMetadataWithoutToken() {
+    expect(this.authRepository.createAuthUser).toHaveBeenCalledWith(
+      this.studentBodyWithoutToken.email,
+      this.studentBodyWithoutToken.password,
+      {
+        role: 'student',
+        firstname: this.studentBodyWithoutToken.firstname,
+        lastname: this.studentBodyWithoutToken.lastname,
+        acceptTerms: this.studentBodyWithoutToken.acceptTerms,
+        invitationToken: undefined,
+        establishment: this.studentBodyWithoutToken.establishment,
+      },
+    );
+    expect(this.authRepository.createAuthUser).toHaveBeenCalledTimes(1);
+  }
+
   thenCreateAuthUserCalledWithTeacherMetadata() {
     expect(this.authRepository.createAuthUser).toHaveBeenCalledWith(
       this.teacherBody.email,
@@ -274,22 +318,6 @@ class Fixtures {
     expect(this.authRepository.createAuthUser).toHaveBeenCalledTimes(1);
   }
 
-  thenCreateAuthUserCalledWithStudentMetadata() {
-    expect(this.authRepository.createAuthUser).toHaveBeenCalledWith(
-      this.studentBody.email,
-      this.studentBody.password,
-      {
-        role: 'student',
-        firstname: this.studentBody.firstname,
-        lastname: this.studentBody.lastname,
-        acceptTerms: this.studentBody.acceptTerms,
-        invitationToken: this.studentBody.invitationToken,
-        establishment: this.studentBody.establishment,
-      },
-    );
-    expect(this.authRepository.createAuthUser).toHaveBeenCalledTimes(1);
-  }
-
   thenCreateTeacherWithInvitationCalled() {
     expect(
       this.teacherRepository.createTeacherWithInvitationToken,
@@ -300,6 +328,18 @@ class Fixtures {
     expect(
       this.invitationTokenRepository.updateTokenUsedAt,
     ).toHaveBeenCalledWith(this.invitationToken.id, this.createdTeacher.id);
+  }
+
+  thenInvitationFlowNotUsed() {
+    expect(
+      this.invitationTokenRepository.getInvitationByToken,
+    ).not.toHaveBeenCalled();
+    expect(
+      this.teacherRepository.createTeacherWithInvitationToken,
+    ).not.toHaveBeenCalled();
+    expect(
+      this.invitationTokenRepository.updateTokenUsedAt,
+    ).not.toHaveBeenCalled();
   }
 
   thenSendWelcomeEmailCalledWith(email: string, name: string, role: string) {
