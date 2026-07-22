@@ -56,6 +56,26 @@ jobs:
         with:
           version: latest
 
+      - name: Validate production DB URL uses IPv4 pooler
+        env:
+          DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DB_URL" ]; then
+            echo "::error::PROD_SUPABASE_DB_URL is empty. Add it in repo or environment 'production' secrets."
+            exit 1
+          fi
+          if echo "$DB_URL" | grep -qE '@db\.[a-z0-9]+\.supabase\.co'; then
+            echo "::error::PROD_SUPABASE_DB_URL uses direct db.*.supabase.co host (IPv6)."
+            echo "Use Connect → Session pooler URI (host must contain pooler.supabase.com)."
+            echo "Environment secrets on 'production' override repository secrets — update the right one."
+            exit 1
+          fi
+          if echo "$DB_URL" | grep -q 'pooler.supabase.com'; then
+            echo "OK: connection string uses pooler.supabase.com (IPv4)"
+          else
+            echo "WARN: pooler.supabase.com not detected in URL; continuing anyway"
+          fi
+
       - name: Apply production DB migrations
         run: supabase db push --db-url "${{ secrets.PROD_SUPABASE_DB_URL }}"
 
