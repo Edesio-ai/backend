@@ -45,19 +45,6 @@ export class RegisterUseCase {
       invitationToken,
     } = body;
 
-    const token = invitationToken
-      ? await this.invitationTokenRepository.getInvitationByToken(
-          invitationToken,
-        )
-      : null;
-
-    if (!token) {
-      throw new BadRequestError('Invalid invitation token');
-    }
-    if (token.invitedEmail !== email) {
-      throw new BadRequestError('Email mismatch');
-    }
-
     const metadata: UserMetadata = {
       role,
       firstname,
@@ -66,29 +53,62 @@ export class RegisterUseCase {
       invitationToken,
     };
 
+    if(invitationToken) {
+      return this.registerByInvitationToken(body, metadata);
+    }
+
     if (role === 'student') {
       metadata.establishment = establishment;
     }
 
-    const authUser = await this.authRepository.createAuthUser(
+    await this.authRepository.createAuthUser(
       email,
       password,
       metadata,
     );
 
-    if (token) {
-      const teacher =
-        await this.teacherRepository.createTeacherWithInvitationToken(
-          authUser,
-          token,
-        );
-      await this.invitationTokenRepository.updateTokenUsedAt(
-        token.id,
-        teacher.id,
-      );
-    }
+    
     await this.emailProvider.sendWelcomeEmail(email, firstname, role);
 
-    return;
+  }
+
+  private async registerByInvitationToken(body: RegisterBody, metadata: UserMetadata): Promise<void> {
+    const {
+      email,
+      password,
+      firstname,
+      role,
+      invitationToken,
+    } = body;
+
+    const token = invitationToken ? await this.invitationTokenRepository.getInvitationByToken(invitationToken) : null;
+      
+      if(!token) {
+        throw new BadRequestError('Invalid invitation token');
+      }
+
+      if(token.invitedEmail !== email) {
+        throw new BadRequestError('Email mismatch');
+      }
+      
+      const authUser = await this.authRepository.createAuthUser(
+        email,
+        password,
+        metadata,
+      );
+      
+      if (token) {
+        const teacher =
+          await this.teacherRepository.createTeacherWithInvitationToken(
+            authUser,
+            token,
+          );
+        await this.invitationTokenRepository.updateTokenUsedAt(
+          token.id,
+          teacher.id,
+        );
+      }
+      await this.emailProvider.sendWelcomeEmail(email, firstname, role);
+      return;
   }
 }
