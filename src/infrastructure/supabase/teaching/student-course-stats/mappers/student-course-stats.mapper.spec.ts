@@ -4,7 +4,7 @@ import type {
   SupabaseStudentCourseStatsWithStudent,
   insertStudentCourseStats,
   UpdateStudentCourseStats,
-} from 'src/domain/teaching/student/type/student.type';
+} from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 
 describe('StudentCourseStatsMapper', () => {
   let fixtures: Fixtures;

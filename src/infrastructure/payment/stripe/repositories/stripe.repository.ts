@@ -97,6 +97,7 @@ export class StripeRepository implements IStripeProvider {
     user: User,
     priceId: string,
     planType: string,
+    locale?: 'en' | 'fr',
   ): Promise<any> {
     try {
       const { email } = user;
@@ -105,6 +106,7 @@ export class StripeRepository implements IStripeProvider {
         mode: 'subscription',
         customer_email: email,
         allow_promotion_codes: true,
+        locale: locale ?? 'auto',
         line_items: [
           {
             price: priceId,

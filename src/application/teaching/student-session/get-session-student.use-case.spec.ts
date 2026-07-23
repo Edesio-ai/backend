@@ -7,7 +7,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
-import { SessionStudent } from 'src/domain/teaching/student/type/student.type';
+import { SessionStudent } from 'src/domain/teaching/student-session/types/student-session.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';

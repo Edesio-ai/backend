@@ -159,6 +159,7 @@ class Fixtures {
       this.user,
       this.priceId,
       this.planType,
+      undefined,
     );
     expect(this.paymentClient.createCheckoutSession).toHaveBeenCalledTimes(1);
   }

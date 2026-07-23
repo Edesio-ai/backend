@@ -1,6 +1,6 @@
 import { GetStudentJoinedSessionsUseCase } from './get-student-joined-sessions.use-case';
 import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
-import { StudentJoinedSession } from 'src/domain/teaching/student/type/student.type';
+import { StudentJoinedSession } from 'src/domain/teaching/student-session/types/student-session.type';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 
 describe('GetStudentJoinedSessionsUseCase', () => {

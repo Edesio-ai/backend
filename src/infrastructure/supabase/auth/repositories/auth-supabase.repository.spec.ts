@@ -7,7 +7,7 @@ import {
 } from '../../../../domain/shared/errors/global.errors';
 import {
   AuthUserWithSession,
-  Session,
+  SupabaseAuthSession,
 } from '../../../../domain/auth/types/auth.type';
 
 describe('AuthSupabaseRepository', () => {
@@ -202,7 +202,7 @@ class LoginUserFixtures {
   public readonly signInWithPasswordMock = jest.fn();
   public readonly sut: AuthSupabaseRepository;
 
-  public readonly sessionPayload: Session;
+  public readonly sessionPayload: SupabaseAuthSession;
   public readonly expectedAuthUserWithSession: AuthUserWithSession;
 
   constructor() {
@@ -214,28 +214,22 @@ class LoginUserFixtures {
 
     this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
 
-    const user: Session['user'] = {
+    const user: SupabaseAuthSession['user'] = {
       id: 'u1',
-      aud: 'authenticated',
-      role: 'authenticated',
       email: this.emailNormalized,
       email_confirmed_at: '2026-01-01T00:00:00.000Z',
-      phone: '',
-      app_metadata: { provider: 'email', providers: ['email'] },
       user_metadata: {
         role: 'teacher',
         firstname: 'Ada',
         lastname: 'Lovelace',
       },
-      identities: [],
-      created_at: '2026-01-01T00:00:00.000Z',
-      updated_at: '2026-01-01T00:00:00.000Z',
-      is_anonymous: false,
       confirmed_at: '2026-01-01T00:00:00.000Z',
       last_sign_in_at: '2026-01-01T00:00:00.000Z',
+      created_at: '2026-01-01T00:00:00.000Z',
+      updated_at: '2026-01-01T00:00:00.000Z',
     };
 
-    const authSession: Session['session'] = {
+    const authSession: SupabaseAuthSession['session'] = {
       access_token: 'at',
       token_type: 'bearer',
       expires_in: 3600,

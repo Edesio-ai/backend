@@ -6,10 +6,8 @@ import {
   NotFoundError,
 } from 'src/domain/shared/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  Student,
-  StudentSession,
-} from 'src/domain/teaching/student/type/student.type';
+import { Student } from 'src/domain/teaching/student/type/student.type';
+import { StudentSession } from 'src/domain/teaching/student-session/types/student-session.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 

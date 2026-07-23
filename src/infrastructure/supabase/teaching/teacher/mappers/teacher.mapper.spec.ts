@@ -1,8 +1,6 @@
 import { TeacherMapper } from './teacher.mapper';
-import {
-  SupabaseTeacher,
-  SupabaseTeacherSession,
-} from 'src/domain/teaching/teacher/types/teacher.type';
+import { SupabaseTeacher } from 'src/domain/teaching/teacher/types/teacher.type';
+import { SupabaseSession } from 'src/domain/teaching/session/types/session.type';
 
 describe('TeacherMapper', () => {
   let fixtures: Fixtures;
@@ -117,7 +115,7 @@ class Fixtures {
     supabaseUserId: 'user-1',
   };
 
-  public readonly sessionRow: SupabaseTeacherSession = {
+  public readonly sessionRow: SupabaseSession = {
     id: 's-1',
     name: 'Cours',
     code: 'ABC',

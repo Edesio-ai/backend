@@ -1,7 +1,7 @@
 import { ServerError } from 'src/domain/shared/errors/global.errors';
+import { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 import {
   CreateQuestionBody,
-  GeneratedQuestion,
   Question,
 } from 'src/domain/teaching/question/types/question.type';
 import { QuestionSupabaseRepository } from './question-supabase.repository';

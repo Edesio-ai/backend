@@ -1,5 +1,8 @@
 import { AuthMapper } from './auth.mappers';
-import { Session, SupabaseUser } from 'src/domain/auth/types/auth.type';
+import {
+  SupabaseAuthSession,
+  SupabaseUser,
+} from 'src/domain/auth/types/auth.type';
 
 describe('AuthMapper', () => {
   describe('toAuthUser', () => {
@@ -38,7 +41,7 @@ describe('AuthMapper', () => {
           user: userSession,
           weak_password: null,
         },
-      } as unknown as Session;
+      } as unknown as SupabaseAuthSession;
 
       expect(AuthMapper.toAuthUser(data)).toEqual({
         id: 'u-1',
@@ -85,7 +88,7 @@ describe('AuthMapper', () => {
           user: userSession,
           weak_password: null,
         },
-      } as unknown as Session;
+      } as unknown as SupabaseAuthSession;
 
       expect(AuthMapper.toAuthTokenData(data)).toEqual({
         accessToken: 'access',
@@ -99,21 +102,13 @@ describe('AuthMapper', () => {
     it('maps JWT getUser payload to domain User metadata', () => {
       const user: SupabaseUser = {
         id: 'uid-jwt',
-        aud: 'authenticated',
-        role: 'authenticated',
         email: 'jwt@example.com',
         email_confirmed_at: '2026-01-01T00:00:00.000Z',
-        phone: '',
-        app_metadata: { provider: 'email', providers: ['email'] },
         user_metadata: {
           role: 'teacher',
           firstname: 'Marie',
           lastname: 'Curie',
         },
-        identities: [],
-        created_at: '2026-01-01T00:00:00.000Z',
-        updated_at: '2026-01-01T00:00:00.000Z',
-        is_anonymous: false,
       };
 
       expect(AuthMapper.SupabaseValidatedTokenUserToUser(user)).toEqual({
@@ -133,20 +128,12 @@ describe('AuthMapper', () => {
     it('maps Supabase user to domain User', () => {
       const user: SupabaseUser = {
         id: 'uid-1',
-        aud: 'authenticated',
-        role: 'authenticated',
         email: 'user@example.com',
         email_confirmed_at: '2026-01-01T00:00:00.000Z',
-        phone: '',
-        app_metadata: { provider: 'email', providers: ['email'] },
         user_metadata: {
           firstname: 'Jean',
           lastname: 'Dupont',
         },
-        identities: [],
-        created_at: '2026-01-01T00:00:00.000Z',
-        updated_at: '2026-01-01T00:00:00.000Z',
-        is_anonymous: false,
       };
 
       expect(AuthMapper.AuthUserToUser(user)).toEqual({

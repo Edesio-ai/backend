@@ -174,7 +174,12 @@ class Fixtures {
     return this.useCase.execute(this.course.id, this.body, this.user as any);
   }
 
-  whenExecuteWithBody(body: typeof this.body) {
+  whenExecuteWithBody(
+    body: Omit<typeof this.body, 'proposals' | 'explanation'> & {
+      proposals?: string[];
+      explanation?: string;
+    },
+  ) {
     return this.useCase.execute(this.course.id, body, this.user as any);
   }
 

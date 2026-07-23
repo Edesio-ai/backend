@@ -142,6 +142,7 @@ class Fixtures {
   public readonly courseWithSession: CourseWithSession = {
     id: this.courseId,
     session: { teacherId: this.teacher.id },
+    teachers: { id: this.teacher.id },
   };
 
   public readonly deleteCourseQuestionError = new Error(
@@ -205,6 +206,7 @@ class Fixtures {
     this.courseRepository.getCourseWithSessionById.mockResolvedValue({
       id: this.courseId,
       session: { teacherId: 'other-teacher-id' },
+      teachers: { id: 'other-teacher-id' },
     });
   }
 

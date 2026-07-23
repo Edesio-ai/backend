@@ -16,6 +16,7 @@ export interface IStripeProvider {
     user: User,
     priceId: string,
     planType: string,
+    locale?: 'en' | 'fr',
   ): Promise<any>;
   getCheckoutSession(sessionId: string): Promise<StripeSession>;
   cancelSubscription(user: User): Promise<CancelSubscription>;

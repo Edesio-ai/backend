@@ -35,11 +35,12 @@ export class BillingController {
     @CurrentUser() user: User,
     @Body() body: CreateCheckoutSessionBodyDto,
   ): Promise<any> {
-    const { priceId, planType } = body;
+    const { priceId, planType, locale } = body;
     return await this.createCheckoutSessionUseCase.execute(
       priceId,
       planType,
       user,
+      locale,
     );
   }
 

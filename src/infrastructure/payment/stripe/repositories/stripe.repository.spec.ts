@@ -805,6 +805,7 @@ class Fixtures {
       mode: 'subscription',
       customer_email: this.email,
       allow_promotion_codes: true,
+      locale: 'auto',
       line_items: [
         {
           price: this.priceId,

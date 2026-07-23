@@ -18,7 +18,12 @@ export class CreateCheckoutSessionsUseCase {
     private readonly paymentClient: IStripeProvider,
   ) {}
 
-  async execute(priceId: string, planType: string, user: User): Promise<any> {
+  async execute(
+    priceId: string,
+    planType: string,
+    user: User,
+    locale?: 'en' | 'fr',
+  ): Promise<any> {
     if (!user) {
       throw new TokenUserNotFoundError('User not found');
     }
@@ -32,6 +37,7 @@ export class CreateCheckoutSessionsUseCase {
         user,
         priceId,
         planType,
+        locale,
       );
     }
 
