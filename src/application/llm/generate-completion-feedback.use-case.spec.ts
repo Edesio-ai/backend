@@ -16,7 +16,26 @@ describe('GenerateCompletionFeedbackUseCase', () => {
     expect(result).toBe('Excellent travail !');
     expect(
       fixtures.openaiRepository.generateCompletionFeedback,
-    ).toHaveBeenCalledWith(fixtures.body);
+    ).toHaveBeenCalledWith({
+      ...fixtures.body,
+      language: 'francais',
+    });
+  });
+
+  it('should forward an explicit language to the repository', async () => {
+    fixtures.whenRepositoryReturnsFeedback('Great job!');
+
+    await fixtures.whenExecuteWithBody({
+      ...fixtures.body,
+      language: 'anglais',
+    });
+
+    expect(
+      fixtures.openaiRepository.generateCompletionFeedback,
+    ).toHaveBeenCalledWith({
+      ...fixtures.body,
+      language: 'anglais',
+    });
   });
 
   it('should propagate repository errors', async () => {
@@ -50,6 +69,10 @@ class Fixtures {
 
   whenExecute() {
     return this.useCase.execute(this.body);
+  }
+
+  whenExecuteWithBody(body: typeof this.body & { language?: string }) {
+    return this.useCase.execute(body as any);
   }
 
   whenRepositoryReturnsFeedback(text: string) {

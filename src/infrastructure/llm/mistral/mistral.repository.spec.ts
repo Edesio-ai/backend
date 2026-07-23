@@ -130,6 +130,26 @@ describe('MistralProvider', () => {
 
       await expect(fixtures.whenGenerate()).rejects.toBeInstanceOf(ServerError);
     });
+
+    it('defaults language to francais in the prompts', async () => {
+      fixtures.whenApiReturnsFeedback('ok');
+
+      await fixtures.whenGenerate();
+
+      const call = fixtures.chatCompleteMock.mock.calls[0][0];
+      expect(call.messages[0].content).toContain('français');
+      expect(call.messages[1].content).toContain('français');
+    });
+
+    it('passes an explicit course language into the prompts', async () => {
+      fixtures.whenApiReturnsFeedback('ok');
+
+      await fixtures.whenGenerateWithLanguage('anglais');
+
+      const call = fixtures.chatCompleteMock.mock.calls[0][0];
+      expect(call.messages[0].content).toContain('anglais');
+      expect(call.messages[1].content).toContain('anglais');
+    });
   });
 });
 
@@ -236,6 +256,15 @@ class CompletionFeedbackFixtures {
 
   whenGenerate() {
     return this.provider.generateCompletionFeedback(this.body);
+  }
+
+  whenGenerateWithLanguage(
+    language: 'francais' | 'anglais' | 'espagnol' | 'allemand',
+  ) {
+    return this.provider.generateCompletionFeedback({
+      ...this.body,
+      language,
+    });
   }
 
   whenApiReturnsFeedback(content: string | null) {

@@ -123,9 +123,10 @@ export class MistralProvider implements MistralRepositoryContract {
             ? "L'élève a un résultat moyen. Encourage-le à continuer ses efforts."
             : "L'élève a eu des difficultés. Motive-le positivement sans le décourager.";
 
-      const systemPrompt = getGenerateCompletionFeedbackSystemPrompt();
+      const language = body.language ?? 'francais';
+      const systemPrompt = getGenerateCompletionFeedbackSystemPrompt(language);
       const userPrompt = getGenerateCompletionFeedbackUserPrompt(
-        body,
+        { ...body, language },
         feedbackContext,
         percent,
       );
