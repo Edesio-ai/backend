@@ -1,18 +1,9 @@
 import { Inject } from '@nestjs/common';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  NotFoundError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { NotFoundError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 export type UpdateCourseBody = {
   title?: string | null;
@@ -28,11 +19,7 @@ export class UpdateCourseUseCase {
     private readonly teacherRepository: ITeacherRepository,
   ) {}
 
-  async execute(
-    courseId: string,
-    body: UpdateCourseBody,
-    user: AuthUser,
-  ): Promise<Course> {
+  async execute(courseId: string, body: UpdateCourseBody, user: AuthUser): Promise<Course> {
     const course = await this.courseRepository.getCourseWithSessionById(
       courseId,
       'id, sessions:sessions!inner(teacher_id)',
@@ -50,10 +37,7 @@ export class UpdateCourseUseCase {
       throw new UnauthorizedError('You are not allowed to update this course');
     }
 
-    const updatedCourse = await this.courseRepository.updateCourse(
-      courseId,
-      body,
-    );
+    const updatedCourse = await this.courseRepository.updateCourse(courseId, body);
     return updatedCourse;
   }
 }

@@ -3,10 +3,7 @@ import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-stud
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { SessionStudent } from 'src/domain/teaching/student-session/types/student-session.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
@@ -41,15 +38,11 @@ describe('GetSessionStudentUseCase', () => {
 
     await fixtures.whenExecuteAsTeacher();
 
-    expect(
-      fixtures.studentSessionRepository.listStudentsEnrolledInSession,
-    ).toHaveBeenCalledWith(
+    expect(fixtures.studentSessionRepository.listStudentsEnrolledInSession).toHaveBeenCalledWith(
       fixtures.sessionId,
       expect.stringContaining('joined_at'),
     );
-    expect(
-      fixtures.studentSessionRepository.listStudentsEnrolledInSession,
-    ).toHaveBeenCalledWith(
+    expect(fixtures.studentSessionRepository.listStudentsEnrolledInSession).toHaveBeenCalledWith(
       fixtures.sessionId,
       expect.stringContaining('students'),
     );
@@ -58,9 +51,7 @@ describe('GetSessionStudentUseCase', () => {
   it('should throw NotFoundError when teacher is not found', async () => {
     fixtures.whenTeacherNotFound();
 
-    await expect(fixtures.whenExecuteAsTeacher()).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(fixtures.whenExecuteAsTeacher()).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('should not call the session or student repository when teacher is not found', async () => {
@@ -69,27 +60,21 @@ describe('GetSessionStudentUseCase', () => {
     await fixtures.whenExecuteAsTeacher().catch(() => null);
 
     expect(fixtures.sessionRepository.getSessionById).not.toHaveBeenCalled();
-    expect(
-      fixtures.studentSessionRepository.listStudentsEnrolledInSession,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.studentSessionRepository.listStudentsEnrolledInSession).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundError when session is not found', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenSessionNotFound();
 
-    await expect(fixtures.whenExecuteAsTeacher()).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(fixtures.whenExecuteAsTeacher()).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('should throw ForbiddenError when the teacher does not own the session', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenSessionOwnedByAnotherTeacher();
 
-    await expect(fixtures.whenExecuteAsTeacher()).rejects.toBeInstanceOf(
-      ForbiddenError,
-    );
+    await expect(fixtures.whenExecuteAsTeacher()).rejects.toBeInstanceOf(ForbiddenError);
   });
 
   it('should return an empty array when the session has no students', async () => {
@@ -126,18 +111,14 @@ describe('GetSessionStudentUseCase', () => {
   it('should throw NotFoundError when establishment is not found', async () => {
     fixtures.whenEstablishmentNotFound();
 
-    await expect(fixtures.whenExecuteAsEstablishment()).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(fixtures.whenExecuteAsEstablishment()).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('should throw NotFoundError when session is not found (establishment role)', async () => {
     fixtures.whenEstablishmentFound();
     fixtures.whenSessionNotFound();
 
-    await expect(fixtures.whenExecuteAsEstablishment()).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(fixtures.whenExecuteAsEstablishment()).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it('should throw NotFoundError when teacher does not belong to establishment', async () => {
@@ -145,9 +126,7 @@ describe('GetSessionStudentUseCase', () => {
     fixtures.whenSessionFound();
     fixtures.whenTeacherNotFoundByConditions();
 
-    await expect(fixtures.whenExecuteAsEstablishment()).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(fixtures.whenExecuteAsEstablishment()).rejects.toBeInstanceOf(NotFoundError);
   });
 });
 
@@ -218,9 +197,7 @@ class Fixtures {
   public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
-  public readonly studentSessionRepository: ReturnType<
-    typeof createMockStudentSessionRepository
-  >;
+  public readonly studentSessionRepository: ReturnType<typeof createMockStudentSessionRepository>;
   public readonly useCase: GetSessionStudentUseCase;
 
   constructor() {
@@ -255,9 +232,7 @@ class Fixtures {
   }
 
   whenTeacherFoundByConditions() {
-    this.teacherRepository.getTeacherByConditions.mockResolvedValue(
-      this.teacher,
-    );
+    this.teacherRepository.getTeacherByConditions.mockResolvedValue(this.teacher);
   }
 
   whenTeacherNotFoundByConditions() {
@@ -265,9 +240,7 @@ class Fixtures {
   }
 
   whenEstablishmentFound() {
-    this.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(
-      this.establishment,
-    );
+    this.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(this.establishment);
   }
 
   whenEstablishmentNotFound() {
@@ -292,20 +265,14 @@ class Fixtures {
   }
 
   whenStudentsSessionsFound() {
-    this.studentSessionRepository.listStudentsEnrolledInSession.mockResolvedValue(
-      this.sessionStudents,
-    );
+    this.studentSessionRepository.listStudentsEnrolledInSession.mockResolvedValue(this.sessionStudents);
   }
 
   whenNoStudentsInSession() {
-    this.studentSessionRepository.listStudentsEnrolledInSession.mockResolvedValue(
-      [],
-    );
+    this.studentSessionRepository.listStudentsEnrolledInSession.mockResolvedValue([]);
   }
 
   whenStudentRepositoryThrows(error: Error) {
-    this.studentSessionRepository.listStudentsEnrolledInSession.mockRejectedValue(
-      error,
-    );
+    this.studentSessionRepository.listStudentsEnrolledInSession.mockRejectedValue(error);
   }
 }

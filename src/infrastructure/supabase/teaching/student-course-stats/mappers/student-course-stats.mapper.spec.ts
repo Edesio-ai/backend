@@ -140,15 +140,11 @@ class Fixtures {
   }
 
   whenCourseStatWithStudentToDomain() {
-    return StudentCourseStatsMapper.courseStatWithStudentToDomain(
-      this.embedRow,
-    );
+    return StudentCourseStatsMapper.courseStatWithStudentToDomain(this.embedRow);
   }
 
   whenListFromQuery(rawRows: unknown) {
-    return StudentCourseStatsMapper.listCourseStatsWithStudentFromQuery(
-      rawRows,
-    );
+    return StudentCourseStatsMapper.listCourseStatsWithStudentFromQuery(rawRows);
   }
 
   whenToInsert() {

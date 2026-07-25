@@ -22,18 +22,12 @@ export class GetSuggestionsUseCase {
     const { role } = user.metadata;
 
     if (role !== category) {
-      throw new ForbiddenException(
-        'You are not authorized to access this resource',
-      );
+      throw new ForbiddenException('You are not authorized to access this resource');
     }
-    const suggestions =
-      await this.suggestionRepository.getSuggestions(category);
+    const suggestions = await this.suggestionRepository.getSuggestions(category);
 
     const suggestionIds = suggestions.map((suggestion) => suggestion.id);
-    const userLikes = await this.suggestionLikeRepository.getUserLikes(
-      user.id,
-      suggestionIds,
-    );
+    const userLikes = await this.suggestionLikeRepository.getUserLikes(user.id, suggestionIds);
 
     const suggestionsWithLikeStatus = suggestions.map((suggestion) => ({
       ...suggestion,

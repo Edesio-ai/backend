@@ -1,10 +1,7 @@
 import { JoinSessionByCodeUseCase } from './join-session-by-code.use-case';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
-import {
-  BadRequestError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { BadRequestError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { Session } from 'src/domain/teaching/session/types/session.type';
 import { Student } from 'src/domain/teaching/student/type/student.type';
 import { StudentJoinedSession } from 'src/domain/teaching/student-session/types/student-session.type';
@@ -37,9 +34,7 @@ describe('JoinSessionByCodeUseCase', () => {
     fixtures.whenStudentFound();
     fixtures.whenStudentAlreadyJoinedSession();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      BadRequestError,
-    );
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(BadRequestError);
   });
 
   it('should throw BadRequestError with correct message when already joined', async () => {
@@ -47,9 +42,7 @@ describe('JoinSessionByCodeUseCase', () => {
     fixtures.whenStudentFound();
     fixtures.whenStudentAlreadyJoinedSession();
 
-    await expect(fixtures.whenExecute()).rejects.toThrow(
-      'Student already joined this session',
-    );
+    await expect(fixtures.whenExecute()).rejects.toThrow('Student already joined this session');
   });
 
   it('should call createStudentSession with the correct student id and session id', async () => {
@@ -60,9 +53,10 @@ describe('JoinSessionByCodeUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(
-      fixtures.studentSessionRepository.createStudentSession,
-    ).toHaveBeenCalledWith(fixtures.student.id, fixtures.session.id);
+    expect(fixtures.studentSessionRepository.createStudentSession).toHaveBeenCalledWith(
+      fixtures.student.id,
+      fixtures.session.id,
+    );
   });
 
   it('should propagate errors thrown by createStudentSession', async () => {
@@ -109,9 +103,7 @@ class Fixtures {
 
   public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly sessionRepository: jest.Mocked<ISessionRepository>;
-  public readonly studentSessionRepository: ReturnType<
-    typeof createMockStudentSessionRepository
-  >;
+  public readonly studentSessionRepository: ReturnType<typeof createMockStudentSessionRepository>;
   public readonly useCase: JoinSessionByCodeUseCase;
 
   constructor() {
@@ -146,21 +138,15 @@ class Fixtures {
   }
 
   whenStudentAlreadyJoinedSession() {
-    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue(
-      [this.alreadyJoinedSession],
-    );
+    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue([this.alreadyJoinedSession]);
   }
 
   whenStudentHasNoJoinedSessions() {
-    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue(
-      [],
-    );
+    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue([]);
   }
 
   whenCreateStudentSessionSucceeds() {
-    this.studentSessionRepository.createStudentSession.mockResolvedValue(
-      undefined,
-    );
+    this.studentSessionRepository.createStudentSession.mockResolvedValue(undefined);
   }
 
   whenCreateStudentSessionFails(error: Error) {

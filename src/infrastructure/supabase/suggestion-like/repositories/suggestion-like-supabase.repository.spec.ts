@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { SuggestionLikeSupabaseRepository } from './suggestion-like-supabase.repository';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 
@@ -143,7 +144,7 @@ class Fixtures {
 
     this.repository = new SuggestionLikeSupabaseRepository({
       from: this.fromMock,
-    } as any);
+    } as unknown as SupabaseClient);
   }
 
   whenGetUserLikes(userId: string, ids: string[]) {
@@ -151,10 +152,7 @@ class Fixtures {
   }
 
   whenGetLikeByPair(userId: string, suggestionId: string) {
-    return this.repository.getSuggestionLikeByUserAndSuggestionId(
-      userId,
-      suggestionId,
-    );
+    return this.repository.getSuggestionLikeByUserAndSuggestionId(userId, suggestionId);
   }
 
   whenDeleteLike(likeId: string) {
@@ -223,10 +221,7 @@ class Fixtures {
   thenMaybeSingleChainBuilt(userId: string, suggestionId: string) {
     expect(this.selectLikesMock).toHaveBeenCalledWith('id');
     expect(this.eqLikeUserForPairMock).toHaveBeenCalledWith('user_id', userId);
-    expect(this.eqSuggestionPairMock).toHaveBeenCalledWith(
-      'suggestion_id',
-      suggestionId,
-    );
+    expect(this.eqSuggestionPairMock).toHaveBeenCalledWith('suggestion_id', suggestionId);
     expect(this.maybeSingleMock).toHaveBeenCalledTimes(1);
   }
 

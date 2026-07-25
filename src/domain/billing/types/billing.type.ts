@@ -1,6 +1,38 @@
 export type SubscriptionStatus = {
   hasActiveSubscription: boolean;
   role: string;
+  status?: string;
+  cancelAtPeriodEnd?: boolean;
+  currentPeriodEnd?: number;
+  isPending?: boolean;
+};
+
+export type StripeCustomer = {
+  id: string;
+};
+
+export type StripeSubscriptionLookupItem = {
+  status: string;
+  cancel_at_period_end: boolean;
+  current_period_end: number;
+  cancel_at?: number | null;
+};
+
+/** Array of subscriptions that may also expose a `.data` list (legacy dual shape). */
+export type StripeSubscriptionsLookup = StripeSubscriptionLookupItem[] & {
+  data: StripeSubscriptionLookupItem[];
+};
+
+export type CheckoutSessionCreateResult = {
+  url: string;
+};
+
+export type CheckoutSessionExistingResult = {
+  checkoutUrl: string;
+};
+
+export type UserSubscriptionRecord = {
+  checkout_url: string;
 };
 
 export type StripeSession = {
@@ -19,7 +51,7 @@ export type StripeSubscription = {
   interval: string;
   amount: number;
   currency: string;
-  currentPeriodEnd: number;
+  currentPeriodEnd?: number;
   cancelAtPeriodEnd: boolean;
   last4: string | null;
   cardBrand: string | null;

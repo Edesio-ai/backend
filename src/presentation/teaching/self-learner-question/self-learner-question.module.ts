@@ -9,11 +9,7 @@ import { UpdateSelfLearnerQuestionUseCase } from 'src/application/teaching/self-
 import { DeleteSelfLearnerQuestionUseCase } from 'src/application/teaching/self-learner-question/delete-self-learner-question.use-case';
 
 @Module({
-  imports: [
-    SelfLearnerPersistenceModule,
-    SelfLearnerCoursePersistenceModule,
-    SelfLearnerQuestionPersistenceModule,
-  ],
+  imports: [SelfLearnerPersistenceModule, SelfLearnerCoursePersistenceModule, SelfLearnerQuestionPersistenceModule],
   controllers: [SelfLearnerQuestionController],
   providers: [
     GetSelfLearnerQuestionsUseCase,

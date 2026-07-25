@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type ISelfLearnerCourseFileRepository,
   SELF_LEARNER_COURSE_FILE_REPOSITORY,
@@ -27,18 +24,13 @@ export class GetSelfLearnerCourseFilesUseCase {
     private readonly selfLearnerCourseRepository: ISelfLearnerCourseRepository,
   ) {}
 
-  async execute(
-    userId: string,
-    courseId: string,
-  ): Promise<SelfLearnerCourseFile[]> {
-    const selfLearner =
-      await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
+  async execute(userId: string, courseId: string): Promise<SelfLearnerCourseFile[]> {
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
     if (!selfLearner) {
       throw new NotFoundError('Self learner course not found');
     }
 
-    const selfLearnerCourse =
-      await this.selfLearnerCourseRepository.getSelfLearnerCourseById(courseId);
+    const selfLearnerCourse = await this.selfLearnerCourseRepository.getSelfLearnerCourseById(courseId);
     if (!selfLearnerCourse) {
       throw new NotFoundError('Self learner course not found');
     }
@@ -46,8 +38,6 @@ export class GetSelfLearnerCourseFilesUseCase {
     if (selfLearnerCourse.selfLearnerId !== selfLearner.id) {
       throw new ForbiddenError('You are not authorized to access this course');
     }
-    return this.selfLearnerCourseFileRepository.getSelfLearnerCourseFiles(
-      courseId,
-    );
+    return this.selfLearnerCourseFileRepository.getSelfLearnerCourseFiles(courseId);
   }
 }

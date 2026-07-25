@@ -1,9 +1,6 @@
 import { CreateEstablishmentUseCase } from './create-establishment.use-case';
 import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
-import {
-  CreateEstablishmentBody,
-  Establishment,
-} from 'src/domain/teaching/establishment/types/establishment.type';
+import { CreateEstablishmentBody, Establishment } from 'src/domain/teaching/establishment/types/establishment.type';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 
 describe('CreateEstablishmentUseCase', () => {
@@ -43,9 +40,7 @@ class Fixtures {
   constructor() {
     this.establishmentRepository = createMockEstablishmentRepository();
 
-    this.createEstablishmentUseCase = new CreateEstablishmentUseCase(
-      this.establishmentRepository,
-    );
+    this.createEstablishmentUseCase = new CreateEstablishmentUseCase(this.establishmentRepository);
 
     this.body = {
       supabaseUserId: 'user-1',
@@ -69,15 +64,11 @@ class Fixtures {
   }
 
   whenRepositoryReturnsEstablishment() {
-    this.establishmentRepository.createEstablishment.mockResolvedValue(
-      this.establishment,
-    );
+    this.establishmentRepository.createEstablishment.mockResolvedValue(this.establishment);
   }
 
   whenRepositoryThrowsError() {
-    this.establishmentRepository.createEstablishment.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.establishmentRepository.createEstablishment.mockRejectedValue(this.repositoryError);
   }
 
   async thenThrowRepositoryError(promise: Promise<unknown>) {
@@ -85,16 +76,12 @@ class Fixtures {
   }
 
   thenRepositoryCalledWithExpectedArguments() {
-    expect(
-      this.establishmentRepository.createEstablishment,
-    ).toHaveBeenCalledWith(
+    expect(this.establishmentRepository.createEstablishment).toHaveBeenCalledWith(
       this.body.supabaseUserId,
       this.body.name,
       this.body.email,
     );
-    expect(
-      this.establishmentRepository.createEstablishment,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.establishmentRepository.createEstablishment).toHaveBeenCalledTimes(1);
   }
 
   thenReturnExpectedEstablishment(result: Establishment) {

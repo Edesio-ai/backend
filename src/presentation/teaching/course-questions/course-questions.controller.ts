@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
@@ -40,11 +32,8 @@ export class CourseQuestionsController {
   }
 
   @Get('answered')
-  async getAnsweredQuestionsCount(
-    @CurrentUser() user: AuthUser,
-  ): Promise<{ answeredQuestionsCount: number }> {
-    const answeredQuestionsCount =
-      await this.getAnsweredQuestionsCountUseCase.execute(user);
+  async getAnsweredQuestionsCount(@CurrentUser() user: AuthUser): Promise<{ answeredQuestionsCount: number }> {
+    const answeredQuestionsCount = await this.getAnsweredQuestionsCountUseCase.execute(user);
     return { answeredQuestionsCount };
   }
 
@@ -54,10 +43,7 @@ export class CourseQuestionsController {
     @Param('courseId') courseId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<CourseQuestion[]> {
-    const questions = await this.getStudentCourseQuestionsUseCase.execute(
-      courseId,
-      user,
-    );
+    const questions = await this.getStudentCourseQuestionsUseCase.execute(courseId, user);
     return questions;
   }
 
@@ -66,10 +52,7 @@ export class CourseQuestionsController {
     @CurrentUser() user: AuthUser,
     @Body() body: SendCourseQuestionBodyDto,
   ): Promise<CourseQuestion | null> {
-    const courseQuestion = await this.sendCourseQuestionUseCase.execute(
-      body,
-      user,
-    );
+    const courseQuestion = await this.sendCourseQuestionUseCase.execute(body, user);
     return courseQuestion;
   }
 
@@ -79,10 +62,7 @@ export class CourseQuestionsController {
     @CurrentUser() user: AuthUser,
     @Body() body: AnswerCourseQuestionBodyDto,
   ): Promise<CourseQuestion | null> {
-    const questions = await this.answerCourseQuestionUseCase.execute(
-      body,
-      user,
-    );
+    const questions = await this.answerCourseQuestionUseCase.execute(body, user);
     return questions;
   }
 

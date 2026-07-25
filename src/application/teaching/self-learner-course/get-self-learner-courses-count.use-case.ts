@@ -18,17 +18,12 @@ export class GetSelfLearnerCoursesCountUseCase {
   ) {}
 
   async execute(user: AuthUser): Promise<{ count: number }> {
-    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(
-      user.id,
-    );
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(user.id);
     if (!selfLearner) {
       throw new NotFoundException('Self learner not found');
     }
 
-    const count =
-      await this.selfLearnerCourseRepository.getSelfLearnerCoursesCount(
-        selfLearner.id,
-      );
+    const count = await this.selfLearnerCourseRepository.getSelfLearnerCoursesCount(selfLearner.id);
     return { count };
   }
 }

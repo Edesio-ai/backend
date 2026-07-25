@@ -26,9 +26,7 @@ describe('UploadSelfLearnerCourseFileUseCase', () => {
       fixtures.file,
       `self-learner/${fixtures.courseId}/1700000000000.pdf`,
     );
-    expect(
-      fixtures.selfLearnerCourseFileRepository.uploadSelfLearnerCourseFile,
-    ).toHaveBeenCalledWith({
+    expect(fixtures.selfLearnerCourseFileRepository.uploadSelfLearnerCourseFile).toHaveBeenCalledWith({
       courseId: fixtures.courseId,
       fileUrl: `self-learner/${fixtures.courseId}/1700000000000.pdf`,
       fileName: fixtures.file.originalFileName,
@@ -53,17 +51,13 @@ describe('UploadSelfLearnerCourseFileUseCase', () => {
     fixtures.courseFileRepository.storeCourseFile.mockRejectedValue(err);
 
     await expect(fixtures.whenExecute()).rejects.toBe(err);
-    expect(
-      fixtures.selfLearnerCourseFileRepository.uploadSelfLearnerCourseFile,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.selfLearnerCourseFileRepository.uploadSelfLearnerCourseFile).not.toHaveBeenCalled();
   });
 
   it('propagates error when DB insert fails', async () => {
     fixtures.courseFileRepository.storeCourseFile.mockResolvedValue(undefined);
     const err = new Error('duplicate');
-    fixtures.selfLearnerCourseFileRepository.uploadSelfLearnerCourseFile.mockRejectedValue(
-      err,
-    );
+    fixtures.selfLearnerCourseFileRepository.uploadSelfLearnerCourseFile.mockRejectedValue(err);
 
     await expect(fixtures.whenExecute()).rejects.toBe(err);
   });
@@ -92,8 +86,7 @@ class Fixtures {
 
   constructor() {
     this.courseFileRepository = createMockCourseFileRepository();
-    this.selfLearnerCourseFileRepository =
-      createMockSelfLearnerCourseFileRepository();
+    this.selfLearnerCourseFileRepository = createMockSelfLearnerCourseFileRepository();
 
     this.useCase = new UploadSelfLearnerCourseFileUseCase(
       this.selfLearnerCourseFileRepository,
@@ -107,8 +100,6 @@ class Fixtures {
 
   whenPipelineSucceeds() {
     this.courseFileRepository.storeCourseFile.mockResolvedValue(undefined);
-    this.selfLearnerCourseFileRepository.uploadSelfLearnerCourseFile.mockResolvedValue(
-      this.inserted,
-    );
+    this.selfLearnerCourseFileRepository.uploadSelfLearnerCourseFile.mockResolvedValue(this.inserted);
   }
 }

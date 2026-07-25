@@ -13,12 +13,6 @@ export type SelfLearnerCourseFileSupabase = {
   file_name: string;
   created_at: string;
 };
-export type SelfLearnerCourseFileInsertPayload = Omit<
-  SelfLearnerCourseFile,
-  'id' | 'createdAt'
->;
+export type SelfLearnerCourseFileInsertPayload = Omit<SelfLearnerCourseFile, 'id' | 'createdAt'>;
 
-export type SelfLearnerCourseFileInsertPayloadSupabase = Omit<
-  SelfLearnerCourseFileSupabase,
-  'id' | 'created_at'
->;
+export type SelfLearnerCourseFileInsertPayloadSupabase = Omit<SelfLearnerCourseFileSupabase, 'id' | 'created_at'>;

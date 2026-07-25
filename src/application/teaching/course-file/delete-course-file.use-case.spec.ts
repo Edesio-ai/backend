@@ -13,12 +13,8 @@ describe('DeleteCourseFileUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.courseFileRepository.deleteFileById).toHaveBeenCalledWith(
-      fixtures.fileId,
-    );
-    expect(fixtures.courseFileRepository.deleteFileById).toHaveBeenCalledTimes(
-      1,
-    );
+    expect(fixtures.courseFileRepository.deleteFileById).toHaveBeenCalledWith(fixtures.fileId);
+    expect(fixtures.courseFileRepository.deleteFileById).toHaveBeenCalledTimes(1);
   });
 
   it('should propagate errors thrown by deleteFileById', async () => {
@@ -48,8 +44,6 @@ class Fixtures {
   }
 
   whenDeleteFileFails() {
-    this.courseFileRepository.deleteFileById.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.courseFileRepository.deleteFileById.mockRejectedValue(this.repositoryError);
   }
 }

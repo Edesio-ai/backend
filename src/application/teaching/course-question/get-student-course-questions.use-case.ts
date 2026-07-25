@@ -1,18 +1,12 @@
 import { Inject } from '@nestjs/common';
 import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   STUDENT_REPOSITORY,
   type IStudentRepository,
 } from 'src/domain/teaching/student/contracts/I-student.repository';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   COURSE_QUESTION_REPOSITORY,
   type ICourseQuestionRepository,
@@ -21,10 +15,7 @@ import {
   STUDENT_SESSION_REPOSITORY,
   type IStudentSessionRepository,
 } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   type ISessionRepository,
   SESSION_REPOSITORY,
@@ -58,18 +49,13 @@ export class GetStudentCourseQuestionsUseCase {
         break;
       }
       default: {
-        throw new ForbiddenError(
-          'You are not authorized to access this course',
-        );
+        throw new ForbiddenError('You are not authorized to access this course');
       }
     }
     return this.courseQuestionRepository.getCourseQuestionsByCourseId(courseId);
   }
 
-  private async checkStudentAccess(
-    courseId: string,
-    userId: string,
-  ): Promise<void> {
+  private async checkStudentAccess(courseId: string, userId: string): Promise<void> {
     const student = await this.studentRepository.getStudentByUserId(userId);
     if (!student) {
       throw new NotFoundError();
@@ -79,14 +65,9 @@ export class GetStudentCourseQuestionsUseCase {
       throw new NotFoundError(`Course with id ${courseId} not found`);
     }
 
-    const studentSession =
-      await this.studentSessionRepository.getStudentSessionBySessionId(
-        course.sessionId,
-      );
+    const studentSession = await this.studentSessionRepository.getStudentSessionBySessionId(course.sessionId);
     if (!studentSession) {
-      throw new ForbiddenError(
-        `Student session not found for course id ${courseId}`,
-      );
+      throw new ForbiddenError(`Student session not found for course id ${courseId}`);
     }
 
     if (studentSession.studentId !== student.id) {
@@ -96,10 +77,7 @@ export class GetStudentCourseQuestionsUseCase {
     }
   }
 
-  private async checkTeacherAccess(
-    courseId: string,
-    userId: string,
-  ): Promise<void> {
+  private async checkTeacherAccess(courseId: string, userId: string): Promise<void> {
     const teacher = await this.teacherRepository.getTeacherByUserId(userId);
     if (!teacher) {
       throw new NotFoundError();
@@ -108,16 +86,12 @@ export class GetStudentCourseQuestionsUseCase {
     if (!course) {
       throw new NotFoundError(`Course with id ${courseId} not found`);
     }
-    const session = await this.sessionRepository.getSessionById(
-      course.sessionId,
-    );
+    const session = await this.sessionRepository.getSessionById(course.sessionId);
     if (!session) {
       throw new NotFoundError(`Session with id ${course.sessionId} not found`);
     }
     if (teacher.id !== session.teacherId) {
-      throw new ForbiddenError(
-        `Teacher id ${teacher.id} does not match the session teacher id ${session.teacherId}`,
-      );
+      throw new ForbiddenError(`Teacher id ${teacher.id} does not match the session teacher id ${session.teacherId}`);
     }
   }
 }

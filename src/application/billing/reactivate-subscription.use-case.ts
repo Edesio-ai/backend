@@ -1,9 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { User } from 'src/domain/auth/types/auth.type';
-import {
-  type IStripeProvider,
-  STRIPE_PROVIDER,
-} from 'src/domain/billing/contracts/i-stripe-client.provider';
+import { type IStripeProvider, STRIPE_PROVIDER } from 'src/domain/billing/contracts/i-stripe-client.provider';
 
 export class ReactivateSubscriptionUseCase {
   constructor(

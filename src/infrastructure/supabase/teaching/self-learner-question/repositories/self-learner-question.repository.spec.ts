@@ -19,10 +19,7 @@ describe('SelfLearnerQuestionRepository', () => {
 
       expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_questions');
       expect(fixtures.deleteMock).toHaveBeenCalledTimes(1);
-      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith(
-        'course_id',
-        fixtures.courseId,
-      );
+      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith('course_id', fixtures.courseId);
     });
 
     it('throws ServerError when delete fails', async () => {
@@ -44,9 +41,7 @@ describe('SelfLearnerQuestionRepository', () => {
 
       const result = await fixtures.whenList();
 
-      expect(result).toEqual([
-        selfLearnerQuestionMapper.toDomain(fixtures.rows[0]),
-      ]);
+      expect(result).toEqual([selfLearnerQuestionMapper.toDomain(fixtures.rows[0])]);
       fixtures.thenListChainBuilt(fixtures.courseId);
     });
 
@@ -79,14 +74,9 @@ describe('SelfLearnerQuestionRepository', () => {
       const result = await fixtures.whenInsert();
 
       expect(fixtures.insertMock).toHaveBeenCalledWith(
-        selfLearnerQuestionMapper.generatedToInserts(
-          fixtures.generatedQuestions,
-          fixtures.courseId,
-        ),
+        selfLearnerQuestionMapper.generatedToInserts(fixtures.generatedQuestions, fixtures.courseId),
       );
-      expect(result).toEqual([
-        selfLearnerQuestionMapper.toDomain(fixtures.returnedRows[0]),
-      ]);
+      expect(result).toEqual([selfLearnerQuestionMapper.toDomain(fixtures.returnedRows[0])]);
       expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_questions');
       expect(fixtures.selectAfterInsertMock).toHaveBeenCalledTimes(1);
     });
@@ -120,10 +110,7 @@ describe('SelfLearnerQuestionRepository', () => {
 
       expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_questions');
       expect(fixtures.deleteMock).toHaveBeenCalledTimes(1);
-      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith(
-        'id',
-        fixtures.questionId,
-      );
+      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith('id', fixtures.questionId);
     });
 
     it('throws ServerError when delete fails', async () => {
@@ -149,9 +136,7 @@ describe('SelfLearnerQuestionRepository', () => {
       expect(fixtures.selectMock).toHaveBeenCalledWith('*');
       expect(fixtures.eqMock).toHaveBeenCalledWith('id', fixtures.questionId);
       expect(fixtures.singleMock).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(
-        selfLearnerQuestionMapper.toDomain(fixtures.returnedRow),
-      );
+      expect(result).toEqual(selfLearnerQuestionMapper.toDomain(fixtures.returnedRow));
     });
 
     it('throws ServerError when Supabase returns error', async () => {
@@ -174,14 +159,10 @@ describe('SelfLearnerQuestionRepository', () => {
       const result = await fixtures.whenUpdate();
 
       expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_questions');
-      expect(fixtures.updateMock).toHaveBeenCalledWith(
-        selfLearnerQuestionMapper.toUpdate(fixtures.payload),
-      );
+      expect(fixtures.updateMock).toHaveBeenCalledWith(selfLearnerQuestionMapper.toUpdate(fixtures.payload));
       expect(fixtures.eqMock).toHaveBeenCalledWith('id', fixtures.questionId);
       expect(fixtures.singleAfterSelectMock).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(
-        selfLearnerQuestionMapper.toDomain(fixtures.returnedRow),
-      );
+      expect(result).toEqual(selfLearnerQuestionMapper.toDomain(fixtures.returnedRow));
     });
 
     it('throws ServerError when Supabase returns error', async () => {
@@ -204,13 +185,9 @@ describe('SelfLearnerQuestionRepository', () => {
       const result = await fixtures.whenCreate();
 
       expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_questions');
-      expect(fixtures.insertMock).toHaveBeenCalledWith(
-        selfLearnerQuestionMapper.toInsert(fixtures.payload),
-      );
+      expect(fixtures.insertMock).toHaveBeenCalledWith(selfLearnerQuestionMapper.toInsert(fixtures.payload));
       expect(fixtures.singleAfterSelectMock).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(
-        selfLearnerQuestionMapper.toDomain(fixtures.returnedRow),
-      );
+      expect(result).toEqual(selfLearnerQuestionMapper.toDomain(fixtures.returnedRow));
     });
 
     it('throws ServerError when Supabase returns error', async () => {
@@ -375,10 +352,7 @@ class InsertFixtures {
   }
 
   whenInsert() {
-    return this.repository.insertSelfLearnerQuestions(
-      this.generatedQuestions,
-      this.courseId,
-    );
+    return this.repository.insertSelfLearnerQuestions(this.generatedQuestions, this.courseId);
   }
 
   whenInsertSucceedsWithRows(rows: typeof this.returnedRows) {
@@ -527,10 +501,7 @@ class UpdateFixtures {
   }
 
   whenUpdate() {
-    return this.repository.updateSelfLearnerQuestion(
-      this.questionId,
-      this.payload,
-    );
+    return this.repository.updateSelfLearnerQuestion(this.questionId, this.payload);
   }
 
   whenUpdateSucceeds() {

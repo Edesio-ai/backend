@@ -15,9 +15,7 @@ describe('GetCourseValidatedQuestionsUseCase', () => {
     const result = await fixtures.whenExecute();
 
     expect(result).toEqual({ validatedQuestions: true });
-    expect(
-      fixtures.courseRepository.getCourseValidatedQuestions,
-    ).toHaveBeenCalledWith(fixtures.courseId);
+    expect(fixtures.courseRepository.getCourseValidatedQuestions).toHaveBeenCalledWith(fixtures.courseId);
   });
 
   it('should propagate repository errors', async () => {
@@ -39,9 +37,7 @@ class Fixtures {
   constructor() {
     this.courseRepository = createMockCourseRepository();
 
-    this.useCase = new GetCourseValidatedQuestionsUseCase(
-      this.courseRepository,
-    );
+    this.useCase = new GetCourseValidatedQuestionsUseCase(this.courseRepository);
   }
 
   whenExecute() {
@@ -53,8 +49,6 @@ class Fixtures {
   }
 
   whenRepositoryThrows() {
-    this.courseRepository.getCourseValidatedQuestions.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.courseRepository.getCourseValidatedQuestions.mockRejectedValue(this.repositoryError);
   }
 }

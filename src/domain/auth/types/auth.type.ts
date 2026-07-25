@@ -46,7 +46,12 @@ export type SupabaseUser = {
 };
 
 export type UserMetadata = {
-  [key: string]: any;
+  role?: string;
+  firstname?: string;
+  lastname?: string;
+  establishment?: string;
+  invitationToken?: string;
+  [key: string]: unknown;
 };
 
 export type RegisterBody = {

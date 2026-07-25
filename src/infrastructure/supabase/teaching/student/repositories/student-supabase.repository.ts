@@ -2,11 +2,7 @@ import { Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from '../../../supabase.module';
 import { mapList } from '../../../common/mapper.util';
-import {
-  InsertStudent,
-  Student,
-  UpdateStudentPayload,
-} from 'src/domain/teaching/student/type/student.type';
+import { InsertStudent, Student, UpdateStudentPayload } from 'src/domain/teaching/student/type/student.type';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
@@ -26,11 +22,7 @@ export class StudentSupabaseRepository implements IStudentRepository {
       .maybeSingle();
 
     if (error) {
-      console.error(
-        'An error occurred while getting student by user id',
-        userId,
-        error,
-      );
+      console.error('An error occurred while getting student by user id', userId, error);
       throw new ServerError(error.message);
     }
     return data ? StudentMapper.toDomain(data) : null;
@@ -55,11 +47,7 @@ export class StudentSupabaseRepository implements IStudentRepository {
       .single();
 
     if (error) {
-      console.error(
-        'An error occurred while creating student',
-        studentDataToInsert,
-        error,
-      );
+      console.error('An error occurred while creating student', studentDataToInsert, error);
       throw new ServerError(error.message);
     }
 
@@ -67,75 +55,42 @@ export class StudentSupabaseRepository implements IStudentRepository {
   }
 
   public async getStudentsByIds(studentIds: string[]): Promise<Student[]> {
-    const { data, error } = await this.supabase
-      .from('students')
-      .select('*')
-      .in('id', studentIds);
+    const { data, error } = await this.supabase.from('students').select('*').in('id', studentIds);
 
     if (error) {
-      console.error(
-        'An error occurred while getting students by ids',
-        studentIds,
-        error,
-      );
+      console.error('An error occurred while getting students by ids', studentIds, error);
       throw new ServerError(error.message);
     }
     return mapList(data ?? [], StudentMapper.toDomain);
   }
 
-  public async storeStudentPhoto(
-    buffer: Buffer,
-    storagePath: string,
-  ): Promise<string> {
-    const { error } = await this.supabase.storage
-      .from('profile-photos')
-      .upload(storagePath, buffer, { upsert: true });
+  public async storeStudentPhoto(buffer: Buffer, storagePath: string): Promise<string> {
+    const { error } = await this.supabase.storage.from('profile-photos').upload(storagePath, buffer, { upsert: true });
 
     if (error) {
       console.error('Error uploading photo:', error);
       throw new ServerError(error.message);
     }
 
-    const { data } = this.supabase.storage
-      .from('profile-photos')
-      .getPublicUrl(storagePath);
+    const { data } = this.supabase.storage.from('profile-photos').getPublicUrl(storagePath);
 
     return data.publicUrl ?? '';
   }
 
-  public async updateStudentPhoto(
-    studentId: string,
-    photoUrl: string,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('students')
-      .update({ photo_url: photoUrl })
-      .eq('id', studentId);
+  public async updateStudentPhoto(studentId: string, photoUrl: string): Promise<void> {
+    const { error } = await this.supabase.from('students').update({ photo_url: photoUrl }).eq('id', studentId);
 
     if (error) {
-      console.error(
-        'An error occurred while updating student photo',
-        studentId,
-        photoUrl,
-        error,
-      );
+      console.error('An error occurred while updating student photo', studentId, photoUrl, error);
       throw new ServerError(error.message);
     }
   }
 
-  public async updateStudent(
-    userId: string,
-    payload: UpdateStudentPayload,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('students')
-      .update(payload)
-      .eq('supabase_user_id', userId);
+  public async updateStudent(userId: string, payload: UpdateStudentPayload): Promise<void> {
+    const { error } = await this.supabase.from('students').update(payload).eq('supabase_user_id', userId);
 
     if (error) {
-      console.error(
-        `An error occure while updating student: ${userId}, error: ${error}`,
-      );
+      console.error(`An error occure while updating student: ${userId}, error: ${error}`);
       throw new ServerError(`An error occure while updating student`);
     }
   }

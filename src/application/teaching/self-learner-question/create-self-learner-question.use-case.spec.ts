@@ -1,7 +1,5 @@
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { AuthUser } from 'src/domain/auth/types/auth.type';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import type { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-learner-course/contracts/i-self-learner-course.repository';
 import type { ISelfLearnerQuestionRepository } from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
 import type { SelfLearnerQuestion } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
@@ -23,9 +21,7 @@ describe('CreateSelfLearnerQuestionUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(
-      fixtures.questionRepo.createSelfLearnerQuestion,
-    ).toHaveBeenCalledWith({
+    expect(fixtures.questionRepo.createSelfLearnerQuestion).toHaveBeenCalledWith({
       courseId: fixtures.course.id,
       type: fixtures.body.type,
       questionText: fixtures.body.questionText,
@@ -44,9 +40,9 @@ describe('CreateSelfLearnerQuestionUseCase', () => {
       explanation: undefined,
     });
 
-    expect(
-      fixtures.questionRepo.createSelfLearnerQuestion,
-    ).toHaveBeenCalledWith(expect.objectContaining({ explanation: '' }));
+    expect(fixtures.questionRepo.createSelfLearnerQuestion).toHaveBeenCalledWith(
+      expect.objectContaining({ explanation: '' }),
+    );
   });
 
   it('fills proposals with empty array when omitted', async () => {
@@ -57,18 +53,16 @@ describe('CreateSelfLearnerQuestionUseCase', () => {
       proposals: undefined,
     });
 
-    expect(
-      fixtures.questionRepo.createSelfLearnerQuestion,
-    ).toHaveBeenCalledWith(expect.objectContaining({ proposals: [] }));
+    expect(fixtures.questionRepo.createSelfLearnerQuestion).toHaveBeenCalledWith(
+      expect.objectContaining({ proposals: [] }),
+    );
   });
 
   it('throws NotFoundError when self learner is missing', async () => {
     fixtures.selfLearnerRepo.getSelfLearnerByUserId.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionRepo.createSelfLearnerQuestion,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepo.createSelfLearnerQuestion).not.toHaveBeenCalled();
   });
 
   it('throws NotFoundError when course is missing', async () => {
@@ -76,9 +70,7 @@ describe('CreateSelfLearnerQuestionUseCase', () => {
     fixtures.courseRepo.getSelfLearnerCourseById.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionRepo.createSelfLearnerQuestion,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepo.createSelfLearnerQuestion).not.toHaveBeenCalled();
   });
 
   it('throws ForbiddenError when course belongs to another learner', async () => {
@@ -89,9 +81,7 @@ describe('CreateSelfLearnerQuestionUseCase', () => {
     });
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
-    expect(
-      fixtures.questionRepo.createSelfLearnerQuestion,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepo.createSelfLearnerQuestion).not.toHaveBeenCalled();
   });
 
   it('propagates repository errors', async () => {
@@ -106,7 +96,7 @@ describe('CreateSelfLearnerQuestionUseCase', () => {
 class Fixtures {
   public readonly userId = 'auth-create-q';
 
-  public readonly user = {
+  public readonly user: AuthUser = {
     id: this.userId,
     email: 'u@test.com',
     metadata: { role: 'self-learner' },
@@ -159,19 +149,13 @@ class Fixtures {
     this.questionRepo = createMockSelfLearnerQuestionRepository();
     this.courseRepo = createMockSelfLearnerCourseRepository();
 
-    this.useCase = new CreateSelfLearnerQuestionUseCase(
-      this.selfLearnerRepo,
-      this.questionRepo,
-      this.courseRepo,
-    );
+    this.useCase = new CreateSelfLearnerQuestionUseCase(this.selfLearnerRepo, this.questionRepo, this.courseRepo);
 
-    this.questionRepo.createSelfLearnerQuestion.mockResolvedValue(
-      this.createdQuestion,
-    );
+    this.questionRepo.createSelfLearnerQuestion.mockResolvedValue(this.createdQuestion);
   }
 
   whenExecute() {
-    return this.useCase.execute(this.course.id, this.body, this.user as any);
+    return this.useCase.execute(this.course.id, this.body, this.user);
   }
 
   whenExecuteWithBody(
@@ -180,7 +164,7 @@ class Fixtures {
       explanation?: string;
     },
   ) {
-    return this.useCase.execute(this.course.id, body, this.user as any);
+    return this.useCase.execute(this.course.id, body, this.user);
   }
 
   whenLearnerExists() {

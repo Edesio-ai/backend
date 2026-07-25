@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type ISelfLearnerCourseRepository,
   SELF_LEARNER_COURSE_REPOSITORY,
@@ -27,19 +24,13 @@ export class UpdateSelfLearnerCourseUseCase {
     private readonly selfLearnerCourseRepository: ISelfLearnerCourseRepository,
   ) {}
 
-  async execute(
-    userId: string,
-    courseId: string,
-    body: UpdateSelfLearnerCourseBody,
-  ): Promise<SelfLearnerCourse> {
-    const selfLearner =
-      await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
+  async execute(userId: string, courseId: string, body: UpdateSelfLearnerCourseBody): Promise<SelfLearnerCourse> {
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
     if (!selfLearner) {
       throw new NotFoundError('Self learner not found');
     }
 
-    const selfLearnerCourse =
-      await this.selfLearnerCourseRepository.getSelfLearnerCourseById(courseId);
+    const selfLearnerCourse = await this.selfLearnerCourseRepository.getSelfLearnerCourseById(courseId);
     if (!selfLearnerCourse) {
       throw new NotFoundError('Self learner course not found');
     }
@@ -48,9 +39,6 @@ export class UpdateSelfLearnerCourseUseCase {
       throw new ForbiddenError('You are not authorized to update this course');
     }
 
-    return this.selfLearnerCourseRepository.updateSelfLearnerCourse(
-      courseId,
-      body,
-    );
+    return this.selfLearnerCourseRepository.updateSelfLearnerCourse(courseId, body);
   }
 }

@@ -1,6 +1,6 @@
 import { CreateCourseUseCase } from './create-course.use-case';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
-import { CreateCourseBody } from 'src/domain/teaching/course/types/course.type';
+import { Course, CreateCourseBody } from 'src/domain/teaching/course/types/course.type';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 
 describe('CreateCourseUseCase', () => {
@@ -36,13 +36,13 @@ class Fixtures {
     contentText: 'Body',
   };
 
-  public readonly createdCourse = {
+  public readonly createdCourse: Course = {
     id: 'course-1',
-    session_id: this.body.sessionId,
+    sessionId: this.body.sessionId,
     title: this.body.title,
-    description: this.body.description,
-    text_content: this.body.contentText,
-    created_at: '2026-01-01T00:00:00.000Z',
+    description: this.body.description ?? null,
+    contentText: this.body.contentText,
+    createdAt: '2026-01-01T00:00:00.000Z',
   };
 
   public readonly repositoryError = new Error('insert failed');
@@ -60,9 +60,7 @@ class Fixtures {
   }
 
   whenCreateCourseSucceeds() {
-    this.courseRepository.createCourse.mockResolvedValue(
-      this.createdCourse as any,
-    );
+    this.courseRepository.createCourse.mockResolvedValue(this.createdCourse);
   }
 
   whenCreateCourseFails() {

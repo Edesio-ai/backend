@@ -12,8 +12,6 @@ export class GetStudentJoinedSessionsUseCase {
   ) {}
 
   async execute(studentId: string): Promise<StudentJoinedSession[]> {
-    return this.studentSessionRepository.listSessionsEnrolledByStudent(
-      studentId,
-    );
+    return this.studentSessionRepository.listSessionsEnrolledByStudent(studentId);
   }
 }

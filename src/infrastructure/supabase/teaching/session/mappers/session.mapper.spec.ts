@@ -145,15 +145,11 @@ class Fixtures {
   }
 
   whenCourseWithSessionToDomainFull() {
-    return SessionMapper.courseWithSessionToDomain(
-      this.courseWithSessionFullRow,
-    );
+    return SessionMapper.courseWithSessionToDomain(this.courseWithSessionFullRow);
   }
 
   whenCourseWithSessionToDomainSparse() {
-    return SessionMapper.courseWithSessionToDomain(
-      this.courseWithSessionSparseRow,
-    );
+    return SessionMapper.courseWithSessionToDomain(this.courseWithSessionSparseRow);
   }
 
   thenReturnsExpectedSession(result: unknown) {
@@ -177,9 +173,7 @@ class Fixtures {
     expect(result).toEqual(this.expectedCourseWithSession);
   }
 
-  thenMatchesCourseWithSessionFallbacks(
-    result: ReturnType<typeof SessionMapper.courseWithSessionToDomain>,
-  ) {
+  thenMatchesCourseWithSessionFallbacks(result: ReturnType<typeof SessionMapper.courseWithSessionToDomain>) {
     expect(result.session.id).toBe('');
     expect(result.session.teacherId).toBe('');
     expect(result.session.language).toBe('francais');

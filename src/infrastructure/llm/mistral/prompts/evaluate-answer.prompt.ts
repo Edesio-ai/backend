@@ -81,9 +81,7 @@ export const getEvaluateAnswerSystemPrompt = (): string => {
   }`;
 };
 
-export const getEvaluateAnswerUserPrompt = (
-  body: EvaluateAnswerBody,
-): string => {
+export const getEvaluateAnswerUserPrompt = (body: EvaluateAnswerBody): string => {
   const { questionText, correctAnswer, explanation, answer } = body;
   return `
         QUESTION: ${questionText}

@@ -1,7 +1,5 @@
-import {
-  EvaluateAnswerUseCase,
-  EvaluateAnswerBody,
-} from './evaluate-answer.use-case';
+import type { ILlmProvider } from 'src/domain/llm/contracts/I-llm.provider';
+import { EvaluateAnswerUseCase, EvaluateAnswerBody } from './evaluate-answer.use-case';
 import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
 
 describe('EvaluateAnswerUseCase', () => {
@@ -20,16 +18,12 @@ describe('EvaluateAnswerUseCase', () => {
 
       expect(result.score).toBe(0);
       expect(result.isCheating).toBe(true);
-      expect(result.feedback).toBe(
-        "Bien essayé ! Mais ce n'est pas en trichant que tu vas progresser.",
-      );
+      expect(result.feedback).toBe("Bien essayé ! Mais ce n'est pas en trichant que tu vas progresser.");
       expect(result.concepts).toEqual([]);
       expect(result.missingElements).toEqual([]);
       expect(result.suggestedAction).toBeNull();
       expect(result.actionPrompt).toBeNull();
-      expect(
-        fixtures.openaiRepositoryMock.evaluateAnswer,
-      ).not.toHaveBeenCalled();
+      expect(fixtures.openaiRepositoryMock.evaluateAnswer).not.toHaveBeenCalled();
     });
 
     it('should detect cheating when answers differ only in case', async () => {
@@ -41,9 +35,7 @@ describe('EvaluateAnswerUseCase', () => {
 
       expect(result.isCheating).toBe(true);
       expect(result.score).toBe(0);
-      expect(
-        fixtures.openaiRepositoryMock.evaluateAnswer,
-      ).not.toHaveBeenCalled();
+      expect(fixtures.openaiRepositoryMock.evaluateAnswer).not.toHaveBeenCalled();
     });
 
     it('should detect cheating when answers differ only in accents', async () => {
@@ -55,9 +47,7 @@ describe('EvaluateAnswerUseCase', () => {
 
       expect(result.isCheating).toBe(true);
       expect(result.score).toBe(0);
-      expect(
-        fixtures.openaiRepositoryMock.evaluateAnswer,
-      ).not.toHaveBeenCalled();
+      expect(fixtures.openaiRepositoryMock.evaluateAnswer).not.toHaveBeenCalled();
     });
 
     it('should detect cheating when answers differ only in punctuation', async () => {
@@ -69,9 +59,7 @@ describe('EvaluateAnswerUseCase', () => {
 
       expect(result.isCheating).toBe(true);
       expect(result.score).toBe(0);
-      expect(
-        fixtures.openaiRepositoryMock.evaluateAnswer,
-      ).not.toHaveBeenCalled();
+      expect(fixtures.openaiRepositoryMock.evaluateAnswer).not.toHaveBeenCalled();
     });
 
     it('should detect cheating when answers differ only in extra whitespace', async () => {
@@ -83,9 +71,7 @@ describe('EvaluateAnswerUseCase', () => {
 
       expect(result.isCheating).toBe(true);
       expect(result.score).toBe(0);
-      expect(
-        fixtures.openaiRepositoryMock.evaluateAnswer,
-      ).not.toHaveBeenCalled();
+      expect(fixtures.openaiRepositoryMock.evaluateAnswer).not.toHaveBeenCalled();
     });
   });
 
@@ -98,12 +84,10 @@ describe('EvaluateAnswerUseCase', () => {
         answer: 'Une réponse différente',
       });
 
-      expect(fixtures.openaiRepositoryMock.evaluateAnswer).toHaveBeenCalledWith(
-        {
-          ...fixtures.body,
-          answer: 'Une réponse différente',
-        },
-      );
+      expect(fixtures.openaiRepositoryMock.evaluateAnswer).toHaveBeenCalledWith({
+        ...fixtures.body,
+        answer: 'Une réponse différente',
+      });
       expect(result).toEqual(fixtures.openaiEvaluationResult);
     });
 
@@ -124,9 +108,9 @@ describe('EvaluateAnswerUseCase', () => {
     it('should propagate errors thrown by OpenAI', async () => {
       fixtures.whenOpenAiThrows(new Error('OpenAI failure'));
 
-      await expect(
-        fixtures.whenExecute({ ...fixtures.body, answer: 'Mauvaise réponse' }),
-      ).rejects.toThrow('OpenAI failure');
+      await expect(fixtures.whenExecute({ ...fixtures.body, answer: 'Mauvaise réponse' })).rejects.toThrow(
+        'OpenAI failure',
+      );
     });
   });
 });
@@ -134,8 +118,7 @@ describe('EvaluateAnswerUseCase', () => {
 class Fixtures {
   public readonly body: EvaluateAnswerBody = {
     questionText: 'Quelles sont les causes de la Révolution française ?',
-    correctAnswer:
-      'Crise financière, inégalités sociales, influence des Lumières',
+    correctAnswer: 'Crise financière, inégalités sociales, influence des Lumières',
     answer: 'Crise financière, inégalités sociales, influence des Lumières',
     explanation: 'La Révolution française a été causée par plusieurs facteurs.',
   };
@@ -157,7 +140,7 @@ class Fixtures {
   public readonly useCase: EvaluateAnswerUseCase;
 
   constructor() {
-    this.useCase = new EvaluateAnswerUseCase(this.openaiRepositoryMock as any);
+    this.useCase = new EvaluateAnswerUseCase(this.openaiRepositoryMock as unknown as ILlmProvider);
   }
 
   whenExecute(body: EvaluateAnswerBody = this.body) {
@@ -165,9 +148,7 @@ class Fixtures {
   }
 
   whenOpenAiReturnsEvaluation() {
-    this.openaiRepositoryMock.evaluateAnswer.mockResolvedValue(
-      this.openaiEvaluationResult,
-    );
+    this.openaiRepositoryMock.evaluateAnswer.mockResolvedValue(this.openaiEvaluationResult);
   }
 
   whenOpenAiThrows(error: Error) {

@@ -7,10 +7,7 @@ import {
   STUDENT_REPOSITORY,
   type IStudentRepository,
 } from 'src/domain/teaching/student/contracts/I-student.repository';
-import {
-  BadRequestError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { BadRequestError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
@@ -37,21 +34,13 @@ export class JoinSessionByCodeUseCase {
       throw new NotFoundError();
     }
 
-    const studentSessions =
-      await this.studentSessionRepository.listSessionsEnrolledByStudent(
-        student.id,
-      );
+    const studentSessions = await this.studentSessionRepository.listSessionsEnrolledByStudent(student.id);
 
-    const existingSession = studentSessions.find(
-      (studentSession) => studentSession.id === session.id,
-    );
+    const existingSession = studentSessions.find((studentSession) => studentSession.id === session.id);
     if (existingSession) {
       throw new BadRequestError('Student already joined this session');
     }
 
-    await this.studentSessionRepository.createStudentSession(
-      student.id,
-      session.id,
-    );
+    await this.studentSessionRepository.createStudentSession(student.id, session.id);
   }
 }

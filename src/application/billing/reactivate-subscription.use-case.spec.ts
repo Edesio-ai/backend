@@ -38,9 +38,7 @@ class Fixtures {
   constructor() {
     this.stripeRepository = createMockStripeProvider();
 
-    this.reactivateSubscriptionUseCase = new ReactivateSubscriptionUseCase(
-      this.stripeRepository,
-    );
+    this.reactivateSubscriptionUseCase = new ReactivateSubscriptionUseCase(this.stripeRepository);
 
     this.user = {
       id: 'u-1',
@@ -61,18 +59,12 @@ class Fixtures {
   }
 
   whenStripeReactivateThrows() {
-    this.stripeRepository.reactivateSubscription.mockRejectedValue(
-      this.stripeError,
-    );
+    this.stripeRepository.reactivateSubscription.mockRejectedValue(this.stripeError);
   }
 
   thenReactivateSubscriptionCalledWith(email: string) {
-    expect(this.stripeRepository.reactivateSubscription).toHaveBeenCalledWith(
-      email,
-    );
-    expect(this.stripeRepository.reactivateSubscription).toHaveBeenCalledTimes(
-      1,
-    );
+    expect(this.stripeRepository.reactivateSubscription).toHaveBeenCalledWith(email);
+    expect(this.stripeRepository.reactivateSubscription).toHaveBeenCalledTimes(1);
   }
 
   async thenThrowStripeError(promise: Promise<unknown>) {

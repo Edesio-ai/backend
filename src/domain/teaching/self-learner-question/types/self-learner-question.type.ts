@@ -20,21 +20,9 @@ export type SelfLearnerQuestionSupabase = {
   created_at: Date;
 };
 
-export type SelfLearnerQuestionInsert = Omit<
-  SelfLearnerQuestion,
-  'id' | 'createdAt'
->;
+export type SelfLearnerQuestionInsert = Omit<SelfLearnerQuestion, 'id' | 'createdAt'>;
 
-export type SelfLearnerQuestionInsertSupabase = Omit<
-  SelfLearnerQuestionSupabase,
-  'id' | 'created_at'
->;
+export type SelfLearnerQuestionInsertSupabase = Omit<SelfLearnerQuestionSupabase, 'id' | 'created_at'>;
 
-export type UpdateSelfLearnerQuestionPayload = Pick<
-  SelfLearnerQuestion,
-  'questionText' | 'correctAnswers'
->;
-export type SelfLearnerQuestionUpdateSupabase = Pick<
-  SelfLearnerQuestionSupabase,
-  'question_text' | 'correct_answers'
->;
+export type UpdateSelfLearnerQuestionPayload = Pick<SelfLearnerQuestion, 'questionText' | 'correctAnswers'>;
+export type SelfLearnerQuestionUpdateSupabase = Pick<SelfLearnerQuestionSupabase, 'question_text' | 'correct_answers'>;

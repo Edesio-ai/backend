@@ -1,8 +1,6 @@
 import { ProfesseurInvitationTemplateData } from './professeur-invitation-email.types';
 
-export function renderProfesseurInvitationEmailHtml(
-  data: ProfesseurInvitationTemplateData,
-): string {
+export function renderProfesseurInvitationEmailHtml(data: ProfesseurInvitationTemplateData): string {
   const chatbotsText =
     data.availableChatbots > 0
       ? `<p style="color: #d97706; font-size: 14px; margin: 16px 0; padding: 12px; background-color: #fef3c7; border-radius: 8px;">

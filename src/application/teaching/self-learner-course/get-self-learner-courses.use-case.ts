@@ -19,16 +19,12 @@ export class GetSelfLearnerCoursesUseCase {
   ) {}
 
   async execute(user: AuthUser): Promise<SelfLearnerCourse[]> {
-    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(
-      user.id,
-    );
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(user.id);
     if (!selfLearner) {
       console.error(`Self learner not found for user ${user.id}`);
       throw new NotFoundException('Self learner not found');
     }
 
-    return await this.selfLearnerCourseRepository.getSelfLearnerCourses(
-      selfLearner.id,
-    );
+    return await this.selfLearnerCourseRepository.getSelfLearnerCourses(selfLearner.id);
   }
 }

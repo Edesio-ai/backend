@@ -1,7 +1,4 @@
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import type { SelfLearnerQuestion } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
 import type { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-learner-course/contracts/i-self-learner-course.repository';
 import type { ISelfLearnerQuestionRepository } from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
@@ -23,9 +20,7 @@ describe('GetSelfLearnerQuestionsUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(fixtures.questionRepo.getSelfLearnerQuestions).toHaveBeenCalledWith(
-      fixtures.courseId,
-    );
+    expect(fixtures.questionRepo.getSelfLearnerQuestions).toHaveBeenCalledWith(fixtures.courseId);
     expect(result).toEqual(fixtures.questions);
   });
 
@@ -33,9 +28,7 @@ describe('GetSelfLearnerQuestionsUseCase', () => {
     fixtures.selfLearnerRepo.getSelfLearnerByUserId.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionRepo.getSelfLearnerQuestions,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepo.getSelfLearnerQuestions).not.toHaveBeenCalled();
   });
 
   it('throws NotFoundError when course missing', async () => {
@@ -43,9 +36,7 @@ describe('GetSelfLearnerQuestionsUseCase', () => {
     fixtures.courseRepo.getSelfLearnerCourseById.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionRepo.getSelfLearnerQuestions,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepo.getSelfLearnerQuestions).not.toHaveBeenCalled();
   });
 
   it('throws ForbiddenError when course belongs to someone else', async () => {
@@ -56,9 +47,7 @@ describe('GetSelfLearnerQuestionsUseCase', () => {
     });
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
-    expect(
-      fixtures.questionRepo.getSelfLearnerQuestions,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepo.getSelfLearnerQuestions).not.toHaveBeenCalled();
   });
 
   it('propagates errors from question repository', async () => {
@@ -115,11 +104,7 @@ class Fixtures {
     this.questionRepo = createMockSelfLearnerQuestionRepository();
     this.selfLearnerRepo = createMockSelfLearnerRepository();
 
-    this.useCase = new GetSelfLearnerQuestionsUseCase(
-      this.courseRepo,
-      this.questionRepo,
-      this.selfLearnerRepo,
-    );
+    this.useCase = new GetSelfLearnerQuestionsUseCase(this.courseRepo, this.questionRepo, this.selfLearnerRepo);
 
     this.questionRepo.getSelfLearnerQuestions.mockResolvedValue(this.questions);
   }

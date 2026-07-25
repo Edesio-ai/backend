@@ -1,9 +1,5 @@
-import {
-  BadRequestError,
-  NotFoundError,
-  ServerError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
+import { AuthUser } from 'src/domain/auth/types/auth.type';
+import { BadRequestError, NotFoundError, ServerError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
 import type { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 import type { ILlmProvider } from 'src/domain/llm/contracts/I-llm.provider';
 import type { IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
@@ -32,9 +28,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
     fixtures.whenNoFiles();
     fixtures.whenNoExistingQuestions();
     fixtures.whenOpenAiGenerates([fixtures.generatedSingle]);
-    fixtures.questionRepo.createSelfLearnerQuestion.mockResolvedValue(
-      fixtures.createdQuestion,
-    );
+    fixtures.questionRepo.createSelfLearnerQuestion.mockResolvedValue(fixtures.createdQuestion);
 
     const result = await fixtures.whenExecute('single');
 
@@ -48,9 +42,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
       }),
       [],
     );
-    expect(
-      fixtures.questionRepo.createSelfLearnerQuestion,
-    ).toHaveBeenCalledWith(
+    expect(fixtures.questionRepo.createSelfLearnerQuestion).toHaveBeenCalledWith(
       expect.objectContaining({
         courseId: fixtures.courseId,
         type: 'single',
@@ -64,9 +56,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
     fixtures.whenNoFiles();
     fixtures.whenNoExistingQuestions();
     fixtures.whenOpenAiGenerates([fixtures.generatedOpen]);
-    fixtures.questionRepo.createSelfLearnerQuestion.mockResolvedValue(
-      fixtures.createdQuestion,
-    );
+    fixtures.questionRepo.createSelfLearnerQuestion.mockResolvedValue(fixtures.createdQuestion);
 
     await fixtures.whenExecute('open');
 
@@ -84,33 +74,23 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
       { ...fixtures.createdQuestion, questionText: 'Question déjà posée' },
     ]);
     fixtures.whenOpenAiGenerates([fixtures.generatedSingle]);
-    fixtures.questionRepo.createSelfLearnerQuestion.mockResolvedValue(
-      fixtures.createdQuestion,
-    );
+    fixtures.questionRepo.createSelfLearnerQuestion.mockResolvedValue(fixtures.createdQuestion);
 
     await fixtures.whenExecute('single');
 
-    expect(fixtures.mistralRepo.generateQuestions).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(Object),
-      ['Question déjà posée'],
-    );
+    expect(fixtures.mistralRepo.generateQuestions).toHaveBeenCalledWith(expect.any(String), expect.any(Object), [
+      'Question déjà posée',
+    ]);
   });
 
   it('appends PDF content to course text when files are present', async () => {
     fixtures.whenOwnershipOk();
     fixtures.whenNoExistingQuestions();
-    fixtures.selfLearnerCourseFileRepo.getSelfLearnerCourseFiles.mockResolvedValue(
-      [fixtures.courseFile],
-    );
-    fixtures.courseFileRepo.getFileBufferFromStorage.mockResolvedValue(
-      Buffer.from('pdf-data'),
-    );
+    fixtures.selfLearnerCourseFileRepo.getSelfLearnerCourseFiles.mockResolvedValue([fixtures.courseFile]);
+    fixtures.courseFileRepo.getFileBufferFromStorage.mockResolvedValue(Buffer.from('pdf-data'));
     fixtures.pdfExtractor.extractTextFromPdf.mockResolvedValue('Texte PDF');
     fixtures.whenOpenAiGenerates([fixtures.generatedSingle]);
-    fixtures.questionRepo.createSelfLearnerQuestion.mockResolvedValue(
-      fixtures.createdQuestion,
-    );
+    fixtures.questionRepo.createSelfLearnerQuestion.mockResolvedValue(fixtures.createdQuestion);
 
     await fixtures.whenExecute('single');
 
@@ -124,20 +104,12 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
   it('continues without PDF text when PDF extraction fails', async () => {
     fixtures.whenOwnershipOk();
     fixtures.whenNoExistingQuestions();
-    fixtures.selfLearnerCourseFileRepo.getSelfLearnerCourseFiles.mockResolvedValue(
-      [fixtures.courseFile],
-    );
-    fixtures.courseFileRepo.getFileBufferFromStorage.mockRejectedValue(
-      new Error('storage down'),
-    );
+    fixtures.selfLearnerCourseFileRepo.getSelfLearnerCourseFiles.mockResolvedValue([fixtures.courseFile]);
+    fixtures.courseFileRepo.getFileBufferFromStorage.mockRejectedValue(new Error('storage down'));
     fixtures.whenOpenAiGenerates([fixtures.generatedSingle]);
-    fixtures.questionRepo.createSelfLearnerQuestion.mockResolvedValue(
-      fixtures.createdQuestion,
-    );
+    fixtures.questionRepo.createSelfLearnerQuestion.mockResolvedValue(fixtures.createdQuestion);
 
-    await expect(fixtures.whenExecute('single')).resolves.toEqual(
-      fixtures.createdQuestion,
-    );
+    await expect(fixtures.whenExecute('single')).resolves.toEqual(fixtures.createdQuestion);
   });
 
   it('throws BadRequestError when course has no text content and no files', async () => {
@@ -145,12 +117,8 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
     fixtures.whenNoFiles();
     fixtures.whenNoExistingQuestions();
 
-    await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(
-      BadRequestError,
-    );
-    expect(
-      fixtures.questionRepo.createSelfLearnerQuestion,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(BadRequestError);
+    expect(fixtures.questionRepo.createSelfLearnerQuestion).not.toHaveBeenCalled();
   });
 
   it('throws ServerError when OpenAI returns empty array', async () => {
@@ -159,20 +127,14 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
     fixtures.whenNoExistingQuestions();
     fixtures.whenOpenAiGenerates([]);
 
-    await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(
-      ServerError,
-    );
-    expect(
-      fixtures.questionRepo.createSelfLearnerQuestion,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(ServerError);
+    expect(fixtures.questionRepo.createSelfLearnerQuestion).not.toHaveBeenCalled();
   });
 
   it('throws NotFoundError when self learner is missing', async () => {
     fixtures.selfLearnerRepo.getSelfLearnerByUserId.mockResolvedValue(null);
 
-    await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(NotFoundError);
     expect(fixtures.mistralRepo.generateQuestions).not.toHaveBeenCalled();
   });
 
@@ -180,9 +142,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
     fixtures.whenLearnerExists();
     fixtures.courseRepo.getSelfLearnerCourseById.mockResolvedValue(null);
 
-    await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(
-      NotFoundError,
-    );
+    await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(NotFoundError);
     expect(fixtures.mistralRepo.generateQuestions).not.toHaveBeenCalled();
   });
 
@@ -193,9 +153,7 @@ describe('GenerateSelfLearnerQuestionUseCase', () => {
       selfLearnerId: 'other-sl',
     });
 
-    await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(
-      UnauthorizedError,
-    );
+    await expect(fixtures.whenExecute('single')).rejects.toBeInstanceOf(UnauthorizedError);
     expect(fixtures.mistralRepo.generateQuestions).not.toHaveBeenCalled();
   });
 });
@@ -204,7 +162,7 @@ class Fixtures {
   public readonly userId = 'auth-gen-sl-q';
   public readonly courseId = 'sl-course-gen';
 
-  public readonly user = {
+  public readonly user: AuthUser = {
     id: this.userId,
     email: 'u@test.com',
     metadata: { role: 'self-learner' },
@@ -278,8 +236,7 @@ class Fixtures {
   constructor() {
     this.selfLearnerRepo = createMockSelfLearnerRepository();
     this.courseRepo = createMockSelfLearnerCourseRepository();
-    this.selfLearnerCourseFileRepo =
-      createMockSelfLearnerCourseFileRepository();
+    this.selfLearnerCourseFileRepo = createMockSelfLearnerCourseFileRepository();
     this.courseFileRepo = createMockCourseFileRepository();
     this.pdfExtractor = {
       extractTextFromPdf: jest.fn(),
@@ -305,7 +262,7 @@ class Fixtures {
   }
 
   whenExecute(type: 'single' | 'open' | 'multiple') {
-    return this.useCase.execute(this.user as any, type, this.courseId);
+    return this.useCase.execute(this.user, type, this.courseId);
   }
 
   whenLearnerExists() {
@@ -321,9 +278,7 @@ class Fixtures {
   }
 
   whenNoFiles() {
-    this.selfLearnerCourseFileRepo.getSelfLearnerCourseFiles.mockResolvedValue(
-      [],
-    );
+    this.selfLearnerCourseFileRepo.getSelfLearnerCourseFiles.mockResolvedValue([]);
   }
 
   whenNoExistingQuestions() {

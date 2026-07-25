@@ -1,14 +1,10 @@
-import {
-  getEvaluateAnswerSystemPrompt,
-  getEvaluateAnswerUserPrompt,
-} from './evaluate-answer.prompt';
+import { getEvaluateAnswerSystemPrompt, getEvaluateAnswerUserPrompt } from './evaluate-answer.prompt';
 import { EvaluateAnswerBody } from 'src/application/llm/evaluate-answer.use-case';
 
 describe('evaluate-answer.prompt', () => {
   const body: EvaluateAnswerBody = {
     questionText: 'Quelles sont les causes de la Révolution française ?',
-    correctAnswer:
-      'Crise financière, inégalités sociales, influence des Lumières',
+    correctAnswer: 'Crise financière, inégalités sociales, influence des Lumières',
     answer: "L'argent et les inégalités",
     explanation: 'La Révolution française a été causée par plusieurs facteurs.',
   };

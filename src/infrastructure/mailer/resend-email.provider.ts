@@ -40,26 +40,18 @@ export class ResendEmailProvider implements IEmailProvider {
       });
 
       if (error) {
-        throw new ServerError(
-          `Error sending professeur invitation email: ${error.message}`,
-        );
+        throw new ServerError(`Error sending professeur invitation email: ${error.message}`);
       }
     } catch (err) {
       if (err instanceof ServerError) {
         throw err;
       }
       const message = err instanceof Error ? err.message : String(err);
-      throw new ServerError(
-        `Error sending professeur invitation email: ${message}`,
-      );
+      throw new ServerError(`Error sending professeur invitation email: ${message}`);
     }
   }
 
-  public async sendWelcomeEmail(
-    email: string,
-    name: string,
-    role: string,
-  ): Promise<void> {
+  public async sendWelcomeEmail(email: string, name: string, role: string): Promise<void> {
     const appUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
 
     const templateData = buildWelcomeEmailTemplateData({
@@ -89,9 +81,7 @@ export class ResendEmailProvider implements IEmailProvider {
       throw new ServerError(`Error sending welcome email: ${message}`);
     }
   }
-  public async sendCancelSubscriptionEmail(
-    params: CancelSubscriptionEmailParams,
-  ): Promise<void> {
+  public async sendCancelSubscriptionEmail(params: CancelSubscriptionEmailParams): Promise<void> {
     const { email } = params;
     const html = renderCancelSubscriptionEmailHtml(params);
 
@@ -103,9 +93,7 @@ export class ResendEmailProvider implements IEmailProvider {
     });
 
     if (error) {
-      throw new ServerError(
-        `Error sending cancellation email: ${error.message}`,
-      );
+      throw new ServerError(`Error sending cancellation email: ${error.message}`);
     }
   }
 }

@@ -55,9 +55,7 @@ class Fixtures {
       updateTokenUsedAt: jest.fn(),
     };
 
-    this.getInvitationTokenUseCase = new GetInvitationTokenUseCase(
-      this.invitationTokenRepository,
-    );
+    this.getInvitationTokenUseCase = new GetInvitationTokenUseCase(this.invitationTokenRepository);
 
     this.establishmentId = 'est-1';
     this.invitationTokens = [
@@ -81,15 +79,11 @@ class Fixtures {
   }
 
   whenRepositoryReturnsInvitationTokens() {
-    this.invitationTokenRepository.getInvitationTokenByEstablishmentId.mockResolvedValue(
-      this.invitationTokens,
-    );
+    this.invitationTokenRepository.getInvitationTokenByEstablishmentId.mockResolvedValue(this.invitationTokens);
   }
 
   whenRepositoryThrowsError() {
-    this.invitationTokenRepository.getInvitationTokenByEstablishmentId.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.invitationTokenRepository.getInvitationTokenByEstablishmentId.mockRejectedValue(this.repositoryError);
   }
 
   async thenThrowNotFoundForEmptyEstablishmentId(promise: Promise<unknown>) {
@@ -101,18 +95,14 @@ class Fixtures {
   }
 
   thenRepositoryCalledWithEstablishmentId() {
-    expect(
-      this.invitationTokenRepository.getInvitationTokenByEstablishmentId,
-    ).toHaveBeenCalledWith(this.establishmentId);
-    expect(
-      this.invitationTokenRepository.getInvitationTokenByEstablishmentId,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.invitationTokenRepository.getInvitationTokenByEstablishmentId).toHaveBeenCalledWith(
+      this.establishmentId,
+    );
+    expect(this.invitationTokenRepository.getInvitationTokenByEstablishmentId).toHaveBeenCalledTimes(1);
   }
 
   thenRepositoryNotCalled() {
-    expect(
-      this.invitationTokenRepository.getInvitationTokenByEstablishmentId,
-    ).not.toHaveBeenCalled();
+    expect(this.invitationTokenRepository.getInvitationTokenByEstablishmentId).not.toHaveBeenCalled();
   }
 
   thenReturnExpectedInvitationTokens(result: InvitationToken[]) {

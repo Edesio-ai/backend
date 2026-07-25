@@ -24,16 +24,7 @@ export type SupabaseSuggestion = {
 };
 
 export type SuggestionLikesCount = Pick<Suggestion, 'id' | 'likesCount'>;
-export type SupabaseSuggestionLikesCount = Pick<
-  SupabaseSuggestion,
-  'id' | 'likes_count'
->;
+export type SupabaseSuggestionLikesCount = Pick<SupabaseSuggestion, 'id' | 'likes_count'>;
 export type SupabaseCountLike = Pick<SupabaseSuggestion, 'likes_count'>;
-export type SuggestionToInsert = Omit<
-  Suggestion,
-  'id' | 'createdAt' | 'userHasLiked'
->;
-export type SupabaseSuggestionToInsert = Omit<
-  SupabaseSuggestion,
-  'id' | 'created_at'
->;
+export type SuggestionToInsert = Omit<Suggestion, 'id' | 'createdAt' | 'userHasLiked'>;
+export type SupabaseSuggestionToInsert = Omit<SupabaseSuggestion, 'id' | 'created_at'>;

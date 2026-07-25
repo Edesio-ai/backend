@@ -29,7 +29,7 @@ describe('RegisterBody', () => {
   });
 
   it('rejects unsupported role values', async () => {
-    const dto = Object.assign(valid(), { role: 'admin' as any });
+    const dto = Object.assign(valid(), { role: 'admin' as never });
 
     const errors = await validate(dto);
 

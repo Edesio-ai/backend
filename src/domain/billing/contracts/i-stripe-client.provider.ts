@@ -3,21 +3,24 @@ import {
   StripeSession,
   StripeSubscription,
   CancelSubscription,
+  StripeCustomer,
+  StripeSubscriptionsLookup,
+  CheckoutSessionCreateResult,
 } from 'src/domain/billing/types/billing.type';
 
 export const STRIPE_PROVIDER = Symbol('STRIPE_PROVIDER');
 
 export interface IStripeProvider {
   getUserSubscription(email: string): Promise<StripeSubscription | null>;
-  getCustomerByEmail(email: string): Promise<any>;
+  getCustomerByEmail(email: string): Promise<StripeCustomer[]>;
   getCheckoutSessionByUserId(userId: string): Promise<string | null>;
-  getSubscriptionsByCustomerId(customerId: string): Promise<any>;
+  getSubscriptionsByCustomerId(customerId: string): Promise<StripeSubscriptionsLookup>;
   createCheckoutSession(
     user: User,
     priceId: string,
     planType: string,
     locale?: 'en' | 'fr',
-  ): Promise<any>;
+  ): Promise<CheckoutSessionCreateResult>;
   getCheckoutSession(sessionId: string): Promise<StripeSession>;
   cancelSubscription(user: User): Promise<CancelSubscription>;
   reactivateSubscription(email: string): Promise<void>;

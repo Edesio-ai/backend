@@ -11,9 +11,7 @@ export class EmailController {
 
   @Roles('establishment')
   @Post('send-invitation')
-  async sendInvitation(
-    @Body() body: SendInvitationBodyDto,
-  ): Promise<{ success: boolean }> {
+  async sendInvitation(@Body() body: SendInvitationBodyDto): Promise<{ success: boolean }> {
     await this.sendInvitationUseCase.execute(body);
     return { success: true };
   }

@@ -33,41 +33,30 @@ describe('DeleteCourseQuestionUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
-      fixtures.teacherUser.id,
+    expect(fixtures.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(fixtures.teacherUser.id);
+    expect(fixtures.courseQuestionRepository.getCourseQuestionByCourseId).toHaveBeenCalledWith(
+      fixtures.courseQuestionId,
     );
-    expect(
-      fixtures.courseQuestionRepository.getCourseQuestionByCourseId,
-    ).toHaveBeenCalledWith(fixtures.courseQuestionId);
-    expect(
-      fixtures.courseRepository.getCourseWithSessionById,
-    ).toHaveBeenCalledWith(fixtures.courseId, DELETE_COURSE_QUESTION_SELECT);
-    expect(
-      fixtures.courseQuestionRepository.deleteCourseQuestionById,
-    ).toHaveBeenCalledWith(fixtures.courseQuestionId);
+    expect(fixtures.courseRepository.getCourseWithSessionById).toHaveBeenCalledWith(
+      fixtures.courseId,
+      DELETE_COURSE_QUESTION_SELECT,
+    );
+    expect(fixtures.courseQuestionRepository.deleteCourseQuestionById).toHaveBeenCalledWith(fixtures.courseQuestionId);
   });
 
   it('should throw NotFoundException when teacher is missing', async () => {
     fixtures.whenTeacherNotFound();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
-    expect(
-      fixtures.courseQuestionRepository.getCourseQuestionByCourseId,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundException);
+    expect(fixtures.courseQuestionRepository.getCourseQuestionByCourseId).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundException when course question is missing', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseQuestionNotFound();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
-    expect(
-      fixtures.courseRepository.getCourseWithSessionById,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundException);
+    expect(fixtures.courseRepository.getCourseWithSessionById).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundException when course with session is missing', async () => {
@@ -75,12 +64,8 @@ describe('DeleteCourseQuestionUseCase', () => {
     fixtures.whenCourseQuestionFound();
     fixtures.whenCourseWithSessionMissing();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
-    expect(
-      fixtures.courseQuestionRepository.deleteCourseQuestionById,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundException);
+    expect(fixtures.courseQuestionRepository.deleteCourseQuestionById).not.toHaveBeenCalled();
   });
 
   it('should throw ForbiddenException when teacher does not own the session', async () => {
@@ -88,12 +73,8 @@ describe('DeleteCourseQuestionUseCase', () => {
     fixtures.whenCourseQuestionFound();
     fixtures.whenCourseWithSessionWrongTeacher();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      ForbiddenException,
-    );
-    expect(
-      fixtures.courseQuestionRepository.deleteCourseQuestionById,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenException);
+    expect(fixtures.courseQuestionRepository.deleteCourseQuestionById).not.toHaveBeenCalled();
   });
 
   it('should propagate errors from deleteCourseQuestionById', async () => {
@@ -102,9 +83,7 @@ describe('DeleteCourseQuestionUseCase', () => {
     fixtures.whenCourseWithSessionReturned();
     fixtures.whenDeleteByIdFails();
 
-    await expect(fixtures.whenExecute()).rejects.toBe(
-      fixtures.deleteCourseQuestionError,
-    );
+    await expect(fixtures.whenExecute()).rejects.toBe(fixtures.deleteCourseQuestionError);
   });
 });
 
@@ -145,9 +124,7 @@ class Fixtures {
     teachers: { id: this.teacher.id },
   };
 
-  public readonly deleteCourseQuestionError = new Error(
-    'delete_course_question failed',
-  );
+  public readonly deleteCourseQuestionError = new Error('delete_course_question failed');
 
   public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly courseQuestionRepository: jest.Mocked<ICourseQuestionRepository>;
@@ -179,27 +156,19 @@ class Fixtures {
   }
 
   whenCourseQuestionFound() {
-    this.courseQuestionRepository.getCourseQuestionByCourseId.mockResolvedValue(
-      this.courseQuestion,
-    );
+    this.courseQuestionRepository.getCourseQuestionByCourseId.mockResolvedValue(this.courseQuestion);
   }
 
   whenCourseQuestionNotFound() {
-    this.courseQuestionRepository.getCourseQuestionByCourseId.mockResolvedValue(
-      null,
-    );
+    this.courseQuestionRepository.getCourseQuestionByCourseId.mockResolvedValue(null);
   }
 
   whenCourseWithSessionReturned() {
-    this.courseRepository.getCourseWithSessionById.mockResolvedValue(
-      this.courseWithSession,
-    );
+    this.courseRepository.getCourseWithSessionById.mockResolvedValue(this.courseWithSession);
   }
 
   whenCourseWithSessionMissing() {
-    this.courseRepository.getCourseWithSessionById.mockResolvedValue(
-      null as unknown as CourseWithSession,
-    );
+    this.courseRepository.getCourseWithSessionById.mockResolvedValue(null as unknown as CourseWithSession);
   }
 
   whenCourseWithSessionWrongTeacher() {
@@ -215,8 +184,6 @@ class Fixtures {
   }
 
   whenDeleteByIdFails() {
-    this.courseQuestionRepository.deleteCourseQuestionById.mockRejectedValue(
-      this.deleteCourseQuestionError,
-    );
+    this.courseQuestionRepository.deleteCourseQuestionById.mockRejectedValue(this.deleteCourseQuestionError);
   }
 }

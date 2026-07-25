@@ -18,22 +18,10 @@ export type SupabaseCourseQuestion = {
   answered_at: string;
 };
 
-export type CourseQuestionToInsert = Pick<
-  CourseQuestion,
-  'courseId' | 'studentId' | 'questionText'
->;
+export type CourseQuestionToInsert = Pick<CourseQuestion, 'courseId' | 'studentId' | 'questionText'>;
 
-export type SupabaseCourseQuestionToInsert = Pick<
-  SupabaseCourseQuestion,
-  'course_id' | 'student_id' | 'question_text'
->;
+export type SupabaseCourseQuestionToInsert = Pick<SupabaseCourseQuestion, 'course_id' | 'student_id' | 'question_text'>;
 
-export type CourseQuestionAnswer = Pick<
-  CourseQuestion,
-  'answer' | 'answeredAt'
->;
+export type CourseQuestionAnswer = Pick<CourseQuestion, 'answer' | 'answeredAt'>;
 
-export type SupabaseCourseQuestionAnswer = Pick<
-  SupabaseCourseQuestion,
-  'answer' | 'answered_at'
->;
+export type SupabaseCourseQuestionAnswer = Pick<SupabaseCourseQuestion, 'answer' | 'answered_at'>;

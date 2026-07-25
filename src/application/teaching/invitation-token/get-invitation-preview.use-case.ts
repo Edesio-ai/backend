@@ -19,8 +19,7 @@ export class GetInvitationPreviewUseCase {
       throw new NotFoundError('Invitation token not found');
     }
 
-    const invitationTokenPreview =
-      await this.invitationTokenRepository.getInvitationPreview(token);
+    const invitationTokenPreview = await this.invitationTokenRepository.getInvitationPreview(token);
     return invitationTokenPreview;
   }
 }

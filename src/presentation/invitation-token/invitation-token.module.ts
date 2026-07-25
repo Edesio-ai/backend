@@ -10,11 +10,7 @@ import { GetInvitationPreviewUseCase } from 'src/application/teaching/invitation
 import { CreateInvitationTokenUseCase } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
 
 @Module({
-  imports: [
-    AuthPersistenceModule,
-    InvitationTokenPersistenceModule,
-    TeacherPersistenceModule,
-  ],
+  imports: [AuthPersistenceModule, InvitationTokenPersistenceModule, TeacherPersistenceModule],
   controllers: [InvitationTokenController],
   providers: [
     GetInvitationTokenUseCase,

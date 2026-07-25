@@ -26,13 +26,9 @@ describe('StudentSessionMapper', () => {
 
   describe('mapEnrollmentRowsWithEmbeddedSessions', () => {
     it('maps a row with a single embedded session object', () => {
-      const rows: SupabaseStudentJoinedSession[] = [
-        { joined_at: '2026-01-15T10:00:00.000Z', sessions: sessionA },
-      ];
+      const rows: SupabaseStudentJoinedSession[] = [{ joined_at: '2026-01-15T10:00:00.000Z', sessions: sessionA }];
 
-      expect(
-        StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(rows),
-      ).toEqual([
+      expect(StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(rows)).toEqual([
         {
           id: 'session-1',
           teacherId: 'teacher-1',
@@ -46,9 +42,7 @@ describe('StudentSessionMapper', () => {
     });
 
     it('returns an empty array for empty input', () => {
-      expect(
-        StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions([]),
-      ).toEqual([]);
+      expect(StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions([])).toEqual([]);
     });
 
     it('maps multiple rows preserving order', () => {
@@ -57,8 +51,7 @@ describe('StudentSessionMapper', () => {
         { joined_at: '2026-01-15T10:00:00.000Z', sessions: sessionA },
       ];
 
-      const result =
-        StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(rows);
+      const result = StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(rows);
 
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe('session-2');
@@ -74,13 +67,10 @@ describe('StudentSessionMapper', () => {
         },
       ];
 
-      const result =
-        StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(rows);
+      const result = StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(rows);
 
       expect(result).toHaveLength(2);
-      expect(
-        result.every((r) => r.joinedAt === '2026-03-01T12:00:00.000Z'),
-      ).toBe(true);
+      expect(result.every((r) => r.joinedAt === '2026-03-01T12:00:00.000Z')).toBe(true);
       expect(result[0].id).toBe('session-2');
       expect(result[1].id).toBe('session-1');
     });
@@ -91,9 +81,7 @@ describe('StudentSessionMapper', () => {
         { joined_at: '2026-02-01T00:00:00.000Z', sessions: sessionA },
       ];
 
-      expect(
-        StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(rows),
-      ).toEqual([
+      expect(StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(rows)).toEqual([
         {
           id: 'session-1',
           teacherId: 'teacher-1',
@@ -121,9 +109,7 @@ describe('StudentSessionMapper', () => {
         },
       ];
 
-      expect(
-        StudentSessionMapper.mapEnrollmentRowsWithEmbeddedStudents(rows),
-      ).toEqual([
+      expect(StudentSessionMapper.mapEnrollmentRowsWithEmbeddedStudents(rows)).toEqual([
         {
           id: 'student-1',
           name: 'Alice',
@@ -135,9 +121,7 @@ describe('StudentSessionMapper', () => {
     });
 
     it('returns an empty array for empty roster input', () => {
-      expect(
-        StudentSessionMapper.mapEnrollmentRowsWithEmbeddedStudents([]),
-      ).toEqual([]);
+      expect(StudentSessionMapper.mapEnrollmentRowsWithEmbeddedStudents([])).toEqual([]);
     });
   });
 });

@@ -1,4 +1,7 @@
-import { GenerateCompletionFeedbackUseCase } from './generate-completion-feedback.use-case';
+import {
+  GenerateCompletionFeedbackBody,
+  GenerateCompletionFeedbackUseCase,
+} from './generate-completion-feedback.use-case';
 import type { ILlmProvider } from 'src/domain/llm/contracts/I-llm.provider';
 
 describe('GenerateCompletionFeedbackUseCase', () => {
@@ -14,9 +17,7 @@ describe('GenerateCompletionFeedbackUseCase', () => {
     const result = await fixtures.whenExecute();
 
     expect(result).toBe('Excellent travail !');
-    expect(
-      fixtures.openaiRepository.generateCompletionFeedback,
-    ).toHaveBeenCalledWith({
+    expect(fixtures.openaiRepository.generateCompletionFeedback).toHaveBeenCalledWith({
       ...fixtures.body,
       language: 'francais',
     });
@@ -30,9 +31,7 @@ describe('GenerateCompletionFeedbackUseCase', () => {
       language: 'anglais',
     });
 
-    expect(
-      fixtures.openaiRepository.generateCompletionFeedback,
-    ).toHaveBeenCalledWith({
+    expect(fixtures.openaiRepository.generateCompletionFeedback).toHaveBeenCalledWith({
       ...fixtures.body,
       language: 'anglais',
     });
@@ -46,12 +45,10 @@ describe('GenerateCompletionFeedbackUseCase', () => {
 });
 
 class Fixtures {
-  public readonly openaiRepository: jest.Mocked<
-    Pick<ILlmProvider, 'generateCompletionFeedback'>
-  >;
+  public readonly openaiRepository: jest.Mocked<Pick<ILlmProvider, 'generateCompletionFeedback'>>;
   public readonly useCase: GenerateCompletionFeedbackUseCase;
 
-  public readonly body = {
+  public readonly body: GenerateCompletionFeedbackBody = {
     total: 10,
     score: 8,
     courseTitle: 'Histoire',
@@ -62,17 +59,15 @@ class Fixtures {
     this.openaiRepository = {
       generateCompletionFeedback: jest.fn(),
     };
-    this.useCase = new GenerateCompletionFeedbackUseCase(
-      this.openaiRepository as unknown as ILlmProvider,
-    );
+    this.useCase = new GenerateCompletionFeedbackUseCase(this.openaiRepository as unknown as ILlmProvider);
   }
 
   whenExecute() {
     return this.useCase.execute(this.body);
   }
 
-  whenExecuteWithBody(body: typeof this.body & { language?: string }) {
-    return this.useCase.execute(body as any);
+  whenExecuteWithBody(body: GenerateCompletionFeedbackBody) {
+    return this.useCase.execute(body);
   }
 
   whenRepositoryReturnsFeedback(text: string) {

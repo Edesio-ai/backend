@@ -1,7 +1,4 @@
-import {
-  UpdateProfilePayload,
-  UpdateProfileUseCase,
-} from 'src/application/profile/update-profile.use-case';
+import { UpdateProfilePayload, UpdateProfileUseCase } from 'src/application/profile/update-profile.use-case';
 import type { IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import type { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
@@ -22,28 +19,20 @@ describe('UpdateProfileUseCase', () => {
   it('updates Supabase auth and teacher row when role is teacher', async () => {
     await fixtures.whenExecute();
 
-    expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalledWith(
-      fixtures.userId,
-      {
-        email: 'NEW@School.com ',
-        metadata: {
-          role: 'teacher',
-          firstname: 'Ann',
-          lastname: 'Other',
-          email: 'new@school.com',
-        },
-      },
-    );
-    expect(fixtures.teacherRepository.updateTeacher).toHaveBeenCalledWith(
-      fixtures.userId,
-      {
-        name: 'Ann Other',
+    expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalledWith(fixtures.userId, {
+      email: 'NEW@School.com ',
+      metadata: {
+        role: 'teacher',
+        firstname: 'Ann',
+        lastname: 'Other',
         email: 'new@school.com',
       },
-    );
-    expect(
-      fixtures.establishmentRepository.updateEstablishment,
-    ).not.toHaveBeenCalled();
+    });
+    expect(fixtures.teacherRepository.updateTeacher).toHaveBeenCalledWith(fixtures.userId, {
+      name: 'Ann Other',
+      email: 'new@school.com',
+    });
+    expect(fixtures.establishmentRepository.updateEstablishment).not.toHaveBeenCalled();
     expect(fixtures.studentRepository.updateStudent).not.toHaveBeenCalled();
   });
 
@@ -53,9 +42,7 @@ describe('UpdateProfileUseCase', () => {
     await fixtures.whenExecute();
 
     expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalled();
-    expect(
-      fixtures.establishmentRepository.updateEstablishment,
-    ).toHaveBeenCalledWith(fixtures.userId, {
+    expect(fixtures.establishmentRepository.updateEstablishment).toHaveBeenCalledWith(fixtures.userId, {
       name: 'Ann Other',
       email: 'new@school.com',
     });
@@ -69,17 +56,12 @@ describe('UpdateProfileUseCase', () => {
     await fixtures.whenExecute();
 
     expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalled();
-    expect(fixtures.studentRepository.updateStudent).toHaveBeenCalledWith(
-      fixtures.userId,
-      {
-        name: 'Ann Other',
-        email: 'new@school.com',
-      },
-    );
+    expect(fixtures.studentRepository.updateStudent).toHaveBeenCalledWith(fixtures.userId, {
+      name: 'Ann Other',
+      email: 'new@school.com',
+    });
     expect(fixtures.teacherRepository.updateTeacher).not.toHaveBeenCalled();
-    expect(
-      fixtures.establishmentRepository.updateEstablishment,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.establishmentRepository.updateEstablishment).not.toHaveBeenCalled();
   });
 
   it('does not set metadata email when payload email equals user email', async () => {
@@ -88,17 +70,14 @@ describe('UpdateProfileUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalledWith(
-      fixtures.userId,
-      {
-        email: 'same@school.com',
-        metadata: {
-          role: 'teacher',
-          firstname: 'Ann',
-          lastname: 'Other',
-        },
+    expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalledWith(fixtures.userId, {
+      email: 'same@school.com',
+      metadata: {
+        role: 'teacher',
+        firstname: 'Ann',
+        lastname: 'Other',
       },
-    );
+    });
   });
 
   it('propagates errors from auth repository', async () => {
@@ -158,9 +137,7 @@ class Fixtures {
 
     this.authRepository.updateAuthUser.mockResolvedValue(undefined);
     this.teacherRepository.updateTeacher.mockResolvedValue(undefined);
-    this.establishmentRepository.updateEstablishment.mockResolvedValue(
-      undefined,
-    );
+    this.establishmentRepository.updateEstablishment.mockResolvedValue(undefined);
     this.studentRepository.updateStudent.mockResolvedValue(undefined);
   }
 

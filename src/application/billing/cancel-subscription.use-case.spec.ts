@@ -61,10 +61,7 @@ class Fixtures {
 
     this.emailProvider = createMockEmailProvider();
 
-    this.cancelSubscriptionUseCase = new CancelSubscriptionUseCase(
-      this.stripeRepository,
-      this.emailProvider,
-    );
+    this.cancelSubscriptionUseCase = new CancelSubscriptionUseCase(this.stripeRepository, this.emailProvider);
 
     this.user = {
       id: 'u-1',
@@ -87,15 +84,11 @@ class Fixtures {
   }
 
   whenStripeCancelSucceeds() {
-    this.stripeRepository.cancelSubscription.mockResolvedValue(
-      this.canceledSubscription,
-    );
+    this.stripeRepository.cancelSubscription.mockResolvedValue(this.canceledSubscription);
   }
 
   whenStripeCancelThrows() {
-    this.stripeRepository.cancelSubscription.mockRejectedValue(
-      this.stripeError,
-    );
+    this.stripeRepository.cancelSubscription.mockRejectedValue(this.stripeError);
   }
 
   whenSendCancelEmailResolves() {
@@ -103,36 +96,26 @@ class Fixtures {
   }
 
   whenSendCancelEmailThrows() {
-    this.emailProvider.sendCancelSubscriptionEmail.mockRejectedValue(
-      this.emailError,
-    );
+    this.emailProvider.sendCancelSubscriptionEmail.mockRejectedValue(this.emailError);
   }
 
   thenCancelSubscriptionCalledWithUser() {
-    expect(this.stripeRepository.cancelSubscription).toHaveBeenCalledWith(
-      this.user,
-    );
+    expect(this.stripeRepository.cancelSubscription).toHaveBeenCalledWith(this.user);
     expect(this.stripeRepository.cancelSubscription).toHaveBeenCalledTimes(1);
   }
 
   thenSendCancelSubscriptionEmailCalledWithExpectedPayload() {
-    expect(this.emailProvider.sendCancelSubscriptionEmail).toHaveBeenCalledWith(
-      {
-        email: this.user.email,
-        firstname: this.user.metadata.firstname,
-        planName: this.canceledSubscription.planName,
-        endDate: this.canceledSubscription.endDate,
-      },
-    );
-    expect(
-      this.emailProvider.sendCancelSubscriptionEmail,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.emailProvider.sendCancelSubscriptionEmail).toHaveBeenCalledWith({
+      email: this.user.email,
+      firstname: this.user.metadata.firstname,
+      planName: this.canceledSubscription.planName,
+      endDate: this.canceledSubscription.endDate,
+    });
+    expect(this.emailProvider.sendCancelSubscriptionEmail).toHaveBeenCalledTimes(1);
   }
 
   thenSendCancelSubscriptionEmailNotCalled() {
-    expect(
-      this.emailProvider.sendCancelSubscriptionEmail,
-    ).not.toHaveBeenCalled();
+    expect(this.emailProvider.sendCancelSubscriptionEmail).not.toHaveBeenCalled();
   }
 
   thenReturnsCanceledPayload(result: CancelSubscription) {

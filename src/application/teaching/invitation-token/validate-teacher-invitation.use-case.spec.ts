@@ -1,10 +1,6 @@
 import { ValidateTeacherInvitationUseCase } from 'src/application/teaching/invitation-token/validate-teacher-invitation.use-case';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { BadRequestError, ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
@@ -123,10 +119,7 @@ class Fixtures {
       getInvitationPreview: jest.fn(),
       updateTokenUsedAt: jest.fn(),
     };
-    this.useCase = new ValidateTeacherInvitationUseCase(
-      this.teacherRepository,
-      this.tokenRepository,
-    );
+    this.useCase = new ValidateTeacherInvitationUseCase(this.teacherRepository, this.tokenRepository);
   }
 
   whenExecute() {
@@ -134,7 +127,7 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null as any);
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
   }
 
   whenTeacherFound() {
@@ -149,7 +142,7 @@ class Fixtures {
   }
 
   whenInvitationNotFound() {
-    this.tokenRepository.getInvitationByToken.mockResolvedValue(null as any);
+    this.tokenRepository.getInvitationByToken.mockResolvedValue(null);
   }
 
   whenInvitationExpired() {
@@ -174,46 +167,31 @@ class Fixtures {
   }
 
   whenInvitationValid() {
-    this.tokenRepository.getInvitationByToken.mockResolvedValue(
-      this.invitation,
-    );
+    this.tokenRepository.getInvitationByToken.mockResolvedValue(this.invitation);
     this.tokenRepository.markInvitationTokenAsUsed.mockResolvedValue();
     this.teacherRepository.linkTeacherToEstablishment.mockResolvedValue();
   }
 
   thenMarkInvitationAsUsedCalled() {
-    expect(this.tokenRepository.markInvitationTokenAsUsed).toHaveBeenCalledWith(
-      this.invitation.id,
-      this.teacher.id,
-    );
-    expect(
-      this.tokenRepository.markInvitationTokenAsUsed,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.tokenRepository.markInvitationTokenAsUsed).toHaveBeenCalledWith(this.invitation.id, this.teacher.id);
+    expect(this.tokenRepository.markInvitationTokenAsUsed).toHaveBeenCalledTimes(1);
   }
 
   thenLinkTeacherToEstablishmentCalled() {
-    expect(
-      this.teacherRepository.linkTeacherToEstablishment,
-    ).toHaveBeenCalledWith(
+    expect(this.teacherRepository.linkTeacherToEstablishment).toHaveBeenCalledWith(
       this.invitation.id,
       this.teacher.id,
       this.invitation.establishmentId,
     );
-    expect(
-      this.teacherRepository.linkTeacherToEstablishment,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.teacherRepository.linkTeacherToEstablishment).toHaveBeenCalledTimes(1);
   }
 
   thenInvitationRepositoryNotCalled() {
     expect(this.tokenRepository.getInvitationByToken).not.toHaveBeenCalled();
-    expect(
-      this.tokenRepository.markInvitationTokenAsUsed,
-    ).not.toHaveBeenCalled();
+    expect(this.tokenRepository.markInvitationTokenAsUsed).not.toHaveBeenCalled();
   }
 
   thenTeacherLinkNotCalled() {
-    expect(
-      this.teacherRepository.linkTeacherToEstablishment,
-    ).not.toHaveBeenCalled();
+    expect(this.teacherRepository.linkTeacherToEstablishment).not.toHaveBeenCalled();
   }
 }

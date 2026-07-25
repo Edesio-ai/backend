@@ -1,10 +1,7 @@
 import { DeleteStudentSessionUseCase } from 'src/application/teaching/student-session/delete-student-session.use-case';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Student } from 'src/domain/teaching/student/type/student.type';
 import { StudentSession } from 'src/domain/teaching/student-session/types/student-session.type';
@@ -24,21 +21,18 @@ describe('DeleteStudentSessionUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(
-      fixtures.studentSessionRepository.deleteStudentSession,
-    ).toHaveBeenCalledWith(fixtures.sessionId, fixtures.student.id);
+    expect(fixtures.studentSessionRepository.deleteStudentSession).toHaveBeenCalledWith(
+      fixtures.sessionId,
+      fixtures.student.id,
+    );
   });
 
   it('should throw NotFoundError when student is not found', async () => {
     fixtures.whenStudentNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.studentSessionRepository.getStudentSessionBySessionId,
-    ).not.toHaveBeenCalled();
-    expect(
-      fixtures.studentSessionRepository.deleteStudentSession,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.studentSessionRepository.getStudentSessionBySessionId).not.toHaveBeenCalled();
+    expect(fixtures.studentSessionRepository.deleteStudentSession).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundError when student session is not found', async () => {
@@ -46,9 +40,7 @@ describe('DeleteStudentSessionUseCase', () => {
     fixtures.whenStudentSessionNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.studentSessionRepository.deleteStudentSession,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.studentSessionRepository.deleteStudentSession).not.toHaveBeenCalled();
   });
 
   it('should throw ForbiddenError when student does not own the session', async () => {
@@ -56,9 +48,7 @@ describe('DeleteStudentSessionUseCase', () => {
     fixtures.whenStudentSessionOwnedByAnother();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
-    expect(
-      fixtures.studentSessionRepository.deleteStudentSession,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.studentSessionRepository.deleteStudentSession).not.toHaveBeenCalled();
   });
 
   it('should propagate errors from the student repository (getStudentByUserId)', async () => {
@@ -108,10 +98,7 @@ class Fixtures {
   constructor() {
     this.studentRepository = createMockStudentRepository();
     this.studentSessionRepository = createMockStudentSessionRepository();
-    this.useCase = new DeleteStudentSessionUseCase(
-      this.studentRepository,
-      this.studentSessionRepository,
-    );
+    this.useCase = new DeleteStudentSessionUseCase(this.studentRepository, this.studentSessionRepository);
   }
 
   whenExecute() {
@@ -127,35 +114,25 @@ class Fixtures {
   }
 
   whenStudentRepositoryFails() {
-    this.studentRepository.getStudentByUserId.mockRejectedValue(
-      new Error('student repo failed'),
-    );
+    this.studentRepository.getStudentByUserId.mockRejectedValue(new Error('student repo failed'));
   }
 
   whenStudentSessionFound() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
-      this.studentSession,
-    );
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(this.studentSession);
   }
 
   whenStudentSessionNotFound() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
-      null,
-    );
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(null);
   }
 
   whenStudentSessionOwnedByAnother() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
-      {
-        sessionId: this.sessionId,
-        studentId: 'another-student-99',
-      },
-    );
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue({
+      sessionId: this.sessionId,
+      studentId: 'another-student-99',
+    });
   }
 
   whenDeleteFails() {
-    this.studentSessionRepository.deleteStudentSession.mockRejectedValue(
-      new Error('delete failed'),
-    );
+    this.studentSessionRepository.deleteStudentSession.mockRejectedValue(new Error('delete failed'));
   }
 }

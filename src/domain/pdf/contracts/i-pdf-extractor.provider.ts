@@ -8,5 +8,5 @@ export interface IPdfExtractorProvider {
     questions: Question[],
     sessionName: string,
     courseTitle: string,
-  ): Promise<{ buffer: Buffer; fileName: string }>;
+  ): { buffer: Buffer; fileName: string };
 }

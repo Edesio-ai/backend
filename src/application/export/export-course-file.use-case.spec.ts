@@ -13,21 +13,15 @@ describe('ExportCourseFileUseCase', () => {
   it('should throw NotFoundException when file is not found', async () => {
     fixtures.whenGetCourseFileByIdReturnsNull();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
-    expect(
-      fixtures.courseFileRepository.getFileBufferFromStorage,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundException);
+    expect(fixtures.courseFileRepository.getFileBufferFromStorage).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundException when buffer is not found in storage', async () => {
     fixtures.whenGetCourseFileByIdSucceeds();
     fixtures.whenGetFileBufferReturnsNull();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('should return buffer and fileName on success', async () => {
@@ -36,12 +30,8 @@ describe('ExportCourseFileUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(
-      fixtures.courseFileRepository.getCourseFileById,
-    ).toHaveBeenCalledWith(fixtures.fileId);
-    expect(
-      fixtures.courseFileRepository.getFileBufferFromStorage,
-    ).toHaveBeenCalledWith(fixtures.courseFile.fileUrl);
+    expect(fixtures.courseFileRepository.getCourseFileById).toHaveBeenCalledWith(fixtures.fileId);
+    expect(fixtures.courseFileRepository.getFileBufferFromStorage).toHaveBeenCalledWith(fixtures.courseFile.fileUrl);
     expect(result).toEqual({
       buffer: fixtures.buffer,
       fileName: fixtures.courseFile.fileName,
@@ -89,36 +79,26 @@ class Fixtures {
   }
 
   whenGetCourseFileByIdSucceeds() {
-    this.courseFileRepository.getCourseFileById.mockResolvedValue(
-      this.courseFile,
-    );
+    this.courseFileRepository.getCourseFileById.mockResolvedValue(this.courseFile);
   }
 
   whenGetCourseFileByIdReturnsNull() {
-    this.courseFileRepository.getCourseFileById.mockResolvedValue(null as any);
+    this.courseFileRepository.getCourseFileById.mockResolvedValue(null);
   }
 
   whenGetCourseFileByIdFails() {
-    this.courseFileRepository.getCourseFileById.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.courseFileRepository.getCourseFileById.mockRejectedValue(this.repositoryError);
   }
 
   whenGetFileBufferSucceeds() {
-    this.courseFileRepository.getFileBufferFromStorage.mockResolvedValue(
-      this.buffer,
-    );
+    this.courseFileRepository.getFileBufferFromStorage.mockResolvedValue(this.buffer);
   }
 
   whenGetFileBufferReturnsNull() {
-    this.courseFileRepository.getFileBufferFromStorage.mockResolvedValue(
-      null as any,
-    );
+    this.courseFileRepository.getFileBufferFromStorage.mockResolvedValue(null);
   }
 
   whenGetFileBufferFails() {
-    this.courseFileRepository.getFileBufferFromStorage.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.courseFileRepository.getFileBufferFromStorage.mockRejectedValue(this.repositoryError);
   }
 }

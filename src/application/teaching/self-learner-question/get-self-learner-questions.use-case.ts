@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type ISelfLearnerCourseRepository,
   SELF_LEARNER_COURSE_REPOSITORY,
@@ -27,18 +24,13 @@ export class GetSelfLearnerQuestionsUseCase {
     private readonly selfLearnerRepository: ISelfLearnerRepository,
   ) {}
 
-  public async execute(
-    userId: string,
-    courseId: string,
-  ): Promise<SelfLearnerQuestion[]> {
-    const selfLearner =
-      await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
+  public async execute(userId: string, courseId: string): Promise<SelfLearnerQuestion[]> {
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
     if (!selfLearner) {
       throw new NotFoundError('Self learner not found');
     }
 
-    const selfLearnerCourse =
-      await this.selfLearnerCourseRepository.getSelfLearnerCourseById(courseId);
+    const selfLearnerCourse = await this.selfLearnerCourseRepository.getSelfLearnerCourseById(courseId);
     if (!selfLearnerCourse) {
       throw new NotFoundError('Self learner course not found');
     }
@@ -47,8 +39,6 @@ export class GetSelfLearnerQuestionsUseCase {
       throw new ForbiddenError('You are not authorized to access this course');
     }
 
-    return await this.selfLearnerQuestionRepository.getSelfLearnerQuestions(
-      courseId,
-    );
+    return await this.selfLearnerQuestionRepository.getSelfLearnerQuestions(courseId);
   }
 }

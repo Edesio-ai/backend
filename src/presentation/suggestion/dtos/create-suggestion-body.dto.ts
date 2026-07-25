@@ -1,10 +1,4 @@
-import {
-  IsIn,
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsIn, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 import { Suggestion } from 'src/domain/suggestion/suggestion.type';
 
 export class CreateSuggestionBodyDto {

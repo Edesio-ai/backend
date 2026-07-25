@@ -24,31 +24,18 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
       .is('answer', null);
 
     if (countError) {
-      console.error(
-        'error getting pending question count for course ids',
-        courseIds,
-        countError,
-      );
+      console.error('error getting pending question count for course ids', courseIds, countError);
       throw new ServerError(countError.message);
     }
 
     return count ?? 0;
   }
 
-  public async deleteCourseQuestionsByCourseId(
-    courseId: string,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('course_questions')
-      .delete()
-      .eq('course_id', courseId);
+  public async deleteCourseQuestionsByCourseId(courseId: string): Promise<void> {
+    const { error } = await this.supabase.from('course_questions').delete().eq('course_id', courseId);
 
     if (error) {
-      console.error(
-        'error deleting course questions by course id',
-        courseId,
-        error,
-      );
+      console.error('error deleting course questions by course id', courseId, error);
       throw new ServerError(error.message);
     }
   }
@@ -61,39 +48,24 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
       .not('answer', 'is', null);
 
     if (error) {
-      console.error(
-        'error getting answered question count for student id',
-        studentId,
-        error,
-      );
+      console.error('error getting answered question count for student id', studentId, error);
       throw new ServerError(error.message);
     }
 
     return count ?? 0;
   }
 
-  public async getCourseQuestionsByCourseId(
-    courseId: string,
-  ): Promise<CourseQuestion[]> {
-    const { data, error } = await this.supabase
-      .from('course_questions')
-      .select('*')
-      .eq('course_id', courseId);
+  public async getCourseQuestionsByCourseId(courseId: string): Promise<CourseQuestion[]> {
+    const { data, error } = await this.supabase.from('course_questions').select('*').eq('course_id', courseId);
 
     if (error) {
-      console.error(
-        'error getting student course questions for course id',
-        courseId,
-        error,
-      );
+      console.error('error getting student course questions for course id', courseId, error);
       throw new ServerError(error.message);
     }
 
     return data?.map(CourseQuestionMapper.toDomain) ?? [];
   }
-  public async createCourseQuestion(
-    courseQuestion: CourseQuestionToInsert,
-  ): Promise<CourseQuestion | null> {
+  public async createCourseQuestion(courseQuestion: CourseQuestionToInsert): Promise<CourseQuestion | null> {
     const { data, error } = await this.supabase
       .from('course_questions')
       .insert(CourseQuestionMapper.toInsert(courseQuestion))
@@ -107,9 +79,7 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
     return data ? CourseQuestionMapper.toDomain(data) : null;
   }
 
-  public async getCourseQuestionByCourseId(
-    courseQuestionId: string,
-  ): Promise<CourseQuestion | null> {
+  public async getCourseQuestionByCourseId(courseQuestionId: string): Promise<CourseQuestion | null> {
     const { data, error } = await this.supabase
       .from('course_questions')
       .select('*')
@@ -117,11 +87,7 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
       .single();
 
     if (error) {
-      console.error(
-        'error getting course question by course id',
-        courseQuestionId,
-        error,
-      );
+      console.error('error getting course question by course id', courseQuestionId, error);
       throw new ServerError(error.message);
     }
 
@@ -140,32 +106,18 @@ export class CourseQuestionSupabaseRepository implements ICourseQuestionReposito
       .single();
 
     if (error) {
-      console.error(
-        'error updating course question',
-        courseQuestionId,
-        updatePayload,
-        error,
-      );
+      console.error('error updating course question', courseQuestionId, updatePayload, error);
       throw new ServerError(error.message);
     }
 
     return data ? CourseQuestionMapper.toDomain(data) : null;
   }
 
-  public async deleteCourseQuestionById(
-    courseQuestionId: string,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('course_questions')
-      .delete()
-      .eq('id', courseQuestionId);
+  public async deleteCourseQuestionById(courseQuestionId: string): Promise<void> {
+    const { error } = await this.supabase.from('course_questions').delete().eq('id', courseQuestionId);
 
     if (error) {
-      console.error(
-        'error deleting course question by id',
-        courseQuestionId,
-        error,
-      );
+      console.error('error deleting course question by id', courseQuestionId, error);
       throw new ServerError(error.message);
     }
   }

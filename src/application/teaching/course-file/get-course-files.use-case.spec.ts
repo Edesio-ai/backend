@@ -16,12 +16,8 @@ describe('GetCourseFilesUseCase', () => {
     const result = await fixtures.whenExecute();
 
     expect(result).toEqual(fixtures.courseFiles);
-    expect(
-      fixtures.courseFileRepository.getCourseFilesByCourseId,
-    ).toHaveBeenCalledWith(fixtures.courseId);
-    expect(
-      fixtures.courseFileRepository.getCourseFilesByCourseId,
-    ).toHaveBeenCalledTimes(1);
+    expect(fixtures.courseFileRepository.getCourseFilesByCourseId).toHaveBeenCalledWith(fixtures.courseId);
+    expect(fixtures.courseFileRepository.getCourseFilesByCourseId).toHaveBeenCalledTimes(1);
   });
 
   it('should propagate repository errors', async () => {
@@ -61,14 +57,10 @@ class Fixtures {
   }
 
   whenRepositoryReturnsFiles() {
-    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue(
-      this.courseFiles,
-    );
+    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue(this.courseFiles);
   }
 
   whenRepositoryThrows() {
-    this.courseFileRepository.getCourseFilesByCourseId.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.courseFileRepository.getCourseFilesByCourseId.mockRejectedValue(this.repositoryError);
   }
 }

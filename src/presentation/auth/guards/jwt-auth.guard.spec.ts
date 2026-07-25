@@ -31,9 +31,7 @@ describe('JwtAuthGuard', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
 
     await expect(
-      guard.canActivate(
-        mockHttpContext({ headers: {}, cookies: {} } as unknown as Request),
-      ),
+      guard.canActivate(mockHttpContext({ headers: {}, cookies: {} } as unknown as Request)),
     ).rejects.toBeInstanceOf(UnauthorizedException);
     expect(authRepository.validateToken).not.toHaveBeenCalled();
   });

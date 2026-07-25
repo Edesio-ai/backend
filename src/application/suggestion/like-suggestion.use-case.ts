@@ -17,21 +17,13 @@ export class LikeSuggestionUseCase {
     private readonly suggestionLikeRepository: ISuggestionLikeRepository,
   ) {}
 
-  async execute(
-    suggestionId: string,
-    user: User,
-  ): Promise<{ liked: boolean; likesCount: number }> {
-    const suggestion =
-      await this.suggestionRepository.getSuggestionLikesCountById(suggestionId);
+  async execute(suggestionId: string, user: User): Promise<{ liked: boolean; likesCount: number }> {
+    const suggestion = await this.suggestionRepository.getSuggestionLikesCountById(suggestionId);
     if (!suggestion) {
       throw new NotFoundException('Suggestion not found');
     }
 
-    const likeId =
-      await this.suggestionLikeRepository.getSuggestionLikeByUserAndSuggestionId(
-        user.id,
-        suggestionId,
-      );
+    const likeId = await this.suggestionLikeRepository.getSuggestionLikeByUserAndSuggestionId(user.id, suggestionId);
 
     if (likeId) {
       return this.unlikeSuggestion(likeId, suggestionId, suggestion.likesCount);
@@ -45,9 +37,7 @@ export class LikeSuggestionUseCase {
     suggestionId: string,
     likesCount: number,
   ): Promise<{ liked: boolean; likesCount: number }> {
-    await this.suggestionLikeRepository.deleteSuggestionLikeById(
-      existingLikeId,
-    );
+    await this.suggestionLikeRepository.deleteSuggestionLikeById(existingLikeId);
     await this.suggestionRepository.decrementLike(suggestionId, likesCount);
     return {
       liked: false,
@@ -60,10 +50,7 @@ export class LikeSuggestionUseCase {
     user: User,
     likesCount: number,
   ): Promise<{ liked: boolean; likesCount: number }> {
-    await this.suggestionLikeRepository.createSuggestionLike(
-      suggestionId,
-      user.id,
-    );
+    await this.suggestionLikeRepository.createSuggestionLike(suggestionId, user.id);
     await this.suggestionRepository.incrementLike(suggestionId, likesCount);
     return {
       liked: true,

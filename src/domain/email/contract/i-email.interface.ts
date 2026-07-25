@@ -10,7 +10,5 @@ export interface IEmailProvider {
     invitationToken: string,
     availableChatbots: number,
   ): Promise<void>;
-  sendCancelSubscriptionEmail(
-    params: CancelSubscriptionEmailParams,
-  ): Promise<void>;
+  sendCancelSubscriptionEmail(params: CancelSubscriptionEmailParams): Promise<void>;
 }

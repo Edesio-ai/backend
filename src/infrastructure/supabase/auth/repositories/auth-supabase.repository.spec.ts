@@ -1,14 +1,8 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { AuthSupabaseRepository } from './auth-supabase.repository';
 import { AuthMapper } from '../mappers/auth.mappers';
-import {
-  BadRequestError,
-  ServerError,
-  UnauthorizedError,
-} from '../../../../domain/shared/errors/global.errors';
-import {
-  AuthUserWithSession,
-  SupabaseAuthSession,
-} from '../../../../domain/auth/types/auth.type';
+import { BadRequestError, ServerError, UnauthorizedError } from '../../../../domain/shared/errors/global.errors';
+import { AuthUserWithSession, SupabaseAuthSession } from '../../../../domain/auth/types/auth.type';
 
 describe('AuthSupabaseRepository', () => {
   describe('loginUser', () => {
@@ -150,9 +144,7 @@ describe('AuthSupabaseRepository', () => {
     it('should throw ServerError when updateUserById returns error', async () => {
       fixtures.whenUpdateUserByIdFails();
 
-      await expect(fixtures.whenUpdateAuthUser()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenUpdateAuthUser()).rejects.toBeInstanceOf(ServerError);
     });
   });
 
@@ -212,7 +204,7 @@ class LoginUserFixtures {
       },
     };
 
-    this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as unknown as SupabaseClient);
 
     const user: SupabaseAuthSession['user'] = {
       id: 'u1',
@@ -322,7 +314,7 @@ class CreateAuthUserFixtures {
       },
     };
 
-    this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as unknown as SupabaseClient);
   }
 
   whenAdminCreateUserSucceeds() {
@@ -408,7 +400,7 @@ class UpdateAuthUserFixtures {
       },
     };
 
-    this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as unknown as SupabaseClient);
   }
 
   whenUpdateAuthUser() {
@@ -448,7 +440,7 @@ class LogoutUserFixtures {
       },
     };
 
-    this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as unknown as SupabaseClient);
   }
 
   whenLogoutUser() {
@@ -490,7 +482,7 @@ class ResetPasswordByEmailFixtures {
       },
     };
 
-    this.sut = new AuthSupabaseRepository(supabaseAuthMock as any);
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as unknown as SupabaseClient);
   }
 
   whenResetPasswordByEmail() {

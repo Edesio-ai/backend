@@ -1,17 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  GeneratedQuestion,
-  QuestionGenerationConfig,
-} from 'src/domain/llm/types/openai.type';
+import { GeneratedQuestion, QuestionGenerationConfig } from 'src/domain/llm/types/openai.type';
 import type { ILlmProvider as MistralRepositoryContract } from 'src/domain/llm/contracts/I-llm.provider';
-import {
-  getGenerateQuestionSystemPrompt,
-  getGenerateQuestionUserPrompt,
-} from './prompts/generate-question.prompt';
-import {
-  getEvaluateAnswerSystemPrompt,
-  getEvaluateAnswerUserPrompt,
-} from './prompts/evaluate-answer.prompt';
+import { getGenerateQuestionSystemPrompt, getGenerateQuestionUserPrompt } from './prompts/generate-question.prompt';
+import { getEvaluateAnswerSystemPrompt, getEvaluateAnswerUserPrompt } from './prompts/evaluate-answer.prompt';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { EvaluateAnswerBody } from 'src/application/llm/evaluate-answer.use-case';
 import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
@@ -36,8 +27,7 @@ export class MistralProvider implements MistralRepositoryContract {
     const maxChars = 15000;
     const truncatedContent =
       courseContent.length > maxChars
-        ? courseContent.substring(0, maxChars) +
-          '\n\n[Contenu tronqué pour respecter la limite]'
+        ? courseContent.substring(0, maxChars) + '\n\n[Contenu tronqué pour respecter la limite]'
         : courseContent;
 
     const existingQuestionsContext =
@@ -46,11 +36,7 @@ export class MistralProvider implements MistralRepositoryContract {
         : '';
 
     const systemPrompt = getGenerateQuestionSystemPrompt(config);
-    const userPrompt = getGenerateQuestionUserPrompt(
-      config,
-      truncatedContent,
-      existingQuestionsContext,
-    );
+    const userPrompt = getGenerateQuestionUserPrompt(config, truncatedContent, existingQuestionsContext);
 
     const response = await this.mistral.chat.complete({
       model: 'mistral-large-latest',
@@ -72,9 +58,7 @@ export class MistralProvider implements MistralRepositoryContract {
     return JSON.parse(content).questions;
   }
 
-  public async evaluateAnswer(
-    body: EvaluateAnswerBody,
-  ): Promise<EvaluateAnswerResponse> {
+  public async evaluateAnswer(body: EvaluateAnswerBody): Promise<EvaluateAnswerResponse> {
     const systemPrompt = getEvaluateAnswerSystemPrompt();
     const userPrompt = getEvaluateAnswerUserPrompt(body);
 
@@ -108,9 +92,7 @@ export class MistralProvider implements MistralRepositoryContract {
     };
   }
 
-  public async generateCompletionFeedback(
-    body: GenerateCompletionFeedbackBody,
-  ): Promise<string> {
+  public async generateCompletionFeedback(body: GenerateCompletionFeedbackBody): Promise<string> {
     try {
       const { total, score } = body;
 
@@ -125,11 +107,7 @@ export class MistralProvider implements MistralRepositoryContract {
 
       const language = body.language ?? 'francais';
       const systemPrompt = getGenerateCompletionFeedbackSystemPrompt(language);
-      const userPrompt = getGenerateCompletionFeedbackUserPrompt(
-        { ...body, language },
-        feedbackContext,
-        percent,
-      );
+      const userPrompt = getGenerateCompletionFeedbackUserPrompt({ ...body, language }, feedbackContext, percent);
 
       const response = await this.mistral.chat.complete({
         model: 'mistral-small-latest',
@@ -141,11 +119,9 @@ export class MistralProvider implements MistralRepositoryContract {
         maxTokens: 150,
       });
 
-      const feedback =
-        (response.choices[0]?.message?.content as string) ||
-        'Bravo pour avoir terminé ce quiz !';
+      const feedback = (response.choices[0]?.message?.content as string) || 'Bravo pour avoir terminé ce quiz !';
       return feedback;
-    } catch (error) {
+    } catch {
       throw new ServerError('No response from OpenAI');
     }
   }

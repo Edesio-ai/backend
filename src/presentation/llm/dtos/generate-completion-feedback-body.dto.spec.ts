@@ -26,7 +26,9 @@ describe('GenerateCompletionFeedbackBodyDto', () => {
   });
 
   it('rejects unsupported language values', async () => {
-    const dto = Object.assign(valid(), { language: 'latin' as any });
+    const dto = Object.assign(valid(), {
+      language: 'latin' as unknown as 'fr',
+    });
 
     const errors = await validate(dto);
 

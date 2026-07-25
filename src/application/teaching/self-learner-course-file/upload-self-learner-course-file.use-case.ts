@@ -18,10 +18,7 @@ export class UploadSelfLearnerCourseFileUseCase {
     private readonly courseFileRepository: ICourseFileRepository,
   ) {}
 
-  async execute(
-    courseId: string,
-    file: CourseFileUpload,
-  ): Promise<SelfLearnerCourseFile> {
+  async execute(courseId: string, file: CourseFileUpload): Promise<SelfLearnerCourseFile> {
     const parts = file.originalFileName.split('.');
     const ext = parts.length > 1 ? (parts.pop() ?? '').trim() || 'bin' : 'bin';
     const fileUrl = `self-learner/${courseId}/${Date.now()}.${ext}`;
@@ -32,8 +29,6 @@ export class UploadSelfLearnerCourseFileUseCase {
       fileUrl,
       fileName: file.originalFileName,
     };
-    return this.selfLearnerCourseFileRepository.uploadSelfLearnerCourseFile(
-      payload,
-    );
+    return this.selfLearnerCourseFileRepository.uploadSelfLearnerCourseFile(payload);
   }
 }

@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { EstablishmentSupabaseRepository } from './establishment-supabase.repository';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 
@@ -170,7 +171,7 @@ class Fixtures {
     const supabaseMock = {
       from: this.fromMock,
     };
-    this.repository = new EstablishmentSupabaseRepository(supabaseMock as any);
+    this.repository = new EstablishmentSupabaseRepository(supabaseMock as unknown as SupabaseClient);
   }
 
   whenGetEstablishmentByUserId() {
@@ -178,9 +179,7 @@ class Fixtures {
   }
 
   whenGetEstablishmentById() {
-    return this.repository.getEstablishmentById(
-      this.establishmentSupabaseRow.id,
-    );
+    return this.repository.getEstablishmentById(this.establishmentSupabaseRow.id);
   }
 
   whenCreateEstablishment() {
@@ -192,10 +191,7 @@ class Fixtures {
   }
 
   whenUpdateEstablishment() {
-    return this.repository.updateEstablishment(
-      this.userId,
-      this.profilePayload,
-    );
+    return this.repository.updateEstablishment(this.userId, this.profilePayload);
   }
 
   whenSupabaseReturnsData() {
@@ -270,14 +266,11 @@ class Fixtures {
   thenGetByIdQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('establishment');
     expect(this.selectMock).toHaveBeenCalledWith('*');
-    expect(this.eqMock).toHaveBeenCalledWith(
-      'id',
-      this.establishmentSupabaseRow.id,
-    );
+    expect(this.eqMock).toHaveBeenCalledWith('id', this.establishmentSupabaseRow.id);
     expect(this.singleMock).toHaveBeenCalledTimes(1);
   }
 
-  thenReturnExpectedEstablishment(result: any) {
+  thenReturnExpectedEstablishment(result: unknown) {
     expect(result).toEqual(this.expectedEstablishment);
   }
 
@@ -292,18 +285,13 @@ class Fixtures {
     expect(this.createSingleMock).toHaveBeenCalledTimes(1);
   }
 
-  thenReturnExpectedCreatedEstablishment(result: any) {
+  thenReturnExpectedCreatedEstablishment(result: unknown) {
     expect(result).toEqual(this.expectedCreatedEstablishment);
   }
 
   thenUpdateEstablishmentQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('establishment');
-    expect(this.updateEstablishmentMock).toHaveBeenCalledWith(
-      this.profilePayload,
-    );
-    expect(this.updateEstablishmentEqMock).toHaveBeenCalledWith(
-      'supabase_user_id',
-      this.userId,
-    );
+    expect(this.updateEstablishmentMock).toHaveBeenCalledWith(this.profilePayload);
+    expect(this.updateEstablishmentEqMock).toHaveBeenCalledWith('supabase_user_id', this.userId);
   }
 }

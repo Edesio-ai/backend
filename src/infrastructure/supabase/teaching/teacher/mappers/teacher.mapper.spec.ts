@@ -35,15 +35,7 @@ describe('TeacherMapper', () => {
 
   describe('toInsertWithEstablishment', () => {
     it('maps teacher onboarding fields including normalized email', () => {
-      expect(
-        TeacherMapper.toInsertWithEstablishment(
-          'u1',
-          'A B',
-          'Teacher@School.com ',
-          'est-1',
-          2,
-        ),
-      ).toEqual({
+      expect(TeacherMapper.toInsertWithEstablishment('u1', 'A B', 'Teacher@School.com ', 'est-1', 2)).toEqual({
         supabase_user_id: 'u1',
         name: 'A B',
         email: 'teacher@school.com',

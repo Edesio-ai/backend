@@ -5,10 +5,8 @@ import {
   SUBSCRIPTION_REPOSITORY,
   type ISubscriptionRepository,
 } from 'src/domain/subscription/contracts/i-subscription.repository';
-import {
-  STRIPE_PROVIDER,
-  type IStripeProvider,
-} from '../../domain/billing/contracts/i-stripe-client.provider';
+import { STRIPE_PROVIDER, type IStripeProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
+import { CheckoutSessionCreateResult, CheckoutSessionExistingResult } from 'src/domain/billing/types/billing.type';
 
 export class CreateCheckoutSessionsUseCase {
   constructor(
@@ -23,22 +21,16 @@ export class CreateCheckoutSessionsUseCase {
     planType: string,
     user: User,
     locale?: 'en' | 'fr',
-  ): Promise<any> {
+  ): Promise<CheckoutSessionCreateResult | CheckoutSessionExistingResult> {
     if (!user) {
       throw new TokenUserNotFoundError('User not found');
     }
 
     const { id } = user;
-    const subscription =
-      await this.subscriptionRepository.getUserSubscription(id);
+    const subscription = await this.subscriptionRepository.getUserSubscription(id);
 
     if (!subscription) {
-      return await this.paymentClient.createCheckoutSession(
-        user,
-        priceId,
-        planType,
-        locale,
-      );
+      return await this.paymentClient.createCheckoutSession(user, priceId, planType, locale);
     }
 
     return {

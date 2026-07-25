@@ -16,10 +16,7 @@ export class GetInvitationTokenUseCase {
     if (!establishmentId) {
       throw new NotFoundError('Establishment id not found');
     }
-    const invitationTokens =
-      await this.invitationTokenRepository.getInvitationTokenByEstablishmentId(
-        establishmentId,
-      );
+    const invitationTokens = await this.invitationTokenRepository.getInvitationTokenByEstablishmentId(establishmentId);
     return invitationTokens;
   }
 }

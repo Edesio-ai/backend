@@ -6,11 +6,7 @@ import { GetUserSessionUseCase } from '../../application/auth/get-user-session.u
 import { LoginUseCase } from '../../application/auth/login.use-case';
 import { RegisterUseCase } from '../../application/auth/register.use-case';
 import { LogoutUseCase } from '../../application/auth/logout.use-case';
-import {
-  AuthUser,
-  GetUserSessionResponse,
-  type User,
-} from '../../domain/auth/types/auth.type';
+import { AuthUser, GetUserSessionResponse, Role, type User } from '../../domain/auth/types/auth.type';
 import { RegisterBody } from './dto/register-body.dto';
 import { LoginBodyDto } from './dto/login-body.dto';
 import { Public } from './decorator/public.decorator';
@@ -35,8 +31,7 @@ export class AuthController {
 
   @Get('session')
   async getUserSession(@Req() req: Request): Promise<GetUserSessionResponse> {
-    const token =
-      req.cookies?.access_token ?? req.headers?.authorization?.split(' ')[1];
+    const token = req.cookies?.access_token ?? req.headers?.authorization?.split(' ')[1];
     if (!token) {
       return {
         user: null,
@@ -44,7 +39,7 @@ export class AuthController {
       };
     }
     const user = await this.getUserSessionUseCase.execute(token);
-    const role = user.metadata.role;
+    const role = (user.metadata.role as Role | undefined) ?? null;
     return { user, role };
   }
 
@@ -75,10 +70,7 @@ export class AuthController {
   @Public()
   @SkipCsrf()
   @Post('login')
-  async login(
-    @Body() body: LoginBodyDto,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<AuthUser> {
+  async login(@Body() body: LoginBodyDto, @Res({ passthrough: true }) res: Response): Promise<AuthUser> {
     const isProd = process.env.NODE_ENV === 'production';
     const { authUser, session } = await this.loginUseCase.execute(body);
 
@@ -129,10 +121,7 @@ export class AuthController {
 
   @SkipCsrf()
   @Post('update-password')
-  async changePassword(
-    @Body() body: UpdatePasswordBodyDto,
-    @CurrentUser() user: User,
-  ): Promise<void> {
+  async changePassword(@Body() body: UpdatePasswordBodyDto, @CurrentUser() user: User): Promise<void> {
     await this.updatePasswordUseCase.execute(user.id, body.password);
     return;
   }

@@ -1,8 +1,5 @@
 import { StudentMapper } from './student.mapper';
-import type {
-  InsertStudent,
-  SupabaseStudent,
-} from 'src/domain/teaching/student/type/student.type';
+import type { InsertStudent, SupabaseStudent } from 'src/domain/teaching/student/type/student.type';
 
 describe('StudentMapper', () => {
   const supabaseRow: SupabaseStudent = {

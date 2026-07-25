@@ -16,11 +16,11 @@ export class PdfParseExtractor implements IPdfExtractorProvider {
     }
   }
 
-  async extractQuestionsToPdf(
+  extractQuestionsToPdf(
     questions: Question[],
     sessionName: string,
     courseTitle: string,
-  ): Promise<{ buffer: Buffer; fileName: string }> {
+  ): { buffer: Buffer; fileName: string } {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -49,12 +49,7 @@ export class PdfParseExtractor implements IPdfExtractorProvider {
         yPos = 20;
       }
 
-      const typeLabel =
-        q.type === 'single'
-          ? 'QCM'
-          : q.type === 'multiple'
-            ? 'Choix multiples'
-            : 'Question ouverte';
+      const typeLabel = q.type === 'single' ? 'QCM' : q.type === 'multiple' ? 'Choix multiples' : 'Question ouverte';
 
       doc.setFontSize(11);
       doc.setTextColor(59, 130, 246);
@@ -84,34 +79,18 @@ export class PdfParseExtractor implements IPdfExtractorProvider {
 
         doc.setTextColor(34, 139, 34);
         if (q.type === 'single' && q.correctAnswers?.[0]) {
-          doc.text(
-            `Réponse : ${this.getCorrectAnswerDisplay(q.proposals, q.correctAnswers || [])}`,
-            14,
-            yPos,
-          );
+          doc.text(`Réponse : ${this.getCorrectAnswerDisplay(q.proposals, q.correctAnswers || [])}`, 14, yPos);
           yPos += 6;
-        } else if (
-          q.type === 'multiple' &&
-          q.correctAnswers &&
-          q.correctAnswers.length > 0
-        ) {
-          const resolved = q.correctAnswers.map((ca) =>
-            this.getCorrectAnswerDisplay(q.proposals, q.correctAnswers || []),
-          );
+        } else if (q.type === 'multiple' && q.correctAnswers && q.correctAnswers.length > 0) {
+          const resolved = q.correctAnswers.map((ca) => this.getCorrectAnswerDisplay(q.proposals, [ca]));
           doc.text(`Réponses : ${resolved.join(', ')}`, 14, yPos);
           yPos += 6;
         }
       } else if (q.type === 'open') {
         doc.setTextColor(34, 139, 34);
-        const openDisplay = this.getCorrectAnswerDisplay(
-          q.proposals,
-          q.correctAnswers || [],
-        );
+        const openDisplay = this.getCorrectAnswerDisplay(q.proposals, q.correctAnswers || []);
         if (openDisplay) {
-          const repLines = doc.splitTextToSize(
-            `Réponse attendue : ${openDisplay}`,
-            pageWidth - 28,
-          );
+          const repLines = doc.splitTextToSize(`Réponse attendue : ${openDisplay}`, pageWidth - 28);
           doc.text(repLines, 14, yPos);
           yPos += repLines.length * 5 + 2;
         }
@@ -119,10 +98,7 @@ export class PdfParseExtractor implements IPdfExtractorProvider {
 
       if (q.explanation) {
         doc.setTextColor(100);
-        const expLines = doc.splitTextToSize(
-          `Explication : ${q.explanation}`,
-          pageWidth - 28,
-        );
+        const expLines = doc.splitTextToSize(`Explication : ${q.explanation}`, pageWidth - 28);
         doc.text(expLines, 14, yPos);
         yPos += expLines.length * 5;
       }
@@ -149,10 +125,7 @@ export class PdfParseExtractor implements IPdfExtractorProvider {
       .filter((s) => s.length > 0);
   }
 
-  private getCorrectAnswerDisplay(
-    proposals: unknown,
-    correctAnswers: string[] | null,
-  ): string {
+  private getCorrectAnswerDisplay(proposals: unknown, correctAnswers: string[] | null): string {
     if (correctAnswers == null) return '';
 
     if (!Array.isArray(proposals) || proposals.length === 0) {
@@ -162,10 +135,7 @@ export class PdfParseExtractor implements IPdfExtractorProvider {
     if (typeof first === 'object' && first !== null && 'id' in first) {
       const row = proposals.find(
         (p): p is { id: string; label: string } =>
-          typeof p === 'object' &&
-          p !== null &&
-          'id' in p &&
-          (p as { id: string }).id === correctAnswers[0],
+          typeof p === 'object' && p !== null && 'id' in p && (p as { id: string }).id === correctAnswers[0],
       );
       if (row?.label) return row.label;
     }

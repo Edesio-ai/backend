@@ -8,9 +8,7 @@ import {
 } from 'src/domain/teaching/self-learner-course/types/self-learner-course.type';
 
 export class SelfLearnerCourseMapper {
-  static toInsert(
-    payload: SelfLearnerCourseInsertPayload,
-  ): SelfLearnerCourseInsertSupabase {
+  static toInsert(payload: SelfLearnerCourseInsertPayload): SelfLearnerCourseInsertSupabase {
     return {
       self_learner_id: payload.selfLearnerId,
       title: payload.title,
@@ -30,9 +28,7 @@ export class SelfLearnerCourseMapper {
       createdAt: data.created_at,
     };
   }
-  static toUpdate(
-    payload: UpdateSelfLearnerCoursePayload,
-  ): SelfLearnerCourseUpdateSupabase {
+  static toUpdate(payload: UpdateSelfLearnerCoursePayload): SelfLearnerCourseUpdateSupabase {
     const supabasePayload: SelfLearnerCourseUpdateSupabase = {};
 
     if (payload.title) {

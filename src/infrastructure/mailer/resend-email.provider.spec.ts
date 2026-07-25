@@ -1,3 +1,4 @@
+import { Resend } from 'resend';
 import { ResendEmailProvider } from './resend-email.provider';
 import { ServerError } from '../../domain/shared/errors/global.errors';
 
@@ -75,10 +76,7 @@ describe('ResendEmailProvider', () => {
 
     const promise = fixtures.whenSendWelcomeEmail('teacher');
 
-    await fixtures.thenThrowEmailSendingErrorWithMessage(
-      promise,
-      'provider exploded',
-    );
+    await fixtures.thenThrowEmailSendingErrorWithMessage(promise, 'provider exploded');
   });
 });
 
@@ -99,7 +97,7 @@ class Fixtures {
       },
     };
 
-    this.provider = new ResendEmailProvider(resendMock as any);
+    this.provider = new ResendEmailProvider(resendMock as unknown as Resend);
   }
 
   whenSendWelcomeEmail(role: string) {
@@ -107,12 +105,7 @@ class Fixtures {
   }
 
   whenSendProfesseurInvitation() {
-    return this.provider.sendProfesseurInvitation(
-      this.email,
-      this.name,
-      this.invitationToken,
-      this.availableChatbots,
-    );
+    return this.provider.sendProfesseurInvitation(this.email, this.name, this.invitationToken, this.availableChatbots);
   }
 
   whenResendSendResolvesWithoutError() {
@@ -187,28 +180,17 @@ class Fixtures {
 
   async thenThrowEmailSendingError(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
-    await expect(promise).rejects.toThrow(
-      new RegExp(
-        this.resendErrorMessage.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-      ),
-    );
+    await expect(promise).rejects.toThrow(new RegExp(this.resendErrorMessage.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
 
-  async thenThrowEmailSendingErrorWithMessage(
-    promise: Promise<unknown>,
-    message: string,
-  ) {
+  async thenThrowEmailSendingErrorWithMessage(promise: Promise<unknown>, message: string) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
-    await expect(promise).rejects.toThrow(
-      new RegExp(message.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
-    );
+    await expect(promise).rejects.toThrow(new RegExp(message.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
 
   thenInvitationHtmlContainsFrontendUrl(url: string) {
     const payload = this.sendMock.mock.calls[0][0];
-    expect(payload.html).toContain(
-      `${url}/register/teacher-invitation/${this.invitationToken}`,
-    );
+    expect(payload.html).toContain(`${url}/register/teacher-invitation/${this.invitationToken}`);
     expect(payload.html).toContain(`${url}/icon-192.png`);
   }
 }

@@ -8,9 +8,7 @@ const languageLabels: Record<Language, string> = {
   allemand: 'allemand',
 };
 
-export const getGenerateCompletionFeedbackSystemPrompt = (
-  language: Language = 'francais',
-): string => {
+export const getGenerateCompletionFeedbackSystemPrompt = (language: Language = 'francais'): string => {
   const langLabel = languageLabels[language] ?? language;
   return `
         Tu es un professeur bienveillant et encourageant.
@@ -30,13 +28,7 @@ export const getGenerateCompletionFeedbackUserPrompt = (
   feedbackContext: string,
   percent: number,
 ): string => {
-  const {
-    studentName,
-    courseTitle,
-    score,
-    total,
-    language = 'francais',
-  } = body;
+  const { studentName, courseTitle, score, total, language = 'francais' } = body;
   const langLabel = languageLabels[language] ?? language;
   return `
     ${studentName ? `Élève : ${studentName}` : 'Élève anonyme'}

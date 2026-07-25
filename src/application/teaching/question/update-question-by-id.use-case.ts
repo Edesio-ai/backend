@@ -1,26 +1,13 @@
 import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   QUESTIONS_REPOSITORY,
   type IQuestionsRepository,
 } from 'src/domain/teaching/question/contracts/i-questions.repository';
-import {
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
-import {
-  Question,
-  QuestionType,
-} from 'src/domain/teaching/question/types/question.type';
+import { BadRequestError, NotFoundError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { Question, QuestionType } from 'src/domain/teaching/question/types/question.type';
 
 interface UpdateQuestionBody {
   questionText?: string | undefined;
@@ -41,19 +28,8 @@ export class UpdateQuestionByIdUseCase {
     private readonly teacherRepository: ITeacherRepository,
   ) {}
 
-  async execute(
-    questionId: string,
-    body: UpdateQuestionBody,
-    user: AuthUser,
-  ): Promise<Question> {
-    const {
-      questionText,
-      correctAnswers,
-      explanation,
-      type,
-      proposals,
-      positionOrder,
-    } = body;
+  async execute(questionId: string, body: UpdateQuestionBody, user: AuthUser): Promise<Question> {
+    const { questionText, correctAnswers, explanation, type, proposals, positionOrder } = body;
     const question = await this.questionsRepository.getQuestionById(questionId);
     if (!question) {
       throw new NotFoundError('Question not found');
@@ -65,11 +41,7 @@ export class UpdateQuestionByIdUseCase {
     }
 
     const select = 'id, sessions:sessions!inner(teacher_id)';
-    const courseWithSession =
-      await this.coursesRepository.getCourseWithSessionById(
-        question.courseId,
-        select,
-      );
+    const courseWithSession = await this.coursesRepository.getCourseWithSessionById(question.courseId, select);
 
     if (!courseWithSession) {
       throw new NotFoundError('Course not found');
@@ -79,9 +51,7 @@ export class UpdateQuestionByIdUseCase {
       console.error(
         `teacher not allowed to update this question, course teacher id: ${courseWithSession.session.teacherId}, teacher id: ${teacher.id}`,
       );
-      throw new UnauthorizedError(
-        'You are not allowed to update this question',
-      );
+      throw new UnauthorizedError('You are not allowed to update this question');
     }
 
     const updates: Record<string, unknown> = {};
@@ -111,10 +81,7 @@ export class UpdateQuestionByIdUseCase {
     if (correctAnswers !== undefined) updates.correctAnswers = correctAnswers;
     if (explanation !== undefined) updates.explanation = explanation;
     if (positionOrder !== undefined) updates.positionOrder = positionOrder;
-    const updatedQuestion = await this.questionsRepository.updateQuestionById(
-      questionId,
-      updates,
-    );
+    const updatedQuestion = await this.questionsRepository.updateQuestionById(questionId, updates);
 
     return updatedQuestion;
   }

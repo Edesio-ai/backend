@@ -1,9 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type ISelfLearnerCourseRepository,
   SELF_LEARNER_COURSE_REPOSITORY,
@@ -28,34 +25,24 @@ export class DeleteSelfLearnerQuestionUseCase {
   ) {}
 
   async execute(user: AuthUser, questionId: string): Promise<void> {
-    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(
-      user.id,
-    );
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(user.id);
     if (!selfLearner) {
       throw new NotFoundError('Self learner not found');
     }
-    const selfLearnerQuestion =
-      await this.selfLearnerQuestionRepository.getSelfLearnerQuestionById(
-        questionId,
-      );
+    const selfLearnerQuestion = await this.selfLearnerQuestionRepository.getSelfLearnerQuestionById(questionId);
     if (!selfLearnerQuestion) {
       throw new NotFoundError('Self learner question not found');
     }
-    const selfLearnerCourse =
-      await this.selfLearnerCourseRepository.getSelfLearnerCourseById(
-        selfLearnerQuestion.courseId,
-      );
+    const selfLearnerCourse = await this.selfLearnerCourseRepository.getSelfLearnerCourseById(
+      selfLearnerQuestion.courseId,
+    );
     if (!selfLearnerCourse) {
       throw new NotFoundError('Self learner course not found');
     }
 
     if (selfLearnerCourse.selfLearnerId !== selfLearner.id) {
-      throw new ForbiddenError(
-        'You are not allowed to delete this self learner question',
-      );
+      throw new ForbiddenError('You are not allowed to delete this self learner question');
     }
-    await this.selfLearnerQuestionRepository.deleteSelfLearnerQuestionById(
-      questionId,
-    );
+    await this.selfLearnerQuestionRepository.deleteSelfLearnerQuestionById(questionId);
   }
 }

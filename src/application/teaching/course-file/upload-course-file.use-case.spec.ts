@@ -1,6 +1,6 @@
 import { UploadCourseFileUseCase } from 'src/application/teaching/course-file/upload-course-file.use-case';
 import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
-import { CourseFileUpload } from 'src/domain/teaching/course-file/types/course-file.type';
+import { CourseFile, CourseFileUpload } from 'src/domain/teaching/course-file/types/course-file.type';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 
 describe('UploadCourseFileUseCase', () => {
@@ -43,9 +43,7 @@ describe('UploadCourseFileUseCase', () => {
     const promise = fixtures.whenExecute();
 
     await fixtures.thenThrowRepositoryError(promise);
-    expect(
-      fixtures.courseFileRepository.insertCourseFile,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseFileRepository.insertCourseFile).not.toHaveBeenCalled();
   });
 
   it('should propagate error when insertCourseFile fails', async () => {
@@ -66,7 +64,7 @@ class Fixtures {
     byteLength: 9,
   };
 
-  public readonly insertedFile = {
+  public readonly insertedFile: CourseFile = {
     id: 'file-1',
     courseId: this.courseId,
     fileUrl: `${this.courseId}/1700000000000.pdf`,
@@ -90,40 +88,27 @@ class Fixtures {
 
   whenUploadAndInsertSucceed() {
     this.courseFileRepository.storeCourseFile.mockResolvedValue();
-    this.courseFileRepository.insertCourseFile.mockResolvedValue(
-      this.insertedFile as any,
-    );
+    this.courseFileRepository.insertCourseFile.mockResolvedValue(this.insertedFile);
   }
 
   whenStoreFails() {
-    this.courseFileRepository.storeCourseFile.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.courseFileRepository.storeCourseFile.mockRejectedValue(this.repositoryError);
   }
 
   whenStoreSucceedsInsertFails() {
     this.courseFileRepository.storeCourseFile.mockResolvedValue();
-    this.courseFileRepository.insertCourseFile.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.courseFileRepository.insertCourseFile.mockRejectedValue(this.repositoryError);
   }
 
   thenStoreCourseFileCalledWithExpectedPath() {
     const expectedPath = `${this.courseId}/1700000000000.pdf`;
-    expect(this.courseFileRepository.storeCourseFile).toHaveBeenCalledWith(
-      this.file,
-      expectedPath,
-    );
+    expect(this.courseFileRepository.storeCourseFile).toHaveBeenCalledWith(this.file, expectedPath);
     expect(this.courseFileRepository.storeCourseFile).toHaveBeenCalledTimes(1);
   }
 
   thenInsertCourseFileCalledWithSamePath() {
     const expectedPath = `${this.courseId}/1700000000000.pdf`;
-    expect(this.courseFileRepository.insertCourseFile).toHaveBeenCalledWith(
-      this.courseId,
-      this.file,
-      expectedPath,
-    );
+    expect(this.courseFileRepository.insertCourseFile).toHaveBeenCalledWith(this.courseId, this.file, expectedPath);
     expect(this.courseFileRepository.insertCourseFile).toHaveBeenCalledTimes(1);
   }
 

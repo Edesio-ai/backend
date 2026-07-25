@@ -15,7 +15,4 @@ export type SelfLearnerSupabase = {
 };
 
 export type SelfLearnerToInsert = Omit<SelfLearner, 'id' | 'createdAt'>;
-export type SelfLearnerToInsertSupabase = Omit<
-  SelfLearnerSupabase,
-  'id' | 'created_at'
->;
+export type SelfLearnerToInsertSupabase = Omit<SelfLearnerSupabase, 'id' | 'created_at'>;

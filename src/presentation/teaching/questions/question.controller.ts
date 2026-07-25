@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
@@ -30,18 +22,12 @@ export class QuestionController {
 
   @Roles('student', 'teacher')
   @Get('course/:courseId')
-  async getCourseQuestions(
-    @CurrentUser() user: AuthUser,
-    @Param('courseId') courseId: string,
-  ): Promise<Question[]> {
+  async getCourseQuestions(@CurrentUser() user: AuthUser, @Param('courseId') courseId: string): Promise<Question[]> {
     return (await this.getCourseQuestionsUseCase.execute(courseId, user)) || [];
   }
 
   @Post()
-  async createQuestion(
-    @Body() body: CreateQuestionDto,
-    @CurrentUser() user: AuthUser,
-  ): Promise<{ data: Question }> {
+  async createQuestion(@Body() body: CreateQuestionDto, @CurrentUser() user: AuthUser): Promise<{ data: Question }> {
     const question = await this.createQuestionUseCase.execute(body, user);
     return { data: question };
   }
@@ -51,10 +37,7 @@ export class QuestionController {
     @Param('questionId') questionId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<{ success: boolean }> {
-    const success = await this.deleteQuestionByIdUseCase.execute(
-      questionId,
-      user,
-    );
+    const success = await this.deleteQuestionByIdUseCase.execute(questionId, user);
     return { success };
   }
 
@@ -64,11 +47,7 @@ export class QuestionController {
     @Body() body: UpdateQuestionDto,
     @CurrentUser() user: AuthUser,
   ): Promise<{ question: Question }> {
-    const question = await this.updateQuestionUseCase.execute(
-      courseId,
-      body,
-      user,
-    );
+    const question = await this.updateQuestionUseCase.execute(courseId, body, user);
 
     return { question };
   }

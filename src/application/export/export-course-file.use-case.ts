@@ -16,9 +16,7 @@ export class ExportCourseFileUseCase {
       throw new NotFoundException('File not found');
     }
 
-    const buffer = await this.courseFileRepository.getFileBufferFromStorage(
-      file.fileUrl,
-    );
+    const buffer = await this.courseFileRepository.getFileBufferFromStorage(file.fileUrl);
     if (!buffer) {
       throw new NotFoundException('File not found');
     }

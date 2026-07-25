@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   QUESTIONS_REPOSITORY,
   type IQuestionsRepository,
@@ -11,10 +8,7 @@ import {
   SESSION_REPOSITORY,
   type ISessionRepository,
 } from 'src/domain/teaching/session/contracts/i-session.repository';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   COURSE_FILE_REPOSITORY,
@@ -42,24 +36,17 @@ export class DeleteSessionUseCase {
   ) {}
 
   async execute(sessionId: string, userId: string): Promise<void> {
-    const sessionCourses =
-      await this.courseRepository.getCoursesBySessionId(sessionId);
+    const sessionCourses = await this.courseRepository.getCoursesBySessionId(sessionId);
 
     if (sessionCourses && sessionCourses.length > 0) {
       const sessionCoursesIds = sessionCourses.map((c) => c.id);
 
-      await this.questionsRepository.deleteQuestionsByCourseIds(
-        sessionCoursesIds,
-      );
-      await this.courseFileRepository.deleteCoursesFilesByCourseIds(
-        sessionCoursesIds,
-      );
+      await this.questionsRepository.deleteQuestionsByCourseIds(sessionCoursesIds);
+      await this.courseFileRepository.deleteCoursesFilesByCourseIds(sessionCoursesIds);
     }
 
     await this.courseRepository.deleteCoursesBySessionId(sessionId);
-    await this.studentSessionRepository.deleteStudentSessionsBySessionId(
-      sessionId,
-    );
+    await this.studentSessionRepository.deleteStudentSessionsBySessionId(sessionId);
 
     const teacher = await this.teacherRepository.getTeacherByUserId(userId);
     if (!teacher) {

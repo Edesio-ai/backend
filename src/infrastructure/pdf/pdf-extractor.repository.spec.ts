@@ -81,9 +81,7 @@ describe('PdfParseExtractor', () => {
     it('should call destroy even when getText throws', async () => {
       mockGetText.mockRejectedValue(new Error('parse error'));
 
-      await expect(
-        extractor.extractTextFromPdf(Buffer.from('pdf')),
-      ).rejects.toThrow('parse error');
+      await expect(extractor.extractTextFromPdf(Buffer.from('pdf'))).rejects.toThrow('parse error');
 
       expect(mockDestroy).toHaveBeenCalledTimes(1);
     });
@@ -93,24 +91,14 @@ describe('PdfParseExtractor', () => {
 
   describe('extractQuestionsToPdf', () => {
     it('should return a Buffer and a fileName', async () => {
-      const { buffer, fileName } = await extractor.extractQuestionsToPdf(
-        [BASE_QUESTION],
-        'Session A',
-        'Mathématiques',
-      );
+      const { buffer, fileName } = extractor.extractQuestionsToPdf([BASE_QUESTION], 'Session A', 'Mathématiques');
 
       expect(buffer).toBeInstanceOf(Buffer);
-      expect(fileName).toMatch(
-        /^questions_Math_matiques_\d{4}-\d{2}-\d{2}\.pdf$/,
-      );
+      expect(fileName).toMatch(/^questions_Math_matiques_\d{4}-\d{2}-\d{2}\.pdf$/);
     });
 
     it('should include the session name and course title in the header', async () => {
-      await extractor.extractQuestionsToPdf(
-        [BASE_QUESTION],
-        'Session Test',
-        'Histoire',
-      );
+      extractor.extractQuestionsToPdf([BASE_QUESTION], 'Session Test', 'Histoire');
 
       const allTextCalls = mockText.mock.calls.map((c) => c[0]);
       expect(allTextCalls).toContain('Session : Session Test');
@@ -119,19 +107,17 @@ describe('PdfParseExtractor', () => {
 
     it('should write question count in the header', async () => {
       const questions = [BASE_QUESTION, { ...BASE_QUESTION, id: 'q-2' }];
-      await extractor.extractQuestionsToPdf(questions, 'S', 'C');
+      extractor.extractQuestionsToPdf(questions, 'S', 'C');
 
       const allTextCalls = mockText.mock.calls.map((c) => c[0]);
       expect(allTextCalls).toContain('2 question(s)');
     });
 
     it('should display "QCM" label for single-type questions', async () => {
-      await extractor.extractQuestionsToPdf([BASE_QUESTION], 'S', 'C');
+      extractor.extractQuestionsToPdf([BASE_QUESTION], 'S', 'C');
 
       const allTextCalls = mockText.mock.calls.map((c) => c[0]);
-      expect(
-        allTextCalls.some((t) => typeof t === 'string' && t.includes('QCM')),
-      ).toBe(true);
+      expect(allTextCalls.some((t) => typeof t === 'string' && t.includes('QCM'))).toBe(true);
     });
 
     it('should display "Choix multiples" label for multiple-type questions', async () => {
@@ -140,14 +126,10 @@ describe('PdfParseExtractor', () => {
         type: 'multiple',
         correctAnswers: ['a', 'b'],
       };
-      await extractor.extractQuestionsToPdf([q], 'S', 'C');
+      extractor.extractQuestionsToPdf([q], 'S', 'C');
 
       const allTextCalls = mockText.mock.calls.map((c) => c[0]);
-      expect(
-        allTextCalls.some(
-          (t) => typeof t === 'string' && t.includes('Choix multiples'),
-        ),
-      ).toBe(true);
+      expect(allTextCalls.some((t) => typeof t === 'string' && t.includes('Choix multiples'))).toBe(true);
     });
 
     it('should display "Question ouverte" label for open-type questions', async () => {
@@ -157,28 +139,19 @@ describe('PdfParseExtractor', () => {
         proposals: null,
         correctAnswers: ['Paris'],
       };
-      await extractor.extractQuestionsToPdf([q], 'S', 'C');
+      extractor.extractQuestionsToPdf([q], 'S', 'C');
 
       const allTextCalls = mockText.mock.calls.map((c) => c[0]);
-      expect(
-        allTextCalls.some(
-          (t) => typeof t === 'string' && t.includes('Question ouverte'),
-        ),
-      ).toBe(true);
+      expect(allTextCalls.some((t) => typeof t === 'string' && t.includes('Question ouverte'))).toBe(true);
     });
 
     it('should write the correct answer for a single-type question with object proposals', async () => {
-      await extractor.extractQuestionsToPdf([BASE_QUESTION], 'S', 'C');
+      extractor.extractQuestionsToPdf([BASE_QUESTION], 'S', 'C');
 
       const allTextCalls = mockText.mock.calls.map((c) => c[0]);
-      expect(
-        allTextCalls.some(
-          (t) =>
-            typeof t === 'string' &&
-            t.includes('Réponse') &&
-            t.includes('Paris'),
-        ),
-      ).toBe(true);
+      expect(allTextCalls.some((t) => typeof t === 'string' && t.includes('Réponse') && t.includes('Paris'))).toBe(
+        true,
+      );
     });
 
     it('should write the expected answer for an open-type question with plain string correctAnswers', async () => {
@@ -189,59 +162,41 @@ describe('PdfParseExtractor', () => {
         correctAnswers: ['La photosynthèse'],
         explanation: null,
       };
-      await extractor.extractQuestionsToPdf([q], 'S', 'C');
+      extractor.extractQuestionsToPdf([q], 'S', 'C');
 
       // doc.text() may receive a string[] from splitTextToSize — flatten 2 levels
-      const allTextCallsFlat = mockText.mock.calls
-        .flat(2)
-        .filter((v) => typeof v === 'string');
-      expect(
-        allTextCallsFlat.some(
-          (t) =>
-            t.includes('Réponse attendue') && t.includes('La photosynthèse'),
-        ),
-      ).toBe(true);
+      const allTextCallsFlat = mockText.mock.calls.flat(2).filter((v) => typeof v === 'string');
+      expect(allTextCallsFlat.some((t) => t.includes('Réponse attendue') && t.includes('La photosynthèse'))).toBe(true);
     });
 
     it('should write the explanation when present', async () => {
-      await extractor.extractQuestionsToPdf([BASE_QUESTION], 'S', 'C');
+      extractor.extractQuestionsToPdf([BASE_QUESTION], 'S', 'C');
 
       // doc.text() may receive a string[] from splitTextToSize — flatten 2 levels
-      const allTextCallsFlat = mockText.mock.calls
-        .flat(2)
-        .filter((v) => typeof v === 'string');
-      expect(
-        allTextCallsFlat.some(
-          (t) =>
-            t.includes('Explication') && t.includes('Paris est la capitale.'),
-        ),
-      ).toBe(true);
+      const allTextCallsFlat = mockText.mock.calls.flat(2).filter((v) => typeof v === 'string');
+      expect(allTextCallsFlat.some((t) => t.includes('Explication') && t.includes('Paris est la capitale.'))).toBe(
+        true,
+      );
     });
 
     it('should not write an explanation block when explanation is null', async () => {
       const q: Question = { ...BASE_QUESTION, explanation: null };
-      await extractor.extractQuestionsToPdf([q], 'S', 'C');
+      extractor.extractQuestionsToPdf([q], 'S', 'C');
 
-      const allTextCallsFlat = mockText.mock.calls
-        .flat()
-        .filter((v) => typeof v === 'string');
-      expect(allTextCallsFlat.some((t) => t.includes('Explication'))).toBe(
-        false,
-      );
+      const allTextCallsFlat = mockText.mock.calls.flat().filter((v) => typeof v === 'string');
+      expect(allTextCallsFlat.some((t) => t.includes('Explication'))).toBe(false);
     });
 
     it('should add a new page when yPos exceeds 250', async () => {
       // splitTextToSize returns 60 lines per call → yPos grows fast and triggers addPage
-      mockSplitTextToSize.mockImplementation((text: string) =>
-        Array(60).fill(text),
-      );
+      mockSplitTextToSize.mockImplementation((text: string) => Array(60).fill(text));
 
       const manyQuestions = Array.from({ length: 5 }, (_, i) => ({
         ...BASE_QUESTION,
         id: `q-${i}`,
       }));
 
-      await extractor.extractQuestionsToPdf(manyQuestions, 'S', 'C');
+      extractor.extractQuestionsToPdf(manyQuestions, 'S', 'C');
 
       expect(mockAddPage).toHaveBeenCalled();
     });
@@ -253,16 +208,11 @@ describe('PdfParseExtractor', () => {
         correctAnswers: ['Oui'],
       };
 
-      const { buffer } = await extractor.extractQuestionsToPdf([q], 'S', 'C');
+      const { buffer } = extractor.extractQuestionsToPdf([q], 'S', 'C');
 
       expect(buffer).toBeInstanceOf(Buffer);
       const allTextCalls = mockText.mock.calls.map((c) => c[0]);
-      expect(
-        allTextCalls.some(
-          (t) =>
-            typeof t === 'string' && t.includes('Réponse') && t.includes('Oui'),
-        ),
-      ).toBe(true);
+      expect(allTextCalls.some((t) => typeof t === 'string' && t.includes('Réponse') && t.includes('Oui'))).toBe(true);
     });
 
     it('should handle questions with null proposals gracefully', async () => {
@@ -274,34 +224,22 @@ describe('PdfParseExtractor', () => {
         explanation: null,
       };
 
-      await expect(
-        extractor.extractQuestionsToPdf([q], 'S', 'C'),
-      ).resolves.not.toThrow();
+      expect(() => extractor.extractQuestionsToPdf([q], 'S', 'C')).not.toThrow();
     });
 
     it('should produce a non-empty buffer', async () => {
       mockOutput.mockReturnValue(new ArrayBuffer(16));
 
-      const { buffer } = await extractor.extractQuestionsToPdf(
-        [BASE_QUESTION],
-        'S',
-        'C',
-      );
+      const { buffer } = extractor.extractQuestionsToPdf([BASE_QUESTION], 'S', 'C');
 
       expect(buffer.length).toBeGreaterThan(0);
     });
 
     it('should sanitise special characters in the fileName', async () => {
-      const { fileName } = await extractor.extractQuestionsToPdf(
-        [BASE_QUESTION],
-        'S',
-        'Cours & Tests!',
-      );
+      const { fileName } = extractor.extractQuestionsToPdf([BASE_QUESTION], 'S', 'Cours & Tests!');
 
       expect(fileName).not.toMatch(/[&! ]/);
-      expect(fileName).toMatch(
-        /^questions_Cours___Tests__\d{4}-\d{2}-\d{2}\.pdf$/,
-      );
+      expect(fileName).toMatch(/^questions_Cours___Tests__\d{4}-\d{2}-\d{2}\.pdf$/);
     });
   });
 });

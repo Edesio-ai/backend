@@ -1,15 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from '../../supabase.module';
-import {
-  InvitationToken,
-  InvitationTokenPreview,
-} from 'src/domain/auth/invitation.type';
+import { InvitationToken, InvitationTokenPreview } from 'src/domain/auth/invitation.type';
 import { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
-import {
-  BadRequestError,
-  ServerError,
-} from 'src/domain/shared/errors/global.errors';
+import { BadRequestError, ServerError } from 'src/domain/shared/errors/global.errors';
 import { invitationTokenMapper } from '../mappers/invitation-token.mapper';
 import { CreateInvitationTokenBody } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
 
@@ -20,38 +14,24 @@ export class InvitationTokenSupabaseRepository implements IInvitationTokenReposi
   ) {}
 
   public async deleteInvitationToken(token: string): Promise<void> {
-    const { error: deleteError } = await this.supabase
-      .from('invitation_tokens')
-      .delete()
-      .eq('id', token);
+    const { error: deleteError } = await this.supabase.from('invitation_tokens').delete().eq('id', token);
 
     if (deleteError) {
-      throw new ServerError(
-        `Error deleting invitation token: ${deleteError.message}`,
-      );
+      throw new ServerError(`Error deleting invitation token: ${deleteError.message}`);
     }
   }
 
-  public async getInvitationByToken(token: string): Promise<InvitationToken> {
-    const { data, error } = await this.supabase
-      .from('invitation_tokens')
-      .select('*')
-      .eq('token', token)
-      .single();
+  public async getInvitationByToken(token: string): Promise<InvitationToken | null> {
+    const { data, error } = await this.supabase.from('invitation_tokens').select('*').eq('token', token).single();
 
     if (error) {
-      throw new ServerError(
-        `Error getting invitation by token: ${error.message}`,
-      );
+      throw new ServerError(`Error getting invitation by token: ${error.message}`);
     }
 
     return invitationTokenMapper.toDomain(data);
   }
 
-  public async markInvitationTokenAsUsed(
-    tokenId: string,
-    teacherId: string,
-  ): Promise<void> {
+  public async markInvitationTokenAsUsed(tokenId: string, teacherId: string): Promise<void> {
     const { data, error } = await this.supabase
       .from('invitation_tokens')
       .update({
@@ -64,16 +44,12 @@ export class InvitationTokenSupabaseRepository implements IInvitationTokenReposi
       .single();
 
     if (!data || error) {
-      throw new BadRequestError(
-        error ? error.message : 'Failed to mark invitation token as used',
-      );
+      throw new BadRequestError(error ? error.message : 'Failed to mark invitation token as used');
     }
     return data;
   }
 
-  async getInvitationTokenByEstablishmentId(
-    establishmentId: string,
-  ): Promise<InvitationToken[]> {
+  async getInvitationTokenByEstablishmentId(establishmentId: string): Promise<InvitationToken[]> {
     const { data, error } = await this.supabase
       .from('invitation_tokens')
       .select('*')
@@ -84,17 +60,13 @@ export class InvitationTokenSupabaseRepository implements IInvitationTokenReposi
       console.error(
         `An error occure while getting invitation token by establishment id: ${establishmentId}, error: ${error}`,
       );
-      throw new ServerError(
-        `An error occure while getting invitation token by establishment id`,
-      );
+      throw new ServerError(`An error occure while getting invitation token by establishment id`);
     }
 
     return (data ?? []).map(invitationTokenMapper.toDomain);
   }
 
-  public async createInvitationToken(
-    body: CreateInvitationTokenBody,
-  ): Promise<void> {
+  public async createInvitationToken(body: CreateInvitationTokenBody): Promise<void> {
     const { error } = await this.supabase
       .from('invitation_tokens')
       .insert(invitationTokenMapper.toInsert(body))
@@ -102,20 +74,14 @@ export class InvitationTokenSupabaseRepository implements IInvitationTokenReposi
       .single();
 
     if (error) {
-      console.error(
-        'An error occurred while creating the invitation token: ',
-        body,
-        error,
-      );
+      console.error('An error occurred while creating the invitation token: ', body, error);
       throw new ServerError(error.message);
     }
 
     return;
   }
 
-  public async getInvitationPreview(
-    token: string,
-  ): Promise<InvitationTokenPreview> {
+  public async getInvitationPreview(token: string): Promise<InvitationTokenPreview> {
     const { data, error } = await this.supabase
       .from('invitation_tokens')
       .select(
@@ -149,10 +115,7 @@ export class InvitationTokenSupabaseRepository implements IInvitationTokenReposi
     return invitationTokenMapper.toPreview(data, maskedEmail);
   }
 
-  public async updateTokenUsedAt(
-    tokenId: string,
-    teacherId: string,
-  ): Promise<void> {
+  public async updateTokenUsedAt(tokenId: string, teacherId: string): Promise<void> {
     const { error } = await this.supabase
       .from('invitation_tokens')
       .update(invitationTokenMapper.toUpdateUsedAt(teacherId))

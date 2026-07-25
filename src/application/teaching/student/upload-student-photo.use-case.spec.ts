@@ -1,10 +1,7 @@
 import { UploadStudentPhotoUseCase } from './upload-student-photo.use-case';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
-import {
-  Student,
-  StudentPhotoUpload,
-} from 'src/domain/teaching/student/type/student.type';
+import { Student, StudentPhotoUpload } from 'src/domain/teaching/student/type/student.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 
@@ -22,9 +19,7 @@ describe('UploadStudentPhotoUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.studentRepository.getStudentByUserId).toHaveBeenCalledWith(
-      fixtures.user.id,
-    );
+    expect(fixtures.studentRepository.getStudentByUserId).toHaveBeenCalledWith(fixtures.user.id);
   });
 
   it('should throw NotFoundError when the student is not found', async () => {
@@ -61,10 +56,7 @@ describe('UploadStudentPhotoUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.studentRepository.updateStudentPhoto).toHaveBeenCalledWith(
-      fixtures.student.id,
-      fixtures.photoUrl,
-    );
+    expect(fixtures.studentRepository.updateStudentPhoto).toHaveBeenCalledWith(fixtures.student.id, fixtures.photoUrl);
   });
 
   it('should return the photo url', async () => {
@@ -94,8 +86,7 @@ describe('UploadStudentPhotoUseCase', () => {
 });
 
 class Fixtures {
-  public readonly photoUrl =
-    'https://storage.example.com/profile-photos/student-1/1234567890.jpg';
+  public readonly photoUrl = 'https://storage.example.com/profile-photos/student-1/1234567890.jpg';
 
   public readonly user: AuthUser = {
     id: 'user-1',

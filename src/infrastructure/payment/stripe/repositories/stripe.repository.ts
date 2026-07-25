@@ -7,11 +7,11 @@ import {
   StripeSession,
   StripeSubscription,
   CancelSubscription,
+  StripeCustomer,
+  StripeSubscriptionsLookup,
+  CheckoutSessionCreateResult,
 } from 'src/domain/billing/types/billing.type';
-import {
-  NotFoundError,
-  ServerError,
-} from 'src/domain/shared/errors/global.errors';
+import { NotFoundError, ServerError } from 'src/domain/shared/errors/global.errors';
 
 export class StripeRepository implements IStripeProvider {
   constructor(
@@ -20,18 +20,12 @@ export class StripeRepository implements IStripeProvider {
   ) {}
   async getCheckoutSession(sessionId: string): Promise<StripeSession> {
     try {
-      const session =
-        await this.stripeClient.checkout.sessions.retrieve(sessionId);
+      const session = await this.stripeClient.checkout.sessions.retrieve(sessionId);
       return {
         id: session.id,
-        customerId:
-          typeof session.customer === 'string'
-            ? session.customer
-            : (session.customer?.id ?? null),
+        customerId: typeof session.customer === 'string' ? session.customer : (session.customer?.id ?? null),
         subscriptionId:
-          typeof session.subscription === 'string'
-            ? session.subscription
-            : (session.subscription?.id ?? null),
+          typeof session.subscription === 'string' ? session.subscription : (session.subscription?.id ?? null),
         status: session.status ?? 'open',
         paymentStatus: session.payment_status,
         metadata: session.metadata ?? {},
@@ -42,7 +36,7 @@ export class StripeRepository implements IStripeProvider {
     }
   }
 
-  async getCustomerByEmail(email: string): Promise<any> {
+  async getCustomerByEmail(email: string): Promise<StripeCustomer[]> {
     try {
       const customer = await this.stripeClient.customers.list({
         email: email,
@@ -56,37 +50,33 @@ export class StripeRepository implements IStripeProvider {
     }
   }
 
-  async getCheckoutSessionByUserId(userId: string): Promise<any> {
+  async getCheckoutSessionByUserId(userId: string): Promise<string | null> {
     try {
       const sessions = await this.stripeClient.checkout.sessions.list({
         limit: 20,
       });
 
-      const matchingSession = sessions.data.find(
-        (s) => s.client_reference_id === userId && s.customer,
-      );
+      const matchingSession = sessions.data.find((s) => s.client_reference_id === userId && s.customer);
 
       if (matchingSession && matchingSession.customer) {
-        return typeof matchingSession.customer === 'string'
-          ? matchingSession.customer
-          : matchingSession.customer.id;
+        return typeof matchingSession.customer === 'string' ? matchingSession.customer : matchingSession.customer.id;
       }
       return null;
     } catch (sessionErr) {
-      const message =
-        sessionErr instanceof Error ? sessionErr.message : 'Unknown error';
+      const message = sessionErr instanceof Error ? sessionErr.message : 'Unknown error';
       throw new ServerError(`Error searching checkout sessions: ${message}`);
     }
   }
 
-  async getSubscriptionsByCustomerId(customerId: string): Promise<any> {
+  async getSubscriptionsByCustomerId(customerId: string): Promise<StripeSubscriptionsLookup> {
     try {
       const subscriptions = await this.stripeClient.subscriptions.list({
         customer: customerId,
         limit: 10,
       });
 
-      return subscriptions.data;
+      // Runtime shape is a plain array; callers may also read `.data` (tests attach it).
+      return subscriptions.data as unknown as StripeSubscriptionsLookup;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       throw new ServerError(`Error searching subscriptions: ${message}`);
@@ -98,7 +88,7 @@ export class StripeRepository implements IStripeProvider {
     priceId: string,
     planType: string,
     locale?: 'en' | 'fr',
-  ): Promise<any> {
+  ): Promise<CheckoutSessionCreateResult> {
     try {
       const { email } = user;
 
@@ -196,7 +186,7 @@ export class StripeRepository implements IStripeProvider {
         interval: interval,
         amount: subscription.items.data[0]?.price?.unit_amount || 0,
         currency: subscription.items.data[0]?.price?.currency || 'eur',
-        currentPeriodEnd: preview ? preview.period_end : subscription.cancel_at,
+        currentPeriodEnd: (preview ? preview.period_end : subscription.cancel_at) ?? undefined,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
         last4,
         cardBrand,
@@ -207,17 +197,14 @@ export class StripeRepository implements IStripeProvider {
     }
   }
 
-  private async getPreview(
-    customerId: string,
-    subscriptionId: string,
-  ): Promise<any> {
+  private async getPreview(customerId: string, subscriptionId: string): Promise<Stripe.Invoice | null> {
     try {
       const preview = await this.stripeClient.invoices.createPreview({
         customer: customerId,
         subscription: subscriptionId,
       });
       return preview;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -242,13 +229,11 @@ export class StripeRepository implements IStripeProvider {
 
       const subscriptionId = subscriptions.data[0].id;
 
-      const canceledSubscription = await this.stripeClient.subscriptions.update(
-        subscriptionId,
-        { cancel_at_period_end: true },
-      );
+      const canceledSubscription = await this.stripeClient.subscriptions.update(subscriptionId, {
+        cancel_at_period_end: true,
+      });
 
-      const productId = subscriptions.data[0].items.data[0]?.price
-        ?.product as string;
+      const productId = subscriptions.data[0].items.data[0]?.price?.product as string;
 
       let planName = 'Abonnement Edesio';
       if (productId) {
@@ -260,15 +245,12 @@ export class StripeRepository implements IStripeProvider {
         }
       }
 
-      const endTimestamp = (canceledSubscription as any).cancel_at;
-      const endDate = new Date(endTimestamp * 1000).toLocaleDateString(
-        'fr-FR',
-        {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        },
-      );
+      const endTimestamp = canceledSubscription.cancel_at ?? 0;
+      const endDate = new Date(endTimestamp * 1000).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
 
       return {
         planName,

@@ -4,14 +4,8 @@ import {
   COURSE_QUESTION_REPOSITORY,
   type ICourseQuestionRepository,
 } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
-import {
-  type ITeacherRepository,
-  TEACHER_REPOSITORY,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { type ITeacherRepository, TEACHER_REPOSITORY } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 export class DeleteCourseQuestionUseCase {
   constructor(
@@ -29,10 +23,7 @@ export class DeleteCourseQuestionUseCase {
       throw new NotFoundException('Teacher not found');
     }
 
-    const courseQuestion =
-      await this.courseQuestionRepository.getCourseQuestionByCourseId(
-        courseQuestionId,
-      );
+    const courseQuestion = await this.courseQuestionRepository.getCourseQuestionByCourseId(courseQuestionId);
     if (!courseQuestion) {
       throw new NotFoundException('Course question not found');
     }
@@ -44,23 +35,15 @@ export class DeleteCourseQuestionUseCase {
         )
         `;
 
-    const CourseWithSession =
-      await this.courseRepository.getCourseWithSessionById(
-        courseQuestion.courseId,
-        select,
-      );
+    const CourseWithSession = await this.courseRepository.getCourseWithSessionById(courseQuestion.courseId, select);
     if (!CourseWithSession) {
       throw new NotFoundException('Course not found');
     }
 
     if (CourseWithSession.session.teacherId !== teacher.id) {
-      throw new ForbiddenException(
-        'You are not allowed to delete this course question',
-      );
+      throw new ForbiddenException('You are not allowed to delete this course question');
     }
 
-    await this.courseQuestionRepository.deleteCourseQuestionById(
-      courseQuestionId,
-    );
+    await this.courseQuestionRepository.deleteCourseQuestionById(courseQuestionId);
   }
 }

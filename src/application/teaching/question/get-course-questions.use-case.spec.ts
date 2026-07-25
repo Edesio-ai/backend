@@ -1,9 +1,6 @@
 import { GetCourseQuestionsUseCase } from './get-course-questions.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
@@ -14,10 +11,7 @@ import { createMockQuestionsRepository } from 'src/testing/mock-questions-reposi
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
-import {
-  Course,
-  CourseWithSession,
-} from 'src/domain/teaching/course/types/course.type';
+import { Course, CourseWithSession } from 'src/domain/teaching/course/types/course.type';
 import { Question } from 'src/domain/teaching/question/types/question.type';
 
 /** Même valeur que dans `GetCourseQuestionsUseCase.checkTeacherAccess` (PostgREST select). */
@@ -44,18 +38,13 @@ describe('GetCourseQuestionsUseCase', () => {
       const result = await fixtures.whenTeacherExecute();
 
       expect(result).toEqual(fixtures.questions);
-      expect(
-        fixtures.coursesRepository.getCourseWithSessionById,
-      ).toHaveBeenCalledWith(fixtures.courseId, TEACHER_COURSE_SELECT);
-      expect(
-        fixtures.studentRepository.getStudentByUserId,
-      ).not.toHaveBeenCalled();
-      expect(
-        fixtures.questionsRepository.getCourseQuestions,
-      ).toHaveBeenCalledWith(fixtures.courseId);
-      expect(
-        fixtures.questionsRepository.getCourseQuestions,
-      ).toHaveBeenCalledTimes(1);
+      expect(fixtures.coursesRepository.getCourseWithSessionById).toHaveBeenCalledWith(
+        fixtures.courseId,
+        TEACHER_COURSE_SELECT,
+      );
+      expect(fixtures.studentRepository.getStudentByUserId).not.toHaveBeenCalled();
+      expect(fixtures.questionsRepository.getCourseQuestions).toHaveBeenCalledWith(fixtures.courseId);
+      expect(fixtures.questionsRepository.getCourseQuestions).toHaveBeenCalledTimes(1);
     });
 
     it('should throw NotFoundError when teacher is missing', async () => {
@@ -64,15 +53,9 @@ describe('GetCourseQuestionsUseCase', () => {
       const promise = fixtures.whenTeacherExecute();
 
       await expect(promise).rejects.toBeInstanceOf(NotFoundError);
-      expect(
-        fixtures.coursesRepository.getCourseWithSessionById,
-      ).not.toHaveBeenCalled();
-      expect(
-        fixtures.studentRepository.getStudentByUserId,
-      ).not.toHaveBeenCalled();
-      expect(
-        fixtures.questionsRepository.getCourseQuestions,
-      ).not.toHaveBeenCalled();
+      expect(fixtures.coursesRepository.getCourseWithSessionById).not.toHaveBeenCalled();
+      expect(fixtures.studentRepository.getStudentByUserId).not.toHaveBeenCalled();
+      expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundError when course is missing', async () => {
@@ -82,12 +65,11 @@ describe('GetCourseQuestionsUseCase', () => {
       const promise = fixtures.whenTeacherExecute();
 
       await expect(promise).rejects.toBeInstanceOf(NotFoundError);
-      expect(
-        fixtures.coursesRepository.getCourseWithSessionById,
-      ).toHaveBeenCalledWith(fixtures.courseId, TEACHER_COURSE_SELECT);
-      expect(
-        fixtures.questionsRepository.getCourseQuestions,
-      ).not.toHaveBeenCalled();
+      expect(fixtures.coursesRepository.getCourseWithSessionById).toHaveBeenCalledWith(
+        fixtures.courseId,
+        TEACHER_COURSE_SELECT,
+      );
+      expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
     });
 
     it('should throw ForbiddenError when session teacher does not match', async () => {
@@ -97,9 +79,7 @@ describe('GetCourseQuestionsUseCase', () => {
       const promise = fixtures.whenTeacherExecute();
 
       await expect(promise).rejects.toBeInstanceOf(ForbiddenError);
-      expect(
-        fixtures.questionsRepository.getCourseQuestions,
-      ).not.toHaveBeenCalled();
+      expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
     });
 
     it('should propagate errors from questions repository', async () => {
@@ -123,51 +103,29 @@ describe('GetCourseQuestionsUseCase', () => {
       const result = await fixtures.whenStudentExecute();
 
       expect(result).toEqual(fixtures.questions);
-      expect(
-        fixtures.teachersRepository.getTeacherByUserId,
-      ).not.toHaveBeenCalled();
-      expect(
-        fixtures.coursesRepository.getCourseWithSessionById,
-      ).not.toHaveBeenCalled();
-      expect(
-        fixtures.studentRepository.getStudentByUserId,
-      ).toHaveBeenCalledWith(fixtures.studentUser.id);
-      expect(fixtures.coursesRepository.getCourseById).toHaveBeenCalledWith(
-        fixtures.courseId,
-      );
-      expect(
-        fixtures.studentSessionRepository.getStudentSessionBySessionId,
-      ).toHaveBeenCalledWith(fixtures.sessionId);
-      expect(
-        fixtures.questionsRepository.getCourseQuestions,
-      ).toHaveBeenCalledWith(fixtures.courseId);
+      expect(fixtures.teachersRepository.getTeacherByUserId).not.toHaveBeenCalled();
+      expect(fixtures.coursesRepository.getCourseWithSessionById).not.toHaveBeenCalled();
+      expect(fixtures.studentRepository.getStudentByUserId).toHaveBeenCalledWith(fixtures.studentUser.id);
+      expect(fixtures.coursesRepository.getCourseById).toHaveBeenCalledWith(fixtures.courseId);
+      expect(fixtures.studentSessionRepository.getStudentSessionBySessionId).toHaveBeenCalledWith(fixtures.sessionId);
+      expect(fixtures.questionsRepository.getCourseQuestions).toHaveBeenCalledWith(fixtures.courseId);
     });
 
     it('should throw NotFoundError when student is missing', async () => {
       fixtures.whenStudentNotFound();
 
-      await expect(fixtures.whenStudentExecute()).rejects.toBeInstanceOf(
-        NotFoundError,
-      );
+      await expect(fixtures.whenStudentExecute()).rejects.toBeInstanceOf(NotFoundError);
       expect(fixtures.coursesRepository.getCourseById).not.toHaveBeenCalled();
-      expect(
-        fixtures.questionsRepository.getCourseQuestions,
-      ).not.toHaveBeenCalled();
+      expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundError when course is missing', async () => {
       fixtures.whenStudentFound();
       fixtures.whenCourseByIdMissing();
 
-      await expect(fixtures.whenStudentExecute()).rejects.toBeInstanceOf(
-        NotFoundError,
-      );
-      expect(
-        fixtures.studentSessionRepository.getStudentSessionBySessionId,
-      ).not.toHaveBeenCalled();
-      expect(
-        fixtures.questionsRepository.getCourseQuestions,
-      ).not.toHaveBeenCalled();
+      await expect(fixtures.whenStudentExecute()).rejects.toBeInstanceOf(NotFoundError);
+      expect(fixtures.studentSessionRepository.getStudentSessionBySessionId).not.toHaveBeenCalled();
+      expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
     });
 
     it('should throw ForbiddenError when student is not enrolled in session', async () => {
@@ -175,12 +133,8 @@ describe('GetCourseQuestionsUseCase', () => {
       fixtures.whenCourseReturnedForStudent();
       fixtures.whenStudentSessionNotFound();
 
-      await expect(fixtures.whenStudentExecute()).rejects.toBeInstanceOf(
-        ForbiddenError,
-      );
-      expect(
-        fixtures.questionsRepository.getCourseQuestions,
-      ).not.toHaveBeenCalled();
+      await expect(fixtures.whenStudentExecute()).rejects.toBeInstanceOf(ForbiddenError);
+      expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
     });
 
     it('should throw ForbiddenError when session row belongs to another student', async () => {
@@ -188,12 +142,8 @@ describe('GetCourseQuestionsUseCase', () => {
       fixtures.whenCourseReturnedForStudent();
       fixtures.whenStudentSessionOwnedBySomeoneElse();
 
-      await expect(fixtures.whenStudentExecute()).rejects.toBeInstanceOf(
-        ForbiddenError,
-      );
-      expect(
-        fixtures.questionsRepository.getCourseQuestions,
-      ).not.toHaveBeenCalled();
+      await expect(fixtures.whenStudentExecute()).rejects.toBeInstanceOf(ForbiddenError);
+      expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
     });
   });
 });
@@ -301,29 +251,23 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teachersRepository.getTeacherByUserId.mockResolvedValue(null as any);
+    this.teachersRepository.getTeacherByUserId.mockResolvedValue(null);
   }
 
   whenStudentFound() {
-    this.studentRepository.getStudentByUserId.mockResolvedValue(
-      this.enrolledStudent,
-    );
+    this.studentRepository.getStudentByUserId.mockResolvedValue(this.enrolledStudent);
   }
 
   whenStudentNotFound() {
-    this.studentRepository.getStudentByUserId.mockResolvedValue(null as any);
+    this.studentRepository.getStudentByUserId.mockResolvedValue(null);
   }
 
   whenCourseWithSessionMatchesTeacher() {
-    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(
-      this.courseWithSession,
-    );
+    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(this.courseWithSession);
   }
 
   whenCourseNotFound() {
-    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(
-      null as any,
-    );
+    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(null);
   }
 
   whenCourseSessionBelongsToAnotherTeacher() {
@@ -335,48 +279,36 @@ class Fixtures {
   }
 
   whenCourseReturnedForStudent() {
-    this.coursesRepository.getCourseById.mockResolvedValue(
-      this.courseForStudent,
-    );
+    this.coursesRepository.getCourseById.mockResolvedValue(this.courseForStudent);
   }
 
   whenCourseByIdMissing() {
-    this.coursesRepository.getCourseById.mockResolvedValue(null as any);
+    this.coursesRepository.getCourseById.mockResolvedValue(null);
   }
 
   whenStudentSessionMatchesEnrollment() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
-      {
-        sessionId: this.sessionId,
-        studentId: this.enrolledStudent.id,
-      },
-    );
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue({
+      sessionId: this.sessionId,
+      studentId: this.enrolledStudent.id,
+    });
   }
 
   whenStudentSessionNotFound() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
-      null,
-    );
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(null);
   }
 
   whenStudentSessionOwnedBySomeoneElse() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(
-      {
-        sessionId: this.sessionId,
-        studentId: 'other-student',
-      },
-    );
+    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue({
+      sessionId: this.sessionId,
+      studentId: 'other-student',
+    });
   }
 
   whenQuestionsReturned() {
-    this.questionsRepository.getCourseQuestions.mockResolvedValue(
-      this.questions,
-    );
+    this.questionsRepository.getCourseQuestions.mockResolvedValue(this.questions);
   }
 
   whenQuestionsFail() {
-    this.questionsRepository.getCourseQuestions.mockRejectedValue(
-      this.questionsError,
-    );
+    this.questionsRepository.getCourseQuestions.mockRejectedValue(this.questionsError);
   }
 }

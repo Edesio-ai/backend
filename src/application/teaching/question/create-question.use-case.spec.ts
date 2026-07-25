@@ -1,7 +1,4 @@
-import {
-  CreateQuestionBody,
-  CreateQuestionUseCase,
-} from './create-question.use-case';
+import { CreateQuestionBody, CreateQuestionUseCase } from './create-question.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { UnauthorizedError } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
@@ -22,12 +19,8 @@ describe('CreateQuestionUseCase', () => {
   it('should throw UnauthorizedError when teacher is not found', async () => {
     fixtures.whenTeacherNotFound();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      UnauthorizedError,
-    );
-    expect(
-      fixtures.coursesRepository.getCourseWithSessionById,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(UnauthorizedError);
+    expect(fixtures.coursesRepository.getCourseWithSessionById).not.toHaveBeenCalled();
     expect(fixtures.questionsRepository.insertQuestion).not.toHaveBeenCalled();
   });
 
@@ -35,9 +28,7 @@ describe('CreateQuestionUseCase', () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseSessionBelongsToOtherTeacher();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      UnauthorizedError,
-    );
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(UnauthorizedError);
     expect(fixtures.questionsRepository.insertQuestion).not.toHaveBeenCalled();
   });
 
@@ -49,9 +40,7 @@ describe('CreateQuestionUseCase', () => {
     const result = await fixtures.whenExecute();
 
     expect(result).toEqual(fixtures.createdQuestion);
-    expect(fixtures.questionsRepository.insertQuestion).toHaveBeenCalledWith(
-      fixtures.body,
-    );
+    expect(fixtures.questionsRepository.insertQuestion).toHaveBeenCalledWith(fixtures.body);
   });
 
   it('should propagate errors from questionsRepository', async () => {
@@ -114,11 +103,7 @@ class Fixtures {
     this.teachersRepository = createMockTeacherRepository();
     this.coursesRepository = createMockCourseRepository();
 
-    this.useCase = new CreateQuestionUseCase(
-      this.questionsRepository,
-      this.teachersRepository,
-      this.coursesRepository,
-    );
+    this.useCase = new CreateQuestionUseCase(this.questionsRepository, this.teachersRepository, this.coursesRepository);
   }
 
   whenExecute() {
@@ -130,7 +115,7 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teachersRepository.getTeacherByUserId.mockResolvedValue(null as any);
+    this.teachersRepository.getTeacherByUserId.mockResolvedValue(null);
   }
 
   whenCourseSessionMatchesTeacher() {
@@ -150,14 +135,10 @@ class Fixtures {
   }
 
   whenInsertQuestionSucceeds() {
-    this.questionsRepository.insertQuestion.mockResolvedValue(
-      this.createdQuestion,
-    );
+    this.questionsRepository.insertQuestion.mockResolvedValue(this.createdQuestion);
   }
 
   whenInsertQuestionFails() {
-    this.questionsRepository.insertQuestion.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.questionsRepository.insertQuestion.mockRejectedValue(this.repositoryError);
   }
 }

@@ -1,13 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { User } from 'src/domain/auth/types/auth.type';
-import {
-  type IStripeProvider,
-  STRIPE_PROVIDER,
-} from 'src/domain/billing/contracts/i-stripe-client.provider';
-import {
-  EMAIL_PROVIDER,
-  type IEmailProvider,
-} from 'src/domain/email/contract/i-email.interface';
+import { type IStripeProvider, STRIPE_PROVIDER } from 'src/domain/billing/contracts/i-stripe-client.provider';
+import { EMAIL_PROVIDER, type IEmailProvider } from 'src/domain/email/contract/i-email.interface';
 import { CancelSubscription } from 'src/domain/billing/types/billing.type';
 
 export class CancelSubscriptionUseCase {
@@ -19,12 +13,11 @@ export class CancelSubscriptionUseCase {
   ) {}
 
   async execute(user: User): Promise<CancelSubscription> {
-    const canceledSubscription =
-      await this.stripeRepository.cancelSubscription(user);
+    const canceledSubscription = await this.stripeRepository.cancelSubscription(user);
 
     await this.emailProvider.sendCancelSubscriptionEmail({
       email: user.email,
-      firstname: user.metadata.firstname,
+      firstname: user.metadata.firstname ?? '',
       planName: canceledSubscription.planName,
       endDate: canceledSubscription.endDate,
     });

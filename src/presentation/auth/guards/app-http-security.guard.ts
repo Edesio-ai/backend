@@ -16,8 +16,7 @@ export class AppHttpSecurityGuard implements CanActivate {
     if (!jwtOk) {
       return false;
     }
-    const rolesOk = await this.rolesGuard.canActivate(context);
-    if (!rolesOk) {
+    if (!this.rolesGuard.canActivate(context)) {
       return false;
     }
     return this.csrfGuard.canActivate(context);

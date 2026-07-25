@@ -56,22 +56,15 @@ class Fixtures {
   }
 
   whenUpdateSessionNameSucceeds() {
-    this.sessionRepository.updateSessionName.mockResolvedValue(
-      this.updatedSession,
-    );
+    this.sessionRepository.updateSessionName.mockResolvedValue(this.updatedSession);
   }
 
   whenUpdateSessionNameFails() {
-    this.sessionRepository.updateSessionName.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.sessionRepository.updateSessionName.mockRejectedValue(this.repositoryError);
   }
 
   thenUpdateSessionNameCalledWithExpectedArguments() {
-    expect(this.sessionRepository.updateSessionName).toHaveBeenCalledWith(
-      this.sessionId,
-      this.body,
-    );
+    expect(this.sessionRepository.updateSessionName).toHaveBeenCalledWith(this.sessionId, this.body);
     expect(this.sessionRepository.updateSessionName).toHaveBeenCalledTimes(1);
   }
 

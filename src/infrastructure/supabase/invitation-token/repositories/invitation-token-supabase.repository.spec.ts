@@ -1,8 +1,5 @@
 import { InvitationTokenSupabaseRepository } from './invtiation-token-supabase.repository';
-import {
-  BadRequestError,
-  ServerError,
-} from 'src/domain/shared/errors/global.errors';
+import { BadRequestError, ServerError } from 'src/domain/shared/errors/global.errors';
 
 describe('InvitationTokenSupabaseRepository', () => {
   let fixtures: Fixtures;
@@ -166,8 +163,7 @@ class Fixtures {
     if (this.mode === 'delete') return { delete: this.deleteMock };
     if (this.mode === 'get') return { select: this.getSelectMock };
     if (this.mode === 'mark') return { update: this.markUpdateMock };
-    if (this.mode === 'listEstablishment')
-      return { select: this.listSelectMock };
+    if (this.mode === 'listEstablishment') return { select: this.listSelectMock };
     return {};
   });
   private mode: 'delete' | 'get' | 'mark' | 'listEstablishment' = 'delete';
@@ -178,9 +174,7 @@ class Fixtures {
     const supabaseMock = {
       from: this.fromMock,
     };
-    this.repository = new InvitationTokenSupabaseRepository(
-      supabaseMock as never,
-    );
+    this.repository = new InvitationTokenSupabaseRepository(supabaseMock as never);
   }
 
   whenDeleteInvitationToken() {
@@ -195,17 +189,12 @@ class Fixtures {
 
   whenMarkInvitationTokenAsUsed() {
     this.mode = 'mark';
-    return this.repository.markInvitationTokenAsUsed(
-      this.invitationTokenId,
-      this.teacherId,
-    );
+    return this.repository.markInvitationTokenAsUsed(this.invitationTokenId, this.teacherId);
   }
 
   whenGetInvitationTokenByEstablishmentId() {
     this.mode = 'listEstablishment';
-    return this.repository.getInvitationTokenByEstablishmentId(
-      this.establishmentId,
-    );
+    return this.repository.getInvitationTokenByEstablishmentId(this.establishmentId);
   }
 
   whenSupabaseDeleteSucceeds() {
@@ -310,10 +299,7 @@ class Fixtures {
   thenGetInvitationTokenByEstablishmentIdQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('invitation_tokens');
     expect(this.listSelectMock).toHaveBeenCalledWith('*');
-    expect(this.listEqMock).toHaveBeenCalledWith(
-      'establishment_id',
-      this.establishmentId,
-    );
+    expect(this.listEqMock).toHaveBeenCalledWith('establishment_id', this.establishmentId);
     expect(this.listOrderMock).toHaveBeenCalledWith('created_at', {
       ascending: false,
     });

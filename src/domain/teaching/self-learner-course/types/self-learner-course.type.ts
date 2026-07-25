@@ -20,19 +20,10 @@ export type SelfLearnerCourseSupabase = {
   created_at: string;
 };
 
-export type SelfLearnerCourseInsertPayload = Omit<
-  SelfLearnerCourse,
-  'id' | 'createdAt'
->;
-export type SelfLearnerCourseInsertSupabase = Omit<
-  SelfLearnerCourseSupabase,
-  'id' | 'created_at'
->;
+export type SelfLearnerCourseInsertPayload = Omit<SelfLearnerCourse, 'id' | 'createdAt'>;
+export type SelfLearnerCourseInsertSupabase = Omit<SelfLearnerCourseSupabase, 'id' | 'created_at'>;
 
-export type UpdateSelfLearnerCoursePayload = Omit<
-  Partial<SelfLearnerCourse>,
-  'id' | 'createdAt' | 'selfLearnerId'
->;
+export type UpdateSelfLearnerCoursePayload = Omit<Partial<SelfLearnerCourse>, 'id' | 'createdAt' | 'selfLearnerId'>;
 
 export type SelfLearnerCourseUpdateSupabase = Omit<
   Partial<SelfLearnerCourseSupabase>,

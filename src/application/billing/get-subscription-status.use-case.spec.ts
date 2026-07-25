@@ -7,6 +7,7 @@ import { ITeacherRepository } from '../../domain/teaching/teacher/contracts/teac
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 import { createMockStripeProvider } from 'src/testing/mock-stripe-provider';
+import { StripeSubscriptionLookupItem, StripeSubscriptionsLookup } from 'src/domain/billing/types/billing.type';
 
 describe('GetSubscriptionStatusUseCase', () => {
   let fixtures: Fixtures;
@@ -112,21 +113,9 @@ class Fixtures {
     this.customerId = 'cus_123';
     this.paymentClientError = new Error('stripe unavailable');
 
-    this.establishmentUser = this.createUser(
-      'establishment',
-      'owner@school.com',
-      'user-1',
-    );
-    this.studentUser = this.createUser(
-      'student',
-      'student@school.com',
-      'user-3',
-    );
-    this.teacherUser = this.createUser(
-      'teacher',
-      'teacher@school.com',
-      'user-2',
-    );
+    this.establishmentUser = this.createUser('establishment', 'owner@school.com', 'user-1');
+    this.studentUser = this.createUser('student', 'student@school.com', 'user-3');
+    this.teacherUser = this.createUser('teacher', 'teacher@school.com', 'user-2');
     this.userWithoutEmail = this.createUser('establishment', '', 'user-4');
   }
 
@@ -148,14 +137,10 @@ class Fixtures {
   }
 
   whenCustomerFound() {
-    this.paymentClient.getCustomerByEmail.mockResolvedValue([
-      { id: this.customerId },
-    ]);
+    this.paymentClient.getCustomerByEmail.mockResolvedValue([{ id: this.customerId }]);
   }
 
-  whenTeacherFound(
-    establishmentId: string | null = this.teacher.establishmentId,
-  ) {
+  whenTeacherFound(establishmentId: string | null = this.teacher.establishmentId) {
     this.teacherRepository.getTeacherByUserId.mockResolvedValue({
       ...this.teacher,
       establishmentId,
@@ -163,19 +148,15 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null as any);
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
   }
 
   whenEstablishmentFound() {
-    this.establishmentRepository.getEstablishmentById.mockResolvedValue(
-      this.establishment,
-    );
+    this.establishmentRepository.getEstablishmentById.mockResolvedValue(this.establishment);
   }
 
   whenEstablishmentNotFound() {
-    this.establishmentRepository.getEstablishmentById.mockResolvedValue(
-      null as any,
-    );
+    this.establishmentRepository.getEstablishmentById.mockResolvedValue(null);
   }
 
   whenSubscriptionsReturnActive() {
@@ -202,16 +183,14 @@ class Fixtures {
     );
   }
 
-  private createSubscriptionsPayload(subscriptions: any[]) {
-    const payload = [...subscriptions] as any;
+  private createSubscriptionsPayload(subscriptions: StripeSubscriptionLookupItem[]): StripeSubscriptionsLookup {
+    const payload = [...subscriptions] as StripeSubscriptionsLookup;
     payload.data = subscriptions;
     return payload;
   }
 
   whenCustomerLookupThrowsError() {
-    this.paymentClient.getCustomerByEmail.mockRejectedValue(
-      this.paymentClientError,
-    );
+    this.paymentClient.getCustomerByEmail.mockRejectedValue(this.paymentClientError);
   }
 
   async thenThrowPaymentClientError(promise: Promise<unknown>) {
@@ -220,73 +199,55 @@ class Fixtures {
 
   thenPaymentClientNotCalled() {
     expect(this.paymentClient.getCustomerByEmail).not.toHaveBeenCalled();
-    expect(
-      this.paymentClient.getCheckoutSessionByUserId,
-    ).not.toHaveBeenCalled();
-    expect(
-      this.paymentClient.getSubscriptionsByCustomerId,
-    ).not.toHaveBeenCalled();
+    expect(this.paymentClient.getCheckoutSessionByUserId).not.toHaveBeenCalled();
+    expect(this.paymentClient.getSubscriptionsByCustomerId).not.toHaveBeenCalled();
   }
 
   thenEstablishmentRepositoryNotCalled() {
-    expect(
-      this.establishmentRepository.getEstablishmentById,
-    ).not.toHaveBeenCalled();
+    expect(this.establishmentRepository.getEstablishmentById).not.toHaveBeenCalled();
   }
 
   thenCustomerLookupCalledWithUserEmail() {
-    expect(this.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(
-      this.establishmentUser.email,
-    );
+    expect(this.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(this.establishmentUser.email);
     expect(this.paymentClient.getCustomerByEmail).toHaveBeenCalledTimes(1);
   }
 
   thenSessionLookupCalledWithUserId() {
-    expect(this.paymentClient.getCheckoutSessionByUserId).toHaveBeenCalledWith(
-      this.establishmentUser.id,
-    );
-    expect(this.paymentClient.getCheckoutSessionByUserId).toHaveBeenCalledTimes(
-      1,
-    );
+    expect(this.paymentClient.getCheckoutSessionByUserId).toHaveBeenCalledWith(this.establishmentUser.id);
+    expect(this.paymentClient.getCheckoutSessionByUserId).toHaveBeenCalledTimes(1);
   }
 
   thenSubscriptionsLookupCalledWithCustomerId() {
-    expect(
-      this.paymentClient.getSubscriptionsByCustomerId,
-    ).toHaveBeenCalledWith(this.customerId);
-    expect(
-      this.paymentClient.getSubscriptionsByCustomerId,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.paymentClient.getSubscriptionsByCustomerId).toHaveBeenCalledWith(this.customerId);
+    expect(this.paymentClient.getSubscriptionsByCustomerId).toHaveBeenCalledTimes(1);
   }
 
   thenSubscriptionsLookupNotCalled() {
-    expect(
-      this.paymentClient.getSubscriptionsByCustomerId,
-    ).not.toHaveBeenCalled();
+    expect(this.paymentClient.getSubscriptionsByCustomerId).not.toHaveBeenCalled();
   }
 
-  thenReturnStudentSubscription(result: any) {
+  thenReturnStudentSubscription(result: unknown) {
     expect(result).toEqual({
       hasActiveSubscription: true,
       role: 'student',
     });
   }
 
-  thenReturnInactiveSubscriptionWithoutEmail(result: any) {
+  thenReturnInactiveSubscriptionWithoutEmail(result: unknown) {
     expect(result).toEqual({
       hasActiveSubscription: false,
       role: 'establishment',
     });
   }
 
-  thenReturnInactiveSubscription(result: any) {
+  thenReturnInactiveSubscription(result: unknown) {
     expect(result).toEqual({
       hasActiveSubscription: false,
       role: 'establishment',
     });
   }
 
-  thenReturnActiveSubscription(result: any) {
+  thenReturnActiveSubscription(result: unknown) {
     expect(result).toEqual({
       hasActiveSubscription: true,
       status: 'active',
@@ -297,7 +258,7 @@ class Fixtures {
     });
   }
 
-  thenReturnPendingSubscription(result: any) {
+  thenReturnPendingSubscription(result: unknown) {
     expect(result).toEqual({
       hasActiveSubscription: false,
       status: 'past_due',
@@ -322,9 +283,7 @@ describe('GetSubscriptionStatusUseCase - teacher flow', () => {
     const promise = fixtures.whenExecuteWith(fixtures.teacherUser);
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundError);
-    expect(fixtures.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
-      fixtures.teacherUser.id,
-    );
+    expect(fixtures.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(fixtures.teacherUser.id);
   });
 
   it('should use teacher email when teacher has no establishment', async () => {
@@ -334,13 +293,9 @@ describe('GetSubscriptionStatusUseCase - teacher flow', () => {
 
     const result = await fixtures.whenExecuteWith(fixtures.teacherUser);
 
-    expect(fixtures.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
-      fixtures.teacherUser.id,
-    );
+    expect(fixtures.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(fixtures.teacherUser.id);
     fixtures.thenEstablishmentRepositoryNotCalled();
-    expect(fixtures.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(
-      fixtures.teacherUser.email,
-    );
+    expect(fixtures.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(fixtures.teacherUser.email);
     expect(result.hasActiveSubscription).toBe(true);
     expect(result.role).toBe('teacher');
   });
@@ -353,12 +308,10 @@ describe('GetSubscriptionStatusUseCase - teacher flow', () => {
 
     await fixtures.whenExecuteWith(fixtures.teacherUser);
 
-    expect(
-      fixtures.establishmentRepository.getEstablishmentById,
-    ).toHaveBeenCalledWith(fixtures.teacher.establishmentId);
-    expect(fixtures.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(
-      fixtures.establishment.email,
+    expect(fixtures.establishmentRepository.getEstablishmentById).toHaveBeenCalledWith(
+      fixtures.teacher.establishmentId,
     );
+    expect(fixtures.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(fixtures.establishment.email);
   });
 
   it('should throw NotFoundError when teacher establishment is missing', async () => {

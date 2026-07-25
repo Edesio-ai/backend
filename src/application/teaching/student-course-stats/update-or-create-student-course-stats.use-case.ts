@@ -1,9 +1,6 @@
 import { Inject, NotFoundException } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   type IStudentCourseStatsRepository,
   STUDENT_COURSE_STATS_REPOSITORY,
@@ -27,11 +24,7 @@ export class UpdateOrCreateStudentCourseStatsUseCase {
     private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}
 
-  async execute(
-    courseId: string,
-    user: AuthUser,
-    body: UpdateOrCreateStudentCourseStatsBoyd,
-  ): Promise<void> {
+  async execute(courseId: string, user: AuthUser, body: UpdateOrCreateStudentCourseStatsBoyd): Promise<void> {
     const student = await this.studentRepository.getStudentByUserId(user.id);
     if (!student) {
       throw new NotFoundException('Student not found');
@@ -40,17 +33,13 @@ export class UpdateOrCreateStudentCourseStatsUseCase {
     if (!course) {
       throw new NotFoundException('Course not found');
     }
-    const existingStats =
-      await this.studentCourseStatsRepository.getStudentCourseStatsByStudentIdAndCourseId(
-        student.id,
-        courseId,
-      );
+    const existingStats = await this.studentCourseStatsRepository.getStudentCourseStatsByStudentIdAndCourseId(
+      student.id,
+      courseId,
+    );
 
     if (existingStats) {
-      await this.studentCourseStatsRepository.updateStudentCourseStats(
-        existingStats.id,
-        body,
-      );
+      await this.studentCourseStatsRepository.updateStudentCourseStats(existingStats.id, body);
     } else {
       const statToInser = {
         studentId: student.id,
@@ -59,9 +48,7 @@ export class UpdateOrCreateStudentCourseStatsUseCase {
         correctAnswers: body.correctAnswers,
         lastAttemptAt: new Date().toISOString(),
       };
-      await this.studentCourseStatsRepository.createStudentCourseStats(
-        statToInser,
-      );
+      await this.studentCourseStatsRepository.createStudentCourseStats(statToInser);
     }
   }
 }

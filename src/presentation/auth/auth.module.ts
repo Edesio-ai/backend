@@ -21,12 +21,7 @@ import { ResetPasswordUseCase } from 'src/application/auth/reset-password.use-ca
 import { UpdatePasswordUseCase } from 'src/application/auth/update-password.use-case';
 
 @Module({
-  imports: [
-    AuthPersistenceModule,
-    MailerModule,
-    TeacherPersistenceModule,
-    InvitationTokenPersistenceModule,
-  ],
+  imports: [AuthPersistenceModule, MailerModule, TeacherPersistenceModule, InvitationTokenPersistenceModule],
   controllers: [AuthController],
   providers: [
     {

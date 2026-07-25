@@ -24,8 +24,7 @@ export class EvaluateAnswerUseCase {
     if (normalizedCorrectAnswers === normalizedStudentAnswer) {
       return {
         score: 0,
-        feedback:
-          "Bien essayé ! Mais ce n'est pas en trichant que tu vas progresser.",
+        feedback: "Bien essayé ! Mais ce n'est pas en trichant que tu vas progresser.",
         concepts: [],
         missingElements: [],
         suggestedAction: null,

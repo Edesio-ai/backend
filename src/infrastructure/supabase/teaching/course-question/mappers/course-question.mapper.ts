@@ -18,9 +18,7 @@ export const CourseQuestionMapper = {
     answeredAt: row.answered_at,
   }),
 
-  toInsert: (
-    courseQuestion: CourseQuestionToInsert,
-  ): SupabaseCourseQuestionToInsert => ({
+  toInsert: (courseQuestion: CourseQuestionToInsert): SupabaseCourseQuestionToInsert => ({
     course_id: courseQuestion.courseId,
     student_id: courseQuestion.studentId,
     question_text: courseQuestion.questionText,

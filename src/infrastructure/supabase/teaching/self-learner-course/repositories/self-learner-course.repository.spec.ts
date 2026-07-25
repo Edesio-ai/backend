@@ -17,9 +17,7 @@ describe('SelfLearnerCourseRepository', () => {
       const result = await fixtures.whenGetCourses();
 
       fixtures.thenListChainBuilt(fixtures.selfLearnerId);
-      expect(result).toEqual([
-        SelfLearnerCourseMapper.toDomain(fixtures.supabaseRows[0]),
-      ]);
+      expect(result).toEqual([SelfLearnerCourseMapper.toDomain(fixtures.supabaseRows[0])]);
     });
 
     it('returns empty array when data is null', async () => {
@@ -34,9 +32,7 @@ describe('SelfLearnerCourseRepository', () => {
     it('throws ServerError when Supabase returns error', async () => {
       fixtures.whenQueryFails('permission denied');
 
-      await expect(fixtures.whenGetCourses()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenGetCourses()).rejects.toBeInstanceOf(ServerError);
     });
   });
 
@@ -81,12 +77,8 @@ describe('SelfLearnerCourseRepository', () => {
 
       const result = await fixtures.whenCreate();
 
-      expect(result).toEqual(
-        SelfLearnerCourseMapper.toDomain(fixtures.supabaseRow),
-      );
-      expect(fixtures.insertMock).toHaveBeenCalledWith(
-        SelfLearnerCourseMapper.toInsert(fixtures.payload),
-      );
+      expect(result).toEqual(SelfLearnerCourseMapper.toDomain(fixtures.supabaseRow));
+      expect(fixtures.insertMock).toHaveBeenCalledWith(SelfLearnerCourseMapper.toInsert(fixtures.payload));
       expect(fixtures.singleAfterInsertMock).toHaveBeenCalledTimes(1);
     });
 
@@ -138,17 +130,10 @@ describe('SelfLearnerCourseRepository', () => {
 
       const result = await fixtures.whenUpdate();
 
-      expect(fixtures.updateMock).toHaveBeenCalledWith(
-        SelfLearnerCourseMapper.toUpdate(fixtures.patch),
-      );
-      expect(fixtures.eqAfterUpdateMock).toHaveBeenCalledWith(
-        'id',
-        fixtures.courseId,
-      );
+      expect(fixtures.updateMock).toHaveBeenCalledWith(SelfLearnerCourseMapper.toUpdate(fixtures.patch));
+      expect(fixtures.eqAfterUpdateMock).toHaveBeenCalledWith('id', fixtures.courseId);
       expect(fixtures.singleAfterUpdateMock).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(
-        SelfLearnerCourseMapper.toDomain(fixtures.updatedRow),
-      );
+      expect(result).toEqual(SelfLearnerCourseMapper.toDomain(fixtures.updatedRow));
     });
 
     it('throws ServerError when Supabase rejects update', async () => {
@@ -172,18 +157,13 @@ describe('SelfLearnerCourseRepository', () => {
 
       expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_courses');
       expect(fixtures.deleteMock).toHaveBeenCalledTimes(1);
-      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith(
-        'id',
-        fixtures.courseId,
-      );
+      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith('id', fixtures.courseId);
     });
 
     it('throws ServerError when Supabase rejects delete', async () => {
       fixtures.whenDeleteFails('rls');
 
-      await expect(fixtures.whenDeleteCourse()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenDeleteCourse()).rejects.toBeInstanceOf(ServerError);
     });
   });
 });

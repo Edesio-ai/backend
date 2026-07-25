@@ -2,10 +2,11 @@ import {
   SelfLearnerCourseFile,
   SelfLearnerCourseFileInsertPayload,
   SelfLearnerCourseFileInsertPayloadSupabase,
+  SelfLearnerCourseFileSupabase,
 } from 'src/domain/teaching/self-learner-course-file/types/self-learner-course-file.type';
 
 export const selfLearnerCourseFileMapper = {
-  toDomain: (data: any): SelfLearnerCourseFile => {
+  toDomain: (data: SelfLearnerCourseFileSupabase): SelfLearnerCourseFile => {
     return {
       id: data.id,
       courseId: data.course_id,
@@ -14,16 +15,14 @@ export const selfLearnerCourseFileMapper = {
       createdAt: data.created_at,
     };
   },
-  toInsert: (
-    payload: SelfLearnerCourseFileInsertPayload,
-  ): SelfLearnerCourseFileInsertPayloadSupabase => {
+  toInsert: (payload: SelfLearnerCourseFileInsertPayload): SelfLearnerCourseFileInsertPayloadSupabase => {
     return {
       course_id: payload.courseId,
       file_url: payload.fileUrl,
       file_name: payload.fileName,
     };
   },
-  toCourseFilesUrls: (data: any): string[] => {
-    return data.map((row: any) => row.file_url);
+  toCourseFilesUrls: (data: Pick<SelfLearnerCourseFileSupabase, 'file_url'>[]): string[] => {
+    return data.map((row) => row.file_url);
   },
 };

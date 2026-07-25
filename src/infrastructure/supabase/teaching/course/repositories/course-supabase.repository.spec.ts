@@ -1,5 +1,7 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { CreateCourseBody } from 'src/domain/teaching/course/types/course.type';
+import { CourseFileUpload } from 'src/domain/teaching/course-file/types/course-file.type';
 import { CourseFileRepository } from 'src/infrastructure/supabase/teaching/course-file/repositories/course-file-supabase.repository';
 import { CourseSupabaseRepository } from 'src/infrastructure/supabase/teaching/course/repositories/course-supabase.repository';
 
@@ -323,7 +325,7 @@ class Fixtures {
 
   public readonly courseId = 'course-1';
   public readonly storagePath = 'course-1/doc.pdf';
-  public readonly fileUpload = {
+  public readonly fileUpload: CourseFileUpload = {
     buffer: Buffer.from('x'),
     originalFileName: 'doc.pdf',
     mimeType: 'application/pdf',
@@ -423,23 +425,21 @@ class Fixtures {
     order: this.coursesSessionFirstOrderMock,
   }));
 
-  private readonly coursesSelectMock = jest.fn(
-    (first: string, second?: object) => {
-      if (second && typeof second === 'object' && 'count' in second) {
-        return { eq: this.coursesCountEqMock };
-      }
-      if (first === 'id') {
-        return { eq: this.coursesListEqMock };
-      }
-      if (first === 'id, session_id' || first === 'validated_questions') {
-        return { eq: this.coursesByIdEqMock };
-      }
-      if (first === '*') {
-        return { eq: this.coursesSessionCoursesEqMock };
-      }
-      return { eq: this.courseWithSessionEqMock };
-    },
-  );
+  private readonly coursesSelectMock = jest.fn((first: string, second?: object) => {
+    if (second && typeof second === 'object' && 'count' in second) {
+      return { eq: this.coursesCountEqMock };
+    }
+    if (first === 'id') {
+      return { eq: this.coursesListEqMock };
+    }
+    if (first === 'id, session_id' || first === 'validated_questions') {
+      return { eq: this.coursesByIdEqMock };
+    }
+    if (first === '*') {
+      return { eq: this.coursesSessionCoursesEqMock };
+    }
+    return { eq: this.courseWithSessionEqMock };
+  });
 
   private readonly coursesDeleteEqMock = jest.fn();
   private readonly coursesDeleteMock = jest.fn(() => ({
@@ -532,8 +532,8 @@ class Fixtures {
       from: this.fromMock,
       storage: { from: this.storageFromMock },
     };
-    this.repository = new CourseSupabaseRepository(supabaseMock as any);
-    this.courseFileRepository = new CourseFileRepository(supabaseMock as any);
+    this.repository = new CourseSupabaseRepository(supabaseMock as unknown as SupabaseClient);
+    this.courseFileRepository = new CourseFileRepository(supabaseMock as unknown as SupabaseClient);
   }
 
   whenGetCoursesBySessionId() {
@@ -545,9 +545,7 @@ class Fixtures {
   }
 
   whenDeleteCoursesFilesByCourseIds() {
-    return this.courseFileRepository.deleteCoursesFilesByCourseIds(
-      this.courseIds,
-    );
+    return this.courseFileRepository.deleteCoursesFilesByCourseIds(this.courseIds);
   }
 
   whenGetSessionCoursesCount() {
@@ -559,18 +557,11 @@ class Fixtures {
   }
 
   whenStoreCourseFile() {
-    return this.courseFileRepository.storeCourseFile(
-      this.fileUpload as any,
-      this.storagePath,
-    );
+    return this.courseFileRepository.storeCourseFile(this.fileUpload, this.storagePath);
   }
 
   whenInsertCourseFile() {
-    return this.courseFileRepository.insertCourseFile(
-      this.courseId,
-      this.fileUpload as any,
-      this.storagePath,
-    );
+    return this.courseFileRepository.insertCourseFile(this.courseId, this.fileUpload, this.storagePath);
   }
 
   whenGetCourseById() {
@@ -771,10 +762,7 @@ class Fixtures {
   thenGetCoursesQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('courses');
     expect(this.coursesSelectMock).toHaveBeenCalledWith('id');
-    expect(this.coursesListEqMock).toHaveBeenCalledWith(
-      'session_id',
-      this.sessionId,
-    );
+    expect(this.coursesListEqMock).toHaveBeenCalledWith('session_id', this.sessionId);
   }
 
   thenReturnsCourseIds(result: unknown) {
@@ -784,10 +772,7 @@ class Fixtures {
   thenDeleteCoursesBySessionQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('courses');
     expect(this.coursesDeleteMock).toHaveBeenCalledTimes(1);
-    expect(this.coursesDeleteEqMock).toHaveBeenCalledWith(
-      'session_id',
-      this.sessionId,
-    );
+    expect(this.coursesDeleteEqMock).toHaveBeenCalledWith('session_id', this.sessionId);
   }
 
   thenStorageRemoveCalledWithPaths() {
@@ -802,10 +787,7 @@ class Fixtures {
       count: 'exact',
       head: true,
     });
-    expect(this.coursesCountEqMock).toHaveBeenCalledWith(
-      'session_id',
-      this.sessionId,
-    );
+    expect(this.coursesCountEqMock).toHaveBeenCalledWith('session_id', this.sessionId);
   }
 
   thenCreateCourseInsertBuilt() {
@@ -825,14 +807,10 @@ class Fixtures {
 
   thenUploadBuiltWithExpectedArgs() {
     expect(this.storageFromMock).toHaveBeenCalledWith('courses-pdf');
-    expect(this.uploadMock).toHaveBeenCalledWith(
-      this.storagePath,
-      this.fileUpload.buffer,
-      {
-        contentType: this.fileUpload.mimeType,
-        upsert: false,
-      },
-    );
+    expect(this.uploadMock).toHaveBeenCalledWith(this.storagePath, this.fileUpload.buffer, {
+      contentType: this.fileUpload.mimeType,
+      upsert: false,
+    });
   }
 
   thenInsertCourseFileBuilt() {
@@ -854,45 +832,27 @@ class Fixtures {
   thenGetCourseByIdQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('courses');
     expect(this.coursesSelectMock).toHaveBeenCalledWith('id, session_id');
-    expect(this.coursesByIdEqMock).toHaveBeenCalledWith(
-      'id',
-      this.courseDetailId,
-    );
+    expect(this.coursesByIdEqMock).toHaveBeenCalledWith('id', this.courseDetailId);
   }
 
   thenGetCourseValidatedQuestionsQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('courses');
     expect(this.coursesSelectMock).toHaveBeenCalledWith('validated_questions');
-    expect(this.coursesByIdEqMock).toHaveBeenCalledWith(
-      'id',
-      this.courseDetailId,
-    );
+    expect(this.coursesByIdEqMock).toHaveBeenCalledWith('id', this.courseDetailId);
   }
 
   thenGetSessionCoursesBySessionIdQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('courses');
     expect(this.coursesSelectMock).toHaveBeenCalledWith('*');
-    expect(this.coursesSessionCoursesEqMock).toHaveBeenCalledWith(
-      'session_id',
-      this.sessionId,
-    );
-    expect(this.coursesSessionFirstOrderMock).toHaveBeenCalledWith(
-      'position_order',
-      { ascending: true },
-    );
-    expect(this.coursesSessionSecondOrderMock).toHaveBeenCalledWith(
-      'created_at',
-      { ascending: false },
-    );
+    expect(this.coursesSessionCoursesEqMock).toHaveBeenCalledWith('session_id', this.sessionId);
+    expect(this.coursesSessionFirstOrderMock).toHaveBeenCalledWith('position_order', { ascending: true });
+    expect(this.coursesSessionSecondOrderMock).toHaveBeenCalledWith('created_at', { ascending: false });
   }
 
   thenGetCourseFilesQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('course_files');
     expect(this.courseFilesSelectMock).toHaveBeenCalledWith('*');
-    expect(this.courseFilesEqMock).toHaveBeenCalledWith(
-      'course_id',
-      this.courseId,
-    );
+    expect(this.courseFilesEqMock).toHaveBeenCalledWith('course_id', this.courseId);
   }
 
   // --- getCourseWithSessionById ---
@@ -936,10 +896,7 @@ class Fixtures {
   };
 
   whenGetCourseWithSessionById() {
-    return this.repository.getCourseWithSessionById(
-      this.courseDetailId,
-      'id, title',
-    );
+    return this.repository.getCourseWithSessionById(this.courseDetailId, 'id, title');
   }
 
   whenGetCourseWithSessionByIdSucceeds() {
@@ -959,10 +916,7 @@ class Fixtures {
   thenGetCourseWithSessionByIdQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('courses');
     expect(this.coursesSelectMock).toHaveBeenCalledWith('id, title');
-    expect(this.courseWithSessionEqMock).toHaveBeenCalledWith(
-      'id',
-      this.courseDetailId,
-    );
+    expect(this.courseWithSessionEqMock).toHaveBeenCalledWith('id', this.courseDetailId);
     expect(this.courseWithSessionSingleMock).toHaveBeenCalledTimes(1);
   }
 
@@ -990,10 +944,7 @@ class Fixtures {
 
   thenDeleteCourseByIdQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('courses');
-    expect(this.coursesByIdDeleteEqMock).toHaveBeenCalledWith(
-      'id',
-      this.courseDetailId,
-    );
+    expect(this.coursesByIdDeleteEqMock).toHaveBeenCalledWith('id', this.courseDetailId);
   }
 
   // --- updateCourse ---
@@ -1026,10 +977,7 @@ class Fixtures {
   };
 
   whenUpdateCourse() {
-    return this.repository.updateCourse(
-      this.courseDetailId,
-      this.updatePayload,
-    );
+    return this.repository.updateCourse(this.courseDetailId, this.updatePayload);
   }
 
   whenUpdateCourseSucceeds() {
@@ -1052,10 +1000,7 @@ class Fixtures {
       title: 'Titre mis à jour',
       text_content: 'Contenu mis à jour',
     });
-    expect(this.coursesUpdateEqMock).toHaveBeenCalledWith(
-      'id',
-      this.courseDetailId,
-    );
+    expect(this.coursesUpdateEqMock).toHaveBeenCalledWith('id', this.courseDetailId);
     expect(this.coursesUpdateSelectMock).toHaveBeenCalledTimes(1);
     expect(this.coursesUpdateSingleMock).toHaveBeenCalledTimes(1);
   }
@@ -1071,7 +1016,7 @@ class Fixtures {
   whenGetFileBufferSucceeds() {
     const arrayBuffer = new ArrayBuffer(8);
     this.downloadMock.mockResolvedValue({
-      data: { arrayBuffer: async () => arrayBuffer },
+      data: { arrayBuffer: () => arrayBuffer },
       error: null,
     });
   }

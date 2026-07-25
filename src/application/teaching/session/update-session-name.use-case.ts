@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  Session,
-  UpdateSessionNameBody,
-} from 'src/domain/teaching/session/types/session.type';
+import { Session, UpdateSessionNameBody } from 'src/domain/teaching/session/types/session.type';
 import {
   SESSION_REPOSITORY,
   type ISessionRepository,
@@ -14,10 +11,7 @@ export class UpdateSessionNameUseCase {
     private readonly sessionRepository: ISessionRepository,
   ) {}
 
-  async execute(
-    sessionId: string,
-    body: UpdateSessionNameBody,
-  ): Promise<Session> {
+  async execute(sessionId: string, body: UpdateSessionNameBody): Promise<Session> {
     return await this.sessionRepository.updateSessionName(sessionId, body);
   }
 }

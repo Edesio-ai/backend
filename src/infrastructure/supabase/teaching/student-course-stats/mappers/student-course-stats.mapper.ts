@@ -10,9 +10,7 @@ import type {
 } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 import { mapList } from 'src/infrastructure/supabase/common/mapper.util';
 
-function courseStatWithStudentRowToDomain(
-  row: SupabaseStudentCourseStatsWithStudent,
-): StudentCourseStatsWithStudent {
+function courseStatWithStudentRowToDomain(row: SupabaseStudentCourseStatsWithStudent): StudentCourseStatsWithStudent {
   return {
     studentId: row.student_id,
     attemptedQuestions: row.attempted_questions,
@@ -39,18 +37,11 @@ export const StudentCourseStatsMapper = {
 
   courseStatWithStudentToDomain: courseStatWithStudentRowToDomain,
 
-  listCourseStatsWithStudentFromQuery(
-    rawRows: unknown,
-  ): StudentCourseStatsWithStudent[] {
+  listCourseStatsWithStudentFromQuery(rawRows: unknown): StudentCourseStatsWithStudent[] {
     const rows = Array.isArray(rawRows) ? rawRows : [];
-    return mapList(
-      rows as SupabaseStudentCourseStatsWithStudent[],
-      courseStatWithStudentRowToDomain,
-    );
+    return mapList(rows as SupabaseStudentCourseStatsWithStudent[], courseStatWithStudentRowToDomain);
   },
-  toInsert: (
-    body: insertStudentCourseStats,
-  ): supabaseInsertStudentCourseStats => ({
+  toInsert: (body: insertStudentCourseStats): supabaseInsertStudentCourseStats => ({
     course_id: body.courseId,
     student_id: body.studentId,
     attempted_questions: body.attemptedQuestions,
@@ -58,9 +49,7 @@ export const StudentCourseStatsMapper = {
     last_attempt_at: body.lastAttemptAt,
   }),
 
-  toUpdate: (
-    body: UpdateStudentCourseStats,
-  ): supabaseUpdateStudentCourseStats => ({
+  toUpdate: (body: UpdateStudentCourseStats): supabaseUpdateStudentCourseStats => ({
     attempted_questions: body.attemptedQuestions,
     correct_answers: body.correctAnswers,
     last_attempt_at: new Date().toISOString(),

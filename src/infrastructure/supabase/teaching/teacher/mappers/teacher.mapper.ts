@@ -1,12 +1,5 @@
-import {
-  Session,
-  SupabaseSession,
-} from 'src/domain/teaching/session/types/session.type';
-import {
-  SupabaseTeacher,
-  Teacher,
-  SupabaseTeacherInsert,
-} from 'src/domain/teaching/teacher/types/teacher.type';
+import { Session, SupabaseSession } from 'src/domain/teaching/session/types/session.type';
+import { SupabaseTeacher, Teacher, SupabaseTeacherInsert } from 'src/domain/teaching/teacher/types/teacher.type';
 
 export const TeacherMapper = {
   toDomain: (row: SupabaseTeacher): Teacher => ({
@@ -28,30 +21,19 @@ export const TeacherMapper = {
     createdAt: row.created_at,
   }),
 
-  toInsert: (
-    userId: string,
-    name: string,
-    email: string,
-  ): SupabaseTeacherInsert => ({
+  toInsert: (userId: string, name: string, email: string): SupabaseTeacherInsert => ({
     supabase_user_id: userId,
     name,
     email: email || '',
   }),
 
-  toEstablishmentUpdate: (
-    establishmentId: string,
-  ): { establishment_id: string } => ({
+  toEstablishmentUpdate: (establishmentId: string): { establishment_id: string } => ({
     establishment_id: establishmentId,
   }),
 
-  toCondition: (
-    conditions: Partial<Record<'id' | 'establishmentId' | 'teacherId', string>>,
-  ): Record<string, string> =>
+  toCondition: (conditions: Partial<Record<'id' | 'establishmentId' | 'teacherId', string>>): Record<string, string> =>
     Object.fromEntries(
-      Object.entries(conditions).map(([key, value]) => [
-        key.replace(/([A-Z])/g, '_$1').toLowerCase(),
-        value,
-      ]),
+      Object.entries(conditions).map(([key, value]) => [key.replace(/([A-Z])/g, '_$1').toLowerCase(), value]),
     ),
   toInsertWithEstablishment: (
     userId: string,

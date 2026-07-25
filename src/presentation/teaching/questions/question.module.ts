@@ -21,11 +21,6 @@ import { StudentSessionPersistenceModule } from 'src/infrastructure/supabase/tea
     StudentPersistenceModule,
   ],
   controllers: [QuestionController],
-  providers: [
-    GetCourseQuestionsUseCase,
-    CreateQuestionUseCase,
-    DeleteQuestionByIdUseCase,
-    UpdateQuestionByIdUseCase,
-  ],
+  providers: [GetCourseQuestionsUseCase, CreateQuestionUseCase, DeleteQuestionByIdUseCase, UpdateQuestionByIdUseCase],
 })
 export class QuestionModule {}

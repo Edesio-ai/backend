@@ -4,14 +4,8 @@ import {
   COURSE_QUESTION_REPOSITORY,
   type ICourseQuestionRepository,
 } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
-import {
-  CourseQuestion,
-  CourseQuestionToInsert,
-} from 'src/domain/teaching/course-question/types/course-question.type';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { CourseQuestion, CourseQuestionToInsert } from 'src/domain/teaching/course-question/types/course-question.type';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   STUDENT_SESSION_REPOSITORY,
   type IStudentSessionRepository,
@@ -37,10 +31,7 @@ export class SendCourseQuestionUseCase {
     private readonly courseRepository: ICourseRepository,
   ) {}
 
-  async execute(
-    body: SendCourseQuestionBody,
-    user: AuthUser,
-  ): Promise<CourseQuestion | null> {
+  async execute(body: SendCourseQuestionBody, user: AuthUser): Promise<CourseQuestion | null> {
     const student = await this.studentRepository.getStudentByUserId(user.id);
     if (!student) {
       throw new NotFoundException('Student not found');
@@ -51,10 +42,7 @@ export class SendCourseQuestionUseCase {
       throw new NotFoundException('Course not found');
     }
 
-    const studentSession =
-      await this.studentSessionRepository.getStudentSessionBySessionId(
-        course.sessionId,
-      );
+    const studentSession = await this.studentSessionRepository.getStudentSessionBySessionId(course.sessionId);
     if (!studentSession) {
       throw new NotFoundException('Student session not found');
     }
@@ -68,10 +56,7 @@ export class SendCourseQuestionUseCase {
       studentId: student.id,
     };
 
-    const courseQuestion =
-      await this.courseQuestionRepository.createCourseQuestion(
-        newCourseQuestion,
-      );
+    const courseQuestion = await this.courseQuestionRepository.createCourseQuestion(newCourseQuestion);
     return courseQuestion;
   }
 }

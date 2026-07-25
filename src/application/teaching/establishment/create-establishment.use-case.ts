@@ -3,10 +3,7 @@ import {
   ESTABLISHMENT_REPOSITORY,
   type IEstablishmentRepository,
 } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
-import {
-  CreateEstablishmentBody,
-  Establishment,
-} from 'src/domain/teaching/establishment/types/establishment.type';
+import { CreateEstablishmentBody, Establishment } from 'src/domain/teaching/establishment/types/establishment.type';
 
 export class CreateEstablishmentUseCase {
   constructor(
@@ -17,12 +14,7 @@ export class CreateEstablishmentUseCase {
   async execute(body: CreateEstablishmentBody): Promise<Establishment> {
     const { supabaseUserId, name, email } = body;
 
-    const establishment =
-      await this.establishmentRepository.createEstablishment(
-        supabaseUserId,
-        name,
-        email,
-      );
+    const establishment = await this.establishmentRepository.createEstablishment(supabaseUserId, name, email);
     return establishment;
   }
 }

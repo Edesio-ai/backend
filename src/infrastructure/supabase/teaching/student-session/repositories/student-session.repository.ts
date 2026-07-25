@@ -22,45 +22,25 @@ export class StudentSessionRepository implements IStudentSessionRepository {
     const { data, error } = await this.supabase
       .from('student_sessions')
       .select('session_id, student_id')
-      .in(
-        'session_id',
-        sessionIds.length > 0
-          ? sessionIds
-          : ['00000000-0000-0000-0000-000000000000'],
-      );
+      .in('session_id', sessionIds.length > 0 ? sessionIds : ['00000000-0000-0000-0000-000000000000']);
 
     if (error) {
-      console.error(
-        'An error occurred while getting students sessions by ids',
-        sessionIds,
-        error,
-      );
+      console.error('An error occurred while getting students sessions by ids', sessionIds, error);
       throw new ServerError(error.message);
     }
     return mapList(data ?? [], StudentSessionMapper.toDomain);
   }
 
-  public async deleteStudentSessionsBySessionId(
-    sessionId: string,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('student_sessions')
-      .delete()
-      .eq('session_id', sessionId);
+  public async deleteStudentSessionsBySessionId(sessionId: string): Promise<void> {
+    const { error } = await this.supabase.from('student_sessions').delete().eq('session_id', sessionId);
 
     if (error) {
-      console.error(
-        'An error occurred while deleting student sessions by session id',
-        sessionId,
-        error,
-      );
+      console.error('An error occurred while deleting student sessions by session id', sessionId, error);
       throw new ServerError(error.message);
     }
   }
 
-  public async listSessionsEnrolledByStudent(
-    studentId: string,
-  ): Promise<StudentJoinedSession[]> {
+  public async listSessionsEnrolledByStudent(studentId: string): Promise<StudentJoinedSession[]> {
     const { data, error } = await this.supabase
       .from('student_sessions')
       .select('joined_at, sessions (*)')
@@ -68,43 +48,23 @@ export class StudentSessionRepository implements IStudentSessionRepository {
       .order('joined_at', { ascending: false });
 
     if (error) {
-      console.error(
-        'An error occurred while listing sessions enrolled by student',
-        studentId,
-        error,
-      );
+      console.error('An error occurred while listing sessions enrolled by student', studentId, error);
       throw new ServerError(error.message);
     }
-    return StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(
-      data ?? [],
-    );
+    return StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(data ?? []);
   }
 
-  public async listStudentsEnrolledInSession(
-    sessionId: string,
-    select: string = '*',
-  ): Promise<SessionStudent[]> {
-    const { data, error } = await this.supabase
-      .from('student_sessions')
-      .select(select)
-      .eq('session_id', sessionId);
+  public async listStudentsEnrolledInSession(sessionId: string, select: string = '*'): Promise<SessionStudent[]> {
+    const { data, error } = await this.supabase.from('student_sessions').select(select).eq('session_id', sessionId);
 
     if (error) {
-      console.error(
-        'An error occurred while listing students enrolled in session',
-        sessionId,
-        error,
-      );
+      console.error('An error occurred while listing students enrolled in session', sessionId, error);
       throw new ServerError(error.message);
     }
-    return StudentSessionMapper.mapEnrollmentRowsWithEmbeddedStudents(
-      data ?? [],
-    );
+    return StudentSessionMapper.mapEnrollmentRowsWithEmbeddedStudents(data ?? []);
   }
 
-  public async getStudentSessionBySessionId(
-    sessionId: string,
-  ): Promise<StudentSession | null> {
+  public async getStudentSessionBySessionId(sessionId: string): Promise<StudentSession | null> {
     const { data, error } = await this.supabase
       .from('student_sessions')
       .select('*')
@@ -112,38 +72,24 @@ export class StudentSessionRepository implements IStudentSessionRepository {
       .maybeSingle();
 
     if (error) {
-      console.error(
-        'An error occurred while getting student session by session id',
-        sessionId,
-        error,
-      );
+      console.error('An error occurred while getting student session by session id', sessionId, error);
       throw new ServerError(error.message);
     }
     return data ? StudentSessionMapper.toDomain(data) : null;
   }
 
-  public async createStudentSession(
-    studentId: string,
-    sessionId: string,
-  ): Promise<void> {
+  public async createStudentSession(studentId: string, sessionId: string): Promise<void> {
     const { error } = await this.supabase
       .from('student_sessions')
       .insert({ student_id: studentId, session_id: sessionId });
 
     if (error) {
-      console.error(
-        'An error occurred while creating student session',
-        studentId,
-        sessionId,
-      );
+      console.error('An error occurred while creating student session', studentId, sessionId);
       throw new ServerError(error.message);
     }
   }
 
-  public async deleteStudentSession(
-    sessionId: string,
-    studentId: string,
-  ): Promise<void> {
+  public async deleteStudentSession(sessionId: string, studentId: string): Promise<void> {
     const { error } = await this.supabase
       .from('student_sessions')
       .delete()
@@ -151,10 +97,7 @@ export class StudentSessionRepository implements IStudentSessionRepository {
       .eq('student_id', studentId);
 
     if (error) {
-      console.error(
-        `Error deleting student session for session id: ${sessionId} and student id: ${studentId}`,
-        error,
-      );
+      console.error(`Error deleting student session for session id: ${sessionId} and student id: ${studentId}`, error);
       throw new ServerError(error.message);
     }
   }

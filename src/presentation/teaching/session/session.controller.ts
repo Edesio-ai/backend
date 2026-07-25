@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
@@ -36,10 +28,7 @@ export class SessionController {
   ) {}
 
   @Delete(':sessionId')
-  async deleteSession(
-    @CurrentUser() user: AuthUser,
-    @Param('sessionId') sessionId: string,
-  ) {
+  async deleteSession(@CurrentUser() user: AuthUser, @Param('sessionId') sessionId: string) {
     await this.deleteSessionUseCase.execute(sessionId, user.id);
     return { success: true };
   }
@@ -59,17 +48,12 @@ export class SessionController {
     @Param('sessionId') sessionId: string,
     @Body() body: UpdateSessionBodyDto,
   ): Promise<{ session: Session }> {
-    const session = await this.updateSessionNameUseCase.execute(
-      sessionId,
-      body,
-    );
+    const session = await this.updateSessionNameUseCase.execute(sessionId, body);
     return { session };
   }
 
   @Get('code/:code')
-  async getSessionByCode(
-    @Param('code') code: string,
-  ): Promise<{ session: Session | null }> {
+  async getSessionByCode(@Param('code') code: string): Promise<{ session: Session | null }> {
     const session = await this.getSessionByCodeUseCase.execute(code);
     return {
       session,
@@ -82,10 +66,7 @@ export class SessionController {
     @Param('courseId') courseId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<{ data: SessionDetails }> {
-    const courseDetail = await this.getSessionDetailsUseCase.execute(
-      courseId,
-      user,
-    );
+    const courseDetail = await this.getSessionDetailsUseCase.execute(courseId, user);
     return { data: courseDetail };
   }
 }

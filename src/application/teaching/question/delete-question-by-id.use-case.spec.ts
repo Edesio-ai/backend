@@ -1,10 +1,6 @@
 import { DeleteQuestionByIdUseCase } from './delete-question-by-id.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
+import { BadRequestError, NotFoundError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
@@ -21,9 +17,7 @@ describe('DeleteQuestionByIdUseCase', () => {
   });
 
   it('should throw BadRequestError when questionId is empty', async () => {
-    await expect(fixtures.whenExecuteWithId('')).rejects.toBeInstanceOf(
-      BadRequestError,
-    );
+    await expect(fixtures.whenExecuteWithId('')).rejects.toBeInstanceOf(BadRequestError);
     expect(fixtures.questionsRepository.getQuestionById).not.toHaveBeenCalled();
   });
 
@@ -31,9 +25,7 @@ describe('DeleteQuestionByIdUseCase', () => {
     fixtures.whenGetQuestionByIdFails();
 
     await expect(fixtures.whenExecute()).rejects.toBe(fixtures.repositoryError);
-    expect(
-      fixtures.teachersRepository.getTeacherByUserId,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.teachersRepository.getTeacherByUserId).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundError when teacher is not found', async () => {
@@ -41,9 +33,7 @@ describe('DeleteQuestionByIdUseCase', () => {
     fixtures.whenTeacherNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.coursesRepository.getCourseWithSessionById,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.coursesRepository.getCourseWithSessionById).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundError when course is not found', async () => {
@@ -52,9 +42,7 @@ describe('DeleteQuestionByIdUseCase', () => {
     fixtures.whenCourseNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionsRepository.deleteQuestionById,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionsRepository.deleteQuestionById).not.toHaveBeenCalled();
   });
 
   it('should throw UnauthorizedError when course belongs to another teacher', async () => {
@@ -62,12 +50,8 @@ describe('DeleteQuestionByIdUseCase', () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseSessionBelongsToOtherTeacher();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      UnauthorizedError,
-    );
-    expect(
-      fixtures.questionsRepository.deleteQuestionById,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(UnauthorizedError);
+    expect(fixtures.questionsRepository.deleteQuestionById).not.toHaveBeenCalled();
   });
 
   it('should delete the question and return true when teacher owns the course', async () => {
@@ -79,9 +63,7 @@ describe('DeleteQuestionByIdUseCase', () => {
     const result = await fixtures.whenExecute();
 
     expect(result).toBe(true);
-    expect(
-      fixtures.questionsRepository.deleteQuestionById,
-    ).toHaveBeenCalledWith(fixtures.questionId);
+    expect(fixtures.questionsRepository.deleteQuestionById).toHaveBeenCalledWith(fixtures.questionId);
   });
 });
 
@@ -150,9 +132,7 @@ class Fixtures {
   }
 
   whenGetQuestionByIdFails() {
-    this.questionsRepository.getQuestionById.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.questionsRepository.getQuestionById.mockRejectedValue(this.repositoryError);
   }
 
   whenTeacherFound() {
@@ -160,7 +140,7 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teachersRepository.getTeacherByUserId.mockResolvedValue(null as any);
+    this.teachersRepository.getTeacherByUserId.mockResolvedValue(null);
   }
 
   whenCourseSessionMatchesTeacher() {
@@ -172,9 +152,7 @@ class Fixtures {
   }
 
   whenCourseNotFound() {
-    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(
-      null as any,
-    );
+    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(null);
   }
 
   whenCourseSessionBelongsToOtherTeacher() {

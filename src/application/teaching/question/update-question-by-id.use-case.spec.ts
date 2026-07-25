@@ -1,9 +1,6 @@
 import { UpdateQuestionByIdUseCase } from './update-question-by-id.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  NotFoundError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
+import { NotFoundError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
@@ -23,9 +20,7 @@ describe('UpdateQuestionByIdUseCase', () => {
     fixtures.whenQuestionNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.teachersRepository.getTeacherByUserId,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.teachersRepository.getTeacherByUserId).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundError when teacher is not found', async () => {
@@ -33,9 +28,7 @@ describe('UpdateQuestionByIdUseCase', () => {
     fixtures.whenTeacherNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.coursesRepository.getCourseWithSessionById,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.coursesRepository.getCourseWithSessionById).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundError when course is not found', async () => {
@@ -44,9 +37,7 @@ describe('UpdateQuestionByIdUseCase', () => {
     fixtures.whenCourseNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionsRepository.updateQuestionById,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionsRepository.updateQuestionById).not.toHaveBeenCalled();
   });
 
   it('should throw UnauthorizedError when course belongs to another teacher', async () => {
@@ -54,12 +45,8 @@ describe('UpdateQuestionByIdUseCase', () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseSessionBelongsToOtherTeacher();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      UnauthorizedError,
-    );
-    expect(
-      fixtures.questionsRepository.updateQuestionById,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(UnauthorizedError);
+    expect(fixtures.questionsRepository.updateQuestionById).not.toHaveBeenCalled();
   });
 
   it('should update and return the question when all checks pass', async () => {
@@ -73,9 +60,7 @@ describe('UpdateQuestionByIdUseCase', () => {
     });
 
     expect(result).toEqual(fixtures.updatedQuestion);
-    expect(
-      fixtures.questionsRepository.updateQuestionById,
-    ).toHaveBeenCalledWith(fixtures.questionId, {
+    expect(fixtures.questionsRepository.updateQuestionById).toHaveBeenCalledWith(fixtures.questionId, {
       questionText: 'Nouveau texte',
     });
   });
@@ -88,9 +73,7 @@ describe('UpdateQuestionByIdUseCase', () => {
 
     await fixtures.whenExecute({ type: 'single' });
 
-    expect(
-      fixtures.questionsRepository.updateQuestionById,
-    ).toHaveBeenCalledWith(fixtures.questionId, {
+    expect(fixtures.questionsRepository.updateQuestionById).toHaveBeenCalledWith(fixtures.questionId, {
       type: 'single',
       proposals: ['Option A', 'Option B', 'Option C', 'Option D'],
       correctAnswers: ['Option A'],
@@ -105,9 +88,7 @@ describe('UpdateQuestionByIdUseCase', () => {
 
     await fixtures.whenExecute({ type: 'multiple' });
 
-    expect(
-      fixtures.questionsRepository.updateQuestionById,
-    ).toHaveBeenCalledWith(fixtures.questionId, {
+    expect(fixtures.questionsRepository.updateQuestionById).toHaveBeenCalledWith(fixtures.questionId, {
       type: 'multiple',
       proposals: ['Option A', 'Option B', 'Option C', 'Option D'],
       correctAnswers: ['Option A'],
@@ -122,9 +103,7 @@ describe('UpdateQuestionByIdUseCase', () => {
 
     await fixtures.whenExecute({ type: 'open' });
 
-    expect(
-      fixtures.questionsRepository.updateQuestionById,
-    ).toHaveBeenCalledWith(
+    expect(fixtures.questionsRepository.updateQuestionById).toHaveBeenCalledWith(
       fixtures.questionId,
       expect.objectContaining({ type: 'open', correctAnswers: null }),
     );
@@ -142,9 +121,7 @@ describe('UpdateQuestionByIdUseCase', () => {
       correctAnswers: ['X'],
     });
 
-    expect(
-      fixtures.questionsRepository.updateQuestionById,
-    ).toHaveBeenCalledWith(fixtures.questionId, {
+    expect(fixtures.questionsRepository.updateQuestionById).toHaveBeenCalledWith(fixtures.questionId, {
       type: 'single',
       proposals: ['X', 'Y'],
       correctAnswers: ['X'],
@@ -161,9 +138,9 @@ describe('UpdateQuestionByIdUseCase', () => {
       explanation: 'Parce que',
     });
 
-    expect(
-      fixtures.questionsRepository.updateQuestionById,
-    ).toHaveBeenCalledWith(fixtures.questionId, { explanation: 'Parce que' });
+    expect(fixtures.questionsRepository.updateQuestionById).toHaveBeenCalledWith(fixtures.questionId, {
+      explanation: 'Parce que',
+    });
   });
 
   it('should include positionOrder in updates when provided', async () => {
@@ -174,9 +151,9 @@ describe('UpdateQuestionByIdUseCase', () => {
 
     await fixtures.whenExecute({ positionOrder: 3 });
 
-    expect(
-      fixtures.questionsRepository.updateQuestionById,
-    ).toHaveBeenCalledWith(fixtures.questionId, { positionOrder: 3 });
+    expect(fixtures.questionsRepository.updateQuestionById).toHaveBeenCalledWith(fixtures.questionId, {
+      positionOrder: 3,
+    });
   });
 
   it('should propagate errors thrown by updateQuestionById', async () => {
@@ -185,9 +162,7 @@ describe('UpdateQuestionByIdUseCase', () => {
     fixtures.whenCourseSessionMatchesTeacher();
     fixtures.whenUpdateFails();
 
-    await expect(fixtures.whenExecute({ questionText: 'X' })).rejects.toBe(
-      fixtures.repositoryError,
-    );
+    await expect(fixtures.whenExecute({ questionText: 'X' })).rejects.toBe(fixtures.repositoryError);
   });
 });
 
@@ -257,7 +232,7 @@ class Fixtures {
   }
 
   whenQuestionNotFound() {
-    this.questionsRepository.getQuestionById.mockResolvedValue(null as any);
+    this.questionsRepository.getQuestionById.mockResolvedValue(null);
   }
 
   whenTeacherFound() {
@@ -265,38 +240,34 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teachersRepository.getTeacherByUserId.mockResolvedValue(null as any);
+    this.teachersRepository.getTeacherByUserId.mockResolvedValue(null);
   }
 
   whenCourseSessionMatchesTeacher() {
     this.coursesRepository.getCourseWithSessionById.mockResolvedValue({
       id: this.courseId,
       session: { teacherId: this.teacher.id },
-    } as any);
+      teachers: {},
+    });
   }
 
   whenCourseNotFound() {
-    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(
-      null as any,
-    );
+    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(null);
   }
 
   whenCourseSessionBelongsToOtherTeacher() {
     this.coursesRepository.getCourseWithSessionById.mockResolvedValue({
       id: this.courseId,
       session: { teacherId: 'other-teacher' },
-    } as any);
+      teachers: {},
+    });
   }
 
   whenUpdateSucceeds() {
-    this.questionsRepository.updateQuestionById.mockResolvedValue(
-      this.updatedQuestion,
-    );
+    this.questionsRepository.updateQuestionById.mockResolvedValue(this.updatedQuestion);
   }
 
   whenUpdateFails() {
-    this.questionsRepository.updateQuestionById.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.questionsRepository.updateQuestionById.mockRejectedValue(this.repositoryError);
   }
 }

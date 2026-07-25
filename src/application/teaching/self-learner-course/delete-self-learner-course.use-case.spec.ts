@@ -1,8 +1,4 @@
-import {
-  ForbiddenError,
-  NotFoundError,
-  ServerError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError, ServerError } from 'src/domain/shared/errors/global.errors';
 import { DeleteSelfLearnerCourseUseCase } from './delete-self-learner-course.use-case';
 import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 import type { ISelfLearnerCourseFileRepository } from 'src/domain/teaching/self-learner-course-file/contracts/i-self-learner-course-file.repository';
@@ -24,62 +20,38 @@ describe('DeleteSelfLearnerCourseUseCase', () => {
 
   it('deletes storage files then rows then course when urls exist', async () => {
     fixtures.whenOwnershipOk();
-    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockResolvedValue(
-      ['a/x.pdf', 'a/y.pdf'],
-    );
+    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockResolvedValue(['a/x.pdf', 'a/y.pdf']);
 
     await fixtures.whenExecute();
 
-    expect(
-      fixtures.courseFileRepository.deleteFileFromStorage,
-    ).toHaveBeenCalledTimes(2);
-    expect(
-      fixtures.courseFileRepository.deleteFileFromStorage,
-    ).toHaveBeenCalledWith('a/x.pdf');
-    expect(
-      fixtures.courseFileRepository.deleteFileFromStorage,
-    ).toHaveBeenCalledWith('a/y.pdf');
-    expect(
-      fixtures.selfLearnerCourseFileRepository
-        .deleteSelfLearnerCourseFilesByCourseId,
-    ).toHaveBeenCalledWith(fixtures.courseId);
-    expect(
-      fixtures.questionRepository.deleteSelfLearnerQuestionsByCourseId,
-    ).toHaveBeenCalledWith(fixtures.courseId);
-    expect(
-      fixtures.courseRepository.deleteSelfLearnerCourse,
-    ).toHaveBeenCalledWith(fixtures.courseId);
+    expect(fixtures.courseFileRepository.deleteFileFromStorage).toHaveBeenCalledTimes(2);
+    expect(fixtures.courseFileRepository.deleteFileFromStorage).toHaveBeenCalledWith('a/x.pdf');
+    expect(fixtures.courseFileRepository.deleteFileFromStorage).toHaveBeenCalledWith('a/y.pdf');
+    expect(fixtures.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFilesByCourseId).toHaveBeenCalledWith(
+      fixtures.courseId,
+    );
+    expect(fixtures.questionRepository.deleteSelfLearnerQuestionsByCourseId).toHaveBeenCalledWith(fixtures.courseId);
+    expect(fixtures.courseRepository.deleteSelfLearnerCourse).toHaveBeenCalledWith(fixtures.courseId);
   });
 
   it('skips storage deletes when no file urls', async () => {
     fixtures.whenOwnershipOk();
-    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockResolvedValue(
-      [],
-    );
+    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockResolvedValue([]);
 
     await fixtures.whenExecute();
 
-    expect(
-      fixtures.courseFileRepository.deleteFileFromStorage,
-    ).not.toHaveBeenCalled();
-    expect(
-      fixtures.selfLearnerCourseFileRepository
-        .deleteSelfLearnerCourseFilesByCourseId,
-    ).toHaveBeenCalledWith(fixtures.courseId);
-    expect(
-      fixtures.courseRepository.deleteSelfLearnerCourse,
-    ).toHaveBeenCalledWith(fixtures.courseId);
+    expect(fixtures.courseFileRepository.deleteFileFromStorage).not.toHaveBeenCalled();
+    expect(fixtures.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFilesByCourseId).toHaveBeenCalledWith(
+      fixtures.courseId,
+    );
+    expect(fixtures.courseRepository.deleteSelfLearnerCourse).toHaveBeenCalledWith(fixtures.courseId);
   });
 
   it('throws NotFoundError when self learner missing', async () => {
-    fixtures.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(
-      null,
-    );
+    fixtures.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.courseRepository.deleteSelfLearnerCourse,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.deleteSelfLearnerCourse).not.toHaveBeenCalled();
   });
 
   it('throws NotFoundError when course missing', async () => {
@@ -87,9 +59,7 @@ describe('DeleteSelfLearnerCourseUseCase', () => {
     fixtures.courseRepository.getSelfLearnerCourseById.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.courseRepository.deleteSelfLearnerCourse,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.deleteSelfLearnerCourse).not.toHaveBeenCalled();
   });
 
   it('throws ForbiddenError when course belongs to someone else', async () => {
@@ -100,31 +70,23 @@ describe('DeleteSelfLearnerCourseUseCase', () => {
     });
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
-    expect(
-      fixtures.courseRepository.deleteSelfLearnerCourse,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.deleteSelfLearnerCourse).not.toHaveBeenCalled();
   });
 
   it('propagates storage delete failures', async () => {
     fixtures.whenOwnershipOk();
-    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockResolvedValue(
-      ['f1'],
-    );
+    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockResolvedValue(['f1']);
     const err = new Error('storage');
     fixtures.courseFileRepository.deleteFileFromStorage.mockRejectedValue(err);
 
     await expect(fixtures.whenExecute()).rejects.toBe(err);
-    expect(
-      fixtures.courseRepository.deleteSelfLearnerCourse,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.deleteSelfLearnerCourse).not.toHaveBeenCalled();
   });
 
   it('propagates when listing file urls fails', async () => {
     fixtures.whenOwnershipOk();
     const err = new ServerError('listing');
-    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockRejectedValue(
-      err,
-    );
+    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockRejectedValue(err);
 
     await expect(fixtures.whenExecute()).rejects.toBe(err);
   });
@@ -132,65 +94,41 @@ describe('DeleteSelfLearnerCourseUseCase', () => {
   it('does not delete course row when learner file mapping delete fails', async () => {
     fixtures.whenOwnershipOk();
     const err = new ServerError('fk');
-    fixtures.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFilesByCourseId.mockRejectedValue(
-      err,
-    );
+    fixtures.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFilesByCourseId.mockRejectedValue(err);
 
     await expect(fixtures.whenExecute()).rejects.toBe(err);
-    expect(
-      fixtures.courseRepository.deleteSelfLearnerCourse,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.deleteSelfLearnerCourse).not.toHaveBeenCalled();
   });
 
   it('does not delete course row when learner questions delete fails', async () => {
     fixtures.whenOwnershipOk();
     const err = new ServerError('q');
-    fixtures.questionRepository.deleteSelfLearnerQuestionsByCourseId.mockRejectedValue(
-      err,
-    );
+    fixtures.questionRepository.deleteSelfLearnerQuestionsByCourseId.mockRejectedValue(err);
 
     await expect(fixtures.whenExecute()).rejects.toBe(err);
-    expect(
-      fixtures.courseRepository.deleteSelfLearnerCourse,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.deleteSelfLearnerCourse).not.toHaveBeenCalled();
   });
 
   it('runs storage deletes then mappings, questions and course deletes', async () => {
     const order: string[] = [];
     fixtures.whenOwnershipOk();
-    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockResolvedValue(
-      ['a.pdf', 'b.pdf'],
-    );
-    fixtures.courseFileRepository.deleteFileFromStorage.mockImplementation(
-      async () => {
-        order.push('storage');
-      },
-    );
-    fixtures.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFilesByCourseId.mockImplementation(
-      async () => {
-        order.push('files');
-      },
-    );
-    fixtures.questionRepository.deleteSelfLearnerQuestionsByCourseId.mockImplementation(
-      async () => {
-        order.push('questions');
-      },
-    );
-    fixtures.courseRepository.deleteSelfLearnerCourse.mockImplementation(
-      async () => {
-        order.push('course');
-      },
-    );
+    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockResolvedValue(['a.pdf', 'b.pdf']);
+    fixtures.courseFileRepository.deleteFileFromStorage.mockImplementation(async () => {
+      order.push('storage');
+    });
+    fixtures.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFilesByCourseId.mockImplementation(async () => {
+      order.push('files');
+    });
+    fixtures.questionRepository.deleteSelfLearnerQuestionsByCourseId.mockImplementation(async () => {
+      order.push('questions');
+    });
+    fixtures.courseRepository.deleteSelfLearnerCourse.mockImplementation(async () => {
+      order.push('course');
+    });
 
     await fixtures.whenExecute();
 
-    expect(order).toEqual([
-      'storage',
-      'storage',
-      'files',
-      'questions',
-      'course',
-    ]);
+    expect(order).toEqual(['storage', 'storage', 'files', 'questions', 'course']);
   });
 });
 
@@ -227,8 +165,7 @@ class Fixtures {
   constructor() {
     this.courseRepository = createMockSelfLearnerCourseRepository();
     this.selfLearnerRepository = createMockSelfLearnerRepository();
-    this.selfLearnerCourseFileRepository =
-      createMockSelfLearnerCourseFileRepository();
+    this.selfLearnerCourseFileRepository = createMockSelfLearnerCourseFileRepository();
     this.courseFileRepository = createMockCourseFileRepository();
     this.questionRepository = createMockSelfLearnerQuestionRepository();
 
@@ -240,19 +177,11 @@ class Fixtures {
       this.questionRepository,
     );
 
-    this.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockResolvedValue(
-      [],
-    );
-    this.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFilesByCourseId.mockResolvedValue(
-      undefined,
-    );
-    this.questionRepository.deleteSelfLearnerQuestionsByCourseId.mockResolvedValue(
-      undefined,
-    );
+    this.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls.mockResolvedValue([]);
+    this.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFilesByCourseId.mockResolvedValue(undefined);
+    this.questionRepository.deleteSelfLearnerQuestionsByCourseId.mockResolvedValue(undefined);
     this.courseRepository.deleteSelfLearnerCourse.mockResolvedValue(undefined);
-    this.courseFileRepository.deleteFileFromStorage.mockResolvedValue(
-      undefined,
-    );
+    this.courseFileRepository.deleteFileFromStorage.mockResolvedValue(undefined);
   }
 
   whenExecute() {
@@ -260,15 +189,11 @@ class Fixtures {
   }
 
   whenLearnerExists() {
-    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(
-      this.learner,
-    );
+    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(this.learner);
   }
 
   whenOwnershipOk() {
     this.whenLearnerExists();
-    this.courseRepository.getSelfLearnerCourseById.mockResolvedValue(
-      this.course,
-    );
+    this.courseRepository.getSelfLearnerCourseById.mockResolvedValue(this.course);
   }
 }

@@ -12,30 +12,18 @@ import { selfLearnerQuestionMapper } from '../mappers/self-learner-question.mapp
 import { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 
 export class SelfLearnerQuestionRepository implements ISelfLearnerQuestionRepository {
-  constructor(
-    @Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient,
-  ) {}
+  constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient) {}
 
-  public async deleteSelfLearnerQuestionsByCourseId(
-    courseId: string,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('self_learner_questions')
-      .delete()
-      .eq('course_id', courseId);
+  public async deleteSelfLearnerQuestionsByCourseId(courseId: string): Promise<void> {
+    const { error } = await this.supabase.from('self_learner_questions').delete().eq('course_id', courseId);
 
     if (error) {
-      console.error(
-        `Error deleting self learner questions by course id: ${courseId}`,
-        error,
-      );
+      console.error(`Error deleting self learner questions by course id: ${courseId}`, error);
       throw new ServerError(error.message);
     }
   }
 
-  public async getSelfLearnerQuestions(
-    courseId: string,
-  ): Promise<SelfLearnerQuestion[]> {
+  public async getSelfLearnerQuestions(courseId: string): Promise<SelfLearnerQuestion[]> {
     const { data, error } = await this.supabase
       .from('self_learner_questions')
       .select('*')
@@ -43,10 +31,7 @@ export class SelfLearnerQuestionRepository implements ISelfLearnerQuestionReposi
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error(
-        `Error getting self learner questions by course id: ${courseId}`,
-        error,
-      );
+      console.error(`Error getting self learner questions by course id: ${courseId}`, error);
       throw new ServerError(error.message);
     }
 
@@ -63,19 +48,14 @@ export class SelfLearnerQuestionRepository implements ISelfLearnerQuestionReposi
       .select();
 
     if (error) {
-      console.error(
-        `Error inserting self learner questions by course id: ${courseId}`,
-        error,
-      );
+      console.error(`Error inserting self learner questions by course id: ${courseId}`, error);
       throw new ServerError(error.message);
     }
 
     return data?.map(selfLearnerQuestionMapper.toDomain) ?? [];
   }
 
-  public async createSelfLearnerQuestion(
-    payload: SelfLearnerQuestionInsert,
-  ): Promise<SelfLearnerQuestion> {
+  public async createSelfLearnerQuestion(payload: SelfLearnerQuestionInsert): Promise<SelfLearnerQuestion> {
     const { data, error } = await this.supabase
       .from('self_learner_questions')
       .insert(selfLearnerQuestionMapper.toInsert(payload))
@@ -83,19 +63,14 @@ export class SelfLearnerQuestionRepository implements ISelfLearnerQuestionReposi
       .single();
 
     if (error) {
-      console.error(
-        `Error creating self learner question: ${error.message}`,
-        error,
-      );
+      console.error(`Error creating self learner question: ${error.message}`, error);
       throw new ServerError(error.message);
     }
 
     return selfLearnerQuestionMapper.toDomain(data);
   }
 
-  public async getSelfLearnerQuestionById(
-    questionId: string,
-  ): Promise<SelfLearnerQuestion> {
+  public async getSelfLearnerQuestionById(questionId: string): Promise<SelfLearnerQuestion> {
     const { data, error } = await this.supabase
       .from('self_learner_questions')
       .select('*')
@@ -103,10 +78,7 @@ export class SelfLearnerQuestionRepository implements ISelfLearnerQuestionReposi
       .single();
 
     if (error) {
-      console.error(
-        `Error getting self learner question by id: ${questionId}`,
-        error,
-      );
+      console.error(`Error getting self learner question by id: ${questionId}`, error);
       throw new ServerError(error.message);
     }
 
@@ -125,29 +97,18 @@ export class SelfLearnerQuestionRepository implements ISelfLearnerQuestionReposi
       .single();
 
     if (error) {
-      console.error(
-        `Error updating self learner question by id: ${questionId}`,
-        error,
-      );
+      console.error(`Error updating self learner question by id: ${questionId}`, error);
       throw new ServerError(error.message);
     }
 
     return selfLearnerQuestionMapper.toDomain(data);
   }
 
-  public async deleteSelfLearnerQuestionById(
-    questionId: string,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('self_learner_questions')
-      .delete()
-      .eq('id', questionId);
+  public async deleteSelfLearnerQuestionById(questionId: string): Promise<void> {
+    const { error } = await this.supabase.from('self_learner_questions').delete().eq('id', questionId);
 
     if (error) {
-      console.error(
-        `Error deleting self learner question by id: ${questionId}`,
-        error,
-      );
+      console.error(`Error deleting self learner question by id: ${questionId}`, error);
       throw new ServerError(error.message);
     }
   }

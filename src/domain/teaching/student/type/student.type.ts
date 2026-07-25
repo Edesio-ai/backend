@@ -17,10 +17,7 @@ export type SupabaseStudent = {
 };
 
 export type InsertStudent = Omit<Student, 'id' | 'createdAt' | 'photoUrl'>;
-export type SupabaseStudentInsert = Omit<
-  SupabaseStudent,
-  'id' | 'created_at' | 'photo_url'
->;
+export type SupabaseStudentInsert = Omit<SupabaseStudent, 'id' | 'created_at' | 'photo_url'>;
 export type UpdateStudentPayload = Pick<Student, 'name' | 'email'>;
 
 export type StudentPhotoUpload = {

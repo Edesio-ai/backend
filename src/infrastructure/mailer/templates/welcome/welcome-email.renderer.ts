@@ -1,9 +1,7 @@
 import { WelcomeEmailTemplateData } from './welcome-email.types';
 
 export function renderWelcomeEmailHtml(data: WelcomeEmailTemplateData): string {
-  const quickStartItems = data.quickStartItems
-    .map((item) => `      <li>${escapeHtml(item)}</li>`)
-    .join('\n');
+  const quickStartItems = data.quickStartItems.map((item) => `      <li>${escapeHtml(item)}</li>`).join('\n');
 
   return `
             <!DOCTYPE html>

@@ -71,15 +71,11 @@ class Fixtures {
   }
 
   whenRepositoryFails() {
-    this.sessionRepository.getSessionByCode.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.sessionRepository.getSessionByCode.mockRejectedValue(this.repositoryError);
   }
 
   thenGetSessionByCodeCalledWithExpectedCode() {
-    expect(this.sessionRepository.getSessionByCode).toHaveBeenCalledWith(
-      this.code,
-    );
+    expect(this.sessionRepository.getSessionByCode).toHaveBeenCalledWith(this.code);
     expect(this.sessionRepository.getSessionByCode).toHaveBeenCalledTimes(1);
   }
 

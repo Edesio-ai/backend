@@ -10,11 +10,6 @@ import { UploadStudentPhotoUseCase } from 'src/application/teaching/student/uplo
 @Module({
   imports: [AuthPersistenceModule, StudentPersistenceModule],
   controllers: [StudentController],
-  providers: [
-    GetStudentByUserIdUseCase,
-    CreateStudentUseCase,
-    GetStudentBatchUseCase,
-    UploadStudentPhotoUseCase,
-  ],
+  providers: [GetStudentByUserIdUseCase, CreateStudentUseCase, GetStudentBatchUseCase, UploadStudentPhotoUseCase],
 })
 export class StudentModule {}

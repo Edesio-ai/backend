@@ -15,9 +15,7 @@ export class SelfLearnerController {
   ) {}
 
   @Get()
-  async getSelfLearner(
-    @CurrentUser() user: AuthUser,
-  ): Promise<SelfLearner | null> {
+  async getSelfLearner(@CurrentUser() user: AuthUser): Promise<SelfLearner | null> {
     return await this.getSelfLearnerUseCase.execute(user);
   }
 

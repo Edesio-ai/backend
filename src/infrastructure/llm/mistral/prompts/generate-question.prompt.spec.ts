@@ -1,7 +1,4 @@
-import {
-  getGenerateQuestionSystemPrompt,
-  getGenerateQuestionUserPrompt,
-} from './generate-question.prompt';
+import { getGenerateQuestionSystemPrompt, getGenerateQuestionUserPrompt } from './generate-question.prompt';
 import { QuestionGenerationConfig } from 'src/domain/llm/types/openai.type';
 
 describe('generate-question.prompt', () => {
@@ -34,66 +31,38 @@ describe('generate-question.prompt', () => {
     const existingContext = '';
 
     it('should include totalQuestions in the user prompt', () => {
-      const prompt = getGenerateQuestionUserPrompt(
-        config,
-        courseContent,
-        existingContext,
-      );
+      const prompt = getGenerateQuestionUserPrompt(config, courseContent, existingContext);
       expect(prompt).toContain('6');
     });
 
     it('should include singleCount in the user prompt', () => {
-      const prompt = getGenerateQuestionUserPrompt(
-        config,
-        courseContent,
-        existingContext,
-      );
+      const prompt = getGenerateQuestionUserPrompt(config, courseContent, existingContext);
       expect(prompt).toContain('4');
     });
 
     it('should include openedCount in the user prompt', () => {
-      const prompt = getGenerateQuestionUserPrompt(
-        config,
-        courseContent,
-        existingContext,
-      );
+      const prompt = getGenerateQuestionUserPrompt(config, courseContent, existingContext);
       expect(prompt).toContain('2');
     });
 
     it('should include the course content', () => {
-      const prompt = getGenerateQuestionUserPrompt(
-        config,
-        courseContent,
-        existingContext,
-      );
+      const prompt = getGenerateQuestionUserPrompt(config, courseContent, existingContext);
       expect(prompt).toContain(courseContent);
     });
 
     it('should include the language', () => {
-      const prompt = getGenerateQuestionUserPrompt(
-        config,
-        courseContent,
-        existingContext,
-      );
+      const prompt = getGenerateQuestionUserPrompt(config, courseContent, existingContext);
       expect(prompt).toContain('francais');
     });
 
     it('should include existing questions context when provided', () => {
       const context = 'QUESTIONS DÉJÀ EXISTANTES';
-      const prompt = getGenerateQuestionUserPrompt(
-        config,
-        courseContent,
-        context,
-      );
+      const prompt = getGenerateQuestionUserPrompt(config, courseContent, context);
       expect(prompt).toContain(context);
     });
 
     it('should specify the expected JSON structure with correct field names', () => {
-      const prompt = getGenerateQuestionUserPrompt(
-        config,
-        courseContent,
-        existingContext,
-      );
+      const prompt = getGenerateQuestionUserPrompt(config, courseContent, existingContext);
       expect(prompt).toContain('questionText');
       expect(prompt).toContain('proposals');
       expect(prompt).toContain('correctAnswers');
@@ -101,11 +70,7 @@ describe('generate-question.prompt', () => {
     });
 
     it('should specify both question types in the JSON schema (single + open)', () => {
-      const prompt = getGenerateQuestionUserPrompt(
-        config,
-        courseContent,
-        existingContext,
-      );
+      const prompt = getGenerateQuestionUserPrompt(config, courseContent, existingContext);
       expect(prompt).toContain('"single"');
       expect(prompt).toContain('"open"');
     });

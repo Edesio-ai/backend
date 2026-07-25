@@ -85,10 +85,7 @@ class Fixtures {
     this.courseRepository = createMockCourseRepository();
     this.courseQuestionRepository = createMockCourseQuestionRepository();
 
-    this.useCase = new GetPendingQuestionCountUseCase(
-      this.courseQuestionRepository,
-      this.courseRepository,
-    );
+    this.useCase = new GetPendingQuestionCountUseCase(this.courseQuestionRepository, this.courseRepository);
   }
 
   whenExecute() {
@@ -104,9 +101,7 @@ class Fixtures {
   }
 
   whenCoursesQueryFails() {
-    this.courseRepository.getCoursesBySessionId.mockRejectedValue(
-      this.courseError,
-    );
+    this.courseRepository.getCoursesBySessionId.mockRejectedValue(this.courseError);
   }
 
   whenPendingCountReturns(n: number) {
@@ -114,33 +109,21 @@ class Fixtures {
   }
 
   whenPendingCountFails() {
-    this.courseQuestionRepository.getPendingQuestionCount.mockRejectedValue(
-      this.courseQuestionsError,
-    );
+    this.courseQuestionRepository.getPendingQuestionCount.mockRejectedValue(this.courseQuestionsError);
   }
 
   thenCoursesLoadedForSession() {
-    expect(this.courseRepository.getCoursesBySessionId).toHaveBeenCalledWith(
-      this.sessionId,
-    );
-    expect(this.courseRepository.getCoursesBySessionId).toHaveBeenCalledTimes(
-      1,
-    );
+    expect(this.courseRepository.getCoursesBySessionId).toHaveBeenCalledWith(this.sessionId);
+    expect(this.courseRepository.getCoursesBySessionId).toHaveBeenCalledTimes(1);
   }
 
   thenPendingCountCalledWithCourseIds(ids: string[]) {
-    expect(
-      this.courseQuestionRepository.getPendingQuestionCount,
-    ).toHaveBeenCalledWith(ids);
-    expect(
-      this.courseQuestionRepository.getPendingQuestionCount,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.courseQuestionRepository.getPendingQuestionCount).toHaveBeenCalledWith(ids);
+    expect(this.courseQuestionRepository.getPendingQuestionCount).toHaveBeenCalledTimes(1);
   }
 
   thenCourseQuestionRepositoryNotCalled() {
-    expect(
-      this.courseQuestionRepository.getPendingQuestionCount,
-    ).not.toHaveBeenCalled();
+    expect(this.courseQuestionRepository.getPendingQuestionCount).not.toHaveBeenCalled();
   }
 
   async thenThrowsCourseError(promise: Promise<unknown>) {

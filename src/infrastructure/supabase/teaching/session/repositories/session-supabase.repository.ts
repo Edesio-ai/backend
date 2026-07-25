@@ -33,11 +33,7 @@ export class SupabaseSessionRepository implements ISessionRepository {
   }
 
   public async getSessionByCode(code: string): Promise<Session | null> {
-    const { data, error } = await this.supabase
-      .from('sessions')
-      .select('*')
-      .eq('code', code)
-      .maybeSingle();
+    const { data, error } = await this.supabase.from('sessions').select('*').eq('code', code).maybeSingle();
 
     if (error) {
       console.error('An error occure while getting session by code:', error);
@@ -48,11 +44,7 @@ export class SupabaseSessionRepository implements ISessionRepository {
   }
 
   public async createSession(body: CreateSessionBody): Promise<Session> {
-    const { data, error } = await this.supabase
-      .from('sessions')
-      .insert(SessionMapper.toInsert(body))
-      .select()
-      .single();
+    const { data, error } = await this.supabase.from('sessions').insert(SessionMapper.toInsert(body)).select().single();
 
     if (error) {
       throw new ServerError(error.message);
@@ -61,10 +53,7 @@ export class SupabaseSessionRepository implements ISessionRepository {
     return SessionMapper.toDomain(data);
   }
 
-  public async updateSessionName(
-    sessionId: string,
-    body: UpdateSessionNameBody,
-  ): Promise<Session> {
+  public async updateSessionName(sessionId: string, body: UpdateSessionNameBody): Promise<Session> {
     const { data, error } = await this.supabase
       .from('sessions')
       .update(SessionMapper.toUpdate(body))
@@ -80,15 +69,8 @@ export class SupabaseSessionRepository implements ISessionRepository {
     return SessionMapper.toDomain(data);
   }
 
-  async deleteSessionByTeacherId(
-    sessionId: string,
-    teacherId: string,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('sessions')
-      .delete()
-      .eq('id', sessionId)
-      .eq('teacher_id', teacherId);
+  async deleteSessionByTeacherId(sessionId: string, teacherId: string): Promise<void> {
+    const { error } = await this.supabase.from('sessions').delete().eq('id', sessionId).eq('teacher_id', teacherId);
 
     if (error) {
       throw new ServerError(error.message);
@@ -96,11 +78,7 @@ export class SupabaseSessionRepository implements ISessionRepository {
   }
 
   async getSessionById(sessionId: string): Promise<Session | null> {
-    const { data, error } = await this.supabase
-      .from('sessions')
-      .select('id, teacher_id')
-      .eq('id', sessionId)
-      .single();
+    const { data, error } = await this.supabase.from('sessions').select('id, teacher_id').eq('id', sessionId).single();
 
     if (error) {
       throw new ServerError(error.message);
@@ -109,18 +87,11 @@ export class SupabaseSessionRepository implements ISessionRepository {
     return data ? SessionMapper.toDomain(data as SupabaseSession) : null;
   }
 
-  public async getTeachersSessionsByIds(
-    teacherIds: string[],
-  ): Promise<Session[]> {
+  public async getTeachersSessionsByIds(teacherIds: string[]): Promise<Session[]> {
     const { data, error } = await this.supabase
       .from('sessions')
       .select('id, name, code, language, teacher_id, created_at')
-      .in(
-        'teacher_id',
-        teacherIds.length > 0
-          ? teacherIds
-          : ['00000000-0000-0000-0000-000000000000'],
-      );
+      .in('teacher_id', teacherIds.length > 0 ? teacherIds : ['00000000-0000-0000-0000-000000000000']);
 
     if (error) {
       throw new ServerError(error.message);

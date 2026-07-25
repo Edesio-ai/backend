@@ -33,9 +33,7 @@ describe('SelfLearnerRepository', () => {
     it('throws ServerError when query fails', async () => {
       fixtures.whenMaybeSingleFails('db error');
 
-      await expect(fixtures.whenGetByUserId()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenGetByUserId()).rejects.toBeInstanceOf(ServerError);
     });
   });
 
@@ -46,9 +44,7 @@ describe('SelfLearnerRepository', () => {
       const result = await fixtures.whenCreate();
 
       expect(result).toEqual(fixtures.expectedDomain);
-      expect(fixtures.insertMock).toHaveBeenCalledWith(
-        SelfLearnerMapper.toInsert(fixtures.insertPayload),
-      );
+      expect(fixtures.insertMock).toHaveBeenCalledWith(SelfLearnerMapper.toInsert(fixtures.insertPayload));
       expect(fixtures.selectAfterInsertMock).toHaveBeenCalledTimes(1);
       expect(fixtures.singleAfterInsertMock).toHaveBeenCalledTimes(1);
     });

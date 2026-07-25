@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   COURSE_QUESTION_REPOSITORY,
   type ICourseQuestionRepository,
@@ -17,12 +14,10 @@ export class GetPendingQuestionCountUseCase {
   ) {}
 
   async execute(sessionId: string): Promise<number> {
-    const courses =
-      await this.courseRepository.getCoursesBySessionId(sessionId);
+    const courses = await this.courseRepository.getCoursesBySessionId(sessionId);
     const courseIds = courses.map((c) => c.id);
 
-    const pendingQuestionCount =
-      await this.courseQuestionRepository.getPendingQuestionCount(courseIds);
+    const pendingQuestionCount = await this.courseQuestionRepository.getPendingQuestionCount(courseIds);
 
     return pendingQuestionCount;
   }

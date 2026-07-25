@@ -9,6 +9,9 @@ import { GetSubscriptionUseCase } from 'src/application/billing/get-subscription
 import {
   CancelSubscription,
   StripeSubscription,
+  SubscriptionStatus,
+  CheckoutSessionCreateResult,
+  CheckoutSessionExistingResult,
 } from 'src/domain/billing/types/billing.type';
 import { CancelSubscriptionUseCase } from 'src/application/billing/cancel-subscription.use-case';
 import { ReactivateSubscriptionUseCase } from 'src/application/billing/reactivate-subscription.use-case';
@@ -26,7 +29,7 @@ export class BillingController {
   ) {}
 
   @Get('subscription-status')
-  async getSubscriptionStatus(@CurrentUser() user: User): Promise<any> {
+  async getSubscriptionStatus(@CurrentUser() user: User): Promise<SubscriptionStatus> {
     return this.getSubscriptionStatusUseCase.execute(user);
   }
 
@@ -34,28 +37,19 @@ export class BillingController {
   async createCheckoutSession(
     @CurrentUser() user: User,
     @Body() body: CreateCheckoutSessionBodyDto,
-  ): Promise<any> {
+  ): Promise<CheckoutSessionCreateResult | CheckoutSessionExistingResult> {
     const { priceId, planType, locale } = body;
-    return await this.createCheckoutSessionUseCase.execute(
-      priceId,
-      planType,
-      user,
-      locale,
-    );
+    return await this.createCheckoutSessionUseCase.execute(priceId, planType, user, locale);
   }
 
   @Get('subscription')
-  async getSubscription(
-    @CurrentUser() user: User,
-  ): Promise<{ subscription: StripeSubscription | null }> {
+  async getSubscription(@CurrentUser() user: User): Promise<{ subscription: StripeSubscription | null }> {
     const subscription = await this.getSubscriptionUseCase.execute(user);
     return { subscription };
   }
 
   @Post('subscription/cancel')
-  async cancelSubscription(
-    @CurrentUser() user: User,
-  ): Promise<CancelSubscription> {
+  async cancelSubscription(@CurrentUser() user: User): Promise<CancelSubscription> {
     return this.cancelSubscriptionUseCase.execute(user);
   }
 
@@ -65,7 +59,7 @@ export class BillingController {
   }
 
   @Get('portal')
-  async getCustomePortalUrl(@CurrentUser() user: User): Promise<any> {
+  async getCustomePortalUrl(@CurrentUser() user: User): Promise<{ url: string | null }> {
     const url = await this.getCustomerPortalUrlUseCase.execute(user);
 
     return { url };

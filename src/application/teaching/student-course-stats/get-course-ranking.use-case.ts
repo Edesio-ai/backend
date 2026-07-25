@@ -1,17 +1,11 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   CourseRanking,
   CourseRankingWithRate,
 } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import {
   SESSION_REPOSITORY,
   type ISessionRepository,
@@ -67,25 +61,18 @@ export class GetCourseRankingUseCase {
         break;
       }
       default: {
-        throw new ForbiddenException(
-          'You are not authorized to access this course',
-        );
+        throw new ForbiddenException('You are not authorized to access this course');
       }
     }
 
-    const studentCourseStats =
-      await this.studentCourseStatsRepository.getStudentCourseStatsByCourseId(
-        courseId,
-      );
+    const studentCourseStats = await this.studentCourseStatsRepository.getStudentCourseStatsByCourseId(courseId);
     const rankingWithRate = this.getRankingWithRate(studentCourseStats);
     const statsSortedByRate = this.getStatsSortedByRate(rankingWithRate);
 
     return this.getRankingWithRank(statsSortedByRate);
   }
 
-  private getStatsSortedByRate(
-    rankingWithRate: CourseRankingWithRate[],
-  ): CourseRankingWithRate[] {
+  private getStatsSortedByRate(rankingWithRate: CourseRankingWithRate[]): CourseRankingWithRate[] {
     return rankingWithRate.sort((a, b) => {
       if (b.successRate !== a.successRate) {
         return b.successRate - a.successRate;
@@ -94,24 +81,18 @@ export class GetCourseRankingUseCase {
     });
   }
 
-  private getRankingWithRank(
-    rankingWithRate: CourseRankingWithRate[],
-  ): CourseRanking[] {
+  private getRankingWithRank(rankingWithRate: CourseRankingWithRate[]): CourseRanking[] {
     return rankingWithRate.map((stat, index) => ({
       ...stat,
       rank: index + 1,
     }));
   }
 
-  private getRankingWithRate(
-    studentStats: StudentCourseStatsWithStudent[],
-  ): CourseRankingWithRate[] {
+  private getRankingWithRate(studentStats: StudentCourseStatsWithStudent[]): CourseRankingWithRate[] {
     return studentStats.map((row): CourseRankingWithRate => {
       const student = row.student;
       const successRate =
-        row.attemptedQuestions > 0
-          ? Math.round((row.correctAnswers / row.attemptedQuestions) * 100)
-          : 0;
+        row.attemptedQuestions > 0 ? Math.round((row.correctAnswers / row.attemptedQuestions) * 100) : 0;
 
       return {
         studentId: row.studentId,
@@ -125,52 +106,37 @@ export class GetCourseRankingUseCase {
     });
   }
 
-  private async checkTeacherAccess(
-    course: Course,
-    user: AuthUser,
-  ): Promise<void> {
+  private async checkTeacherAccess(course: Course, user: AuthUser): Promise<void> {
     const teacher = await this.teacherRepository.getTeacherByUserId(user.id);
     if (!teacher) {
       throw new NotFoundError(`Teacher with id ${user.id} not found`);
     }
 
-    const session = await this.sessionRepository.getSessionById(
-      course.sessionId,
-    );
+    const session = await this.sessionRepository.getSessionById(course.sessionId);
 
     if (session && session.teacherId !== teacher.id) {
       console.error('session teacher id does not match teacher id', {
         sessionId: session.teacherId,
         teacherId: teacher.id,
       });
-      throw new ForbiddenException(
-        'You are not authorized to access this course',
-      );
+      throw new ForbiddenException('You are not authorized to access this course');
     }
   }
 
-  private async checkStudentAccess(
-    course: Course,
-    user: AuthUser,
-  ): Promise<void> {
+  private async checkStudentAccess(course: Course, user: AuthUser): Promise<void> {
     const student = await this.studentRepository.getStudentByUserId(user.id);
     if (!student) {
       throw new NotFoundError(`Student with id ${user.id} not found`);
     }
 
-    const studentSession =
-      await this.studentSessionRepository.getStudentSessionBySessionId(
-        course.sessionId,
-      );
+    const studentSession = await this.studentSessionRepository.getStudentSessionBySessionId(course.sessionId);
 
     if (studentSession && studentSession.studentId !== student.id) {
       console.error('session student id does not match student id', {
         studentSessionId: studentSession.sessionId,
         studentId: student.id,
       });
-      throw new ForbiddenException(
-        'You are not authorized to access this course',
-      );
+      throw new ForbiddenException('You are not authorized to access this course');
     }
   }
 }

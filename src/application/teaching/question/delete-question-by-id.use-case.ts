@@ -1,22 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { BadRequestError, NotFoundError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   QUESTIONS_REPOSITORY,
   type IQuestionsRepository,
 } from 'src/domain/teaching/question/contracts/i-questions.repository';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 @Injectable()
 export class DeleteQuestionByIdUseCase {
@@ -33,8 +23,11 @@ export class DeleteQuestionByIdUseCase {
     if (!questionId) {
       throw new BadRequestError('Question ID is required');
     }
-    const { courseId } =
-      await this.questionsRepository.getQuestionById(questionId);
+    const question = await this.questionsRepository.getQuestionById(questionId);
+    if (!question) {
+      throw new NotFoundError('Question not found');
+    }
+    const { courseId } = question;
 
     const teacher = await this.teachersRepository.getTeacherByUserId(user.id);
     if (!teacher) {
@@ -47,10 +40,7 @@ export class DeleteQuestionByIdUseCase {
         teacher_id
       )
     `;
-    const course = await this.coursesRepository.getCourseWithSessionById(
-      courseId,
-      select,
-    );
+    const course = await this.coursesRepository.getCourseWithSessionById(courseId, select);
     if (!course) {
       throw new NotFoundError('Course not found');
     }
