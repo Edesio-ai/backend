@@ -108,12 +108,8 @@ describe('GetSubscriptionUseCase', () => {
 
 class Fixtures {
   public readonly stripeRepository: jest.Mocked<IStripeProvider>;
-  public readonly teacherRepository: ReturnType<
-    typeof createMockTeacherRepository
-  >;
-  public readonly establishmentRepository: ReturnType<
-    typeof createMockEstablishmentRepository
-  >;
+  public readonly teacherRepository: ReturnType<typeof createMockTeacherRepository>;
+  public readonly establishmentRepository: ReturnType<typeof createMockEstablishmentRepository>;
   public readonly getSubscriptionUseCase: GetSubscriptionUseCase;
 
   public user: User;
@@ -179,9 +175,7 @@ class Fixtures {
   }
 
   whenStripeReturnsSubscription() {
-    this.stripeRepository.getUserSubscription.mockResolvedValue(
-      this.subscription,
-    );
+    this.stripeRepository.getUserSubscription.mockResolvedValue(this.subscription);
   }
 
   whenStripeReturnsNull() {
@@ -189,9 +183,7 @@ class Fixtures {
   }
 
   whenStripeThrowsError() {
-    this.stripeRepository.getUserSubscription.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.stripeRepository.getUserSubscription.mockRejectedValue(this.repositoryError);
   }
 
   whenUserIsTeacherWithoutEstablishment() {
@@ -218,12 +210,8 @@ class Fixtures {
       emailConfirmedAt: '2026-01-01T00:00:00.000Z',
       metadata: { role: 'teacher' },
     };
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(
-      this.teacherWithEstablishment,
-    );
-    this.establishmentRepository.getEstablishmentById.mockResolvedValue(
-      this.establishment,
-    );
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(this.teacherWithEstablishment);
+    this.establishmentRepository.getEstablishmentById.mockResolvedValue(this.establishment);
   }
 
   whenUserIsTeacherButRepositoryReturnsNull() {
@@ -237,18 +225,12 @@ class Fixtures {
   }
 
   whenEstablishmentByIdReturnsNull() {
-    this.establishmentRepository.getEstablishmentById.mockResolvedValue(
-      null as unknown as Establishment,
-    );
+    this.establishmentRepository.getEstablishmentById.mockResolvedValue(null as unknown as Establishment);
   }
 
   thenGetUserSubscriptionCalledWith(email: string, times = 1) {
-    expect(this.stripeRepository.getUserSubscription).toHaveBeenCalledWith(
-      email,
-    );
-    expect(this.stripeRepository.getUserSubscription).toHaveBeenCalledTimes(
-      times,
-    );
+    expect(this.stripeRepository.getUserSubscription).toHaveBeenCalledWith(email);
+    expect(this.stripeRepository.getUserSubscription).toHaveBeenCalledTimes(times);
   }
 
   thenGetUserSubscriptionNotCalled() {
@@ -272,25 +254,17 @@ class Fixtures {
   }
 
   thenGetTeacherByUserIdCalledWith(userId: string) {
-    expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
-      userId,
-    );
+    expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(userId);
     expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledTimes(1);
   }
 
   thenGetEstablishmentByIdNotCalled() {
-    expect(
-      this.establishmentRepository.getEstablishmentById,
-    ).not.toHaveBeenCalled();
+    expect(this.establishmentRepository.getEstablishmentById).not.toHaveBeenCalled();
   }
 
   thenGetEstablishmentByIdCalledWith(establishmentId: string) {
-    expect(
-      this.establishmentRepository.getEstablishmentById,
-    ).toHaveBeenCalledWith(establishmentId);
-    expect(
-      this.establishmentRepository.getEstablishmentById,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.establishmentRepository.getEstablishmentById).toHaveBeenCalledWith(establishmentId);
+    expect(this.establishmentRepository.getEstablishmentById).toHaveBeenCalledTimes(1);
   }
 
   thenSubscriptionIsEstablishment(result: StripeSubscription | null) {

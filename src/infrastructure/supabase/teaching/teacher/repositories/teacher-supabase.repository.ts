@@ -18,13 +18,8 @@ export class TeacherSupabaseRepository implements ITeacherRepository {
     private readonly supabaseAuth: SupabaseClient,
   ) {}
 
-  public async getTeacherByEstablishmentId(
-    establishmentId: string,
-  ): Promise<Teacher[]> {
-    const { data, error } = await this.supabase
-      .from('teachers')
-      .select('*')
-      .eq('establishment_id', establishmentId);
+  public async getTeacherByEstablishmentId(establishmentId: string): Promise<Teacher[]> {
+    const { data, error } = await this.supabase.from('teachers').select('*').eq('establishment_id', establishmentId);
 
     if (error) {
       throw new ServerError(error.message);
@@ -46,11 +41,7 @@ export class TeacherSupabaseRepository implements ITeacherRepository {
     return data ? TeacherMapper.toDomain(data) : null;
   }
 
-  public async createTeacher(
-    userId: string,
-    name: string,
-    email: string,
-  ): Promise<Teacher | null> {
+  public async createTeacher(userId: string, name: string, email: string): Promise<Teacher | null> {
     const { data, error } = await this.supabase
       .from('teachers')
       .insert(TeacherMapper.toInsert(userId, name, email))
@@ -96,20 +87,14 @@ export class TeacherSupabaseRepository implements ITeacherRepository {
     const { data, error } = await query.maybeSingle();
 
     if (error) {
-      console.error(
-        `An error occure while getting teacher by conditions:`,
-        error,
-      );
+      console.error(`An error occure while getting teacher by conditions:`, error);
       throw new ServerError(error.message);
     }
 
     return data ? TeacherMapper.toDomain(data) : null;
   }
 
-  public async createTeacherWithInvitationToken(
-    adminData: User,
-    invitationToken: InvitationToken,
-  ): Promise<Teacher> {
+  public async createTeacherWithInvitationToken(adminData: User, invitationToken: InvitationToken): Promise<Teacher> {
     const { firstname, lastname } = adminData.metadata;
     const email = adminData.email;
 
@@ -135,14 +120,8 @@ export class TeacherSupabaseRepository implements ITeacherRepository {
     return TeacherMapper.toDomain(data);
   }
 
-  public async updateTeacher(
-    userId: string,
-    payload: UpdateTeacherPayload,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('teachers')
-      .update(payload)
-      .eq('supabase_user_id', userId);
+  public async updateTeacher(userId: string, payload: UpdateTeacherPayload): Promise<void> {
+    const { error } = await this.supabase.from('teachers').update(payload).eq('supabase_user_id', userId);
 
     if (error) {
       console.error(`Error updating teacher ${userId}: ${error.message}`);

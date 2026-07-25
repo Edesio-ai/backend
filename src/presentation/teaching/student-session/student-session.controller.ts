@@ -20,19 +20,13 @@ export class StudentSessionController {
   ) {}
 
   @Get('student/:studentId/joined-sessions')
-  async getStudentJoinedSessions(
-    @Param('studentId') studentId: string,
-  ): Promise<StudentJoinedSession[]> {
-    const student =
-      await this.getStudentJoinedSessionsUseCase.execute(studentId);
+  async getStudentJoinedSessions(@Param('studentId') studentId: string): Promise<StudentJoinedSession[]> {
+    const student = await this.getStudentJoinedSessionsUseCase.execute(studentId);
     return student;
   }
 
   @Post('join-session/:code')
-  async joinSessionByCode(
-    @Param('code') code: string,
-    @CurrentUser() user: AuthUser,
-  ): Promise<void> {
+  async joinSessionByCode(@Param('code') code: string, @CurrentUser() user: AuthUser): Promise<void> {
     await this.joinSessionByCodeUseCase.execute(code, user.id);
   }
 
@@ -42,18 +36,12 @@ export class StudentSessionController {
     @Param('sessionId') sessionId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<SessionStudent[]> {
-    const students = await this.getSessionStudentUseCase.execute(
-      sessionId,
-      user,
-    );
+    const students = await this.getSessionStudentUseCase.execute(sessionId, user);
     return students ?? [];
   }
 
   @Delete('session/:sessionId')
-  async deleteStudentSession(
-    @Param('sessionId') sessionId: string,
-    @CurrentUser() user: AuthUser,
-  ): Promise<void> {
+  async deleteStudentSession(@Param('sessionId') sessionId: string, @CurrentUser() user: AuthUser): Promise<void> {
     await this.deleteStudentSessionUseCase.execute(sessionId, user);
   }
 }

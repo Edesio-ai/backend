@@ -1,7 +1,4 @@
-import {
-  InvitationTokenPreview,
-  SupabaseInvitationTokenRow,
-} from 'src/domain/auth/invitation.type';
+import { InvitationTokenPreview, SupabaseInvitationTokenRow } from 'src/domain/auth/invitation.type';
 import { CreateInvitationTokenBody } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
 import { invitationTokenMapper } from './invitation-token.mapper';
 
@@ -71,10 +68,7 @@ describe('invitationTokenMapper', () => {
     });
 
     it('handles missing establishment', () => {
-      const result = invitationTokenMapper.toPreview(
-        { assigned_chatbots: 2, establishment: null },
-        'x',
-      );
+      const result = invitationTokenMapper.toPreview({ assigned_chatbots: 2, establishment: null }, 'x');
 
       expect(result.establishmentName).toBe('');
       expect(result.assignedChatbots).toBe(2);

@@ -64,15 +64,11 @@ class Fixtures {
   }
 
   whenCreateSessionFails() {
-    this.sessionRepository.createSession.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.sessionRepository.createSession.mockRejectedValue(this.repositoryError);
   }
 
   thenCreateSessionCalledWithExpectedPayload() {
-    expect(this.sessionRepository.createSession).toHaveBeenCalledWith(
-      this.body,
-    );
+    expect(this.sessionRepository.createSession).toHaveBeenCalledWith(this.body);
     expect(this.sessionRepository.createSession).toHaveBeenCalledTimes(1);
   }
 

@@ -1,7 +1,4 @@
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type UpdateSelfLearnerCourseBody,
   UpdateSelfLearnerCourseUseCase,
@@ -25,16 +22,9 @@ describe('UpdateSelfLearnerCourseUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(
-      fixtures.selfLearnerRepo.getSelfLearnerByUserId,
-    ).toHaveBeenCalledWith(fixtures.userId);
-    expect(fixtures.courseRepo.getSelfLearnerCourseById).toHaveBeenCalledWith(
-      fixtures.courseId,
-    );
-    expect(fixtures.courseRepo.updateSelfLearnerCourse).toHaveBeenCalledWith(
-      fixtures.courseId,
-      fixtures.body,
-    );
+    expect(fixtures.selfLearnerRepo.getSelfLearnerByUserId).toHaveBeenCalledWith(fixtures.userId);
+    expect(fixtures.courseRepo.getSelfLearnerCourseById).toHaveBeenCalledWith(fixtures.courseId);
+    expect(fixtures.courseRepo.updateSelfLearnerCourse).toHaveBeenCalledWith(fixtures.courseId, fixtures.body);
     expect(result).toEqual(fixtures.updatedCourse);
   });
 
@@ -122,10 +112,7 @@ class Fixtures {
   constructor() {
     this.selfLearnerRepo = createMockSelfLearnerRepository();
     this.courseRepo = createMockSelfLearnerCourseRepository();
-    this.useCase = new UpdateSelfLearnerCourseUseCase(
-      this.selfLearnerRepo,
-      this.courseRepo,
-    );
+    this.useCase = new UpdateSelfLearnerCourseUseCase(this.selfLearnerRepo, this.courseRepo);
   }
 
   whenExecute() {
@@ -141,8 +128,6 @@ class Fixtures {
   }
 
   whenUpdateSucceeds() {
-    this.courseRepo.updateSelfLearnerCourse.mockResolvedValue(
-      this.updatedCourse,
-    );
+    this.courseRepo.updateSelfLearnerCourse.mockResolvedValue(this.updatedCourse);
   }
 }

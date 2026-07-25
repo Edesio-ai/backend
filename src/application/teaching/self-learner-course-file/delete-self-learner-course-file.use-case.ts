@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type ICourseFileRepository,
   COURSE_FILE_REPOSITORY,
@@ -33,39 +30,26 @@ export class DeleteSelfLearnerCourseFileUseCase {
   ) {}
 
   public async execute(userId: string, fileId: string): Promise<void> {
-    const selfLearner =
-      await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
     if (!selfLearner) {
       throw new NotFoundError('Self learner course file not found');
     }
 
-    const selfLearnerCourseFile =
-      await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFileById(
-        fileId,
-      );
+    const selfLearnerCourseFile = await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFileById(fileId);
     if (!selfLearnerCourseFile) {
       throw new NotFoundError('Self learner course file not found');
     }
 
-    const course =
-      await this.selfLearnerCourseRepository.getSelfLearnerCourseById(
-        selfLearnerCourseFile.courseId,
-      );
+    const course = await this.selfLearnerCourseRepository.getSelfLearnerCourseById(selfLearnerCourseFile.courseId);
     if (!course) {
       throw new NotFoundError('Course not found');
     }
 
     if (course.selfLearnerId !== selfLearner.id) {
-      throw new ForbiddenError(
-        'You are not allowed to delete this course file',
-      );
+      throw new ForbiddenError('You are not allowed to delete this course file');
     }
 
-    await this.courseFileRepository.deleteFileFromStorage(
-      selfLearnerCourseFile.fileUrl,
-    );
-    await this.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFileById(
-      fileId,
-    );
+    await this.courseFileRepository.deleteFileFromStorage(selfLearnerCourseFile.fileUrl);
+    await this.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFileById(fileId);
   }
 }

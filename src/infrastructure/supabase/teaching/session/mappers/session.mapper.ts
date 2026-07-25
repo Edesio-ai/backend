@@ -5,10 +5,7 @@ import {
   SupabaseSessionInsert,
   UpdateSessionNameBody,
 } from 'src/domain/teaching/session/types/session.type';
-import {
-  CourseWithSession,
-  SupabaseCourseWithSession,
-} from 'src/domain/teaching/course/types/course.type';
+import { CourseWithSession, SupabaseCourseWithSession } from 'src/domain/teaching/course/types/course.type';
 
 export const SessionMapper = {
   toDomain: (row: SupabaseSession): Session => ({
@@ -31,9 +28,7 @@ export const SessionMapper = {
     name: body.name,
   }),
 
-  courseWithSessionToDomain: (
-    row: SupabaseCourseWithSession,
-  ): CourseWithSession => ({
+  courseWithSessionToDomain: (row: SupabaseCourseWithSession): CourseWithSession => ({
     id: row.id,
     title: row.title,
     description: row.description,

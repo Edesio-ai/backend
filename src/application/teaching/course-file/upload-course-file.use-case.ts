@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  CourseFile,
-  CourseFileUpload,
-} from 'src/domain/teaching/course-file/types/course-file.type';
+import { CourseFile, CourseFileUpload } from 'src/domain/teaching/course-file/types/course-file.type';
 import {
   COURSE_FILE_REPOSITORY,
   type ICourseFileRepository,
@@ -19,10 +16,6 @@ export class UploadCourseFileUseCase {
     const storagePath = `${courseId}/${Date.now()}.${ext}`;
     await this.courseFileRepository.storeCourseFile(file, storagePath);
 
-    return this.courseFileRepository.insertCourseFile(
-      courseId,
-      file,
-      storagePath,
-    );
+    return this.courseFileRepository.insertCourseFile(courseId, file, storagePath);
   }
 }

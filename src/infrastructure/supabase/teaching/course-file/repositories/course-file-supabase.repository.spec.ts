@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { CourseFileRepository } from './course-file-supabase.repository';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 
@@ -142,7 +143,7 @@ class Fixtures {
       from: this.fromMock,
       storage: { from: this.storageFromMock },
     };
-    this.repository = new CourseFileRepository(supabaseMock as any);
+    this.repository = new CourseFileRepository(supabaseMock as unknown as SupabaseClient);
   }
 
   whenDeleteFileById() {
@@ -172,9 +173,7 @@ class Fixtures {
   }
 
   whenGetCourseFilesByCourseIdSucceeds() {
-    this.courseFilesListEqMock.mockReturnValue(
-      Promise.resolve({ data: [this.supabaseCourseFileRow], error: null }),
-    );
+    this.courseFilesListEqMock.mockReturnValue(Promise.resolve({ data: [this.supabaseCourseFileRow], error: null }));
   }
 
   whenGetCourseFilesByCourseIdFails() {
@@ -210,20 +209,14 @@ class Fixtures {
   thenGetFileQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('course_files');
     expect(this.courseFilesSelectMock).toHaveBeenCalledWith('*');
-    expect(this.courseFilesSelectEqMock).toHaveBeenCalledWith(
-      'id',
-      this.fileId,
-    );
+    expect(this.courseFilesSelectEqMock).toHaveBeenCalledWith('id', this.fileId);
     expect(this.courseFilesSelectSingleMock).toHaveBeenCalledTimes(1);
   }
 
   thenGetFilesByCourseIdQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('course_files');
     expect(this.courseFilesSelectMock).toHaveBeenCalledWith('*');
-    expect(this.courseFilesSelectEqMock).toHaveBeenCalledWith(
-      'course_id',
-      this.courseId,
-    );
+    expect(this.courseFilesSelectEqMock).toHaveBeenCalledWith('course_id', this.courseId);
   }
 
   thenStorageRemoveCalledWithFileUrl() {
@@ -234,9 +227,6 @@ class Fixtures {
   thenDeleteFromDatabaseQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('course_files');
     expect(this.courseFilesDeleteMock).toHaveBeenCalledTimes(1);
-    expect(this.courseFilesDeleteEqMock).toHaveBeenCalledWith(
-      'id',
-      this.fileId,
-    );
+    expect(this.courseFilesDeleteEqMock).toHaveBeenCalledWith('id', this.fileId);
   }
 }

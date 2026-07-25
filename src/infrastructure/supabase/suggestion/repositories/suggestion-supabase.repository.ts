@@ -3,11 +3,7 @@ import { ISuggestionRepository } from 'src/domain/suggestion/contracts/i-suggest
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { SUPABASE_ADMIN } from '../../supabase.module';
 import { Inject } from '@nestjs/common';
-import {
-  Suggestion,
-  SuggestionLikesCount,
-  SuggestionToInsert,
-} from 'src/domain/suggestion/suggestion.type';
+import { Suggestion, SuggestionLikesCount, SuggestionToInsert } from 'src/domain/suggestion/suggestion.type';
 import { SuggestionMapper } from '../mappers/suggestion.mapper';
 
 export class SuggestionSupabaseRepository implements ISuggestionRepository {
@@ -25,18 +21,14 @@ export class SuggestionSupabaseRepository implements ISuggestionRepository {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error(
-        `Error fetching suggestions for category ${category}: ${error.message}`,
-      );
+      console.error(`Error fetching suggestions for category ${category}: ${error.message}`);
       throw new ServerError(error.message);
     }
 
     return data?.map(SuggestionMapper.toDomain) ?? [];
   }
 
-  async getSuggestionLikesCountById(
-    suggestionId: string,
-  ): Promise<SuggestionLikesCount> {
+  async getSuggestionLikesCountById(suggestionId: string): Promise<SuggestionLikesCount> {
     const { data, error } = await this.supabase
       .from('suggestions')
       .select('id, likes_count')
@@ -44,9 +36,7 @@ export class SuggestionSupabaseRepository implements ISuggestionRepository {
       .single();
 
     if (error) {
-      console.error(
-        `Error fetching suggestion by id ${suggestionId}: ${error.message}`,
-      );
+      console.error(`Error fetching suggestion by id ${suggestionId}: ${error.message}`);
       throw new ServerError(error.message);
     }
 
@@ -60,9 +50,7 @@ export class SuggestionSupabaseRepository implements ISuggestionRepository {
       .eq('id', suggestionId);
 
     if (error) {
-      console.error(
-        `Error decrementing like for suggestion ${suggestionId}: ${error.message}`,
-      );
+      console.error(`Error decrementing like for suggestion ${suggestionId}: ${error.message}`);
       throw new ServerError(error.message);
     }
   }
@@ -74,9 +62,7 @@ export class SuggestionSupabaseRepository implements ISuggestionRepository {
       .eq('id', suggestionId);
 
     if (error) {
-      console.error(
-        `Error incrementing like for suggestion ${suggestionId}: ${error.message}`,
-      );
+      console.error(`Error incrementing like for suggestion ${suggestionId}: ${error.message}`);
       throw new ServerError(error.message);
     }
   }
@@ -97,16 +83,10 @@ export class SuggestionSupabaseRepository implements ISuggestionRepository {
   }
 
   async getSuggestionById(suggestionId: string): Promise<Suggestion | null> {
-    const { data, error } = await this.supabase
-      .from('suggestions')
-      .select('*')
-      .eq('id', suggestionId)
-      .single();
+    const { data, error } = await this.supabase.from('suggestions').select('*').eq('id', suggestionId).single();
 
     if (error) {
-      console.error(
-        `Error fetching suggestion by id ${suggestionId}: ${error.message}`,
-      );
+      console.error(`Error fetching suggestion by id ${suggestionId}: ${error.message}`);
       throw new ServerError(error.message);
     }
 
@@ -114,15 +94,10 @@ export class SuggestionSupabaseRepository implements ISuggestionRepository {
   }
 
   async deleteSuggestion(suggestionId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('suggestions')
-      .delete()
-      .eq('id', suggestionId);
+    const { error } = await this.supabase.from('suggestions').delete().eq('id', suggestionId);
 
     if (error) {
-      console.error(
-        `Error deleting suggestion by id ${suggestionId}: ${error.message}`,
-      );
+      console.error(`Error deleting suggestion by id ${suggestionId}: ${error.message}`);
       throw new ServerError(error.message);
     }
   }

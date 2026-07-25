@@ -24,10 +24,7 @@ export class UploadStudentPhotoUseCase {
 
     const ext = payload.originalFileName.split('.').pop() ?? 'bin';
     const storagePath = `${student.id}/${Date.now()}.${ext}`;
-    const photoUrl = await this.studentRepository.storeStudentPhoto(
-      payload.buffer,
-      storagePath,
-    );
+    const photoUrl = await this.studentRepository.storeStudentPhoto(payload.buffer, storagePath);
 
     await this.studentRepository.updateStudentPhoto(student.id, photoUrl);
 

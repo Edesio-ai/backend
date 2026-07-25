@@ -1,13 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   ESTABLISHMENT_REPOSITORY,
   type IEstablishmentRepository,
@@ -24,10 +18,7 @@ import {
   STUDENT_REPOSITORY,
   type IStudentRepository,
 } from 'src/domain/teaching/student/contracts/I-student.repository';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 
 export class GetSessionCoursesUseCase {
@@ -60,18 +51,13 @@ export class GetSessionCoursesUseCase {
         await this.checkStudentOwnership(sessionId, user);
         break;
       default:
-        throw new ForbiddenError(
-          'You are not authorized to access this session',
-        );
+        throw new ForbiddenError('You are not authorized to access this session');
     }
 
     return this.courseRepository.getSessionCoursesBySessionId(sessionId);
   }
 
-  private async checkTeacherOwnership(
-    sessionId: string,
-    user: AuthUser,
-  ): Promise<void> {
+  private async checkTeacherOwnership(sessionId: string, user: AuthUser): Promise<void> {
     const teacher = await this.teachersRepository.getTeacherByUserId(user.id);
     if (!teacher) {
       throw new NotFoundError('Teacher not found');
@@ -89,12 +75,8 @@ export class GetSessionCoursesUseCase {
     }
   }
 
-  private async checkEstablishmentOwnership(
-    sessionId: string,
-    user: AuthUser,
-  ): Promise<void> {
-    const establishment =
-      await this.establishmentRepository.getEstablishmentByUserId(user.id);
+  private async checkEstablishmentOwnership(sessionId: string, user: AuthUser): Promise<void> {
+    const establishment = await this.establishmentRepository.getEstablishmentByUserId(user.id);
     if (!establishment) {
       throw new NotFoundError('Establishment not found');
     }
@@ -117,26 +99,18 @@ export class GetSessionCoursesUseCase {
     }
 
     if (teacher.id !== session.teacherId) {
-      console.error(
-        `Teacher id ${teacher.id} does not match the session teacher id ${session.teacherId}`,
-      );
+      console.error(`Teacher id ${teacher.id} does not match the session teacher id ${session.teacherId}`);
       throw new ForbiddenError('You are not authorized to access this session');
     }
   }
 
-  private async checkStudentOwnership(
-    sessionId: string,
-    user: AuthUser,
-  ): Promise<void> {
+  private async checkStudentOwnership(sessionId: string, user: AuthUser): Promise<void> {
     const student = await this.studentRepository.getStudentByUserId(user.id);
     if (!student) {
       throw new NotFoundError('Student not found');
     }
 
-    const studentSession =
-      await this.studentSessionRepository.getStudentSessionBySessionId(
-        sessionId,
-      );
+    const studentSession = await this.studentSessionRepository.getStudentSessionBySessionId(sessionId);
     if (!studentSession) {
       throw new NotFoundError(`Session not found for id ${sessionId}`);
     }

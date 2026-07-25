@@ -23,12 +23,8 @@ describe('CreateSelfLearnerCourseUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(
-      fixtures.selfLearnerRepository.getSelfLearnerByUserId,
-    ).toHaveBeenCalledWith(fixtures.user.id);
-    expect(
-      fixtures.courseRepository.createSelfLearnerCourse,
-    ).toHaveBeenCalledWith({
+    expect(fixtures.selfLearnerRepository.getSelfLearnerByUserId).toHaveBeenCalledWith(fixtures.user.id);
+    expect(fixtures.courseRepository.createSelfLearnerCourse).toHaveBeenCalledWith({
       selfLearnerId: fixtures.selfLearner.id,
       title: fixtures.body.title,
       description: fixtures.body.description ?? null,
@@ -44,9 +40,7 @@ describe('CreateSelfLearnerCourseUseCase', () => {
     const promise = fixtures.whenExecute();
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundException);
-    expect(
-      fixtures.courseRepository.createSelfLearnerCourse,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.createSelfLearnerCourse).not.toHaveBeenCalled();
   });
 
   it('should propagate errors from repositories', async () => {
@@ -98,10 +92,7 @@ class Fixtures {
   constructor() {
     this.courseRepository = createMockSelfLearnerCourseRepository();
     this.selfLearnerRepository = createMockSelfLearnerRepository();
-    this.useCase = new CreateSelfLearnerCourseUseCase(
-      this.courseRepository,
-      this.selfLearnerRepository,
-    );
+    this.useCase = new CreateSelfLearnerCourseUseCase(this.courseRepository, this.selfLearnerRepository);
   }
 
   whenExecute() {
@@ -109,9 +100,7 @@ class Fixtures {
   }
 
   whenSelfLearnerFound() {
-    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(
-      this.selfLearner,
-    );
+    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(this.selfLearner);
   }
 
   whenSelfLearnerNotFound() {
@@ -119,8 +108,6 @@ class Fixtures {
   }
 
   whenCreateSucceeds() {
-    this.courseRepository.createSelfLearnerCourse.mockResolvedValue(
-      this.createdCourse,
-    );
+    this.courseRepository.createSelfLearnerCourse.mockResolvedValue(this.createdCourse);
   }
 }

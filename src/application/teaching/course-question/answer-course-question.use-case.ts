@@ -6,14 +6,8 @@ import {
 } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 import { AnswerCourseQuestionBodyDto } from 'src/presentation/teaching/course-questions/dtos/answer-course-question.dto';
 import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
-import {
-  type ITeacherRepository,
-  TEACHER_REPOSITORY,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { type ITeacherRepository, TEACHER_REPOSITORY } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 
 export class AnswerCourseQuestionUseCase {
   constructor(
@@ -25,20 +19,14 @@ export class AnswerCourseQuestionUseCase {
     private readonly courseRepository: ICourseRepository,
   ) {}
 
-  async execute(
-    body: AnswerCourseQuestionBodyDto,
-    user: AuthUser,
-  ): Promise<CourseQuestion | null> {
+  async execute(body: AnswerCourseQuestionBodyDto, user: AuthUser): Promise<CourseQuestion | null> {
     const { courseQuestionId } = body;
 
     const teacher = await this.teacherRepository.getTeacherByUserId(user.id);
     if (!teacher) {
       throw new NotFoundException('Teacher not found');
     }
-    const courseQuestion =
-      await this.courseQuestionRepository.getCourseQuestionByCourseId(
-        courseQuestionId,
-      );
+    const courseQuestion = await this.courseQuestionRepository.getCourseQuestionByCourseId(courseQuestionId);
     if (!courseQuestion) {
       throw new NotFoundException('Course question not found');
     }
@@ -50,25 +38,16 @@ export class AnswerCourseQuestionUseCase {
     )
     `;
 
-    const CourseWithSession =
-      await this.courseRepository.getCourseWithSessionById(
-        courseQuestion.courseId,
-        select,
-      );
+    const CourseWithSession = await this.courseRepository.getCourseWithSessionById(courseQuestion.courseId, select);
     if (!CourseWithSession) {
       throw new NotFoundException('Course not found');
     }
 
     if (CourseWithSession.session.teacherId !== teacher.id) {
-      throw new ForbiddenException(
-        'You are not allowed to delete this course question',
-      );
+      throw new ForbiddenException('You are not allowed to delete this course question');
     }
 
-    const courseQuestions =
-      await this.courseQuestionRepository.getCourseQuestionsByCourseId(
-        CourseWithSession.id,
-      );
+    const courseQuestions = await this.courseQuestionRepository.getCourseQuestionsByCourseId(CourseWithSession.id);
     if (courseQuestions.length === 0) {
       throw new NotFoundException('No course questions found');
     }
@@ -77,11 +56,10 @@ export class AnswerCourseQuestionUseCase {
       answer: body.answer,
       answeredAt: new Date().toISOString(),
     };
-    const updatedCourseQuestion =
-      await this.courseQuestionRepository.updateCourseQuestion(
-        body.courseQuestionId,
-        updatePayload,
-      );
+    const updatedCourseQuestion = await this.courseQuestionRepository.updateCourseQuestion(
+      body.courseQuestionId,
+      updatePayload,
+    );
 
     return updatedCourseQuestion;
   }

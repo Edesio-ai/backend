@@ -11,9 +11,7 @@ import {
 } from 'src/domain/teaching/self-learner-course-file/types/self-learner-course-file.type';
 
 export class SelfLearnerCourseFileRepository implements ISelfLearnerCourseFileRepository {
-  constructor(
-    @Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient,
-  ) {}
+  constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient) {}
 
   public async uploadSelfLearnerCourseFile(
     payload: SelfLearnerCourseFileInsertPayload,
@@ -31,9 +29,7 @@ export class SelfLearnerCourseFileRepository implements ISelfLearnerCourseFileRe
     return selfLearnerCourseFileMapper.toDomain(data);
   }
 
-  public async getSelfLearnerCourseFiles(
-    courseId: string,
-  ): Promise<SelfLearnerCourseFile[]> {
+  public async getSelfLearnerCourseFiles(courseId: string): Promise<SelfLearnerCourseFile[]> {
     const { data, error } = await this.supabase
       .from('self_learner_course_files')
       .select('*')
@@ -41,92 +37,58 @@ export class SelfLearnerCourseFileRepository implements ISelfLearnerCourseFileRe
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error(
-        `Error getting self learner course files for course ${courseId}: ${error.message}`,
-      );
+      console.error(`Error getting self learner course files for course ${courseId}: ${error.message}`);
       throw new ServerError(error.message);
     }
-    return data
-      ? data.map((row) => selfLearnerCourseFileMapper.toDomain(row))
-      : [];
+    return data ? data.map((row) => selfLearnerCourseFileMapper.toDomain(row)) : [];
   }
 
-  public async getSelfLearnerCourseFilesUrls(
-    courseId: string,
-  ): Promise<string[]> {
+  public async getSelfLearnerCourseFilesUrls(courseId: string): Promise<string[]> {
     const { data, error } = await this.supabase
       .from('self_learner_course_files')
       .select('file_url')
       .eq('course_id', courseId);
 
     if (error) {
-      console.error(
-        `Error getting self learner course files urls for course ${courseId}: ${error.message}`,
-      );
+      console.error(`Error getting self learner course files urls for course ${courseId}: ${error.message}`);
       throw new ServerError(error.message);
     }
     return data ? selfLearnerCourseFileMapper.toCourseFilesUrls(data) : [];
   }
 
-  public async deleteSelfLearnerCourseFilesByCourseId(
-    courseId: string,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('self_learner_course_files')
-      .delete()
-      .eq('course_id', courseId);
+  public async deleteSelfLearnerCourseFilesByCourseId(courseId: string): Promise<void> {
+    const { error } = await this.supabase.from('self_learner_course_files').delete().eq('course_id', courseId);
 
     if (error) {
-      console.error(
-        `Error deleting self learner course files by course id: ${courseId}: ${error.message}`,
-      );
+      console.error(`Error deleting self learner course files by course id: ${courseId}: ${error.message}`);
       throw new ServerError(error.message);
     }
   }
 
-  public async getSelfLearnerCourseFileById(
-    fileId: string,
-  ): Promise<SelfLearnerCourseFile> {
-    const { data, error } = await this.supabase
-      .from('self_learner_course_files')
-      .select('*')
-      .eq('id', fileId)
-      .single();
+  public async getSelfLearnerCourseFileById(fileId: string): Promise<SelfLearnerCourseFile> {
+    const { data, error } = await this.supabase.from('self_learner_course_files').select('*').eq('id', fileId).single();
 
     if (error) {
-      console.error(
-        `Error getting self learner course file by id: ${fileId}: ${error.message}`,
-      );
+      console.error(`Error getting self learner course file by id: ${fileId}: ${error.message}`);
       throw new ServerError(error.message);
     }
     return selfLearnerCourseFileMapper.toDomain(data);
   }
 
   public async deleteSelfLearnerCourseFileById(fileId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('self_learner_course_files')
-      .delete()
-      .eq('id', fileId);
+    const { error } = await this.supabase.from('self_learner_course_files').delete().eq('id', fileId);
 
     if (error) {
-      console.error(
-        `Error deleting self learner course file by id: ${fileId}: ${error.message}`,
-      );
+      console.error(`Error deleting self learner course file by id: ${fileId}: ${error.message}`);
       throw new ServerError(error.message);
     }
   }
 
-  public async getSelfLearnerCourseFileSignedUrl(
-    fileUrl: string,
-  ): Promise<string | null> {
-    const { data, error } = await this.supabase.storage
-      .from('courses-pdf')
-      .createSignedUrl(fileUrl, 3600);
+  public async getSelfLearnerCourseFileSignedUrl(fileUrl: string): Promise<string | null> {
+    const { data, error } = await this.supabase.storage.from('courses-pdf').createSignedUrl(fileUrl, 3600);
 
     if (error) {
-      console.error(
-        `Error getting self learner course file signed url: ${fileUrl}: ${error.message}`,
-      );
+      console.error(`Error getting self learner course file signed url: ${fileUrl}: ${error.message}`);
       throw new ServerError(error.message);
     }
 

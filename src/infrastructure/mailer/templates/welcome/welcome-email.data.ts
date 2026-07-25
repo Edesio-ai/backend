@@ -1,7 +1,4 @@
-import {
-  WelcomeEmailRole,
-  WelcomeEmailTemplateData,
-} from './welcome-email.types';
+import { WelcomeEmailRole, WelcomeEmailTemplateData } from './welcome-email.types';
 
 const ROLE_LABELS: Record<WelcomeEmailRole, string> = {
   teacher: 'Teacher',

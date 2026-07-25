@@ -40,10 +40,7 @@ export const QuestionMapper = {
     position_order: body.positionOrder ?? null,
   }),
 
-  generatedToInserts: (
-    questions: GeneratedQuestion[],
-    courseId: string,
-  ): SupabaseQuestionInsert[] =>
+  generatedToInserts: (questions: GeneratedQuestion[], courseId: string): SupabaseQuestionInsert[] =>
     questions.map((q) => ({
       course_id: courseId,
       type: q.type,
@@ -56,15 +53,11 @@ export const QuestionMapper = {
   toUpdate: (updates: QuestionUpdate): SupabaseQuestionUpdate => {
     const row: SupabaseQuestionUpdate = {};
     if (updates.type !== undefined) row.type = updates.type;
-    if (updates.questionText !== undefined)
-      row.question_text = updates.questionText;
+    if (updates.questionText !== undefined) row.question_text = updates.questionText;
     if (updates.proposals !== undefined) row.proposals = updates.proposals;
-    if (updates.correctAnswers !== undefined)
-      row.correct_answers = updates.correctAnswers;
-    if (updates.explanation !== undefined)
-      row.explanation = updates.explanation;
-    if (updates.positionOrder !== undefined)
-      row.position_order = updates.positionOrder;
+    if (updates.correctAnswers !== undefined) row.correct_answers = updates.correctAnswers;
+    if (updates.explanation !== undefined) row.explanation = updates.explanation;
+    if (updates.positionOrder !== undefined) row.position_order = updates.positionOrder;
     return row;
   },
 };

@@ -62,9 +62,7 @@ class Fixtures {
   }
 
   whenCreateTeacherFails() {
-    this.teacherRepository.createTeacher.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.teacherRepository.createTeacher.mockRejectedValue(this.repositoryError);
   }
 
   async thenThrowRepositoryError(promise: Promise<unknown>) {
@@ -72,11 +70,7 @@ class Fixtures {
   }
 
   thenCreateTeacherCalledWithExpectedArguments() {
-    expect(this.teacherRepository.createTeacher).toHaveBeenCalledWith(
-      this.userId,
-      this.body.name,
-      this.body.email,
-    );
+    expect(this.teacherRepository.createTeacher).toHaveBeenCalledWith(this.userId, this.body.name, this.body.email);
     expect(this.teacherRepository.createTeacher).toHaveBeenCalledTimes(1);
   }
 

@@ -8,16 +8,8 @@ import { GetCourseFilesUseCase } from 'src/application/teaching/course-file/get-
 import { CourseFilePersistenceModule } from 'src/infrastructure/supabase/teaching/course-file/course-file-persistence.repository';
 
 @Module({
-  imports: [
-    AuthPersistenceModule,
-    CoursePersistenceModule,
-    CourseFilePersistenceModule,
-  ],
+  imports: [AuthPersistenceModule, CoursePersistenceModule, CourseFilePersistenceModule],
   controllers: [CourseFileController],
-  providers: [
-    DeleteCourseFileUseCase,
-    UploadCourseFileUseCase,
-    GetCourseFilesUseCase,
-  ],
+  providers: [DeleteCourseFileUseCase, UploadCourseFileUseCase, GetCourseFilesUseCase],
 })
 export class CourseFileModule {}

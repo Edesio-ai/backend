@@ -40,7 +40,7 @@ describe('CreateSuggestionBodyDto', () => {
   });
 
   it('rejects invalid category', async () => {
-    const dto = Object.assign(valid(), { category: 'admin' as any });
+    const dto = Object.assign(valid(), { category: 'admin' as never });
 
     const errors = await validate(dto);
 

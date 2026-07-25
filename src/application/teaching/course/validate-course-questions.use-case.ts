@@ -1,22 +1,12 @@
 import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { BadRequestError, NotFoundError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   QUESTIONS_REPOSITORY,
   type IQuestionsRepository,
 } from 'src/domain/teaching/question/contracts/i-questions.repository';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 
 export class ValidateCourseQuestionsUseCase {
@@ -41,26 +31,18 @@ export class ValidateCourseQuestionsUseCase {
         teacher_id
       )
     `;
-    const course = await this.courseRepository.getCourseWithSessionById(
-      courseId,
-      select,
-    );
+    const course = await this.courseRepository.getCourseWithSessionById(courseId, select);
     if (!course) {
       throw new NotFoundError('Course not found');
     }
 
     if (course.session.teacherId !== teacher.id) {
-      throw new UnauthorizedError(
-        'You are not allowed to validate questions for this course',
-      );
+      throw new UnauthorizedError('You are not allowed to validate questions for this course');
     }
 
-    const questions =
-      await this.questionsRepository.getCourseQuestions(courseId);
+    const questions = await this.questionsRepository.getCourseQuestions(courseId);
     if (!questions || questions.length === 0) {
-      throw new BadRequestError(
-        'You have to generate as less one question before validating them',
-      );
+      throw new BadRequestError('You have to generate as less one question before validating them');
     }
     const updatedCourse = await this.courseRepository.updateCourse(courseId, {
       validatedQuestions: true,

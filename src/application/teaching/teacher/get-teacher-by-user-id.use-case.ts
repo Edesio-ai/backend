@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
 
 export class GetTeacherByUserIdUseCase {

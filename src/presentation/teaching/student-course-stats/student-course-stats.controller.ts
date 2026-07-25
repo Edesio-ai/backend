@@ -16,12 +16,8 @@ export class StudentCourseStatsController {
 
   @Roles('teacher', 'student')
   @Get('course/:courseId/ranking')
-  async getCourseRanking(
-    @Param('courseId') courseId: string,
-    @CurrentUser() user: AuthUser,
-  ): Promise<CourseRanking[]> {
-    const ranking =
-      (await this.getCourseRankingUseCase.execute(courseId, user)) || [];
+  async getCourseRanking(@Param('courseId') courseId: string, @CurrentUser() user: AuthUser): Promise<CourseRanking[]> {
+    const ranking = (await this.getCourseRankingUseCase.execute(courseId, user)) || [];
     return ranking || [];
   }
 
@@ -32,10 +28,6 @@ export class StudentCourseStatsController {
     @CurrentUser() user: AuthUser,
     @Body() body: UpdateOrCreateStudentCourseStatsBodyDto,
   ): Promise<void> {
-    await this.updateOrCreateStudentCourseStatsUseCase.execute(
-      courseId,
-      user,
-      body,
-    );
+    await this.updateOrCreateStudentCourseStatsUseCase.execute(courseId, user, body);
   }
 }

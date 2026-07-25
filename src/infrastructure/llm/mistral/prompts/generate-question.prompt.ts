@@ -1,8 +1,6 @@
 import { QuestionGenerationConfig } from 'src/domain/llm/types/openai.type';
 
-export const getGenerateQuestionSystemPrompt = (
-  config: QuestionGenerationConfig,
-): string => {
+export const getGenerateQuestionSystemPrompt = (config: QuestionGenerationConfig): string => {
   const { totalQuestions, language } = config;
   return `
     Tu es un professeur expert en pédagogie. Tu génères des questions pédagogiques pertinentes à partir du contenu des PDF, comme le ferait un vrai professeur expérimenté. Tu dois générer exactement ${totalQuestions} questions couvrant les ${totalQuestions} sujets PRINCIPAUX du cours. Tu réponds toujours en JSON valide. Tu génères les questions en ${language}. Important: le contenu du cours peut être dans une autre langue, mais tu dois TOUJOURS générer les questions et réponses en ${language}.

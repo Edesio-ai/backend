@@ -35,25 +35,9 @@ export type CreateQuestionBody = {
 };
 
 export type QuestionUpdate = Partial<
-  Pick<
-    Question,
-    | 'type'
-    | 'questionText'
-    | 'proposals'
-    | 'correctAnswers'
-    | 'explanation'
-    | 'positionOrder'
-  >
+  Pick<Question, 'type' | 'questionText' | 'proposals' | 'correctAnswers' | 'explanation' | 'positionOrder'>
 >;
 
 export type SupabaseQuestionUpdate = Partial<
-  Pick<
-    SupabaseQuestion,
-    | 'type'
-    | 'question_text'
-    | 'proposals'
-    | 'correct_answers'
-    | 'explanation'
-    | 'position_order'
-  >
+  Pick<SupabaseQuestion, 'type' | 'question_text' | 'proposals' | 'correct_answers' | 'explanation' | 'position_order'>
 >;

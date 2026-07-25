@@ -14,12 +14,8 @@ export class ExportController {
   ) {}
 
   @Post('questions')
-  async exportQuestions(
-    @Body() body: ExportQuestionsDto,
-    @Res() res: Response,
-  ): Promise<void> {
-    const { buffer, fileName } =
-      await this.exportQuestionsUseCase.execute(body);
+  exportQuestions(@Body() body: ExportQuestionsDto, @Res() res: Response): void {
+    const { buffer, fileName } = this.exportQuestionsUseCase.execute(body);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
@@ -27,12 +23,8 @@ export class ExportController {
   }
 
   @Post('file/:fileId')
-  async exportCourseFile(
-    @Param('fileId') fileId: string,
-    @Res() res: Response,
-  ): Promise<void> {
-    const { buffer, fileName } =
-      await this.exportCourseFileUseCase.execute(fileId);
+  async exportCourseFile(@Param('fileId') fileId: string, @Res() res: Response): Promise<void> {
+    const { buffer, fileName } = await this.exportCourseFileUseCase.execute(fileId);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);

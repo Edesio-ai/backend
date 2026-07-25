@@ -1,10 +1,4 @@
-import {
-  IsArray,
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsArray, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { type QuestionType } from 'src/domain/teaching/question/types/question.type';
 
 export class CreateSelfLearnerQuestionsBodyDto {

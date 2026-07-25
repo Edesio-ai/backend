@@ -1,8 +1,4 @@
-export type WelcomeEmailRole =
-  | 'teacher'
-  | 'student'
-  | 'establishment'
-  | 'self-learner';
+export type WelcomeEmailRole = 'teacher' | 'student' | 'establishment' | 'self-learner';
 
 export type WelcomeEmailTemplateData = {
   name: string;

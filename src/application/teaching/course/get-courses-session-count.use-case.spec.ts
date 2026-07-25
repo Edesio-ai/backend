@@ -48,18 +48,12 @@ class Fixtures {
   }
 
   whenCountFails() {
-    this.courseRepository.getSessionCoursesCount.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.courseRepository.getSessionCoursesCount.mockRejectedValue(this.repositoryError);
   }
 
   thenRepositoryCalledWithSessionId() {
-    expect(this.courseRepository.getSessionCoursesCount).toHaveBeenCalledWith(
-      this.sessionId,
-    );
-    expect(this.courseRepository.getSessionCoursesCount).toHaveBeenCalledTimes(
-      1,
-    );
+    expect(this.courseRepository.getSessionCoursesCount).toHaveBeenCalledWith(this.sessionId);
+    expect(this.courseRepository.getSessionCoursesCount).toHaveBeenCalledTimes(1);
   }
 
   async thenThrowRepositoryError(promise: Promise<unknown>) {

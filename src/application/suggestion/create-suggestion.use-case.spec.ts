@@ -80,9 +80,7 @@ class Fixtures {
   }
 
   whenRepositoryReturnsCreatedSuggestion() {
-    this.suggestionRepository.createSuggestion.mockResolvedValue(
-      this.createdSuggestion,
-    );
+    this.suggestionRepository.createSuggestion.mockResolvedValue(this.createdSuggestion);
   }
 
   whenRepositoryReturnsNull() {

@@ -29,13 +29,8 @@ export class CreateSelfLearnerCourseUseCase {
     private readonly selfLearnerRepository: ISelfLearnerRepository,
   ) {}
 
-  async execute(
-    user: AuthUser,
-    createSelfLearnerCourseBody: CreateSelfLearnerCourseBody,
-  ): Promise<SelfLearnerCourse> {
-    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(
-      user.id,
-    );
+  async execute(user: AuthUser, createSelfLearnerCourseBody: CreateSelfLearnerCourseBody): Promise<SelfLearnerCourse> {
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(user.id);
     if (!selfLearner) {
       throw new NotFoundException('Self learner not found');
     }
@@ -48,8 +43,6 @@ export class CreateSelfLearnerCourseUseCase {
       language: createSelfLearnerCourseBody.language,
     };
 
-    return this.selfLearnerCourseRepository.createSelfLearnerCourse(
-      insertPayload,
-    );
+    return this.selfLearnerCourseRepository.createSelfLearnerCourse(insertPayload);
   }
 }

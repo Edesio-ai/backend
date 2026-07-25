@@ -29,9 +29,7 @@ describe('CreateSelfLearnerUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.repository.createSelfLearner).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'Jean' }),
-    );
+    expect(fixtures.repository.createSelfLearner).toHaveBeenCalledWith(expect.objectContaining({ name: 'Jean' }));
   });
 
   it('should default name to Apprenant when firstname is missing', async () => {
@@ -40,9 +38,7 @@ describe('CreateSelfLearnerUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.repository.createSelfLearner).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'Apprenant' }),
-    );
+    expect(fixtures.repository.createSelfLearner).toHaveBeenCalledWith(expect.objectContaining({ name: 'Apprenant' }));
   });
 
   it('should return the created self-learner', async () => {

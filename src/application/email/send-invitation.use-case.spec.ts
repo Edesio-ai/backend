@@ -69,9 +69,7 @@ class Fixtures {
   }
 
   whenSendProfesseurInvitationThrowsError() {
-    this.emailProvider.sendProfesseurInvitation.mockRejectedValue(
-      this.emailProviderError,
-    );
+    this.emailProvider.sendProfesseurInvitation.mockRejectedValue(this.emailProviderError);
   }
 
   async thenThrowEmailProviderError(promise: Promise<unknown>) {
@@ -90,8 +88,6 @@ class Fixtures {
       invitationToken,
       availableChatbots,
     );
-    expect(this.emailProvider.sendProfesseurInvitation).toHaveBeenCalledTimes(
-      1,
-    );
+    expect(this.emailProvider.sendProfesseurInvitation).toHaveBeenCalledTimes(1);
   }
 }

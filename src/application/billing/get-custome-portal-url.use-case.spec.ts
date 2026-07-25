@@ -67,9 +67,7 @@ class Fixtures {
   }
 
   whenStripeReturnsPortalUrl() {
-    this.stripeRepository.getCustomerPortalUrl.mockResolvedValue(
-      this.portalUrl,
-    );
+    this.stripeRepository.getCustomerPortalUrl.mockResolvedValue(this.portalUrl);
   }
 
   whenStripeReturnsNull() {
@@ -77,15 +75,11 @@ class Fixtures {
   }
 
   whenStripeThrows() {
-    this.stripeRepository.getCustomerPortalUrl.mockRejectedValue(
-      this.stripeError,
-    );
+    this.stripeRepository.getCustomerPortalUrl.mockRejectedValue(this.stripeError);
   }
 
   thenGetCustomerPortalUrlCalledWith(email: string) {
-    expect(this.stripeRepository.getCustomerPortalUrl).toHaveBeenCalledWith(
-      email,
-    );
+    expect(this.stripeRepository.getCustomerPortalUrl).toHaveBeenCalledWith(email);
     expect(this.stripeRepository.getCustomerPortalUrl).toHaveBeenCalledTimes(1);
   }
 

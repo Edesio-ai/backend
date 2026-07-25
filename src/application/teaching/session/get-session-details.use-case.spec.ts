@@ -1,15 +1,16 @@
 import { GetSessionDetailsUseCase } from './get-session-details.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { SessionDetails } from 'src/domain/teaching/session/types/session.type';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { CourseWithSession } from 'src/domain/teaching/course/types/course.type';
 import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import { Question } from 'src/domain/teaching/question/types/question.type';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
 import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
+import { StudentCourseStatsWithStudent } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
@@ -30,9 +31,7 @@ describe('GetSessionDetailsUseCase', () => {
     const promise = fixtures.whenExecute();
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.coursesRepository.getCourseWithSessionById,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.coursesRepository.getCourseWithSessionById).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundError when course is not found', async () => {
@@ -42,9 +41,7 @@ describe('GetSessionDetailsUseCase', () => {
     const promise = fixtures.whenExecute();
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionsRepository.getCourseQuestions,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
   });
 
   it('should throw ForbiddenError when course belongs to a different establishment', async () => {
@@ -54,9 +51,7 @@ describe('GetSessionDetailsUseCase', () => {
     const promise = fixtures.whenExecute();
 
     await expect(promise).rejects.toBeInstanceOf(ForbiddenError);
-    expect(
-      fixtures.questionsRepository.getCourseQuestions,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
   });
 
   it('should return full course details when all data is found', async () => {
@@ -104,7 +99,7 @@ class Fixtures {
     createdAt: '2026-01-01T00:00:00.000Z',
   };
 
-  public readonly courseWithSession = {
+  public readonly courseWithSession: CourseWithSession = {
     id: this.courseId,
     title: 'Introduction à TypeScript',
     description: 'Un cours sur TypeScript',
@@ -128,18 +123,21 @@ class Fixtures {
     },
   };
 
-  public readonly questions = [
+  public readonly questions: Question[] = [
     {
       id: 'q-1',
       courseId: this.courseId,
-      text: "Qu'est-ce que TypeScript ?",
-      type: 'single' as const,
-      answers: [],
-      status: 'validated' as const,
+      questionText: "Qu'est-ce que TypeScript ?",
+      type: 'single',
+      proposals: [],
+      correctAnswers: [],
+      explanation: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      positionOrder: 1,
     },
   ];
 
-  public readonly studentStats = [
+  public readonly studentStats: StudentCourseStatsWithStudent[] = [
     {
       studentId: 'stu-1',
       attemptedQuestions: 5,
@@ -178,8 +176,7 @@ class Fixtures {
     this.questionsRepository = createMockQuestionsRepository();
     this.studentsRepository = createMockStudentRepository();
     this.courseFileRepository = createMockCourseFileRepository();
-    this.studentCourseStatsRepository =
-      createMockStudentCourseStatsRepository();
+    this.studentCourseStatsRepository = createMockStudentCourseStatsRepository();
     this.useCase = new GetSessionDetailsUseCase(
       this.establishmentRepository,
       this.coursesRepository,
@@ -195,27 +192,19 @@ class Fixtures {
   }
 
   whenEstablishmentNotFound() {
-    this.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(
-      null as any,
-    );
+    this.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(null);
   }
 
   whenEstablishmentFound() {
-    this.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(
-      this.establishment,
-    );
+    this.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(this.establishment);
   }
 
   whenCourseNotFound() {
-    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(
-      null as any,
-    );
+    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(null);
   }
 
   whenCourseFound() {
-    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(
-      this.courseWithSession as any,
-    );
+    this.coursesRepository.getCourseWithSessionById.mockResolvedValue(this.courseWithSession);
   }
 
   whenCourseFoundWithDifferentEstablishment() {
@@ -225,13 +214,11 @@ class Fixtures {
         ...this.courseWithSession.teachers,
         establishmentId: 'other-est',
       },
-    } as any);
+    });
   }
 
   whenQuestionsFound() {
-    this.questionsRepository.getCourseQuestions.mockResolvedValue(
-      this.questions as any,
-    );
+    this.questionsRepository.getCourseQuestions.mockResolvedValue(this.questions);
   }
 
   whenNoQuestionsFound() {
@@ -239,28 +226,22 @@ class Fixtures {
   }
 
   whenStudentsFound() {
-    this.studentCourseStatsRepository.getStudentCourseStatsByCourseId.mockResolvedValue(
-      this.studentStats as any,
-    );
+    this.studentCourseStatsRepository.getStudentCourseStatsByCourseId.mockResolvedValue(this.studentStats);
   }
 
   whenNoStudentsFound() {
-    this.studentCourseStatsRepository.getStudentCourseStatsByCourseId.mockResolvedValue(
-      [],
-    );
+    this.studentCourseStatsRepository.getStudentCourseStatsByCourseId.mockResolvedValue([]);
   }
 
   whenFilesFound() {
-    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue(
-      this.files,
-    );
+    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue(this.files);
   }
 
   whenNoFilesFound() {
     this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue([]);
   }
 
-  thenCourseDetailsReturned(result: any) {
+  thenCourseDetailsReturned(result: SessionDetails) {
     expect(result.course).toMatchObject({
       id: this.courseId,
       title: 'Introduction à TypeScript',
@@ -283,20 +264,10 @@ class Fixtures {
   }
 
   thenAllRepositoriesCalledWithCourseId() {
-    expect(
-      this.establishmentRepository.getEstablishmentByUserId,
-    ).toHaveBeenCalledWith(this.user.id);
-    expect(
-      this.coursesRepository.getCourseWithSessionById,
-    ).toHaveBeenCalledWith(this.courseId, expect.any(String));
-    expect(this.questionsRepository.getCourseQuestions).toHaveBeenCalledWith(
-      this.courseId,
-    );
-    expect(
-      this.studentCourseStatsRepository.getStudentCourseStatsByCourseId,
-    ).toHaveBeenCalledWith(this.courseId);
-    expect(
-      this.courseFileRepository.getCourseFilesByCourseId,
-    ).toHaveBeenCalledWith(this.courseId);
+    expect(this.establishmentRepository.getEstablishmentByUserId).toHaveBeenCalledWith(this.user.id);
+    expect(this.coursesRepository.getCourseWithSessionById).toHaveBeenCalledWith(this.courseId, expect.any(String));
+    expect(this.questionsRepository.getCourseQuestions).toHaveBeenCalledWith(this.courseId);
+    expect(this.studentCourseStatsRepository.getStudentCourseStatsByCourseId).toHaveBeenCalledWith(this.courseId);
+    expect(this.courseFileRepository.getCourseFilesByCourseId).toHaveBeenCalledWith(this.courseId);
   }
 }

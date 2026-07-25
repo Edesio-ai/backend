@@ -24,10 +24,7 @@ describe('GetSuggestionsUseCase', () => {
   it('should return suggestions with like flags when role matches category', async () => {
     fixtures.whenRepositoryReturnsSuggestionsAndPartialLikes();
 
-    const result = await fixtures.whenExecuteWith(
-      'teacher',
-      fixtures.teacherUser,
-    );
+    const result = await fixtures.whenExecuteWith('teacher', fixtures.teacherUser);
 
     fixtures.thenGetSuggestionsCalledWith('teacher');
     fixtures.thenGetUserLikesCalledWith(fixtures.teacherUser.id, ['s1', 's2']);
@@ -37,10 +34,7 @@ describe('GetSuggestionsUseCase', () => {
   it('should still call getUserLikes with empty ids when no suggestions', async () => {
     fixtures.whenRepositoryReturnsEmptySuggestions();
 
-    const result = await fixtures.whenExecuteWith(
-      'teacher',
-      fixtures.teacherUser,
-    );
+    const result = await fixtures.whenExecuteWith('teacher', fixtures.teacherUser);
 
     fixtures.thenGetSuggestionsCalledWith('teacher');
     fixtures.thenGetUserLikesCalledWith(fixtures.teacherUser.id, []);
@@ -60,10 +54,7 @@ class Fixtures {
   constructor() {
     this.suggestionRepository = createMockSuggestionRepository();
     this.suggestionLikeRepository = createMockSuggestionLikeRepository();
-    this.useCase = new GetSuggestionsUseCase(
-      this.suggestionRepository,
-      this.suggestionLikeRepository,
-    );
+    this.useCase = new GetSuggestionsUseCase(this.suggestionRepository, this.suggestionLikeRepository);
 
     this.teacherUser = {
       id: 'u-teacher',
@@ -110,9 +101,7 @@ class Fixtures {
   }
 
   whenRepositoryReturnsSuggestionsAndPartialLikes() {
-    this.suggestionRepository.getSuggestions.mockResolvedValue(
-      this.suggestions,
-    );
+    this.suggestionRepository.getSuggestions.mockResolvedValue(this.suggestions);
     this.suggestionLikeRepository.getUserLikes.mockResolvedValue(['s1']);
   }
 
@@ -123,9 +112,7 @@ class Fixtures {
 
   async thenThrowsForbidden(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ForbiddenException);
-    await expect(promise).rejects.toThrow(
-      'You are not authorized to access this resource',
-    );
+    await expect(promise).rejects.toThrow('You are not authorized to access this resource');
   }
 
   thenRepositoryNotCalled() {
@@ -134,17 +121,12 @@ class Fixtures {
   }
 
   thenGetSuggestionsCalledWith(category: string) {
-    expect(this.suggestionRepository.getSuggestions).toHaveBeenCalledWith(
-      category,
-    );
+    expect(this.suggestionRepository.getSuggestions).toHaveBeenCalledWith(category);
     expect(this.suggestionRepository.getSuggestions).toHaveBeenCalledTimes(1);
   }
 
   thenGetUserLikesCalledWith(userId: string, ids: string[]) {
-    expect(this.suggestionLikeRepository.getUserLikes).toHaveBeenCalledWith(
-      userId,
-      ids,
-    );
+    expect(this.suggestionLikeRepository.getUserLikes).toHaveBeenCalledWith(userId, ids);
     expect(this.suggestionLikeRepository.getUserLikes).toHaveBeenCalledTimes(1);
   }
 

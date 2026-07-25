@@ -16,9 +16,7 @@ describe('GetSelfLearnerUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(fixtures.repository.getSelfLearnerByUserId).toHaveBeenCalledWith(
-      fixtures.user.id,
-    );
+    expect(fixtures.repository.getSelfLearnerByUserId).toHaveBeenCalledWith(fixtures.user.id);
     expect(result).toEqual(fixtures.learner);
   });
 
@@ -27,9 +25,7 @@ describe('GetSelfLearnerUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(fixtures.repository.getSelfLearnerByUserId).toHaveBeenCalledWith(
-      fixtures.user.id,
-    );
+    expect(fixtures.repository.getSelfLearnerByUserId).toHaveBeenCalledWith(fixtures.user.id);
     expect(result).toBeNull();
   });
 

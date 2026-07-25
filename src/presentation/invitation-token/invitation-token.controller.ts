@@ -2,10 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { Roles } from '../auth/decorator/role.decorator';
 import { CurrentUser } from '../auth/decorator/current-user.decorator';
 import { GetInvitationTokenUseCase } from 'src/application/teaching/invitation-token/get-invitation-token.use-case';
-import {
-  InvitationToken,
-  InvitationTokenPreview,
-} from 'src/domain/auth/invitation.type';
+import { InvitationToken, InvitationTokenPreview } from 'src/domain/auth/invitation.type';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { ValidateTeacherInvitationBodyDto } from './dtos/validate-teacher-invitation-body.dto';
 import { ValidateTeacherInvitationUseCase } from 'src/application/teaching/invitation-token/validate-teacher-invitation.use-case';
@@ -28,9 +25,7 @@ export class InvitationTokenController {
   ) {}
 
   @Delete(':token')
-  async deleteInvitationToken(
-    @Param('token') token: string,
-  ): Promise<{ success: boolean }> {
+  async deleteInvitationToken(@Param('token') token: string): Promise<{ success: boolean }> {
     await this.deleteInvitationTokenUseCase.execute(token);
     return { success: true };
   }
@@ -39,25 +34,19 @@ export class InvitationTokenController {
   async getEstablishmentInvitationTokens(
     @Param('establishmentId') establishmentId: string,
   ): Promise<InvitationToken[]> {
-    const tokens =
-      await this.getInvitationTokenUseCase.execute(establishmentId);
+    const tokens = await this.getInvitationTokenUseCase.execute(establishmentId);
     return tokens;
   }
 
   @Public()
   @Get('preview/:token')
-  async getInvitationPreview(
-    @Param() params: GetInvitationPreviewParamsDto,
-  ): Promise<InvitationTokenPreview> {
-    const invitationTokenPreview =
-      await this.getInvitationPreviewUseCase.execute(params.token);
+  async getInvitationPreview(@Param() params: GetInvitationPreviewParamsDto): Promise<InvitationTokenPreview> {
+    const invitationTokenPreview = await this.getInvitationPreviewUseCase.execute(params.token);
     return invitationTokenPreview;
   }
 
   @Post()
-  async createInvitationToken(
-    @Body() body: CreateInvitationTokenBodyDto,
-  ): Promise<{ success: boolean }> {
+  async createInvitationToken(@Body() body: CreateInvitationTokenBodyDto): Promise<{ success: boolean }> {
     await this.createInvitationTokenUseCase.execute(body);
     return { success: true };
   }
@@ -67,12 +56,9 @@ export class InvitationTokenController {
   async validateTeacherInvitation(
     @CurrentUser() user: AuthUser,
     @Body() body: ValidateTeacherInvitationBodyDto,
-  ): Promise<any> {
+  ): Promise<{ success: boolean; etablissementId?: string }> {
     const { id } = user;
-    const invitationToken = await this.validateTeacherInvitationUseCase.execute(
-      id,
-      body.token,
-    );
+    const invitationToken = await this.validateTeacherInvitationUseCase.execute(id, body.token);
 
     return {
       success: true,

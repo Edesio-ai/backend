@@ -27,9 +27,7 @@ export class LlmController {
 
   @Roles('student', 'teacher', 'self-learner')
   @Post('completion-feedback')
-  async generateCompletionFeedback(
-    @Body() body: GenerateCompletionFeedbackBodyDto,
-  ): Promise<{ feedback: string }> {
+  async generateCompletionFeedback(@Body() body: GenerateCompletionFeedbackBodyDto): Promise<{ feedback: string }> {
     const feedback = await this.generateCompletionFeedbackUseCase.execute(body);
     return { feedback };
   }
@@ -50,25 +48,17 @@ export class LlmController {
   }
   @Roles('student', 'teacher', 'self-learner')
   @Post('evaluate-answer')
-  async evaluateAnswer(
-    @Body() body: EvaluateAnswerDto,
-  ): Promise<EvaluateAnswerResponse> {
+  async evaluateAnswer(@Body() body: EvaluateAnswerDto): Promise<EvaluateAnswerResponse> {
     return await this.evaluateAnswerUseCase.execute(body);
   }
 
   @Roles('self-learner')
-  @Post(
-    'generate-self-learner-question/self-learner-course/:selfLearnerCourseId',
-  )
+  @Post('generate-self-learner-question/self-learner-course/:selfLearnerCourseId')
   async generateSelfLearnerQuestion(
     @Param('selfLearnerCourseId') selfLearnerCourseId: string,
     @Body() body: GenerateSelfLearnerQuestionBodyDto,
     @CurrentUser() user: AuthUser,
   ): Promise<SelfLearnerQuestion> {
-    return await this.generateSelfLearnerQuestionUseCase.execute(
-      user,
-      body.type,
-      selfLearnerCourseId,
-    );
+    return await this.generateSelfLearnerQuestionUseCase.execute(user, body.type, selfLearnerCourseId);
   }
 }

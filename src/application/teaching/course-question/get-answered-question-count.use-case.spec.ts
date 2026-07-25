@@ -21,9 +21,7 @@ describe('GetAnsweredQuestionCountUseCase', () => {
     const result = await fixtures.whenExecute();
 
     expect(result).toBe(42);
-    expect(
-      fixtures.courseQuestionRepository.getAnsweredQuestionCount,
-    ).toHaveBeenCalledWith(fixtures.student.id);
+    expect(fixtures.courseQuestionRepository.getAnsweredQuestionCount).toHaveBeenCalledWith(fixtures.student.id);
   });
 
   it('should return 0 when the student has no answered questions', async () => {
@@ -39,9 +37,7 @@ describe('GetAnsweredQuestionCountUseCase', () => {
     fixtures.whenStudentNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.courseQuestionRepository.getAnsweredQuestionCount,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseQuestionRepository.getAnsweredQuestionCount).not.toHaveBeenCalled();
   });
 
   it('should propagate errors from the course question repository', async () => {
@@ -84,10 +80,7 @@ class Fixtures {
   constructor() {
     this.courseQuestionRepository = createMockCourseQuestionRepository();
     this.studentRepository = createMockStudentRepository();
-    this.useCase = new GetAnsweredQuestionCountUseCase(
-      this.courseQuestionRepository,
-      this.studentRepository,
-    );
+    this.useCase = new GetAnsweredQuestionCountUseCase(this.courseQuestionRepository, this.studentRepository);
   }
 
   whenExecute() {
@@ -103,20 +96,14 @@ class Fixtures {
   }
 
   whenStudentRepositoryFails() {
-    this.studentRepository.getStudentByUserId.mockRejectedValue(
-      new Error('student repo failed'),
-    );
+    this.studentRepository.getStudentByUserId.mockRejectedValue(new Error('student repo failed'));
   }
 
   whenCountReturns(count: number) {
-    this.courseQuestionRepository.getAnsweredQuestionCount.mockResolvedValue(
-      count,
-    );
+    this.courseQuestionRepository.getAnsweredQuestionCount.mockResolvedValue(count);
   }
 
   whenCountFails() {
-    this.courseQuestionRepository.getAnsweredQuestionCount.mockRejectedValue(
-      new Error('count failed'),
-    );
+    this.courseQuestionRepository.getAnsweredQuestionCount.mockRejectedValue(new Error('count failed'));
   }
 }

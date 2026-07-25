@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { SubscriptionSupabaseRepository } from './subscription-supabase.repository';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 
@@ -56,7 +57,7 @@ class Fixtures {
     const supabaseMock = {
       from: this.fromMock,
     };
-    this.repository = new SubscriptionSupabaseRepository(supabaseMock as any);
+    this.repository = new SubscriptionSupabaseRepository(supabaseMock as unknown as SupabaseClient);
   }
 
   whenGetUserSubscription() {
@@ -86,9 +87,7 @@ class Fixtures {
 
   async thenThrowServerError(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
-    await expect(promise).rejects.toThrow(
-      'Error fetching subscription: query failed',
-    );
+    await expect(promise).rejects.toThrow('Error fetching subscription: query failed');
   }
 
   thenQueryBuiltWithExpectedArguments() {
@@ -98,7 +97,7 @@ class Fixtures {
     expect(this.eqMock).toHaveBeenCalledTimes(1);
   }
 
-  thenReturnFirstSubscription(result: any) {
+  thenReturnFirstSubscription(result: unknown) {
     expect(result).toEqual(this.subscriptions[0]);
   }
 }

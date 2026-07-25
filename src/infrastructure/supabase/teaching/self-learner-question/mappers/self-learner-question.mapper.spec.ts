@@ -65,9 +65,7 @@ describe('selfLearnerQuestionMapper', () => {
         keyConcepts: [] as string[],
       } as unknown as GeneratedQuestion;
 
-      expect(
-        selfLearnerQuestionMapper.generatedToInserts([runtimePayload], 'c'),
-      ).toEqual([
+      expect(selfLearnerQuestionMapper.generatedToInserts([runtimePayload], 'c')).toEqual([
         {
           course_id: 'c',
           type: 'single',

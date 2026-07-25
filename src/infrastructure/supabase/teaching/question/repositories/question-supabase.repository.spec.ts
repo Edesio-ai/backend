@@ -1,9 +1,7 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
-import {
-  CreateQuestionBody,
-  Question,
-} from 'src/domain/teaching/question/types/question.type';
+import { CreateQuestionBody, Question } from 'src/domain/teaching/question/types/question.type';
 import { QuestionSupabaseRepository } from './question-supabase.repository';
 
 describe('QuestionSupabaseRepository', () => {
@@ -26,9 +24,7 @@ describe('QuestionSupabaseRepository', () => {
   it('should throw ServerError when deleteQuestionsByCourseIds fails', async () => {
     fixtures.whenDeleteByCourseIdsFails();
 
-    await expect(
-      fixtures.whenDeleteQuestionsByCourseIds(),
-    ).rejects.toBeInstanceOf(ServerError);
+    await expect(fixtures.whenDeleteQuestionsByCourseIds()).rejects.toBeInstanceOf(ServerError);
   });
 
   // --- getCourseQuestions ---
@@ -53,9 +49,7 @@ describe('QuestionSupabaseRepository', () => {
   it('should throw ServerError when getCourseQuestions fails', async () => {
     fixtures.whenGetCourseQuestionsFails();
 
-    await expect(fixtures.whenGetCourseQuestions()).rejects.toBeInstanceOf(
-      ServerError,
-    );
+    await expect(fixtures.whenGetCourseQuestions()).rejects.toBeInstanceOf(ServerError);
   });
 
   // --- insertQuestions ---
@@ -72,9 +66,7 @@ describe('QuestionSupabaseRepository', () => {
   it('should throw ServerError when insertQuestions fails', async () => {
     fixtures.whenInsertQuestionsFails();
 
-    await expect(fixtures.whenInsertQuestions()).rejects.toBeInstanceOf(
-      ServerError,
-    );
+    await expect(fixtures.whenInsertQuestions()).rejects.toBeInstanceOf(ServerError);
   });
 
   // --- insertQuestion (single) ---
@@ -91,9 +83,7 @@ describe('QuestionSupabaseRepository', () => {
   it('should throw ServerError when insertQuestion fails', async () => {
     fixtures.whenInsertQuestionFails();
 
-    await expect(fixtures.whenInsertQuestion()).rejects.toBeInstanceOf(
-      ServerError,
-    );
+    await expect(fixtures.whenInsertQuestion()).rejects.toBeInstanceOf(ServerError);
   });
 
   // --- deleteCourseQuizQuestions ---
@@ -109,9 +99,7 @@ describe('QuestionSupabaseRepository', () => {
   it('should throw ServerError when deleteCourseQuizQuestions fails', async () => {
     fixtures.whenDeleteCourseQuestionsFails();
 
-    await expect(fixtures.whenDeleteCourseQuestions()).rejects.toBeInstanceOf(
-      ServerError,
-    );
+    await expect(fixtures.whenDeleteCourseQuestions()).rejects.toBeInstanceOf(ServerError);
   });
 
   // --- getQuestionById ---
@@ -128,9 +116,7 @@ describe('QuestionSupabaseRepository', () => {
   it('should throw ServerError when getQuestionById fails', async () => {
     fixtures.whenGetQuestionByIdFails();
 
-    await expect(fixtures.whenGetQuestionById()).rejects.toBeInstanceOf(
-      ServerError,
-    );
+    await expect(fixtures.whenGetQuestionById()).rejects.toBeInstanceOf(ServerError);
   });
 
   // --- deleteQuestionById ---
@@ -146,9 +132,7 @@ describe('QuestionSupabaseRepository', () => {
   it('should throw ServerError when deleteQuestionById fails', async () => {
     fixtures.whenDeleteQuestionByIdFails();
 
-    await expect(fixtures.whenDeleteQuestionById()).rejects.toBeInstanceOf(
-      ServerError,
-    );
+    await expect(fixtures.whenDeleteQuestionById()).rejects.toBeInstanceOf(ServerError);
   });
 
   // --- updateQuestionById ---
@@ -165,9 +149,7 @@ describe('QuestionSupabaseRepository', () => {
   it('should throw ServerError when updateQuestionById fails', async () => {
     fixtures.whenUpdateQuestionByIdFails();
 
-    await expect(fixtures.whenUpdateQuestionById()).rejects.toBeInstanceOf(
-      ServerError,
-    );
+    await expect(fixtures.whenUpdateQuestionById()).rejects.toBeInstanceOf(ServerError);
   });
 });
 
@@ -270,7 +252,7 @@ class Fixtures {
 
   constructor() {
     const supabaseMock = { from: this.fromMock };
-    this.repository = new QuestionSupabaseRepository(supabaseMock as any);
+    this.repository = new QuestionSupabaseRepository(supabaseMock as unknown as SupabaseClient);
   }
 
   whenDeleteQuestionsByCourseIds() {
@@ -282,10 +264,7 @@ class Fixtures {
   }
 
   whenInsertQuestions() {
-    return this.repository.insertQuestions(
-      [this.generatedQuestion],
-      this.courseId,
-    );
+    return this.repository.insertQuestions([this.generatedQuestion], this.courseId);
   }
 
   whenDeleteCourseQuestions() {
@@ -437,10 +416,7 @@ class Fixtures {
   thenGetCourseQuestionsQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('questions');
     expect(this.questionsSelectMock).toHaveBeenCalledWith('*');
-    expect(this.questionsEqMock).toHaveBeenCalledWith(
-      'course_id',
-      this.courseId,
-    );
+    expect(this.questionsEqMock).toHaveBeenCalledWith('course_id', this.courseId);
     expect(this.questionsOrderMock).toHaveBeenCalledWith('created_at', {
       ascending: true,
     });
@@ -492,9 +468,7 @@ class Fixtures {
 
   thenUpdateQuestionByIdQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('questions');
-    expect(this.updateMock).toHaveBeenCalledWith(
-      expect.objectContaining({ question_text: 'Mise à jour' }),
-    );
+    expect(this.updateMock).toHaveBeenCalledWith(expect.objectContaining({ question_text: 'Mise à jour' }));
     expect(this.updateEqMock).toHaveBeenCalledWith('id', 'q-1');
     expect(this.updateSelectMock).toHaveBeenCalledTimes(1);
     expect(this.updateSingleMock).toHaveBeenCalledTimes(1);

@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 import { Roles } from '../../auth/decorator/role.decorator';
 import { CurrentUser } from '../../auth/decorator/current-user.decorator';
@@ -35,9 +27,7 @@ export class CourseController {
   ) {}
 
   @Post()
-  async createCourse(
-    @Body() body: CreateCourseBodyDto,
-  ): Promise<{ data: Course }> {
+  async createCourse(@Body() body: CreateCourseBodyDto): Promise<{ data: Course }> {
     const data = await this.createCourseUseCase.execute(body);
     return { data };
   }
@@ -75,28 +65,20 @@ export class CourseController {
     @Param('courseId') courseId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<{ data: Course }> {
-    const course = await this.validateCourseQuestionsUseCase.execute(
-      courseId,
-      user,
-    );
+    const course = await this.validateCourseQuestionsUseCase.execute(courseId, user);
 
     return { data: course };
   }
 
   @Get('session/:sessionId/count')
-  async getCoursesSessionCount(
-    @Param('sessionId') sessionId: string,
-  ): Promise<{ count: number }> {
+  async getCoursesSessionCount(@Param('sessionId') sessionId: string): Promise<{ count: number }> {
     const count = await this.getCoursesSessionCountUseCase.execute(sessionId);
     return { count: count };
   }
 
   @Roles('teacher', 'establishment', 'student')
   @Get('session/:sessionId')
-  async getCoursesBySessionId(
-    @Param('sessionId') sessionId: string,
-    @CurrentUser() user: AuthUser,
-  ): Promise<Course[]> {
+  async getCoursesBySessionId(@Param('sessionId') sessionId: string, @CurrentUser() user: AuthUser): Promise<Course[]> {
     return (await this.getSessionCoursesUseCase.execute(sessionId, user)) || [];
   }
 }

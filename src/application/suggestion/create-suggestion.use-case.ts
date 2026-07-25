@@ -17,22 +17,18 @@ export class CreateSuggestionUseCase {
     private readonly suggestionRepository: ISuggestionRepository,
   ) {}
 
-  async execute(
-    body: CreateSuggestionBody,
-    user: User,
-  ): Promise<Suggestion | null> {
+  async execute(body: CreateSuggestionBody, user: User): Promise<Suggestion | null> {
     const suggestionToCreate = {
       userId: user.id,
       userEmail: user.email,
-      userName: user.metadata.firstname,
+      userName: user.metadata.firstname ?? null,
       category: body.category,
       title: body.title,
       content: body.content,
       likesCount: 0,
     };
 
-    const suggestion =
-      await this.suggestionRepository.createSuggestion(suggestionToCreate);
+    const suggestion = await this.suggestionRepository.createSuggestion(suggestionToCreate);
     return suggestion
       ? {
           ...suggestion,

@@ -20,12 +20,8 @@ describe('GetSelfLearnerCoursesUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(
-      fixtures.selfLearnerRepository.getSelfLearnerByUserId,
-    ).toHaveBeenCalledWith(fixtures.user.id);
-    expect(
-      fixtures.courseRepository.getSelfLearnerCourses,
-    ).toHaveBeenCalledWith(fixtures.selfLearner.id);
+    expect(fixtures.selfLearnerRepository.getSelfLearnerByUserId).toHaveBeenCalledWith(fixtures.user.id);
+    expect(fixtures.courseRepository.getSelfLearnerCourses).toHaveBeenCalledWith(fixtures.selfLearner.id);
     expect(result).toEqual(fixtures.courses);
   });
 
@@ -36,16 +32,12 @@ describe('GetSelfLearnerCoursesUseCase', () => {
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundException);
     await expect(promise).rejects.toThrow('Self learner not found');
-    expect(
-      fixtures.courseRepository.getSelfLearnerCourses,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.getSelfLearnerCourses).not.toHaveBeenCalled();
   });
 
   it('should propagate errors from self learner repository', async () => {
     const err = new Error('lookup failed');
-    fixtures.selfLearnerRepository.getSelfLearnerByUserId.mockRejectedValue(
-      err,
-    );
+    fixtures.selfLearnerRepository.getSelfLearnerByUserId.mockRejectedValue(err);
 
     await expect(fixtures.whenExecute()).rejects.toBe(err);
   });
@@ -95,10 +87,7 @@ class Fixtures {
     this.selfLearnerRepository = createMockSelfLearnerRepository();
     this.courseRepository = createMockSelfLearnerCourseRepository();
 
-    this.useCase = new GetSelfLearnerCoursesUseCase(
-      this.courseRepository,
-      this.selfLearnerRepository,
-    );
+    this.useCase = new GetSelfLearnerCoursesUseCase(this.courseRepository, this.selfLearnerRepository);
   }
 
   whenExecute() {
@@ -106,9 +95,7 @@ class Fixtures {
   }
 
   whenSelfLearnerFound() {
-    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(
-      this.selfLearner,
-    );
+    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(this.selfLearner);
   }
 
   whenSelfLearnerNotFound() {

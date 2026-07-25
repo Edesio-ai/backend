@@ -1,17 +1,8 @@
 import { Inject } from '@nestjs/common';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
-import {
-  NotFoundError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { NotFoundError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
 
 import {
   STUDENT_REPOSITORY,
@@ -64,28 +55,21 @@ export class DeleteCourseUseCase {
                 teacher_id
             )
         `;
-    const courseWithSession =
-      await this.courseRepository.getCourseWithSessionById(courseId, select);
+    const courseWithSession = await this.courseRepository.getCourseWithSessionById(courseId, select);
     if (!courseWithSession) {
       console.error(`Course ${courseId} not found`);
       throw new NotFoundError(`Course not found`);
     }
 
     if (courseWithSession.session.teacherId !== teacher.id) {
-      console.error(
-        `Teacher ${teacher.id} is not allowed to delete course ${courseId}`,
-      );
+      console.error(`Teacher ${teacher.id} is not allowed to delete course ${courseId}`);
       throw new UnauthorizedError('You are not allowed to delete this course');
     }
 
     await this.questionsRepository.deleteCourseQuizQuestions(courseId);
     await this.courseFileRepository.deleteCoursesFilesByCourseIds([courseId]);
-    await this.studentCourseStatsRepository.deleteStudentCourseStatsByCourseId(
-      courseId,
-    );
-    await this.courseQuestionRepository.deleteCourseQuestionsByCourseId(
-      courseId,
-    );
+    await this.studentCourseStatsRepository.deleteStudentCourseStatsByCourseId(courseId);
+    await this.courseQuestionRepository.deleteCourseQuestionsByCourseId(courseId);
     await this.courseRepository.deleteCourseById(courseId);
   }
 }

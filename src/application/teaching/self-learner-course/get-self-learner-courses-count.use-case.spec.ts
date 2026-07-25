@@ -19,9 +19,7 @@ describe('GetSelfLearnerCoursesCountUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(
-      fixtures.courseRepository.getSelfLearnerCoursesCount,
-    ).toHaveBeenCalledWith(fixtures.selfLearner.id);
+    expect(fixtures.courseRepository.getSelfLearnerCoursesCount).toHaveBeenCalledWith(fixtures.selfLearner.id);
     expect(result).toEqual({ count: 7 });
   });
 
@@ -31,9 +29,7 @@ describe('GetSelfLearnerCoursesCountUseCase', () => {
     const promise = fixtures.whenExecute();
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundException);
-    expect(
-      fixtures.courseRepository.getSelfLearnerCoursesCount,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.getSelfLearnerCoursesCount).not.toHaveBeenCalled();
   });
 
   it('should propagate errors from course repository', async () => {
@@ -68,10 +64,7 @@ class Fixtures {
   constructor() {
     this.courseRepository = createMockSelfLearnerCourseRepository();
     this.selfLearnerRepository = createMockSelfLearnerRepository();
-    this.useCase = new GetSelfLearnerCoursesCountUseCase(
-      this.courseRepository,
-      this.selfLearnerRepository,
-    );
+    this.useCase = new GetSelfLearnerCoursesCountUseCase(this.courseRepository, this.selfLearnerRepository);
   }
 
   whenExecute() {
@@ -79,9 +72,7 @@ class Fixtures {
   }
 
   whenSelfLearnerFound() {
-    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(
-      this.selfLearner,
-    );
+    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(this.selfLearner);
   }
 
   whenSelfLearnerNotFound() {

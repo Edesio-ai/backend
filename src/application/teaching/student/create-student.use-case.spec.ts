@@ -16,9 +16,7 @@ describe('CreateStudentUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.studentRepository.createStudent).toHaveBeenCalledWith(
-      fixtures.user,
-    );
+    expect(fixtures.studentRepository.createStudent).toHaveBeenCalledWith(fixtures.user);
   });
 
   it('should return the created student', async () => {

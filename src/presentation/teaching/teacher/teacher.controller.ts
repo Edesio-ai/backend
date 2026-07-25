@@ -19,17 +19,14 @@ export class TeacherController {
 
   @Get()
   @UseFilters(GlobalErrorFilter)
-  async getTeacherByUserId(@CurrentUser() user: AuthUser): Promise<any> {
+  async getTeacherByUserId(@CurrentUser() user: AuthUser): Promise<{ teacher: Teacher | null }> {
     const teacher = await this.getTeacherByUserIdUseCase.execute(user.id);
     return { teacher };
   }
 
   @Post()
   @UseFilters(GlobalErrorFilter)
-  async createTeacher(
-    @CurrentUser() user: AuthUser,
-    @Body() body: CreateTeacherBodyDto,
-  ): Promise<Teacher | null> {
+  async createTeacher(@CurrentUser() user: AuthUser, @Body() body: CreateTeacherBodyDto): Promise<Teacher | null> {
     const { id } = user;
 
     return this.createTeacherUseCase.execute(id, body);

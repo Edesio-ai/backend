@@ -1,9 +1,6 @@
 import { DeleteCourseUseCase } from './delete-course.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  NotFoundError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
+import { NotFoundError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
@@ -30,9 +27,7 @@ describe('DeleteCourseUseCase', () => {
     fixtures.whenTeacherNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.courseRepository.getCourseWithSessionById,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.getCourseWithSessionById).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundError when course is not found', async () => {
@@ -40,21 +35,15 @@ describe('DeleteCourseUseCase', () => {
     fixtures.whenCourseNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionsRepository.deleteCourseQuizQuestions,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionsRepository.deleteCourseQuizQuestions).not.toHaveBeenCalled();
   });
 
   it('should throw UnauthorizedError when course belongs to another teacher', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseWithSessionBelongsToOtherTeacher();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      UnauthorizedError,
-    );
-    expect(
-      fixtures.questionsRepository.deleteCourseQuizQuestions,
-    ).not.toHaveBeenCalled();
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(UnauthorizedError);
+    expect(fixtures.questionsRepository.deleteCourseQuizQuestions).not.toHaveBeenCalled();
   });
 
   it('should delete quiz questions, files, stats, course question rows and course in order', async () => {
@@ -64,21 +53,13 @@ describe('DeleteCourseUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(
-      fixtures.questionsRepository.deleteCourseQuizQuestions,
-    ).toHaveBeenCalledWith(fixtures.courseId);
-    expect(
-      fixtures.courseFileRepository.deleteCoursesFilesByCourseIds,
-    ).toHaveBeenCalledWith([fixtures.courseId]);
-    expect(
-      fixtures.studentCourseStatsRepository.deleteStudentCourseStatsByCourseId,
-    ).toHaveBeenCalledWith(fixtures.courseId);
-    expect(
-      fixtures.courseQuestionRepository.deleteCourseQuestionsByCourseId,
-    ).toHaveBeenCalledWith(fixtures.courseId);
-    expect(fixtures.courseRepository.deleteCourseById).toHaveBeenCalledWith(
+    expect(fixtures.questionsRepository.deleteCourseQuizQuestions).toHaveBeenCalledWith(fixtures.courseId);
+    expect(fixtures.courseFileRepository.deleteCoursesFilesByCourseIds).toHaveBeenCalledWith([fixtures.courseId]);
+    expect(fixtures.studentCourseStatsRepository.deleteStudentCourseStatsByCourseId).toHaveBeenCalledWith(
       fixtures.courseId,
     );
+    expect(fixtures.courseQuestionRepository.deleteCourseQuestionsByCourseId).toHaveBeenCalledWith(fixtures.courseId);
+    expect(fixtures.courseRepository.deleteCourseById).toHaveBeenCalledWith(fixtures.courseId);
   });
 
   it('should call deletions in the correct order', async () => {
@@ -86,31 +67,19 @@ describe('DeleteCourseUseCase', () => {
     fixtures.whenTeacherFound();
     fixtures.whenCourseWithSessionMatchesTeacher();
 
-    (
-      fixtures.questionsRepository.deleteCourseQuizQuestions as jest.Mock
-    ).mockImplementation(async () => {
+    (fixtures.questionsRepository.deleteCourseQuizQuestions as jest.Mock).mockImplementation(() => {
       callOrder.push('deleteCourseQuizQuestions');
     });
-    (
-      fixtures.courseFileRepository.deleteCoursesFilesByCourseIds as jest.Mock
-    ).mockImplementation(async () => {
+    (fixtures.courseFileRepository.deleteCoursesFilesByCourseIds as jest.Mock).mockImplementation(() => {
       callOrder.push('deleteCoursesFilesByCourseIds');
     });
-    (
-      fixtures.studentCourseStatsRepository
-        .deleteStudentCourseStatsByCourseId as jest.Mock
-    ).mockImplementation(async () => {
+    (fixtures.studentCourseStatsRepository.deleteStudentCourseStatsByCourseId as jest.Mock).mockImplementation(() => {
       callOrder.push('deleteStudentCourseStatsByCourseId');
     });
-    (
-      fixtures.courseQuestionRepository
-        .deleteCourseQuestionsByCourseId as jest.Mock
-    ).mockImplementation(async () => {
+    (fixtures.courseQuestionRepository.deleteCourseQuestionsByCourseId as jest.Mock).mockImplementation(() => {
       callOrder.push('deleteCourseQuestionsByCourseId');
     });
-    (
-      fixtures.courseRepository.deleteCourseById as jest.Mock
-    ).mockImplementation(async () => {
+    (fixtures.courseRepository.deleteCourseById as jest.Mock).mockImplementation(() => {
       callOrder.push('deleteCourseById');
     });
 
@@ -168,8 +137,7 @@ class Fixtures {
 
     this.courseFileRepository = createMockCourseFileRepository();
 
-    this.studentCourseStatsRepository =
-      createMockStudentCourseStatsRepository();
+    this.studentCourseStatsRepository = createMockStudentCourseStatsRepository();
 
     this.useCase = new DeleteCourseUseCase(
       this.courseRepository,
@@ -191,13 +159,11 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null as any);
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
   }
 
   whenCourseNotFound() {
-    this.courseRepository.getCourseWithSessionById.mockResolvedValue(
-      null as any,
-    );
+    this.courseRepository.getCourseWithSessionById.mockResolvedValue(null);
   }
 
   whenCourseWithSessionMatchesTeacher() {
@@ -217,18 +183,10 @@ class Fixtures {
   }
 
   whenDeleteSucceeds() {
-    this.questionsRepository.deleteCourseQuizQuestions.mockResolvedValue(
-      undefined,
-    );
-    this.courseFileRepository.deleteCoursesFilesByCourseIds.mockResolvedValue(
-      undefined,
-    );
-    this.studentCourseStatsRepository.deleteStudentCourseStatsByCourseId.mockResolvedValue(
-      undefined,
-    );
-    this.courseQuestionRepository.deleteCourseQuestionsByCourseId.mockResolvedValue(
-      undefined,
-    );
+    this.questionsRepository.deleteCourseQuizQuestions.mockResolvedValue(undefined);
+    this.courseFileRepository.deleteCoursesFilesByCourseIds.mockResolvedValue(undefined);
+    this.studentCourseStatsRepository.deleteStudentCourseStatsByCourseId.mockResolvedValue(undefined);
+    this.courseQuestionRepository.deleteCourseQuestionsByCourseId.mockResolvedValue(undefined);
     this.courseRepository.deleteCourseById.mockResolvedValue(undefined);
   }
 }

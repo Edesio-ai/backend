@@ -1,9 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
@@ -27,23 +24,15 @@ export class DeleteStudentSessionUseCase {
       throw new NotFoundError('Student not found');
     }
 
-    const studentSession =
-      await this.studentSessionRepository.getStudentSessionBySessionId(
-        sessionId,
-      );
+    const studentSession = await this.studentSessionRepository.getStudentSessionBySessionId(sessionId);
     if (!studentSession) {
       throw new NotFoundError('Student session not found');
     }
 
     if (studentSession.studentId !== student.id) {
-      throw new ForbiddenError(
-        'You are not authorized to delete this student session',
-      );
+      throw new ForbiddenError('You are not authorized to delete this student session');
     }
 
-    await this.studentSessionRepository.deleteStudentSession(
-      sessionId,
-      student.id,
-    );
+    await this.studentSessionRepository.deleteStudentSession(sessionId, student.id);
   }
 }

@@ -60,9 +60,7 @@ class Fixtures {
   }
 
   thenLogoutUserCalledWithAccessToken() {
-    expect(this.authRepository.logoutUser).toHaveBeenCalledWith(
-      this.accessToken,
-    );
+    expect(this.authRepository.logoutUser).toHaveBeenCalledWith(this.accessToken);
     expect(this.authRepository.logoutUser).toHaveBeenCalledTimes(1);
   }
 }

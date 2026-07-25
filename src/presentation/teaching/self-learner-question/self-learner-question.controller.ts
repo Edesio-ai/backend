@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import { type AuthUser } from 'src/domain/auth/types/auth.type';
 import { GetSelfLearnerQuestionsUseCase } from 'src/application/teaching/self-learner-question/get-self-learner-questions.use-case';
@@ -40,11 +32,7 @@ export class SelfLearnerQuestionController {
     @Body() body: CreateSelfLearnerQuestionsBodyDto,
     @CurrentUser() user: AuthUser,
   ): Promise<SelfLearnerQuestion> {
-    return await this.createSelfLearnerQuestionUseCase.execute(
-      courseId,
-      body,
-      user,
-    );
+    return await this.createSelfLearnerQuestionUseCase.execute(courseId, body, user);
   }
 
   @Patch(':questionId')
@@ -53,11 +41,7 @@ export class SelfLearnerQuestionController {
     @Body() body: UpdateSelfLearnerQuestionBodyDto,
     @CurrentUser() user: AuthUser,
   ): Promise<SelfLearnerQuestion> {
-    return await this.updateSelfLearnerQuestionUseCase.execute(
-      questionId,
-      body,
-      user,
-    );
+    return await this.updateSelfLearnerQuestionUseCase.execute(questionId, body, user);
   }
 
   @Delete(':questionId')
@@ -65,9 +49,6 @@ export class SelfLearnerQuestionController {
     @Param('questionId') questionId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<void> {
-    return await this.deleteSelfLearnerQuestionUseCase.execute(
-      user,
-      questionId,
-    );
+    return await this.deleteSelfLearnerQuestionUseCase.execute(user, questionId);
   }
 }

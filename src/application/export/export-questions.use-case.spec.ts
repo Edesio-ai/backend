@@ -1,7 +1,4 @@
-import {
-  ExportQuestionsUseCase,
-  ExportQuestionsBody,
-} from './export-questions.use-case';
+import { ExportQuestionsUseCase, ExportQuestionsBody } from './export-questions.use-case';
 import { IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
 import { Question } from 'src/domain/teaching/question/types/question.type';
 
@@ -27,10 +24,10 @@ describe('ExportQuestionsUseCase', () => {
     fixtures = new Fixtures();
   });
 
-  it('should call pdfExtractor.extractQuestionsToPdf with the correct arguments', async () => {
+  it('should call pdfExtractor.extractQuestionsToPdf with the correct arguments', () => {
     fixtures.givenExtractorSucceeds();
 
-    await fixtures.whenExecute();
+    fixtures.whenExecute();
 
     expect(fixtures.pdfExtractor.extractQuestionsToPdf).toHaveBeenCalledWith(
       fixtures.body.questions,
@@ -39,10 +36,10 @@ describe('ExportQuestionsUseCase', () => {
     );
   });
 
-  it('should return the buffer and fileName provided by the extractor', async () => {
+  it('should return the buffer and fileName provided by the extractor', () => {
     fixtures.givenExtractorSucceeds();
 
-    const result = await fixtures.whenExecute();
+    const result = fixtures.whenExecute();
 
     expect(result).toEqual({
       buffer: fixtures.fakeBuffer,
@@ -50,17 +47,17 @@ describe('ExportQuestionsUseCase', () => {
     });
   });
 
-  it('should propagate errors thrown by the extractor', async () => {
+  it('should propagate errors thrown by the extractor', () => {
     fixtures.givenExtractorFails();
 
-    await expect(fixtures.whenExecute()).rejects.toBe(fixtures.extractorError);
+    expect(() => fixtures.whenExecute()).toThrow(fixtures.extractorError);
   });
 
-  it('should work with an empty questions array', async () => {
+  it('should work with an empty questions array', () => {
     fixtures.givenExtractorSucceeds();
     fixtures.body = { ...fixtures.body, questions: [] };
 
-    const result = await fixtures.whenExecute();
+    const result = fixtures.whenExecute();
 
     expect(fixtures.pdfExtractor.extractQuestionsToPdf).toHaveBeenCalledWith(
       [],
@@ -94,15 +91,15 @@ class Fixtures {
   }
 
   givenExtractorSucceeds() {
-    this.pdfExtractor.extractQuestionsToPdf.mockResolvedValue({
+    this.pdfExtractor.extractQuestionsToPdf.mockReturnValue({
       buffer: this.fakeBuffer,
       fileName: this.fakeFileName,
     });
   }
 
   givenExtractorFails() {
-    this.pdfExtractor.extractQuestionsToPdf.mockRejectedValue(
-      this.extractorError,
-    );
+    this.pdfExtractor.extractQuestionsToPdf.mockImplementation(() => {
+      throw this.extractorError;
+    });
   }
 }

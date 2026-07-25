@@ -1,35 +1,25 @@
 import { Inject } from '@nestjs/common';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from '../../../supabase.module';
-import {
-  CreateQuestionBody,
-  Question,
-  QuestionUpdate,
-} from 'src/domain/teaching/question/types/question.type';
+import { CreateQuestionBody, Question, QuestionUpdate } from 'src/domain/teaching/question/types/question.type';
 import { QuestionMapper } from '../mappers/question.mapper';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import { GeneratedQuestion } from 'src/domain/llm/types/openai.type';
 
 export class QuestionSupabaseRepository implements IQuestionsRepository {
-  constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: any) {}
+  constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient) {}
 
   async deleteQuestionsByCourseIds(courseIds: string[]): Promise<void> {
-    const { error } = await this.supabase
-      .from('questions')
-      .delete()
-      .in('course_id', courseIds);
+    const { error } = await this.supabase.from('questions').delete().in('course_id', courseIds);
 
     if (error) {
-      console.error(
-        'error deleting questions by course ids for course ids',
-        courseIds,
-        error,
-      );
+      console.error('error deleting questions by course ids for course ids', courseIds, error);
       throw new ServerError(error.message);
     }
   }
 
-  async getCourseQuestions(courseId: string): Promise<Question[]> {
+  async getCourseQuestions(courseId: string): Promise<Question[] | null> {
     const { data, error } = await this.supabase
       .from('questions')
       .select('*')
@@ -37,21 +27,14 @@ export class QuestionSupabaseRepository implements IQuestionsRepository {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error(
-        'error getting course questions for course id',
-        courseId,
-        error,
-      );
+      console.error('error getting course questions for course id', courseId, error);
       throw new ServerError(error.message);
     }
 
     return data?.map(QuestionMapper.toDomain) ?? [];
   }
 
-  async insertQuestions(
-    questions: GeneratedQuestion[],
-    courseId: string,
-  ): Promise<Question[]> {
+  async insertQuestions(questions: GeneratedQuestion[], courseId: string): Promise<Question[]> {
     const { data, error } = await this.supabase
       .from('questions')
       .insert(QuestionMapper.generatedToInserts(questions, courseId))
@@ -66,17 +49,10 @@ export class QuestionSupabaseRepository implements IQuestionsRepository {
   }
 
   async deleteCourseQuizQuestions(courseId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('questions')
-      .delete()
-      .eq('course_id', courseId);
+    const { error } = await this.supabase.from('questions').delete().eq('course_id', courseId);
 
     if (error) {
-      console.error(
-        'error deleting course questions for course id',
-        courseId,
-        error,
-      );
+      console.error('error deleting course questions for course id', courseId, error);
       throw new ServerError(error.message);
     }
   }
@@ -96,12 +72,8 @@ export class QuestionSupabaseRepository implements IQuestionsRepository {
     return QuestionMapper.toDomain(data);
   }
 
-  public async getQuestionById(questionId: string): Promise<Question> {
-    const { data, error } = await this.supabase
-      .from('questions')
-      .select('*')
-      .eq('id', questionId)
-      .single();
+  public async getQuestionById(questionId: string): Promise<Question | null> {
+    const { data, error } = await this.supabase.from('questions').select('*').eq('id', questionId).single();
 
     if (error) {
       console.error('error getting question by id', questionId, error);
@@ -112,10 +84,7 @@ export class QuestionSupabaseRepository implements IQuestionsRepository {
   }
 
   async deleteQuestionById(questionId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('questions')
-      .delete()
-      .eq('id', questionId);
+    const { error } = await this.supabase.from('questions').delete().eq('id', questionId);
 
     if (error) {
       console.error('error deleting question by id', questionId, error);
@@ -123,10 +92,7 @@ export class QuestionSupabaseRepository implements IQuestionsRepository {
     }
   }
 
-  async updateQuestionById(
-    questionId: string,
-    updates: QuestionUpdate,
-  ): Promise<Question> {
+  async updateQuestionById(questionId: string, updates: QuestionUpdate): Promise<Question> {
     const { data, error } = await this.supabase
       .from('questions')
       .update(QuestionMapper.toUpdate(updates))
@@ -135,12 +101,7 @@ export class QuestionSupabaseRepository implements IQuestionsRepository {
       .single();
 
     if (error) {
-      console.error(
-        'error updating question by id',
-        questionId,
-        updates,
-        error,
-      );
+      console.error('error updating question by id', questionId, updates, error);
       throw new ServerError(error.message);
     }
 

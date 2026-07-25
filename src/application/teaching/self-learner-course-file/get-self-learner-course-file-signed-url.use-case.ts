@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type ISelfLearnerCourseFileRepository,
   SELF_LEARNER_COURSE_FILE_REPOSITORY,
@@ -27,36 +24,27 @@ export class GetSelfLearnerCourseFileSignedUrlUseCase {
   ) {}
 
   public async execute(userId: string, fileId: string): Promise<string | null> {
-    const selfLearner =
-      await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
     if (!selfLearner) {
       throw new NotFoundError('Self learner not found');
     }
 
-    const selfLearnerCourseFile =
-      await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFileById(
-        fileId,
-      );
+    const selfLearnerCourseFile = await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFileById(fileId);
     if (!selfLearnerCourseFile) {
       throw new NotFoundError('Self learner course file not found');
     }
 
-    const selfLearnerCourse =
-      await this.selfLearnerCourseRepository.getSelfLearnerCourseById(
-        selfLearnerCourseFile.courseId,
-      );
+    const selfLearnerCourse = await this.selfLearnerCourseRepository.getSelfLearnerCourseById(
+      selfLearnerCourseFile.courseId,
+    );
     if (!selfLearnerCourse) {
       throw new NotFoundError('Self learner course not found');
     }
 
     if (selfLearnerCourse.selfLearnerId !== selfLearner.id) {
-      throw new ForbiddenError(
-        'You are not allowed to get the signed url for this course file',
-      );
+      throw new ForbiddenError('You are not allowed to get the signed url for this course file');
     }
 
-    return await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl(
-      selfLearnerCourseFile.fileUrl,
-    );
+    return await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl(selfLearnerCourseFile.fileUrl);
   }
 }

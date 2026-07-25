@@ -8,6 +8,10 @@ import { createMockSessionRepository } from 'src/testing/mock-session-repository
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
+import { Establishment } from 'src/domain/teaching/establishment/types/establishment.type';
+import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
+import { Session } from 'src/domain/teaching/session/types/session.type';
+import { StudentSession } from 'src/domain/teaching/student-session/types/student-session.type';
 
 describe('GetEstablishmentsStatsUseCase', () => {
   let fixtures: Fixtures;
@@ -26,9 +30,7 @@ describe('GetEstablishmentsStatsUseCase', () => {
   });
 
   it('should throw NotFoundError when establishment is not found', async () => {
-    fixtures.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(
-      null,
-    );
+    fixtures.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
     fixtures.thenDownstreamRepositoriesNotCalled();
@@ -52,10 +54,10 @@ class Fixtures {
   public readonly getEstablishmentsStatsUseCase: GetEstablishmentsStatsUseCase;
 
   public readonly userId: string;
-  public readonly establishment: any;
-  public readonly teachers: any[];
-  public readonly sessions: any[];
-  public readonly studentSessions: any[];
+  public readonly establishment: Establishment;
+  public readonly teachers: Teacher[];
+  public readonly sessions: Session[];
+  public readonly studentSessions: StudentSession[];
   public readonly repositoryError: Error;
 
   constructor() {
@@ -136,24 +138,14 @@ class Fixtures {
   }
 
   whenRepositoriesReturnData() {
-    this.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(
-      this.establishment,
-    );
-    this.teacherRepository.getTeacherByEstablishmentId.mockResolvedValue(
-      this.teachers,
-    );
-    this.sessionRepository.getTeachersSessionsByIds.mockResolvedValue(
-      this.sessions,
-    );
-    this.studentSessionRepository.getStudentsSessionsByIds.mockResolvedValue(
-      this.studentSessions,
-    );
+    this.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(this.establishment);
+    this.teacherRepository.getTeacherByEstablishmentId.mockResolvedValue(this.teachers);
+    this.sessionRepository.getTeachersSessionsByIds.mockResolvedValue(this.sessions);
+    this.studentSessionRepository.getStudentsSessionsByIds.mockResolvedValue(this.studentSessions);
   }
 
   whenEstablishmentRepositoryThrowsError() {
-    this.establishmentRepository.getEstablishmentByUserId.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.establishmentRepository.getEstablishmentByUserId.mockRejectedValue(this.repositoryError);
   }
 
   async thenThrowRepositoryError(promise: Promise<unknown>) {
@@ -161,33 +153,23 @@ class Fixtures {
   }
 
   thenRepositoriesCalledInExpectedOrder() {
-    expect(
-      this.establishmentRepository.getEstablishmentByUserId,
-    ).toHaveBeenCalledWith(this.userId);
-    expect(
-      this.teacherRepository.getTeacherByEstablishmentId,
-    ).toHaveBeenCalledWith(this.establishment.id);
-    expect(
-      this.sessionRepository.getTeachersSessionsByIds,
-    ).toHaveBeenCalledWith(['teacher-1', 'teacher-2']);
-    expect(
-      this.studentSessionRepository.getStudentsSessionsByIds,
-    ).toHaveBeenCalledWith(['session-1', 'session-2', 'session-3']);
+    expect(this.establishmentRepository.getEstablishmentByUserId).toHaveBeenCalledWith(this.userId);
+    expect(this.teacherRepository.getTeacherByEstablishmentId).toHaveBeenCalledWith(this.establishment.id);
+    expect(this.sessionRepository.getTeachersSessionsByIds).toHaveBeenCalledWith(['teacher-1', 'teacher-2']);
+    expect(this.studentSessionRepository.getStudentsSessionsByIds).toHaveBeenCalledWith([
+      'session-1',
+      'session-2',
+      'session-3',
+    ]);
   }
 
   thenDownstreamRepositoriesNotCalled() {
-    expect(
-      this.teacherRepository.getTeacherByEstablishmentId,
-    ).not.toHaveBeenCalled();
-    expect(
-      this.sessionRepository.getTeachersSessionsByIds,
-    ).not.toHaveBeenCalled();
-    expect(
-      this.studentSessionRepository.getStudentsSessionsByIds,
-    ).not.toHaveBeenCalled();
+    expect(this.teacherRepository.getTeacherByEstablishmentId).not.toHaveBeenCalled();
+    expect(this.sessionRepository.getTeachersSessionsByIds).not.toHaveBeenCalled();
+    expect(this.studentSessionRepository.getStudentsSessionsByIds).not.toHaveBeenCalled();
   }
 
-  thenReturnExpectedStats(result: any) {
+  thenReturnExpectedStats(result: unknown) {
     expect(result).toEqual({
       establishment: this.establishment,
       teachers: [

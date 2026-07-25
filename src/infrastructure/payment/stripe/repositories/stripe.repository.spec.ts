@@ -1,8 +1,6 @@
+import Stripe from 'stripe';
 import { User } from 'src/domain/auth/types/auth.type';
-import {
-  CancelSubscription,
-  StripeSubscription,
-} from 'src/domain/billing/types/billing.type';
+import { CancelSubscription, StripeSubscription } from 'src/domain/billing/types/billing.type';
 import { StripeRepository } from './stripe.repository';
 import { ServerError } from '../../../../domain/shared/errors/global.errors';
 
@@ -27,10 +25,7 @@ describe('StripeRepository', () => {
 
     const promise = fixtures.whenGetCustomerByEmail();
 
-    await fixtures.thenThrowServerErrorWithMessagePart(
-      promise,
-      'Error searching customers',
-    );
+    await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Error searching customers');
   });
 
   it('should return customer id from checkout session when found', async () => {
@@ -55,10 +50,7 @@ describe('StripeRepository', () => {
 
     const promise = fixtures.whenGetCheckoutSessionByUserId();
 
-    await fixtures.thenThrowServerErrorWithMessagePart(
-      promise,
-      'Error searching checkout sessions',
-    );
+    await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Error searching checkout sessions');
   });
 
   it('should return subscriptions when getSubscriptionsByCustomerId succeeds', async () => {
@@ -75,10 +67,7 @@ describe('StripeRepository', () => {
 
     const promise = fixtures.whenGetSubscriptionsByCustomerId();
 
-    await fixtures.thenThrowServerErrorWithMessagePart(
-      promise,
-      'Error searching subscriptions',
-    );
+    await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Error searching subscriptions');
   });
 
   it('should return mapped checkout session when retrieve succeeds', async () => {
@@ -95,10 +84,7 @@ describe('StripeRepository', () => {
 
     const promise = fixtures.whenGetCheckoutSession();
 
-    await fixtures.thenThrowServerErrorWithMessagePart(
-      promise,
-      'Error retrieving checkout session',
-    );
+    await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Error retrieving checkout session');
   });
 
   it('should create checkout session and return url when create succeeds', async () => {
@@ -115,10 +101,7 @@ describe('StripeRepository', () => {
 
     const promise = fixtures.whenCreateCheckoutSession();
 
-    await fixtures.thenThrowServerErrorWithMessagePart(
-      promise,
-      'Error creating checkout session',
-    );
+    await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Error creating checkout session');
   });
 
   describe('getUserSubscription', () => {
@@ -207,10 +190,7 @@ describe('StripeRepository', () => {
 
       const promise = fixtures.whenCancelSubscription();
 
-      await fixtures.thenThrowServerErrorWithMessagePart(
-        promise,
-        'Customer not found',
-      );
+      await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Customer not found');
       fixtures.thenSubscriptionsUpdateNotCalled();
     });
 
@@ -220,10 +200,7 @@ describe('StripeRepository', () => {
 
       const promise = fixtures.whenCancelSubscription();
 
-      await fixtures.thenThrowServerErrorWithMessagePart(
-        promise,
-        'No active subscription found',
-      );
+      await fixtures.thenThrowServerErrorWithMessagePart(promise, 'No active subscription found');
       fixtures.thenSubscriptionsUpdateNotCalled();
     });
 
@@ -242,10 +219,7 @@ describe('StripeRepository', () => {
 
       const promise = fixtures.whenCancelSubscription();
 
-      await fixtures.thenThrowServerErrorWithMessagePart(
-        promise,
-        'Error canceling subscription',
-      );
+      await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Error canceling subscription');
     });
   });
 
@@ -263,10 +237,7 @@ describe('StripeRepository', () => {
 
       const promise = fixtures.whenReactivateSubscription();
 
-      await fixtures.thenThrowServerErrorWithMessagePart(
-        promise,
-        'Customer not found',
-      );
+      await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Customer not found');
       fixtures.thenSubscriptionsUpdateNotCalled();
     });
 
@@ -276,10 +247,7 @@ describe('StripeRepository', () => {
 
       const promise = fixtures.whenReactivateSubscription();
 
-      await fixtures.thenThrowServerErrorWithMessagePart(
-        promise,
-        'No active subscription found',
-      );
+      await fixtures.thenThrowServerErrorWithMessagePart(promise, 'No active subscription found');
       fixtures.thenSubscriptionsUpdateNotCalled();
     });
 
@@ -289,10 +257,7 @@ describe('StripeRepository', () => {
 
       const promise = fixtures.whenReactivateSubscription();
 
-      await fixtures.thenThrowServerErrorWithMessagePart(
-        promise,
-        'Error reactivating subscription',
-      );
+      await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Error reactivating subscription');
     });
   });
 
@@ -321,10 +286,7 @@ describe('StripeRepository', () => {
 
       const promise = fixtures.whenGetCustomerPortalUrl();
 
-      await fixtures.thenThrowServerErrorWithMessagePart(
-        promise,
-        'Customer not found',
-      );
+      await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Customer not found');
       fixtures.thenBillingPortalSessionCreateNotCalled();
     });
 
@@ -334,10 +296,7 @@ describe('StripeRepository', () => {
 
       const promise = fixtures.whenGetCustomerPortalUrl();
 
-      await fixtures.thenThrowServerErrorWithMessagePart(
-        promise,
-        'Error getting customer portal url',
-      );
+      await fixtures.thenThrowServerErrorWithMessagePart(promise, 'Error getting customer portal url');
     });
   });
 });
@@ -407,19 +366,11 @@ class Fixtures {
   public readonly planType = 'pro';
   public readonly customers = [{ id: this.customerId }];
   public readonly subscriptions = [{ id: 'sub_1', status: 'active' }];
-  public readonly user = {
+  public readonly user: User = {
     id: this.userId,
-    aud: 'authenticated',
-    role: 'authenticated',
     email: this.email,
-    email_confirmed_at: '2026-01-01T00:00:00.000Z',
-    phone: '',
-    app_metadata: { provider: 'email', providers: ['email'] },
-    user_metadata: { role: 'establishment' },
-    identities: [],
-    created_at: '2026-01-01T00:00:00.000Z',
-    updated_at: '2026-01-01T00:00:00.000Z',
-    is_anonymous: false,
+    emailConfirmedAt: '2026-01-01T00:00:00.000Z',
+    metadata: { role: 'establishment' },
   };
 
   constructor() {
@@ -454,7 +405,7 @@ class Fixtures {
       },
     };
 
-    this.stripeRepository = new StripeRepository(stripeClientMock as any);
+    this.stripeRepository = new StripeRepository(stripeClientMock as unknown as Stripe);
   }
 
   whenGetCustomerByEmail() {
@@ -474,11 +425,7 @@ class Fixtures {
   }
 
   whenCreateCheckoutSession() {
-    return this.stripeRepository.createCheckoutSession(
-      this.user as any,
-      this.priceId,
-      this.planType,
-    );
+    return this.stripeRepository.createCheckoutSession(this.user, this.priceId, this.planType);
   }
 
   whenGetUserSubscription() {
@@ -505,9 +452,7 @@ class Fixtures {
   }
 
   whenBillingPortalSessionThrows() {
-    this.billingPortalSessionsCreateMock.mockRejectedValue(
-      new Error('portal session failed'),
-    );
+    this.billingPortalSessionsCreateMock.mockRejectedValue(new Error('portal session failed'));
   }
 
   whenReactivateFlowSucceeds() {
@@ -659,9 +604,7 @@ class Fixtures {
   }
 
   whenCreatePreviewThrows() {
-    this.invoicesCreatePreviewMock.mockRejectedValue(
-      new Error('preview unavailable'),
-    );
+    this.invoicesCreatePreviewMock.mockRejectedValue(new Error('preview unavailable'));
   }
 
   whenCustomersListSucceeds() {
@@ -669,9 +612,7 @@ class Fixtures {
   }
 
   whenCustomersListThrowsError() {
-    this.customersListMock.mockRejectedValue(
-      new Error('stripe customer failure'),
-    );
+    this.customersListMock.mockRejectedValue(new Error('stripe customer failure'));
   }
 
   whenCheckoutSessionsListFindsCustomer() {
@@ -697,9 +638,7 @@ class Fixtures {
   }
 
   whenCheckoutSessionsListThrowsError() {
-    this.checkoutSessionsListMock.mockRejectedValue(
-      new Error('stripe session failure'),
-    );
+    this.checkoutSessionsListMock.mockRejectedValue(new Error('stripe session failure'));
   }
 
   whenSubscriptionsListSucceeds() {
@@ -707,9 +646,7 @@ class Fixtures {
   }
 
   whenSubscriptionsListThrowsError() {
-    this.subscriptionsListMock.mockRejectedValue(
-      new Error('stripe subscription failure'),
-    );
+    this.subscriptionsListMock.mockRejectedValue(new Error('stripe subscription failure'));
   }
 
   whenCheckoutSessionRetrieveSucceeds() {
@@ -724,9 +661,7 @@ class Fixtures {
   }
 
   whenCheckoutSessionRetrieveThrowsError() {
-    this.checkoutSessionsRetrieveMock.mockRejectedValue(
-      new Error('retrieve failure'),
-    );
+    this.checkoutSessionsRetrieveMock.mockRejectedValue(new Error('retrieve failure'));
   }
 
   whenCreateCheckoutSessionSucceeds() {
@@ -736,15 +671,10 @@ class Fixtures {
   }
 
   whenCreateCheckoutSessionThrowsError() {
-    this.checkoutSessionsCreateMock.mockRejectedValue(
-      new Error('create failure'),
-    );
+    this.checkoutSessionsCreateMock.mockRejectedValue(new Error('create failure'));
   }
 
-  async thenThrowServerErrorWithMessagePart(
-    promise: Promise<unknown>,
-    messagePart: string,
-  ) {
+  async thenThrowServerErrorWithMessagePart(promise: Promise<unknown>, messagePart: string) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
     await expect(promise).rejects.toThrow(messagePart);
   }
@@ -770,26 +700,24 @@ class Fixtures {
     expect(this.subscriptionsListMock).toHaveBeenCalledTimes(1);
   }
 
-  thenReturnExpectedCustomers(result: any) {
+  thenReturnExpectedCustomers(result: unknown) {
     expect(result).toEqual(this.customers);
   }
 
-  thenReturnExpectedCustomerId(result: any) {
+  thenReturnExpectedCustomerId(result: unknown) {
     expect(result).toEqual(this.customerId);
   }
 
-  thenReturnExpectedSubscriptions(result: any) {
+  thenReturnExpectedSubscriptions(result: unknown) {
     expect(result).toEqual(this.subscriptions);
   }
 
   thenCheckoutSessionRetrieveCalledWithExpectedArguments() {
-    expect(this.checkoutSessionsRetrieveMock).toHaveBeenCalledWith(
-      this.checkoutSessionId,
-    );
+    expect(this.checkoutSessionsRetrieveMock).toHaveBeenCalledWith(this.checkoutSessionId);
     expect(this.checkoutSessionsRetrieveMock).toHaveBeenCalledTimes(1);
   }
 
-  thenReturnMappedCheckoutSession(result: any) {
+  thenReturnMappedCheckoutSession(result: unknown) {
     expect(result).toEqual({
       id: this.checkoutSessionId,
       customerId: this.customerId,
@@ -827,7 +755,7 @@ class Fixtures {
     expect(this.checkoutSessionsCreateMock).toHaveBeenCalledTimes(1);
   }
 
-  thenReturnCheckoutUrl(result: any) {
+  thenReturnCheckoutUrl(result: unknown) {
     expect(result).toEqual({ url: 'https://stripe.test/checkout' });
   }
 
@@ -876,11 +804,8 @@ class Fixtures {
       customer: this.customerId,
       limit: 1,
     });
-    expect(this.subscriptionsUpdateMock).toHaveBeenCalledWith(
-      'sub_reactivate_1',
-      {
-        cancel_at_period_end: false,
-      },
-    );
+    expect(this.subscriptionsUpdateMock).toHaveBeenCalledWith('sub_reactivate_1', {
+      cancel_at_period_end: false,
+    });
   }
 }

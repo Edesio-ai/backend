@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { SuggestionSupabaseRepository } from './suggestion-supabase.repository';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { SupabaseSuggestion } from 'src/domain/suggestion/suggestion.type';
@@ -193,17 +194,15 @@ class Fixtures {
     order: this.orderCreatedAtMock,
   }));
   private readonly singleForGetByIdMock = jest.fn();
-  private readonly eqStarSelectMock = jest.fn(
-    (column: string, _value: string) => {
-      if (column === 'category') {
-        return { order: this.orderLikesMock };
-      }
-      if (column === 'id') {
-        return { single: this.singleForGetByIdMock };
-      }
-      throw new Error(`unexpected eq after select *: ${column}`);
-    },
-  );
+  private readonly eqStarSelectMock = jest.fn((column: string, _value: string) => {
+    if (column === 'category') {
+      return { order: this.orderLikesMock };
+    }
+    if (column === 'id') {
+      return { single: this.singleForGetByIdMock };
+    }
+    throw new Error(`unexpected eq after select *: ${column}`);
+  });
 
   private readonly singleMock = jest.fn();
   private readonly eqSuggestionIdForSingleMock = jest.fn(() => ({
@@ -267,7 +266,7 @@ class Fixtures {
     });
 
     const supabaseMock = { from: this.fromMock };
-    this.repository = new SuggestionSupabaseRepository(supabaseMock as any);
+    this.repository = new SuggestionSupabaseRepository(supabaseMock as unknown as SupabaseClient);
   }
 
   whenGetSuggestions(category: string) {
@@ -406,26 +405,18 @@ class Fixtures {
   thenLikesCountQueryBuilt(suggestionId: string) {
     expect(this.fromMock).toHaveBeenCalledWith('suggestions');
     expect(this.selectSuggestionsMock).toHaveBeenCalledWith('id, likes_count');
-    expect(this.eqSuggestionIdForSingleMock).toHaveBeenCalledWith(
-      'id',
-      suggestionId,
-    );
+    expect(this.eqSuggestionIdForSingleMock).toHaveBeenCalledWith('id', suggestionId);
     expect(this.singleMock).toHaveBeenCalledTimes(1);
   }
 
   thenUpdateLikeBuilt(suggestionId: string, payload: { likes_count: number }) {
     expect(this.updateMock).toHaveBeenCalledWith(payload);
-    expect(this.eqSuggestionIdForUpdateMock).toHaveBeenCalledWith(
-      'id',
-      suggestionId,
-    );
+    expect(this.eqSuggestionIdForUpdateMock).toHaveBeenCalledWith('id', suggestionId);
   }
 
   thenInsertSelectSingleChainBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('suggestions');
-    expect(this.insertSuggestionMock).toHaveBeenCalledWith(
-      SuggestionMapper.toInsert(this.insertPayload),
-    );
+    expect(this.insertSuggestionMock).toHaveBeenCalledWith(SuggestionMapper.toInsert(this.insertPayload));
     expect(this.selectAfterInsertMock).toHaveBeenCalledTimes(1);
     expect(this.singleAfterInsertMock).toHaveBeenCalledTimes(1);
   }
@@ -440,9 +431,6 @@ class Fixtures {
   thenDeleteSuggestionChainBuilt(suggestionId: string) {
     expect(this.fromMock).toHaveBeenCalledWith('suggestions');
     expect(this.deleteMock).toHaveBeenCalledTimes(1);
-    expect(this.eqSuggestionIdForDeleteMock).toHaveBeenCalledWith(
-      'id',
-      suggestionId,
-    );
+    expect(this.eqSuggestionIdForDeleteMock).toHaveBeenCalledWith('id', suggestionId);
   }
 }

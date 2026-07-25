@@ -59,15 +59,11 @@ class Fixtures {
   }
 
   whenPaymentClientReturnsCheckoutSession() {
-    this.paymentClient.getCheckoutSession.mockResolvedValue(
-      this.checkoutSession,
-    );
+    this.paymentClient.getCheckoutSession.mockResolvedValue(this.checkoutSession);
   }
 
   whenPaymentClientThrowsError() {
-    this.paymentClient.getCheckoutSession.mockRejectedValue(
-      this.paymentClientError,
-    );
+    this.paymentClient.getCheckoutSession.mockRejectedValue(this.paymentClientError);
   }
 
   async thenThrowPaymentClientError(promise: Promise<unknown>) {
@@ -75,9 +71,7 @@ class Fixtures {
   }
 
   thenPaymentClientCalledWithSessionId() {
-    expect(this.paymentClient.getCheckoutSession).toHaveBeenCalledWith(
-      this.sessionId,
-    );
+    expect(this.paymentClient.getCheckoutSession).toHaveBeenCalledWith(this.sessionId);
     expect(this.paymentClient.getCheckoutSession).toHaveBeenCalledTimes(1);
   }
 

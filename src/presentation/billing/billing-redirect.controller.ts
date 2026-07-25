@@ -14,10 +14,7 @@ export class BillingRedirectController {
   async success(@Query('session_id') sessionId: string, @Res() res: Response) {
     const session = await this.paymentSuccessUseCase.execute(sessionId);
     if (!session) {
-      return res.redirect(
-        302,
-        `${process.env.FRONTEND_URL}/billing/error/reason=no-sub`,
-      );
+      return res.redirect(302, `${process.env.FRONTEND_URL}/billing/error/reason=no-sub`);
     }
     const { metadata } = session;
     const { plan } = metadata;
@@ -25,7 +22,7 @@ export class BillingRedirectController {
   }
 
   @Get('cancel')
-  async cancel(@Res() res: Response) {
+  cancel(@Res() res: Response) {
     return res.redirect(302, `${process.env.FRONTEND_URL}/billing/choose-plan`);
   }
 }

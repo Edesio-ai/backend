@@ -1,8 +1,4 @@
-import {
-  ForbiddenError,
-  NotFoundError,
-  ServerError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError, ServerError } from 'src/domain/shared/errors/global.errors';
 import type { ISelfLearnerCourseFileRepository } from 'src/domain/teaching/self-learner-course-file/contracts/i-self-learner-course-file.repository';
 import type { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-learner-course/contracts/i-self-learner-course.repository';
 import type { ISelfLearnerRepository } from 'src/domain/teaching/self-learner/contracts/i-self-learner.repository';
@@ -24,84 +20,57 @@ describe('GetSelfLearnerCourseFileSignedUrlUseCase', () => {
       'https://signed.example/obj',
     );
 
-    await expect(fixtures.whenExecute()).resolves.toBe(
-      'https://signed.example/obj',
+    await expect(fixtures.whenExecute()).resolves.toBe('https://signed.example/obj');
+    expect(fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl).toHaveBeenCalledWith(
+      fixtures.fileRow.fileUrl,
     );
-    expect(
-      fixtures.selfLearnerCourseFileRepository
-        .getSelfLearnerCourseFileSignedUrl,
-    ).toHaveBeenCalledWith(fixtures.fileRow.fileUrl);
   });
 
   it('returns null when storage layer reports no signedUrl', async () => {
     fixtures.whenOwnershipOk();
-    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl.mockResolvedValue(
-      null,
-    );
+    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).resolves.toBeNull();
   });
 
   it('does not resolve signed URL when learner is missing', async () => {
-    fixtures.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(
-      null,
-    );
+    fixtures.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.selfLearnerCourseFileRepository
-        .getSelfLearnerCourseFileSignedUrl,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl).not.toHaveBeenCalled();
   });
 
   it('does not resolve signed URL when course file row is missing', async () => {
     fixtures.whenLearnerExists();
-    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileById.mockResolvedValue(
-      null as never,
-    );
+    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileById.mockResolvedValue(null as never);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.selfLearnerCourseFileRepository
-        .getSelfLearnerCourseFileSignedUrl,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl).not.toHaveBeenCalled();
   });
 
   it('does not resolve signed URL when parent course is missing', async () => {
     fixtures.whenFileAndLearnerExist();
-    fixtures.selfLearnerCourseRepository.getSelfLearnerCourseById.mockResolvedValue(
-      null,
-    );
+    fixtures.selfLearnerCourseRepository.getSelfLearnerCourseById.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.selfLearnerCourseFileRepository
-        .getSelfLearnerCourseFileSignedUrl,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl).not.toHaveBeenCalled();
   });
 
   it('does not resolve signed URL when learner does not own the course', async () => {
     fixtures.whenFileAndLearnerExist();
-    fixtures.selfLearnerCourseRepository.getSelfLearnerCourseById.mockResolvedValue(
-      {
-        ...fixtures.course,
-        selfLearnerId: 'other',
-      },
-    );
+    fixtures.selfLearnerCourseRepository.getSelfLearnerCourseById.mockResolvedValue({
+      ...fixtures.course,
+      selfLearnerId: 'other',
+    });
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
-    expect(
-      fixtures.selfLearnerCourseFileRepository
-        .getSelfLearnerCourseFileSignedUrl,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl).not.toHaveBeenCalled();
   });
 
   it('propagates storage errors after authorization', async () => {
     fixtures.whenOwnershipOk();
     const err = new ServerError('signed url rejected');
-    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl.mockRejectedValue(
-      err,
-    );
+    fixtures.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl.mockRejectedValue(err);
 
     await expect(fixtures.whenExecute()).rejects.toBe(err);
   });
@@ -144,8 +113,7 @@ class Fixtures {
 
   constructor() {
     this.selfLearnerRepository = createMockSelfLearnerRepository();
-    this.selfLearnerCourseFileRepository =
-      createMockSelfLearnerCourseFileRepository();
+    this.selfLearnerCourseFileRepository = createMockSelfLearnerCourseFileRepository();
     this.selfLearnerCourseRepository = createMockSelfLearnerCourseRepository();
 
     this.useCase = new GetSelfLearnerCourseFileSignedUrlUseCase(
@@ -154,9 +122,7 @@ class Fixtures {
       this.selfLearnerCourseRepository,
     );
 
-    this.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl.mockResolvedValue(
-      'https://default',
-    );
+    this.selfLearnerCourseFileRepository.getSelfLearnerCourseFileSignedUrl.mockResolvedValue('https://default');
   }
 
   whenExecute() {
@@ -164,19 +130,13 @@ class Fixtures {
   }
 
   whenLearnerExists() {
-    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(
-      this.learner,
-    );
+    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue(this.learner);
   }
 
   whenFileAndLearnerExist() {
     this.whenLearnerExists();
-    this.selfLearnerCourseFileRepository.getSelfLearnerCourseFileById.mockResolvedValue(
-      this.fileRow,
-    );
-    this.selfLearnerCourseRepository.getSelfLearnerCourseById.mockResolvedValue(
-      this.course,
-    );
+    this.selfLearnerCourseFileRepository.getSelfLearnerCourseFileById.mockResolvedValue(this.fileRow);
+    this.selfLearnerCourseRepository.getSelfLearnerCourseById.mockResolvedValue(this.course);
   }
 
   whenOwnershipOk() {

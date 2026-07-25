@@ -17,15 +17,9 @@ describe('DeleteSuggestionUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(
-      fixtures.suggestionRepository.getSuggestionById,
-    ).toHaveBeenCalledWith(fixtures.suggestionId);
-    expect(fixtures.suggestionRepository.deleteSuggestion).toHaveBeenCalledWith(
-      fixtures.suggestionId,
-    );
-    expect(
-      fixtures.suggestionRepository.deleteSuggestion,
-    ).toHaveBeenCalledTimes(1);
+    expect(fixtures.suggestionRepository.getSuggestionById).toHaveBeenCalledWith(fixtures.suggestionId);
+    expect(fixtures.suggestionRepository.deleteSuggestion).toHaveBeenCalledWith(fixtures.suggestionId);
+    expect(fixtures.suggestionRepository.deleteSuggestion).toHaveBeenCalledTimes(1);
   });
 
   it('should throw NotFoundException when suggestion is missing', async () => {
@@ -35,9 +29,7 @@ describe('DeleteSuggestionUseCase', () => {
 
     await expect(promise).rejects.toBeInstanceOf(NotFoundException);
     await expect(promise).rejects.toThrow('Suggestion not found');
-    expect(
-      fixtures.suggestionRepository.deleteSuggestion,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.suggestionRepository.deleteSuggestion).not.toHaveBeenCalled();
   });
 
   it('should throw ForbiddenException when suggestion belongs to another user', async () => {
@@ -46,12 +38,8 @@ describe('DeleteSuggestionUseCase', () => {
     const promise = fixtures.whenExecute();
 
     await expect(promise).rejects.toBeInstanceOf(ForbiddenException);
-    await expect(promise).rejects.toThrow(
-      'You are not allowed to delete this suggestion',
-    );
-    expect(
-      fixtures.suggestionRepository.deleteSuggestion,
-    ).not.toHaveBeenCalled();
+    await expect(promise).rejects.toThrow('You are not allowed to delete this suggestion');
+    expect(fixtures.suggestionRepository.deleteSuggestion).not.toHaveBeenCalled();
   });
 });
 
@@ -92,9 +80,7 @@ class Fixtures {
   }
 
   whenRepositoryReturnsOwnedSuggestion() {
-    this.suggestionRepository.getSuggestionById.mockResolvedValue(
-      this.ownedSuggestion,
-    );
+    this.suggestionRepository.getSuggestionById.mockResolvedValue(this.ownedSuggestion);
     this.suggestionRepository.deleteSuggestion.mockResolvedValue(undefined);
   }
 

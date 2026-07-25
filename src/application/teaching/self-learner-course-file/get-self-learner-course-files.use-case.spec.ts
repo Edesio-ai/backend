@@ -1,7 +1,4 @@
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { GetSelfLearnerCourseFilesUseCase } from './get-self-learner-course-files.use-case';
 import type { ISelfLearnerCourseFileRepository } from 'src/domain/teaching/self-learner-course-file/contracts/i-self-learner-course-file.repository';
 import type { SelfLearnerCourseFile } from 'src/domain/teaching/self-learner-course-file/types/self-learner-course-file.type';
@@ -25,15 +22,9 @@ describe('GetSelfLearnerCourseFilesUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(
-      fixtures.selfLearnerRepo.getSelfLearnerByUserId,
-    ).toHaveBeenCalledWith(fixtures.userId);
-    expect(fixtures.courseRepo.getSelfLearnerCourseById).toHaveBeenCalledWith(
-      fixtures.courseId,
-    );
-    expect(fixtures.fileRepo.getSelfLearnerCourseFiles).toHaveBeenCalledWith(
-      fixtures.courseId,
-    );
+    expect(fixtures.selfLearnerRepo.getSelfLearnerByUserId).toHaveBeenCalledWith(fixtures.userId);
+    expect(fixtures.courseRepo.getSelfLearnerCourseById).toHaveBeenCalledWith(fixtures.courseId);
+    expect(fixtures.fileRepo.getSelfLearnerCourseFiles).toHaveBeenCalledWith(fixtures.courseId);
     expect(result).toEqual(fixtures.files);
   });
 
@@ -127,11 +118,7 @@ class Fixtures {
     this.fileRepo = createMockSelfLearnerCourseFileRepository();
     this.selfLearnerRepo = createMockSelfLearnerRepository();
     this.courseRepo = createMockSelfLearnerCourseRepository();
-    this.useCase = new GetSelfLearnerCourseFilesUseCase(
-      this.fileRepo,
-      this.selfLearnerRepo,
-      this.courseRepo,
-    );
+    this.useCase = new GetSelfLearnerCourseFilesUseCase(this.fileRepo, this.selfLearnerRepo, this.courseRepo);
   }
 
   whenExecute() {

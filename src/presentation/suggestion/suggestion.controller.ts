@@ -18,10 +18,7 @@ export class SuggestionController {
   ) {}
 
   @Get('category/:category')
-  async getSuggestions(
-    @CurrentUser() user: User,
-    @Param('category') category: string,
-  ) {
+  async getSuggestions(@CurrentUser() user: User, @Param('category') category: string) {
     return this.getSuggestionsUseCase.execute(category, user);
   }
 
@@ -34,18 +31,12 @@ export class SuggestionController {
   }
 
   @Post()
-  async createSuggestion(
-    @CurrentUser() user: User,
-    @Body() body: CreateSuggestionBodyDto,
-  ): Promise<Suggestion | null> {
+  async createSuggestion(@CurrentUser() user: User, @Body() body: CreateSuggestionBodyDto): Promise<Suggestion | null> {
     return await this.createSuggestionUseCase.execute(body, user);
   }
 
   @Delete(':suggestionId')
-  async deleteSuggestion(
-    @CurrentUser() user: User,
-    @Param('suggestionId') suggestionId: string,
-  ): Promise<void> {
+  async deleteSuggestion(@CurrentUser() user: User, @Param('suggestionId') suggestionId: string): Promise<void> {
     await this.deleteSuggestionUseCase.execute(suggestionId, user);
   }
 }

@@ -53,9 +53,7 @@ class Fixtures {
       updateTokenUsedAt: jest.fn(),
     };
 
-    this.getInvitationPreviewUseCase = new GetInvitationPreviewUseCase(
-      this.invitationTokenRepository,
-    );
+    this.getInvitationPreviewUseCase = new GetInvitationPreviewUseCase(this.invitationTokenRepository);
 
     this.preview = {
       isValid: true,
@@ -72,15 +70,11 @@ class Fixtures {
   }
 
   whenRepositoryReturnsPreview() {
-    this.invitationTokenRepository.getInvitationPreview.mockResolvedValue(
-      this.preview,
-    );
+    this.invitationTokenRepository.getInvitationPreview.mockResolvedValue(this.preview);
   }
 
   whenRepositoryThrowsError() {
-    this.invitationTokenRepository.getInvitationPreview.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.invitationTokenRepository.getInvitationPreview.mockRejectedValue(this.repositoryError);
   }
 
   async thenThrowBadRequest(promise: Promise<unknown>) {
@@ -92,18 +86,12 @@ class Fixtures {
   }
 
   thenRepositoryCalledWith(token: string) {
-    expect(
-      this.invitationTokenRepository.getInvitationPreview,
-    ).toHaveBeenCalledWith(token);
-    expect(
-      this.invitationTokenRepository.getInvitationPreview,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.invitationTokenRepository.getInvitationPreview).toHaveBeenCalledWith(token);
+    expect(this.invitationTokenRepository.getInvitationPreview).toHaveBeenCalledTimes(1);
   }
 
   thenRepositoryNotCalled() {
-    expect(
-      this.invitationTokenRepository.getInvitationPreview,
-    ).not.toHaveBeenCalled();
+    expect(this.invitationTokenRepository.getInvitationPreview).not.toHaveBeenCalled();
   }
 
   thenReturnExpectedPreview(result: InvitationTokenPreview) {

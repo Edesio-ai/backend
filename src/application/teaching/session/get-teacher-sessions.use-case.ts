@@ -4,10 +4,7 @@ import {
   type ISessionRepository,
 } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { Session } from 'src/domain/teaching/session/types/session.type';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 
 export class GetTeacherSessionsUseCase {

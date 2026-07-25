@@ -1,3 +1,4 @@
+import { Mistral } from '@mistralai/mistralai';
 jest.mock('@mistralai/mistralai', () => ({
   Mistral: jest.fn(),
 }));
@@ -15,9 +16,7 @@ describe('MistralProvider', () => {
     });
 
     it('returns parsed questions from the API response', async () => {
-      fixtures.whenApiReturnsContent(
-        JSON.stringify({ questions: fixtures.generatedQuestions }),
-      );
+      fixtures.whenApiReturnsContent(JSON.stringify({ questions: fixtures.generatedQuestions }));
 
       const result = await fixtures.whenGenerate();
 
@@ -33,19 +32,13 @@ describe('MistralProvider', () => {
 
     it('truncates content longer than 15000 characters', async () => {
       const longContent = 'a'.repeat(16000);
-      fixtures.whenApiReturnsContent(
-        JSON.stringify({ questions: fixtures.generatedQuestions }),
-      );
+      fixtures.whenApiReturnsContent(JSON.stringify({ questions: fixtures.generatedQuestions }));
 
       await fixtures.provider.generateQuestions(longContent, fixtures.config);
 
       const call = fixtures.chatCompleteMock.mock.calls[0][0];
-      const userPromptMessage = call.messages.find(
-        (m: { role: string }) => m.role === 'user',
-      );
-      expect(userPromptMessage.content).toContain(
-        '[Contenu tronqué pour respecter la limite]',
-      );
+      const userPromptMessage = call.messages.find((m: { role: string }) => m.role === 'user');
+      expect(userPromptMessage.content).toContain('[Contenu tronqué pour respecter la limite]');
       expect(userPromptMessage.content).not.toContain(longContent);
     });
 
@@ -83,9 +76,7 @@ describe('MistralProvider', () => {
     });
 
     it('strips ```json fences from the response before parsing', async () => {
-      fixtures.whenApiReturnsContent(
-        '```json\n' + JSON.stringify(fixtures.apiEvaluation) + '\n```',
-      );
+      fixtures.whenApiReturnsContent('```json\n' + JSON.stringify(fixtures.apiEvaluation) + '\n```');
 
       const result = await fixtures.whenEvaluate();
 
@@ -184,9 +175,7 @@ class GenerateQuestionsFixtures {
   public readonly provider: MistralProvider;
 
   constructor() {
-    this.provider = new MistralProvider(
-      buildMistralClient(this.chatCompleteMock) as any,
-    );
+    this.provider = new MistralProvider(buildMistralClient(this.chatCompleteMock) as unknown as Mistral);
   }
 
   whenGenerate() {
@@ -221,9 +210,7 @@ class EvaluateAnswerFixtures {
   public readonly provider: MistralProvider;
 
   constructor() {
-    this.provider = new MistralProvider(
-      buildMistralClient(this.chatCompleteMock) as any,
-    );
+    this.provider = new MistralProvider(buildMistralClient(this.chatCompleteMock) as unknown as Mistral);
   }
 
   whenEvaluate() {
@@ -249,18 +236,14 @@ class CompletionFeedbackFixtures {
   public readonly provider: MistralProvider;
 
   constructor() {
-    this.provider = new MistralProvider(
-      buildMistralClient(this.chatCompleteMock) as any,
-    );
+    this.provider = new MistralProvider(buildMistralClient(this.chatCompleteMock) as unknown as Mistral);
   }
 
   whenGenerate() {
     return this.provider.generateCompletionFeedback(this.body);
   }
 
-  whenGenerateWithLanguage(
-    language: 'francais' | 'anglais' | 'espagnol' | 'allemand',
-  ) {
+  whenGenerateWithLanguage(language: 'francais' | 'anglais' | 'espagnol' | 'allemand') {
     return this.provider.generateCompletionFeedback({
       ...this.body,
       language,

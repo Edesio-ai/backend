@@ -29,9 +29,7 @@ class Fixtures {
       generateHex: jest.fn(),
     };
 
-    this.generateCsrfTokenUseCase = new GenerateCsrfTokenUseCase(
-      this.tokenGenerator,
-    );
+    this.generateCsrfTokenUseCase = new GenerateCsrfTokenUseCase(this.tokenGenerator);
     this.generatedToken = 'csrf-token-123';
   }
 

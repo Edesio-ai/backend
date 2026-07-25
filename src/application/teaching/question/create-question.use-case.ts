@@ -1,19 +1,13 @@
-import { QuestionType } from 'src/domain/teaching/question/types/question.type';
+import { Question, QuestionType } from 'src/domain/teaching/question/types/question.type';
 import { Inject } from '@nestjs/common';
 import {
   QUESTIONS_REPOSITORY,
   type IQuestionsRepository,
 } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import { UnauthorizedError } from 'src/domain/shared/errors/global.errors';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
-import {
-  TEACHER_REPOSITORY,
-  type ITeacherRepository,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { NotFoundError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 export interface CreateQuestionBody {
   courseId: string;
@@ -33,13 +27,11 @@ export class CreateQuestionUseCase {
     private readonly coursesRepository: ICourseRepository,
   ) {}
 
-  async execute(body: CreateQuestionBody, user: AuthUser): Promise<any> {
+  async execute(body: CreateQuestionBody, user: AuthUser): Promise<Question> {
     const teacher = await this.teachersRepository.getTeacherByUserId(user.id);
 
     if (!teacher) {
-      throw new UnauthorizedError(
-        `Unauthorized, teacher not exists: ${user.id}`,
-      );
+      throw new UnauthorizedError(`Unauthorized, teacher not exists: ${user.id}`);
     }
 
     const select = `
@@ -48,16 +40,14 @@ export class CreateQuestionUseCase {
                 teacher_id
             )
         `;
-    const courseWithSession =
-      await this.coursesRepository.getCourseWithSessionById(
-        body.courseId,
-        select,
-      );
+    const courseWithSession = await this.coursesRepository.getCourseWithSessionById(body.courseId, select);
+
+    if (!courseWithSession) {
+      throw new NotFoundError(`Course with id ${body.courseId} not found`);
+    }
 
     if (courseWithSession.session.teacherId !== teacher.id) {
-      throw new UnauthorizedError(
-        `Unauthorized, course not belongs to teacher: ${body.courseId}`,
-      );
+      throw new UnauthorizedError(`Unauthorized, course not belongs to teacher: ${body.courseId}`);
     }
 
     const question = await this.questionsRepository.insertQuestion(body);

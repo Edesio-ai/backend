@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { TeacherSupabaseRepository } from './teacher-supabase.repository';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 
@@ -79,9 +80,7 @@ describe('TeacherSupabaseRepository', () => {
   it('should throw ServerError when updateTeacher fails', async () => {
     fixtures.whenUpdateTeacherProfileFails();
 
-    await expect(fixtures.whenUpdateTeacherProfile()).rejects.toBeInstanceOf(
-      ServerError,
-    );
+    await expect(fixtures.whenUpdateTeacherProfile()).rejects.toBeInstanceOf(ServerError);
   });
 
   it('should link teacher to establishment', async () => {
@@ -141,9 +140,7 @@ describe('TeacherSupabaseRepository', () => {
   it('should delete auth user and throw ServerError when createTeacherWithInvitationToken fails', async () => {
     fixtures.whenCreateTeacherWithInvitationReturnsError();
 
-    await expect(
-      fixtures.whenCreateTeacherWithInvitationToken(),
-    ).rejects.toBeInstanceOf(ServerError);
+    await expect(fixtures.whenCreateTeacherWithInvitationToken()).rejects.toBeInstanceOf(ServerError);
     expect(fixtures.deleteUserMock).toHaveBeenCalledWith(fixtures.authUser.id);
   });
 });
@@ -294,13 +291,11 @@ class Fixtures {
 
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'teachers') {
-      if (this.updateTeacherProfileModeEnabled)
-        return { update: this.teacherProfileUpdateMock };
+      if (this.updateTeacherProfileModeEnabled) return { update: this.teacherProfileUpdateMock };
       if (this.linkModeEnabled) return this.linkFromMock();
       if (this.byUserModeEnabled) return this.byUserFromMock();
       if (this.createModeEnabled) return this.createFromMock();
-      if (this.byConditionsModeEnabled)
-        return { select: this.conditionsSelectMock };
+      if (this.byConditionsModeEnabled) return { select: this.conditionsSelectMock };
       return this.teacherFromMock();
     }
     if (table === 'invitation_tokens') return this.rollbackFromMock();
@@ -338,8 +333,8 @@ class Fixtures {
       },
     };
     this.repository = new TeacherSupabaseRepository(
-      supabaseMock as any,
-      supabaseAuthMock as any,
+      supabaseMock as unknown as SupabaseClient,
+      supabaseAuthMock as unknown as SupabaseClient,
     );
   }
 
@@ -349,9 +344,7 @@ class Fixtures {
 
   whenGetTeacherByUserId() {
     this.byUserModeEnabled = true;
-    return this.repository.getTeacherByUserId(
-      this.teacherSupabaseRow.supabase_user_id,
-    );
+    return this.repository.getTeacherByUserId(this.teacherSupabaseRow.supabase_user_id);
   }
 
   whenCreateTeacher() {
@@ -374,10 +367,7 @@ class Fixtures {
 
   whenUpdateTeacherProfile() {
     this.updateTeacherProfileModeEnabled = true;
-    return this.repository.updateTeacher(
-      this.teacherSupabaseRow.supabase_user_id,
-      this.teacherProfilePayload,
-    );
+    return this.repository.updateTeacher(this.teacherSupabaseRow.supabase_user_id, this.teacherProfilePayload);
   }
 
   whenTeacherQueryReturnsData() {
@@ -458,23 +448,17 @@ class Fixtures {
   thenTeacherQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('teachers');
     expect(this.teacherSelectMock).toHaveBeenCalledWith('*');
-    expect(this.teacherEqMock).toHaveBeenCalledWith(
-      'establishment_id',
-      this.establishmentId,
-    );
+    expect(this.teacherEqMock).toHaveBeenCalledWith('establishment_id', this.establishmentId);
   }
 
-  thenReturnExpectedTeachers(result: any) {
+  thenReturnExpectedTeachers(result: unknown) {
     expect(result).toEqual(this.expectedTeachers);
   }
 
   thenGetTeacherByUserIdQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('teachers');
     expect(this.byUserSelectMock).toHaveBeenCalledWith('*');
-    expect(this.byUserEqMock).toHaveBeenCalledWith(
-      'supabase_user_id',
-      this.teacherSupabaseRow.supabase_user_id,
-    );
+    expect(this.byUserEqMock).toHaveBeenCalledWith('supabase_user_id', this.teacherSupabaseRow.supabase_user_id);
     expect(this.byUserMaybeSingleMock).toHaveBeenCalledTimes(1);
   }
 
@@ -494,10 +478,7 @@ class Fixtures {
     expect(this.linkUpdateMock).toHaveBeenCalledWith({
       establishment_id: this.establishmentIdToLink,
     });
-    expect(this.linkEqMock).toHaveBeenCalledWith(
-      'id',
-      this.teacherSupabaseRow.id,
-    );
+    expect(this.linkEqMock).toHaveBeenCalledWith('id', this.teacherSupabaseRow.id);
   }
 
   thenRollbackInvitationTokenCalled() {
@@ -506,10 +487,7 @@ class Fixtures {
       used_at: null,
       used_by: null,
     });
-    expect(this.rollbackEqMock).toHaveBeenCalledWith(
-      'id',
-      this.invitationTokenId,
-    );
+    expect(this.rollbackEqMock).toHaveBeenCalledWith('id', this.invitationTokenId);
   }
 
   thenRollbackInvitationTokenNotCalled() {
@@ -519,16 +497,14 @@ class Fixtures {
 
   thenUpdateTeacherProfileQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('teachers');
-    expect(this.teacherProfileUpdateMock).toHaveBeenCalledWith(
-      this.teacherProfilePayload,
-    );
+    expect(this.teacherProfileUpdateMock).toHaveBeenCalledWith(this.teacherProfilePayload);
     expect(this.teacherProfileEqMock).toHaveBeenCalledWith(
       'supabase_user_id',
       this.teacherSupabaseRow.supabase_user_id,
     );
   }
 
-  thenReturnExpectedTeacher(result: any) {
+  thenReturnExpectedTeacher(result: unknown) {
     expect(result).toEqual(this.expectedTeacher);
   }
 
@@ -564,24 +540,15 @@ class Fixtures {
   thenGetTeacherByConditionsQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('teachers');
     expect(this.conditionsSelectMock).toHaveBeenCalledWith('*');
-    expect(this.conditionsEqMock).toHaveBeenCalledWith(
-      'id',
-      this.teacherSupabaseRow.id,
-    );
-    expect(this.conditionsEqMock).toHaveBeenCalledWith(
-      'establishment_id',
-      this.establishmentId,
-    );
+    expect(this.conditionsEqMock).toHaveBeenCalledWith('id', this.teacherSupabaseRow.id);
+    expect(this.conditionsEqMock).toHaveBeenCalledWith('establishment_id', this.establishmentId);
     expect(this.conditionsEqMock).toHaveBeenCalledTimes(2);
     expect(this.conditionsMaybeSingleMock).toHaveBeenCalledTimes(1);
   }
 
   whenCreateTeacherWithInvitationToken() {
     this.createModeEnabled = true;
-    return this.repository.createTeacherWithInvitationToken(
-      this.authUser,
-      this.invitationToken,
-    );
+    return this.repository.createTeacherWithInvitationToken(this.authUser, this.invitationToken);
   }
 
   whenCreateTeacherWithInvitationReturnsData() {

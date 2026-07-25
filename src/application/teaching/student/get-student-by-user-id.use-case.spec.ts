@@ -15,9 +15,7 @@ describe('GetStudentByUserIdUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.studentRepository.getStudentByUserId).toHaveBeenCalledWith(
-      fixtures.userId,
-    );
+    expect(fixtures.studentRepository.getStudentByUserId).toHaveBeenCalledWith(fixtures.userId);
   });
 
   it('should return the student when found', async () => {

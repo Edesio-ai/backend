@@ -24,8 +24,7 @@ export class GetAnsweredQuestionCountUseCase {
     if (!student) {
       throw new NotFoundError('Student not found');
     }
-    const answeredQuestionsCount =
-      await this.courseQuestionRepository.getAnsweredQuestionCount(student.id);
+    const answeredQuestionsCount = await this.courseQuestionRepository.getAnsweredQuestionCount(student.id);
 
     return answeredQuestionsCount;
   }

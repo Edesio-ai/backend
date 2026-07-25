@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  CreateSessionBody,
-  Session,
-} from 'src/domain/teaching/session/types/session.type';
+import { CreateSessionBody, Session } from 'src/domain/teaching/session/types/session.type';
 import {
   SESSION_REPOSITORY,
   type ISessionRepository,

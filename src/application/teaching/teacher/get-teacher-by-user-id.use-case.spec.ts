@@ -66,19 +66,15 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null as any);
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
   }
 
   whenRepositoryFails() {
-    this.teacherRepository.getTeacherByUserId.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.teacherRepository.getTeacherByUserId.mockRejectedValue(this.repositoryError);
   }
 
   thenRepositoryCalledWithExpectedUserId() {
-    expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
-      this.userId,
-    );
+    expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(this.userId);
     expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledTimes(1);
   }
 

@@ -29,17 +29,10 @@ describe('LikeSuggestionUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(
-      fixtures.suggestionLikeRepository.deleteSuggestionLikeById,
-    ).toHaveBeenCalledWith('like-row-1');
-    expect(fixtures.suggestionRepository.decrementLike).toHaveBeenCalledWith(
-      'sg-1',
-      3,
-    );
+    expect(fixtures.suggestionLikeRepository.deleteSuggestionLikeById).toHaveBeenCalledWith('like-row-1');
+    expect(fixtures.suggestionRepository.decrementLike).toHaveBeenCalledWith('sg-1', 3);
     expect(result).toEqual({ liked: false, likesCount: 2 });
-    expect(
-      fixtures.suggestionLikeRepository.createSuggestionLike,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.suggestionLikeRepository.createSuggestionLike).not.toHaveBeenCalled();
   });
 
   it('should like when user has not liked yet', async () => {
@@ -48,17 +41,10 @@ describe('LikeSuggestionUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(
-      fixtures.suggestionLikeRepository.createSuggestionLike,
-    ).toHaveBeenCalledWith('sg-1', fixtures.user.id);
-    expect(fixtures.suggestionRepository.incrementLike).toHaveBeenCalledWith(
-      'sg-1',
-      1,
-    );
+    expect(fixtures.suggestionLikeRepository.createSuggestionLike).toHaveBeenCalledWith('sg-1', fixtures.user.id);
+    expect(fixtures.suggestionRepository.incrementLike).toHaveBeenCalledWith('sg-1', 1);
     expect(result).toEqual({ liked: true, likesCount: 2 });
-    expect(
-      fixtures.suggestionLikeRepository.deleteSuggestionLikeById,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.suggestionLikeRepository.deleteSuggestionLikeById).not.toHaveBeenCalled();
   });
 
   it('should clamp unlike count at zero when likesCount is zero', async () => {
@@ -81,10 +67,7 @@ class Fixtures {
   constructor() {
     this.suggestionRepository = createMockSuggestionRepository();
     this.suggestionLikeRepository = createMockSuggestionLikeRepository();
-    this.useCase = new LikeSuggestionUseCase(
-      this.suggestionRepository,
-      this.suggestionLikeRepository,
-    );
+    this.useCase = new LikeSuggestionUseCase(this.suggestionRepository, this.suggestionLikeRepository);
 
     this.user = {
       id: 'u-1',
@@ -105,23 +88,17 @@ class Fixtures {
   }
 
   whenSuggestionExists(payload: { id: string; likesCount: number }) {
-    this.suggestionRepository.getSuggestionLikesCountById.mockResolvedValue(
-      payload,
-    );
+    this.suggestionRepository.getSuggestionLikesCountById.mockResolvedValue(payload);
   }
 
   whenExistingLikeId(likeId: string) {
-    this.suggestionLikeRepository.getSuggestionLikeByUserAndSuggestionId.mockResolvedValue(
-      likeId,
-    );
+    this.suggestionLikeRepository.getSuggestionLikeByUserAndSuggestionId.mockResolvedValue(likeId);
     this.suggestionLikeRepository.deleteSuggestionLikeById.mockResolvedValue();
     this.suggestionRepository.decrementLike.mockResolvedValue();
   }
 
   whenNoExistingLike() {
-    this.suggestionLikeRepository.getSuggestionLikeByUserAndSuggestionId.mockResolvedValue(
-      null,
-    );
+    this.suggestionLikeRepository.getSuggestionLikeByUserAndSuggestionId.mockResolvedValue(null);
     this.suggestionLikeRepository.createSuggestionLike.mockResolvedValue();
     this.suggestionRepository.incrementLike.mockResolvedValue();
   }
@@ -132,18 +109,12 @@ class Fixtures {
   }
 
   thenLikeLookupNotCalled() {
-    expect(
-      this.suggestionLikeRepository.getSuggestionLikeByUserAndSuggestionId,
-    ).not.toHaveBeenCalled();
+    expect(this.suggestionLikeRepository.getSuggestionLikeByUserAndSuggestionId).not.toHaveBeenCalled();
   }
 
   thenMutationsNotCalled() {
-    expect(
-      this.suggestionLikeRepository.deleteSuggestionLikeById,
-    ).not.toHaveBeenCalled();
-    expect(
-      this.suggestionLikeRepository.createSuggestionLike,
-    ).not.toHaveBeenCalled();
+    expect(this.suggestionLikeRepository.deleteSuggestionLikeById).not.toHaveBeenCalled();
+    expect(this.suggestionLikeRepository.createSuggestionLike).not.toHaveBeenCalled();
     expect(this.suggestionRepository.decrementLike).not.toHaveBeenCalled();
     expect(this.suggestionRepository.incrementLike).not.toHaveBeenCalled();
   }

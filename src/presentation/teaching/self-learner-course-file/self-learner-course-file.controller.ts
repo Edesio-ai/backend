@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BadRequestError } from 'src/domain/shared/errors/global.errors';
 import { CourseFileUpload } from 'src/domain/teaching/course-file/types/course-file.type';
@@ -46,10 +38,7 @@ export class SelfLearnerCourseFileController {
       byteLength: file.size,
     };
 
-    const data = await this.uploadSelfLearnerCourseFileUseCase.execute(
-      courseId,
-      payload,
-    );
+    const data = await this.uploadSelfLearnerCourseFileUseCase.execute(courseId, payload);
 
     return { data };
   }
@@ -59,21 +48,12 @@ export class SelfLearnerCourseFileController {
     @CurrentUser() user: AuthUser,
     @Param('courseId') courseId: string,
   ): Promise<SelfLearnerCourseFile[]> {
-    return await this.getSelfLearnerCourseFilesUseCase.execute(
-      user.id,
-      courseId,
-    );
+    return await this.getSelfLearnerCourseFilesUseCase.execute(user.id, courseId);
   }
 
   @Delete('/:fileId')
-  async deleteSelfLearnerCourseFile(
-    @CurrentUser() user: AuthUser,
-    @Param('fileId') fileId: string,
-  ): Promise<void> {
-    return await this.deleteSelfLearnerCourseFileUseCase.execute(
-      user.id,
-      fileId,
-    );
+  async deleteSelfLearnerCourseFile(@CurrentUser() user: AuthUser, @Param('fileId') fileId: string): Promise<void> {
+    return await this.deleteSelfLearnerCourseFileUseCase.execute(user.id, fileId);
   }
 
   @Get('/:fileId/signed-url')
@@ -81,11 +61,7 @@ export class SelfLearnerCourseFileController {
     @Param('fileId') fileId: string,
     @CurrentUser() user: AuthUser,
   ): Promise<{ signedUrl: string | null }> {
-    const signedUrl =
-      await this.getSelfLearnerCourseFileSignedUrlUseCase.execute(
-        user.id,
-        fileId,
-      );
+    const signedUrl = await this.getSelfLearnerCourseFileSignedUrlUseCase.execute(user.id, fileId);
     return { signedUrl };
   }
 }

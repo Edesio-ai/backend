@@ -34,11 +34,7 @@ describe('generate-completion-feedback.prompt', () => {
 
   describe('getGenerateCompletionFeedbackUserPrompt', () => {
     it('should include student name, course, score and percent', () => {
-      const prompt = getGenerateCompletionFeedbackUserPrompt(
-        body,
-        'Contexte pédagogique.',
-        70,
-      );
+      const prompt = getGenerateCompletionFeedbackUserPrompt(body, 'Contexte pédagogique.', 70);
       expect(prompt).toContain('Sam');
       expect(prompt).toContain('Mathématiques');
       expect(prompt).toContain('7/10');
@@ -46,11 +42,7 @@ describe('generate-completion-feedback.prompt', () => {
     });
 
     it('should use anonymous label when studentName is empty', () => {
-      const prompt = getGenerateCompletionFeedbackUserPrompt(
-        { ...body, studentName: '' },
-        'Contexte.',
-        0,
-      );
+      const prompt = getGenerateCompletionFeedbackUserPrompt({ ...body, studentName: '' }, 'Contexte.', 0);
       expect(prompt).toContain('Élève anonyme');
     });
 
@@ -61,11 +53,7 @@ describe('generate-completion-feedback.prompt', () => {
     });
 
     it('should mention the course language', () => {
-      const prompt = getGenerateCompletionFeedbackUserPrompt(
-        { ...body, language: 'anglais' },
-        'Contexte.',
-        80,
-      );
+      const prompt = getGenerateCompletionFeedbackUserPrompt({ ...body, language: 'anglais' }, 'Contexte.', 80);
       expect(prompt).toContain('anglais');
     });
   });

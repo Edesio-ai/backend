@@ -43,9 +43,7 @@ export const AuthMapper = {
       lastname: user.user_metadata?.lastname,
     },
   }),
-  toUpdateAuthUser: (
-    payload: Partial<AuthUser>,
-  ): SupabaseUpdateAuthUserPayload => {
+  toUpdateAuthUser: (payload: Partial<AuthUser>): SupabaseUpdateAuthUserPayload => {
     const { email, metadata, password } = payload;
     const UpdateAuthUserPayload: SupabaseUpdateAuthUserPayload = {};
     if (email) {

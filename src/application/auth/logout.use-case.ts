@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  AUTH_REPOSITORY,
-  type IAuthRepository,
-} from '../../domain/auth/contracts/i-auth.repository';
+import { AUTH_REPOSITORY, type IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
 
 export class LogoutUseCase {
   constructor(

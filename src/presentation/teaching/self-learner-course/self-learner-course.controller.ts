@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { GetSelfLearnerCoursesUseCase } from 'src/application/teaching/self-learner-course/get-self-learner-courses.use-case';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
@@ -31,16 +23,12 @@ export class SelfLearnerCourseController {
   ) {}
 
   @Get()
-  async getSelfLearnerCourse(
-    @CurrentUser() user: AuthUser,
-  ): Promise<SelfLearnerCourse[]> {
+  async getSelfLearnerCourse(@CurrentUser() user: AuthUser): Promise<SelfLearnerCourse[]> {
     return this.getSelfLearnerCoursesUseCase.execute(user);
   }
 
   @Get('count')
-  async getSelfLearnerCourseCount(
-    @CurrentUser() user: AuthUser,
-  ): Promise<{ count: number }> {
+  async getSelfLearnerCourseCount(@CurrentUser() user: AuthUser): Promise<{ count: number }> {
     return await this.getSelfLearnerCoursesCountUseCase.execute(user);
   }
 
@@ -58,18 +46,11 @@ export class SelfLearnerCourseController {
     @Param('courseId') courseId: string,
     @Body() body: UpdateSelfLearnerCourseBodyDto,
   ): Promise<SelfLearnerCourse> {
-    return await this.updateSelfLearnerCourseUseCase.execute(
-      user.id,
-      courseId,
-      body,
-    );
+    return await this.updateSelfLearnerCourseUseCase.execute(user.id, courseId, body);
   }
 
   @Delete(':courseId')
-  async deleteSelfLearnerCourse(
-    @CurrentUser() user: AuthUser,
-    @Param('courseId') courseId: string,
-  ): Promise<void> {
+  async deleteSelfLearnerCourse(@CurrentUser() user: AuthUser, @Param('courseId') courseId: string): Promise<void> {
     return await this.deleteSelfLearnerCourseUseCase.execute(user.id, courseId);
   }
 }

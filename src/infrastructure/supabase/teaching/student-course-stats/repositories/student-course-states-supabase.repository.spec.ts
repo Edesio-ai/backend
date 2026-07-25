@@ -22,9 +22,7 @@ describe('StudentCourseStatsSupabaseRepository', () => {
     it('throws ServerError when query fails', async () => {
       fixtures.whenRankingQueryFails();
 
-      await expect(
-        fixtures.whengetStudentCourseStatsByCourseId(),
-      ).rejects.toThrow(ServerError);
+      await expect(fixtures.whengetStudentCourseStatsByCourseId()).rejects.toThrow(ServerError);
     });
   });
 
@@ -40,9 +38,7 @@ describe('StudentCourseStatsSupabaseRepository', () => {
     it('throws ServerError when delete fails', async () => {
       fixtures.whenDeleteByCourseFails();
 
-      await expect(
-        fixtures.whenDeleteStudentCourseStatsByCourseId(),
-      ).rejects.toThrow(ServerError);
+      await expect(fixtures.whenDeleteStudentCourseStatsByCourseId()).rejects.toThrow(ServerError);
     });
   });
 
@@ -50,8 +46,7 @@ describe('StudentCourseStatsSupabaseRepository', () => {
     it('returns mapped row when found', async () => {
       fixtures.whenStatsMaybeSingleReturnsRow();
 
-      const result =
-        await fixtures.whenGetStudentCourseStatsByStudentIdAndCourseId();
+      const result = await fixtures.whenGetStudentCourseStatsByStudentIdAndCourseId();
 
       expect(result).toEqual(fixtures.expectedStatDomain);
       fixtures.thenStatsLookupBuilt();
@@ -60,8 +55,7 @@ describe('StudentCourseStatsSupabaseRepository', () => {
     it('returns null when no row', async () => {
       fixtures.whenStatsMaybeSingleReturnsNull();
 
-      const result =
-        await fixtures.whenGetStudentCourseStatsByStudentIdAndCourseId();
+      const result = await fixtures.whenGetStudentCourseStatsByStudentIdAndCourseId();
 
       expect(result).toBeNull();
     });
@@ -69,9 +63,7 @@ describe('StudentCourseStatsSupabaseRepository', () => {
     it('throws ServerError when query fails', async () => {
       fixtures.whenStatsMaybeSingleFails();
 
-      await expect(
-        fixtures.whenGetStudentCourseStatsByStudentIdAndCourseId(),
-      ).rejects.toThrow(ServerError);
+      await expect(fixtures.whenGetStudentCourseStatsByStudentIdAndCourseId()).rejects.toThrow(ServerError);
     });
   });
 
@@ -93,9 +85,7 @@ describe('StudentCourseStatsSupabaseRepository', () => {
     it('throws ServerError when insert fails', async () => {
       fixtures.whenInsertFails();
 
-      await expect(fixtures.whenCreateStudentCourseStats()).rejects.toThrow(
-        ServerError,
-      );
+      await expect(fixtures.whenCreateStudentCourseStats()).rejects.toThrow(ServerError);
     });
   });
 
@@ -121,9 +111,7 @@ describe('StudentCourseStatsSupabaseRepository', () => {
       jest.setSystemTime(new Date('2026-06-01T09:30:00.000Z'));
       fixtures.whenUpdateFails();
 
-      await expect(fixtures.whenUpdateStudentCourseStats()).rejects.toThrow(
-        ServerError,
-      );
+      await expect(fixtures.whenUpdateStudentCourseStats()).rejects.toThrow(ServerError);
       jest.useRealTimers();
     });
   });
@@ -207,9 +195,7 @@ class Fixtures {
 
   constructor() {
     this.supabase = { from: jest.fn() };
-    this.repository = new StudentCourseStatsSupabaseRepository(
-      this.supabase as unknown as SupabaseClient,
-    );
+    this.repository = new StudentCourseStatsSupabaseRepository(this.supabase as unknown as SupabaseClient);
   }
 
   whenRankingQuerySucceeds() {
@@ -245,9 +231,7 @@ class Fixtures {
   }
 
   whenStatsMaybeSingleReturnsRow() {
-    const maybeSingle = jest
-      .fn()
-      .mockResolvedValue({ data: this.supabaseStatRow, error: null });
+    const maybeSingle = jest.fn().mockResolvedValue({ data: this.supabaseStatRow, error: null });
     const eqCourse = jest.fn().mockReturnValue({ maybeSingle });
     const eqStudent = jest.fn().mockReturnValue({ eq: eqCourse });
     const select = jest.fn().mockReturnValue({ eq: eqStudent });
@@ -255,9 +239,7 @@ class Fixtures {
   }
 
   whenStatsMaybeSingleReturnsNull() {
-    const maybeSingle = jest
-      .fn()
-      .mockResolvedValue({ data: null, error: null });
+    const maybeSingle = jest.fn().mockResolvedValue({ data: null, error: null });
     const eqCourse = jest.fn().mockReturnValue({ maybeSingle });
     const eqStudent = jest.fn().mockReturnValue({ eq: eqCourse });
     const select = jest.fn().mockReturnValue({ eq: eqStudent });
@@ -265,9 +247,7 @@ class Fixtures {
   }
 
   whenStatsMaybeSingleFails() {
-    const maybeSingle = jest
-      .fn()
-      .mockResolvedValue({ data: null, error: { message: 'lookup failed' } });
+    const maybeSingle = jest.fn().mockResolvedValue({ data: null, error: { message: 'lookup failed' } });
     const eqCourse = jest.fn().mockReturnValue({ maybeSingle });
     const eqStudent = jest.fn().mockReturnValue({ eq: eqCourse });
     const select = jest.fn().mockReturnValue({ eq: eqStudent });
@@ -307,10 +287,7 @@ class Fixtures {
   }
 
   whenGetStudentCourseStatsByStudentIdAndCourseId() {
-    return this.repository.getStudentCourseStatsByStudentIdAndCourseId(
-      this.studentId,
-      this.courseId,
-    );
+    return this.repository.getStudentCourseStatsByStudentIdAndCourseId(this.studentId, this.courseId);
   }
 
   whenCreateStudentCourseStats() {
@@ -318,10 +295,7 @@ class Fixtures {
   }
 
   whenUpdateStudentCourseStats() {
-    return this.repository.updateStudentCourseStats(
-      this.statId,
-      this.updatePayload,
-    );
+    return this.repository.updateStudentCourseStats(this.statId, this.updatePayload);
   }
 
   thenRankingSelectBuilt() {

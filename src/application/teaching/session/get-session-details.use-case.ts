@@ -4,14 +4,8 @@ import {
   type IEstablishmentRepository,
 } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   QUESTIONS_REPOSITORY,
   type IQuestionsRepository,
@@ -48,8 +42,7 @@ export class GetSessionDetailsUseCase {
   ) {}
 
   async execute(courseId: string, user: AuthUser): Promise<SessionDetails> {
-    const establishment =
-      await this.establishmentRepository.getEstablishmentByUserId(user.id);
+    const establishment = await this.establishmentRepository.getEstablishmentByUserId(user.id);
     if (!establishment) {
       throw new NotFoundError('Establishment not found');
     }
@@ -66,8 +59,7 @@ export class GetSessionDetailsUseCase {
             )
           )
         `;
-    const courseWithSession =
-      await this.coursesRepository.getCourseWithSessionById(courseId, select);
+    const courseWithSession = await this.coursesRepository.getCourseWithSessionById(courseId, select);
     if (!courseWithSession) {
       throw new NotFoundError('Course not found');
     }
@@ -76,14 +68,9 @@ export class GetSessionDetailsUseCase {
       throw new ForbiddenError('You are not authorized to access this course');
     }
 
-    const questions =
-      await this.questionsRepository.getCourseQuestions(courseId);
-    const students =
-      await this.studentCourseStatsRepository.getStudentCourseStatsByCourseId(
-        courseId,
-      );
-    const files =
-      await this.courseFileRepository.getCourseFilesByCourseId(courseId);
+    const questions = await this.questionsRepository.getCourseQuestions(courseId);
+    const students = await this.studentCourseStatsRepository.getStudentCourseStatsByCourseId(courseId);
+    const files = await this.courseFileRepository.getCourseFilesByCourseId(courseId);
 
     return {
       course: {
@@ -95,17 +82,15 @@ export class GetSessionDetailsUseCase {
         createdAt: courseWithSession.createdAt,
       },
       questions: questions || [],
-      students: (students || []).map(
-        (student: StudentCourseStatsWithStudent) => ({
-          id: student.student.id,
-          name: student.student.name,
-          email: student.student.email,
-          photoUrl: student.student.photoUrl,
-          correctAnswers: student.correctAnswers,
-          attemptedQuestions: student.attemptedQuestions,
-          lastAttemptAt: student.lastAttemptAt,
-        }),
-      ),
+      students: (students || []).map((student: StudentCourseStatsWithStudent) => ({
+        id: student.student.id,
+        name: student.student.name,
+        email: student.student.email,
+        photoUrl: student.student.photoUrl,
+        correctAnswers: student.correctAnswers,
+        attemptedQuestions: student.attemptedQuestions,
+        lastAttemptAt: student.lastAttemptAt,
+      })),
       files: files || [],
     };
   }

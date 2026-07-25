@@ -1,7 +1,4 @@
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import type { SelfLearnerQuestion } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
 import type { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-learner-course/contracts/i-self-learner-course.repository';
 import type { ISelfLearnerQuestionRepository } from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
@@ -20,15 +17,11 @@ describe('UpdateSelfLearnerQuestionUseCase', () => {
 
   it('updates and returns the question when learner owns the course', async () => {
     fixtures.whenOwnershipOk();
-    fixtures.questionRepo.updateSelfLearnerQuestion.mockResolvedValue(
-      fixtures.updatedQuestion,
-    );
+    fixtures.questionRepo.updateSelfLearnerQuestion.mockResolvedValue(fixtures.updatedQuestion);
 
     const result = await fixtures.whenExecute();
 
-    expect(
-      fixtures.questionRepo.updateSelfLearnerQuestion,
-    ).toHaveBeenCalledWith(fixtures.questionId, fixtures.body);
+    expect(fixtures.questionRepo.updateSelfLearnerQuestion).toHaveBeenCalledWith(fixtures.questionId, fixtures.body);
     expect(result).toEqual(fixtures.updatedQuestion);
   });
 
@@ -36,9 +29,7 @@ describe('UpdateSelfLearnerQuestionUseCase', () => {
     fixtures.selfLearnerRepo.getSelfLearnerByUserId.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionRepo.updateSelfLearnerQuestion,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepo.updateSelfLearnerQuestion).not.toHaveBeenCalled();
   });
 
   it('throws NotFoundError when question missing', async () => {
@@ -46,9 +37,7 @@ describe('UpdateSelfLearnerQuestionUseCase', () => {
     fixtures.questionRepo.getSelfLearnerQuestionById.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionRepo.updateSelfLearnerQuestion,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepo.updateSelfLearnerQuestion).not.toHaveBeenCalled();
   });
 
   it('throws NotFoundError when course missing', async () => {
@@ -57,9 +46,7 @@ describe('UpdateSelfLearnerQuestionUseCase', () => {
     fixtures.courseRepo.getSelfLearnerCourseById.mockResolvedValue(null);
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.questionRepo.updateSelfLearnerQuestion,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepo.updateSelfLearnerQuestion).not.toHaveBeenCalled();
   });
 
   it('throws ForbiddenError when course belongs to someone else', async () => {
@@ -71,9 +58,7 @@ describe('UpdateSelfLearnerQuestionUseCase', () => {
     });
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
-    expect(
-      fixtures.questionRepo.updateSelfLearnerQuestion,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.questionRepo.updateSelfLearnerQuestion).not.toHaveBeenCalled();
   });
 
   it('propagates errors from the question repository', async () => {
@@ -140,11 +125,7 @@ class Fixtures {
     this.courseRepo = createMockSelfLearnerCourseRepository();
     this.questionRepo = createMockSelfLearnerQuestionRepository();
 
-    this.useCase = new UpdateSelfLearnerQuestionUseCase(
-      this.questionRepo,
-      this.selfLearnerRepo,
-      this.courseRepo,
-    );
+    this.useCase = new UpdateSelfLearnerQuestionUseCase(this.questionRepo, this.selfLearnerRepo, this.courseRepo);
   }
 
   whenExecute() {
@@ -160,9 +141,7 @@ class Fixtures {
   }
 
   whenQuestionExists() {
-    this.questionRepo.getSelfLearnerQuestionById.mockResolvedValue(
-      this.question,
-    );
+    this.questionRepo.getSelfLearnerQuestionById.mockResolvedValue(this.question);
   }
 
   whenOwnershipOk() {

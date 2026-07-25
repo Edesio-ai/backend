@@ -40,10 +40,7 @@ describe('selfLearnerCourseFileMapper', () => {
   describe('toCourseFilesUrls', () => {
     it('maps partial rows to file_url strings only', () => {
       expect(
-        selfLearnerCourseFileMapper.toCourseFilesUrls([
-          { file_url: 'first.pdf' },
-          { file_url: 'second.pdf' },
-        ]),
+        selfLearnerCourseFileMapper.toCourseFilesUrls([{ file_url: 'first.pdf' }, { file_url: 'second.pdf' }]),
       ).toEqual(['first.pdf', 'second.pdf']);
     });
   });

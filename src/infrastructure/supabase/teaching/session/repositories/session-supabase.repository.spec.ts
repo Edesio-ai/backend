@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { SupabaseSessionRepository } from './session-supabase.repository';
 
@@ -127,40 +128,28 @@ describe('SupabaseSessionRepository', () => {
   it('should return sessions for teacher ids', async () => {
     fixtures.whenGetTeachersSessionsByIdsQuerySucceeds();
 
-    const result = await fixtures.whenGetTeachersSessionsByIds(
-      fixtures.teacherIdsForBulkQuery,
-    );
+    const result = await fixtures.whenGetTeachersSessionsByIds(fixtures.teacherIdsForBulkQuery);
 
-    fixtures.thenGetTeachersSessionsByIdsQueryBuilt(
-      fixtures.teacherIdsForBulkQuery,
-    );
+    fixtures.thenGetTeachersSessionsByIdsQueryBuilt(fixtures.teacherIdsForBulkQuery);
     expect(result).toEqual(fixtures.expectedBulkTeachersSessions);
   });
 
   it('should use fallback uuid when teacher ids are empty', async () => {
-    fixtures.whenGetTeachersSessionsByIdsQuerySucceeds(
-      fixtures.sessionsSupabaseRows,
-    );
+    fixtures.whenGetTeachersSessionsByIdsQuerySucceeds(fixtures.sessionsSupabaseRows);
 
     const result = await fixtures.whenGetTeachersSessionsByIds([]);
 
-    fixtures.thenGetTeachersSessionsByIdsQueryBuilt([
-      fixtures.fallbackTeacherIdForEmptyIn,
-    ]);
+    fixtures.thenGetTeachersSessionsByIdsQueryBuilt([fixtures.fallbackTeacherIdForEmptyIn]);
     expect(result).toEqual(fixtures.expectedSessions);
   });
 
   it('should throw ServerError when getTeachersSessionsByIds fails', async () => {
     fixtures.whenGetTeachersSessionsByIdsQueryFails();
 
-    const promise = fixtures.whenGetTeachersSessionsByIds(
-      fixtures.teacherIdsForBulkQuery,
-    );
+    const promise = fixtures.whenGetTeachersSessionsByIds(fixtures.teacherIdsForBulkQuery);
 
     await fixtures.thenThrowServerError(promise);
-    fixtures.thenGetTeachersSessionsByIdsQueryBuilt(
-      fixtures.teacherIdsForBulkQuery,
-    );
+    fixtures.thenGetTeachersSessionsByIdsQueryBuilt(fixtures.teacherIdsForBulkQuery);
   });
 });
 
@@ -267,8 +256,7 @@ class Fixtures {
   };
 
   public readonly teacherIdsForBulkQuery = ['teacher-1', 'teacher-2'];
-  public readonly fallbackTeacherIdForEmptyIn =
-    '00000000-0000-0000-0000-000000000000';
+  public readonly fallbackTeacherIdForEmptyIn = '00000000-0000-0000-0000-000000000000';
   public readonly bulkTeachersSessionsSupabaseRows = [
     {
       id: 'session-1',
@@ -361,20 +349,12 @@ class Fixtures {
     in: this.teachersSessionsInMock,
   }));
 
-  private mode:
-    | 'list'
-    | 'byCode'
-    | 'byId'
-    | 'create'
-    | 'update'
-    | 'delete'
-    | 'byTeacherIds' = 'list';
+  private mode: 'list' | 'byCode' | 'byId' | 'create' | 'update' | 'delete' | 'byTeacherIds' = 'list';
   private readonly fromMock = jest.fn(() => {
     if (this.mode === 'list') return { select: this.listSelectMock };
     if (this.mode === 'byCode') return { select: this.byCodeSelectMock };
     if (this.mode === 'byId') return { select: this.byIdSelectMock };
-    if (this.mode === 'byTeacherIds')
-      return { select: this.teachersSessionsSelectMock };
+    if (this.mode === 'byTeacherIds') return { select: this.teachersSessionsSelectMock };
     if (this.mode === 'create') return { insert: this.createInsertMock };
     if (this.mode === 'update') return { update: this.updateUpdateMock };
     return { delete: this.sessionDeleteMock };
@@ -386,7 +366,7 @@ class Fixtures {
     const supabaseMock = {
       from: this.fromMock,
     };
-    this.repository = new SupabaseSessionRepository(supabaseMock as any);
+    this.repository = new SupabaseSessionRepository(supabaseMock as unknown as SupabaseClient);
   }
 
   whenGetSessionsByTeacherId() {
@@ -406,18 +386,12 @@ class Fixtures {
 
   whenUpdateSessionName() {
     this.mode = 'update';
-    return this.repository.updateSessionName(
-      this.sessionIdToUpdate,
-      this.updateSessionBody,
-    );
+    return this.repository.updateSessionName(this.sessionIdToUpdate, this.updateSessionBody);
   }
 
   whenDeleteSessionByTeacherId() {
     this.mode = 'delete';
-    return this.repository.deleteSessionByTeacherId(
-      this.sessionIdToDelete,
-      this.teacherId,
-    );
+    return this.repository.deleteSessionByTeacherId(this.sessionIdToDelete, this.teacherId);
   }
 
   whenGetSessionById() {
@@ -517,9 +491,7 @@ class Fixtures {
     });
   }
 
-  whenGetTeachersSessionsByIdsQuerySucceeds(
-    rows = this.bulkTeachersSessionsSupabaseRows,
-  ) {
+  whenGetTeachersSessionsByIdsQuerySucceeds(rows = this.bulkTeachersSessionsSupabaseRows) {
     this.teachersSessionsInMock.mockResolvedValue({
       data: rows,
       error: null,
@@ -583,14 +555,8 @@ class Fixtures {
     expect(this.updateUpdateMock).toHaveBeenCalledWith({
       name: this.updateSessionBody.name,
     });
-    expect(this.updateIdEqMock).toHaveBeenCalledWith(
-      'id',
-      this.sessionIdToUpdate,
-    );
-    expect(this.updateTeacherEqMock).toHaveBeenCalledWith(
-      'teacher_id',
-      this.updateSessionBody.teacherId,
-    );
+    expect(this.updateIdEqMock).toHaveBeenCalledWith('id', this.sessionIdToUpdate);
+    expect(this.updateTeacherEqMock).toHaveBeenCalledWith('teacher_id', this.updateSessionBody.teacherId);
     expect(this.updateSelectMock).toHaveBeenCalledTimes(1);
     expect(this.updateSingleMock).toHaveBeenCalledTimes(1);
   }
@@ -602,34 +568,20 @@ class Fixtures {
   thenDeleteSessionQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('sessions');
     expect(this.sessionDeleteMock).toHaveBeenCalledTimes(1);
-    expect(this.deleteIdEqMock).toHaveBeenCalledWith(
-      'id',
-      this.sessionIdToDelete,
-    );
-    expect(this.deleteTeacherEqMock).toHaveBeenCalledWith(
-      'teacher_id',
-      this.teacherId,
-    );
+    expect(this.deleteIdEqMock).toHaveBeenCalledWith('id', this.sessionIdToDelete);
+    expect(this.deleteTeacherEqMock).toHaveBeenCalledWith('teacher_id', this.teacherId);
   }
 
   thenGetSessionByIdQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('sessions');
     expect(this.byIdSelectMock).toHaveBeenCalledWith('id, teacher_id');
-    expect(this.byIdEqMock).toHaveBeenCalledWith(
-      'id',
-      this.sessionIdForGetById,
-    );
+    expect(this.byIdEqMock).toHaveBeenCalledWith('id', this.sessionIdForGetById);
     expect(this.byIdSingleMock).toHaveBeenCalledTimes(1);
   }
 
   thenGetTeachersSessionsByIdsQueryBuilt(expectedTeacherIdsForIn: string[]) {
     expect(this.fromMock).toHaveBeenCalledWith('sessions');
-    expect(this.teachersSessionsSelectMock).toHaveBeenCalledWith(
-      'id, name, code, language, teacher_id, created_at',
-    );
-    expect(this.teachersSessionsInMock).toHaveBeenCalledWith(
-      'teacher_id',
-      expectedTeacherIdsForIn,
-    );
+    expect(this.teachersSessionsSelectMock).toHaveBeenCalledWith('id, name, code, language, teacher_id, created_at');
+    expect(this.teachersSessionsInMock).toHaveBeenCalledWith('teacher_id', expectedTeacherIdsForIn);
   }
 }

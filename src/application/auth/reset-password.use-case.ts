@@ -1,8 +1,5 @@
-import { Inject, NotFoundException } from '@nestjs/common';
-import {
-  AUTH_REPOSITORY,
-  type IAuthRepository,
-} from 'src/domain/auth/contracts/i-auth.repository';
+import { Inject } from '@nestjs/common';
+import { AUTH_REPOSITORY, type IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
 
 export class ResetPasswordUseCase {
   constructor(

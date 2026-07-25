@@ -9,12 +9,7 @@ import {
   type ISelfLearnerRepository,
   SELF_LEARNER_REPOSITORY,
 } from 'src/domain/teaching/self-learner/contracts/i-self-learner.repository';
-import {
-  BadRequestError,
-  NotFoundError,
-  ServerError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
+import { BadRequestError, NotFoundError, ServerError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
 import {
   type ISelfLearnerCourseRepository,
   SELF_LEARNER_COURSE_REPOSITORY,
@@ -29,19 +24,13 @@ import {
   type ICourseFileRepository,
   COURSE_FILE_REPOSITORY,
 } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
-import {
-  type IPdfExtractorProvider,
-  PDF_EXTRACTOR,
-} from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
+import { type IPdfExtractorProvider, PDF_EXTRACTOR } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
 import {
   type ISelfLearnerQuestionRepository,
   SELF_LEARNER_QUESTION_REPOSITORY,
 } from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
 import { QuestionGenerationConfig } from 'src/domain/llm/types/openai.type';
-import {
-  type ILlmProvider,
-  LLM_REPOSITORY,
-} from 'src/domain/llm/contracts/I-llm.provider';
+import { type ILlmProvider, LLM_REPOSITORY } from 'src/domain/llm/contracts/I-llm.provider';
 
 export class GenerateSelfLearnerQuestionUseCase {
   constructor(
@@ -61,53 +50,33 @@ export class GenerateSelfLearnerQuestionUseCase {
     private readonly mistralRepository: ILlmProvider,
   ) {}
 
-  async execute(
-    user: AuthUser,
-    type: QuestionType,
-    selfLearnerCourseId: string,
-  ): Promise<SelfLearnerQuestion> {
-    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(
-      user.id,
-    );
+  async execute(user: AuthUser, type: QuestionType, selfLearnerCourseId: string): Promise<SelfLearnerQuestion> {
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(user.id);
     if (!selfLearner) {
       throw new NotFoundError('Self learner not found');
     }
 
-    const selfLearnerCourse =
-      await this.selfLearnerCourseRepository.getSelfLearnerCourseById(
-        selfLearnerCourseId,
-      );
+    const selfLearnerCourse = await this.selfLearnerCourseRepository.getSelfLearnerCourseById(selfLearnerCourseId);
     if (!selfLearnerCourse) {
       throw new NotFoundError('Self learner course not found');
     }
 
     if (selfLearnerCourse.selfLearnerId !== selfLearner.id) {
-      throw new UnauthorizedError(
-        'You are not authorized to generate a self learner question for this course',
-      );
+      throw new UnauthorizedError('You are not authorized to generate a self learner question for this course');
     }
 
     const language = selfLearnerCourse.language;
 
     const selfLearnerCourseFiles =
-      await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFiles(
-        selfLearnerCourseId,
-      );
+      await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFiles(selfLearnerCourseId);
 
-    const combinedText = await this.getCombinedText(
-      selfLearnerCourse,
-      selfLearnerCourseFiles,
-    );
+    const combinedText = await this.getCombinedText(selfLearnerCourse, selfLearnerCourseFiles);
     if (!combinedText.trim()) {
       throw new BadRequestError('No content available for this course');
     }
 
-    const selfLearnerQuestion =
-      await this.selfLearnerQuestionRepository.getSelfLearnerQuestions(
-        selfLearnerCourseId,
-      );
-    const existingQuestionTexts =
-      selfLearnerQuestion?.map((q) => q.questionText) || [];
+    const selfLearnerQuestion = await this.selfLearnerQuestionRepository.getSelfLearnerQuestions(selfLearnerCourseId);
+    const existingQuestionTexts = selfLearnerQuestion?.map((q) => q.questionText) || [];
 
     const questionConfig: QuestionGenerationConfig = {
       totalQuestions: 1,
@@ -132,10 +101,7 @@ export class GenerateSelfLearnerQuestionUseCase {
       type: type,
     };
 
-    const newSelfLearnerQuestion =
-      await this.selfLearnerQuestionRepository.createSelfLearnerQuestion(
-        payload,
-      );
+    const newSelfLearnerQuestion = await this.selfLearnerQuestionRepository.createSelfLearnerQuestion(payload);
 
     return newSelfLearnerQuestion;
   }
@@ -147,16 +113,13 @@ export class GenerateSelfLearnerQuestionUseCase {
     let combinedText = selfLearnerCourse.textContent || '';
     for (const file of selfLearnerCourseFiles) {
       try {
-        const buffer = await this.courseFileRepository.getFileBufferFromStorage(
-          file.fileUrl,
-        );
+        const buffer = await this.courseFileRepository.getFileBufferFromStorage(file.fileUrl);
+        if (!buffer) {
+          continue;
+        }
         const pdfText = await this.pdfExtractor.extractTextFromPdf(buffer);
         if (pdfText) {
-          combinedText +=
-            '\n\n--- Contenu du fichier: ' +
-            file.fileName +
-            ' ---\n\n' +
-            pdfText;
+          combinedText += '\n\n--- Contenu du fichier: ' + file.fileName + ' ---\n\n' + pdfText;
         }
       } catch (error) {
         console.error('Error processing PDF:', error);

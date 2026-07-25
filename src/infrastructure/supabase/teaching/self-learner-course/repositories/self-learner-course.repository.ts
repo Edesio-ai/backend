@@ -16,9 +16,7 @@ export class SelfLearnerCourseRepository implements ISelfLearnerCourseRepository
     private readonly supabase: SupabaseClient,
   ) {}
 
-  async getSelfLearnerCourses(
-    selfLearnerId: string,
-  ): Promise<SelfLearnerCourse[]> {
+  async getSelfLearnerCourses(selfLearnerId: string): Promise<SelfLearnerCourse[]> {
     const { data, error } = await this.supabase
       .from('self_learner_courses')
       .select('*')
@@ -26,9 +24,7 @@ export class SelfLearnerCourseRepository implements ISelfLearnerCourseRepository
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error(
-        `Error getting self learner courses for self learner ${selfLearnerId}: ${error.message}`,
-      );
+      console.error(`Error getting self learner courses for self learner ${selfLearnerId}: ${error.message}`);
       throw new ServerError(error.message);
     }
 
@@ -42,18 +38,14 @@ export class SelfLearnerCourseRepository implements ISelfLearnerCourseRepository
       .eq('self_learner_id', selfLearnerId);
 
     if (error) {
-      console.error(
-        `Error getting self learner courses count for self learner ${selfLearnerId}: ${error.message}`,
-      );
+      console.error(`Error getting self learner courses count for self learner ${selfLearnerId}: ${error.message}`);
       throw new ServerError(error.message);
     }
 
     return count ?? 0;
   }
 
-  async createSelfLearnerCourse(
-    payload: SelfLearnerCourseInsertPayload,
-  ): Promise<SelfLearnerCourse> {
+  async createSelfLearnerCourse(payload: SelfLearnerCourseInsertPayload): Promise<SelfLearnerCourse> {
     const { data, error } = await this.supabase
       .from('self_learner_courses')
       .insert(SelfLearnerCourseMapper.toInsert(payload))
@@ -61,36 +53,23 @@ export class SelfLearnerCourseRepository implements ISelfLearnerCourseRepository
       .single();
 
     if (error) {
-      console.error(
-        `Error creating self learner course for self learner ${payload.selfLearnerId}: ${error.message}`,
-      );
+      console.error(`Error creating self learner course for self learner ${payload.selfLearnerId}: ${error.message}`);
       throw new ServerError(error.message);
     }
     return SelfLearnerCourseMapper.toDomain(data);
   }
 
-  public async getSelfLearnerCourseById(
-    courseId: string,
-  ): Promise<SelfLearnerCourse | null> {
-    const { data, error } = await this.supabase
-      .from('self_learner_courses')
-      .select('*')
-      .eq('id', courseId)
-      .single();
+  public async getSelfLearnerCourseById(courseId: string): Promise<SelfLearnerCourse | null> {
+    const { data, error } = await this.supabase.from('self_learner_courses').select('*').eq('id', courseId).single();
 
     if (error) {
-      console.error(
-        `Error getting self learner course by id ${courseId}: ${error.message}`,
-      );
+      console.error(`Error getting self learner course by id ${courseId}: ${error.message}`);
       throw new ServerError(error.message);
     }
     return data ? SelfLearnerCourseMapper.toDomain(data) : null;
   }
 
-  async updateSelfLearnerCourse(
-    courseId: string,
-    payload: UpdateSelfLearnerCoursePayload,
-  ): Promise<SelfLearnerCourse> {
+  async updateSelfLearnerCourse(courseId: string, payload: UpdateSelfLearnerCoursePayload): Promise<SelfLearnerCourse> {
     const { data, error } = await this.supabase
       .from('self_learner_courses')
       .update(SelfLearnerCourseMapper.toUpdate(payload))
@@ -99,24 +78,17 @@ export class SelfLearnerCourseRepository implements ISelfLearnerCourseRepository
       .single();
 
     if (error) {
-      console.error(
-        `Error updating self learner course ${courseId}: ${error.message}`,
-      );
+      console.error(`Error updating self learner course ${courseId}: ${error.message}`);
       throw new ServerError(error.message);
     }
     return SelfLearnerCourseMapper.toDomain(data);
   }
 
   async deleteSelfLearnerCourse(courseId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('self_learner_courses')
-      .delete()
-      .eq('id', courseId);
+    const { error } = await this.supabase.from('self_learner_courses').delete().eq('id', courseId);
 
     if (error) {
-      console.error(
-        `Error deleting self learner course ${courseId}: ${error.message}`,
-      );
+      console.error(`Error deleting self learner course ${courseId}: ${error.message}`);
       throw new ServerError(error.message);
     }
   }

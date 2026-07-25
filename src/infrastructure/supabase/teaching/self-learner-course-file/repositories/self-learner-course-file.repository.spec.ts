@@ -16,12 +16,8 @@ describe('SelfLearnerCourseFileRepository', () => {
 
       const result = await fixtures.whenUpload();
 
-      expect(result).toEqual(
-        selfLearnerCourseFileMapper.toDomain(fixtures.supabaseRow),
-      );
-      expect(fixtures.insertMock).toHaveBeenCalledWith(
-        selfLearnerCourseFileMapper.toInsert(fixtures.payload),
-      );
+      expect(result).toEqual(selfLearnerCourseFileMapper.toDomain(fixtures.supabaseRow));
+      expect(fixtures.insertMock).toHaveBeenCalledWith(selfLearnerCourseFileMapper.toInsert(fixtures.payload));
       expect(fixtures.singleAfterInsertMock).toHaveBeenCalledTimes(1);
     });
 
@@ -44,9 +40,7 @@ describe('SelfLearnerCourseFileRepository', () => {
 
       const result = await fixtures.whenList();
 
-      expect(result).toEqual([
-        selfLearnerCourseFileMapper.toDomain(fixtures.rows[0]),
-      ]);
+      expect(result).toEqual([selfLearnerCourseFileMapper.toDomain(fixtures.rows[0])]);
       fixtures.thenListChainBuilt(fixtures.courseId);
     });
 
@@ -74,34 +68,20 @@ describe('SelfLearnerCourseFileRepository', () => {
     });
 
     it('maps file_url rows to string array', async () => {
-      fixtures.whenUrlsQuerySucceeds([
-        { file_url: 'u1.pdf' },
-        { file_url: 'u2.pdf' },
-      ]);
+      fixtures.whenUrlsQuerySucceeds([{ file_url: 'u1.pdf' }, { file_url: 'u2.pdf' }]);
 
-      await expect(fixtures.whenGetUrls()).resolves.toEqual([
-        'u1.pdf',
-        'u2.pdf',
-      ]);
+      await expect(fixtures.whenGetUrls()).resolves.toEqual(['u1.pdf', 'u2.pdf']);
 
-      expect(fixtures.fromMock).toHaveBeenCalledWith(
-        'self_learner_course_files',
-      );
+      expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_course_files');
       expect(fixtures.selectMock).toHaveBeenCalledWith('file_url');
-      expect(fixtures.eqMock).toHaveBeenCalledWith(
-        'course_id',
-        fixtures.courseId,
-      );
+      expect(fixtures.eqMock).toHaveBeenCalledWith('course_id', fixtures.courseId);
     });
 
     it('returns empty when data is null', async () => {
       fixtures.whenUrlsReturnsNullData();
 
       await expect(fixtures.whenGetUrls()).resolves.toEqual([]);
-      expect(fixtures.eqMock).toHaveBeenCalledWith(
-        'course_id',
-        fixtures.courseId,
-      );
+      expect(fixtures.eqMock).toHaveBeenCalledWith('course_id', fixtures.courseId);
     });
 
     it('throws ServerError when query fails', async () => {
@@ -123,22 +103,15 @@ describe('SelfLearnerCourseFileRepository', () => {
 
       await fixtures.whenDeleteFiles();
 
-      expect(fixtures.fromMock).toHaveBeenCalledWith(
-        'self_learner_course_files',
-      );
+      expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_course_files');
       expect(fixtures.deleteMock).toHaveBeenCalledTimes(1);
-      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith(
-        'course_id',
-        fixtures.courseId,
-      );
+      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith('course_id', fixtures.courseId);
     });
 
     it('throws ServerError when delete fails', async () => {
       fixtures.whenDeleteFails('rls');
 
-      await expect(fixtures.whenDeleteFiles()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenDeleteFiles()).rejects.toBeInstanceOf(ServerError);
     });
   });
 
@@ -154,9 +127,7 @@ describe('SelfLearnerCourseFileRepository', () => {
 
       const result = await fixtures.whenGetById();
 
-      expect(result).toEqual(
-        selfLearnerCourseFileMapper.toDomain(fixtures.row),
-      );
+      expect(result).toEqual(selfLearnerCourseFileMapper.toDomain(fixtures.row));
       fixtures.thenGetByIdChainBuilt(fixtures.fileId);
     });
 
@@ -179,22 +150,15 @@ describe('SelfLearnerCourseFileRepository', () => {
 
       await fixtures.whenDeleteById();
 
-      expect(fixtures.fromMock).toHaveBeenCalledWith(
-        'self_learner_course_files',
-      );
+      expect(fixtures.fromMock).toHaveBeenCalledWith('self_learner_course_files');
       expect(fixtures.deleteMock).toHaveBeenCalledTimes(1);
-      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith(
-        'id',
-        fixtures.fileId,
-      );
+      expect(fixtures.eqAfterDeleteMock).toHaveBeenCalledWith('id', fixtures.fileId);
     });
 
     it('throws ServerError when delete fails', async () => {
       fixtures.whenDeleteFails('rls');
 
-      await expect(fixtures.whenDeleteById()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenDeleteById()).rejects.toBeInstanceOf(ServerError);
     });
   });
 
@@ -211,10 +175,7 @@ describe('SelfLearnerCourseFileRepository', () => {
       const result = await fixtures.whenGetSignedUrl();
 
       expect(fixtures.storageFromMock).toHaveBeenCalledWith('courses-pdf');
-      expect(fixtures.createSignedUrlMock).toHaveBeenCalledWith(
-        fixtures.fileUrl,
-        3600,
-      );
+      expect(fixtures.createSignedUrlMock).toHaveBeenCalledWith(fixtures.fileUrl, 3600);
       expect(result).toBe('https://signed.example/x');
     });
 
@@ -227,9 +188,7 @@ describe('SelfLearnerCourseFileRepository', () => {
     it('throws ServerError when createSignedUrl fails', async () => {
       fixtures.whenCreateSignedUrlFails('permission');
 
-      await expect(fixtures.whenGetSignedUrl()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenGetSignedUrl()).rejects.toBeInstanceOf(ServerError);
     });
   });
 });
@@ -426,9 +385,7 @@ class DeleteFilesFixtures {
   }
 
   whenDeleteFiles() {
-    return this.repository.deleteSelfLearnerCourseFilesByCourseId(
-      this.courseId,
-    );
+    return this.repository.deleteSelfLearnerCourseFilesByCourseId(this.courseId);
   }
 
   whenDeleteSucceeds() {

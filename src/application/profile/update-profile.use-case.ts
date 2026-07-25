@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  AUTH_REPOSITORY,
-  type IAuthRepository,
-} from 'src/domain/auth/contracts/i-auth.repository';
+import { AUTH_REPOSITORY, type IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ESTABLISHMENT_REPOSITORY,
@@ -12,10 +9,7 @@ import {
   type IStudentRepository,
   STUDENT_REPOSITORY,
 } from 'src/domain/teaching/student/contracts/I-student.repository';
-import {
-  type ITeacherRepository,
-  TEACHER_REPOSITORY,
-} from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { type ITeacherRepository, TEACHER_REPOSITORY } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 
 export type UpdateProfilePayload = {
   firstname: string;
@@ -35,10 +29,7 @@ export class UpdateProfileUseCase {
     private readonly studentRepository: IStudentRepository,
   ) {}
 
-  async execute(
-    user: AuthUser,
-    updatePayload: UpdateProfilePayload,
-  ): Promise<void> {
+  async execute(user: AuthUser, updatePayload: UpdateProfilePayload): Promise<void> {
     const { firstname, lastname, email } = updatePayload;
     const { role } = user.metadata;
 
@@ -74,10 +65,7 @@ export class UpdateProfileUseCase {
         await this.teacherRepository.updateTeacher(user.id, payload);
         break;
       case 'establishment':
-        await this.establishmentRepository.updateEstablishment(
-          user.id,
-          payload,
-        );
+        await this.establishmentRepository.updateEstablishment(user.id, payload);
         break;
       case 'student':
         await this.studentRepository.updateStudent(user.id, payload);

@@ -11,11 +11,8 @@ export class SuggestionLikeSupabaseRepository implements ISuggestionLikeReposito
     private readonly supabase: SupabaseClient,
   ) {}
 
-  public async getUserLikes(
-    userId: string,
-    suggestionIds: string[],
-  ): Promise<string[]> {
-    const { data, error } = await this.supabase
+  public async getUserLikes(userId: string, suggestionIds: string[]): Promise<string[]> {
+    const { data } = await this.supabase
       .from('suggestion_likes')
       .select('suggestion_id')
       .eq('user_id', userId)
@@ -24,10 +21,7 @@ export class SuggestionLikeSupabaseRepository implements ISuggestionLikeReposito
     return data?.map(SuggestionLikeMapper.toUserLikeSuggestionId) ?? [];
   }
 
-  public async getSuggestionLikeByUserAndSuggestionId(
-    userId: string,
-    suggestionId: string,
-  ): Promise<string | null> {
+  public async getSuggestionLikeByUserAndSuggestionId(userId: string, suggestionId: string): Promise<string | null> {
     const { data, error } = await this.supabase
       .from('suggestion_likes')
       .select('id')
@@ -36,9 +30,7 @@ export class SuggestionLikeSupabaseRepository implements ISuggestionLikeReposito
       .maybeSingle();
 
     if (error) {
-      console.error(
-        `Error getting suggestion like by user and suggestion id: ${error.message}`,
-      );
+      console.error(`Error getting suggestion like by user and suggestion id: ${error.message}`);
       throw new ServerError(error.message);
     }
 
@@ -46,10 +38,7 @@ export class SuggestionLikeSupabaseRepository implements ISuggestionLikeReposito
   }
 
   public async deleteSuggestionLikeById(likeId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('suggestion_likes')
-      .delete()
-      .eq('id', likeId);
+    const { error } = await this.supabase.from('suggestion_likes').delete().eq('id', likeId);
 
     if (error) {
       console.error(`Error deleting suggestion like by id: ${error.message}`);
@@ -57,10 +46,7 @@ export class SuggestionLikeSupabaseRepository implements ISuggestionLikeReposito
     }
   }
 
-  public async createSuggestionLike(
-    suggestionId: string,
-    userId: string,
-  ): Promise<void> {
+  public async createSuggestionLike(suggestionId: string, userId: string): Promise<void> {
     const { error } = await this.supabase
       .from('suggestion_likes')
       .insert(SuggestionLikeMapper.toInsert(suggestionId, userId));

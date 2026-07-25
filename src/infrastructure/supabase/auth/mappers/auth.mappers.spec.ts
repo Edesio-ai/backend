@@ -1,8 +1,5 @@
 import { AuthMapper } from './auth.mappers';
-import {
-  SupabaseAuthSession,
-  SupabaseUser,
-} from 'src/domain/auth/types/auth.type';
+import { SupabaseAuthSession, SupabaseUser } from 'src/domain/auth/types/auth.type';
 
 describe('AuthMapper', () => {
   describe('toAuthUser', () => {

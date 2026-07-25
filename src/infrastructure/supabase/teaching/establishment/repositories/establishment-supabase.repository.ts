@@ -1,4 +1,5 @@
 import { Inject } from '@nestjs/common';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 import { SUPABASE_ADMIN } from '../../../supabase.module';
 import { Establishment } from 'src/domain/teaching/establishment/types/establishment.type';
@@ -10,30 +11,20 @@ import { UpdateStudentPayload } from 'src/domain/teaching/student/type/student.t
 export class EstablishmentSupabaseRepository implements IEstablishmentRepository {
   constructor(
     @Inject(SUPABASE_ADMIN)
-    private readonly supabase: any,
+    private readonly supabase: SupabaseClient,
   ) {}
 
-  async getEstablishmentById(establishmentId: string): Promise<Establishment> {
-    const { data, error } = await this.supabase
-      .from('establishment')
-      .select('*')
-      .eq('id', establishmentId)
-      .single();
+  async getEstablishmentById(establishmentId: string): Promise<Establishment | null> {
+    const { data, error } = await this.supabase.from('establishment').select('*').eq('id', establishmentId).single();
 
     if (error || !data) {
-      console.error(
-        `An error occure while getting establishment by id: ${establishmentId}, error: ${error}`,
-      );
-      throw new ServerError(
-        `An error occure while getting establishment by id`,
-      );
+      console.error(`An error occure while getting establishment by id: ${establishmentId}, error: ${error}`);
+      throw new ServerError(`An error occure while getting establishment by id`);
     }
     return EstablishmentMapper.toDomain(data);
   }
 
-  async getEstablishmentByUserId(
-    userId: string,
-  ): Promise<Establishment | null> {
+  async getEstablishmentByUserId(userId: string): Promise<Establishment | null> {
     const { data, error } = await this.supabase
       .from('establishment')
       .select('*')
@@ -41,21 +32,13 @@ export class EstablishmentSupabaseRepository implements IEstablishmentRepository
       .maybeSingle();
 
     if (error) {
-      console.error(
-        `An error occure while getting establishment by user id: ${userId}, error: ${error}`,
-      );
-      throw new ServerError(
-        `An error occure while getting establishment by user id`,
-      );
+      console.error(`An error occure while getting establishment by user id: ${userId}, error: ${error}`);
+      throw new ServerError(`An error occure while getting establishment by user id`);
     }
     return data ? EstablishmentMapper.toDomain(data) : null;
   }
 
-  async createEstablishment(
-    supabaseUserId: string,
-    name: string,
-    email: string,
-  ): Promise<Establishment> {
+  async createEstablishment(supabaseUserId: string, name: string, email: string): Promise<Establishment> {
     const { data, error } = await this.supabase
       .from('establishment')
       .insert(EstablishmentMapper.toInsert({ supabaseUserId, name, email }))
@@ -70,19 +53,11 @@ export class EstablishmentSupabaseRepository implements IEstablishmentRepository
     return EstablishmentMapper.toDomain(data);
   }
 
-  async updateEstablishment(
-    userId: string,
-    payload: UpdateStudentPayload,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('establishment')
-      .update(payload)
-      .eq('supabase_user_id', userId);
+  async updateEstablishment(userId: string, payload: UpdateStudentPayload): Promise<void> {
+    const { error } = await this.supabase.from('establishment').update(payload).eq('supabase_user_id', userId);
 
     if (error) {
-      console.error(
-        `An error occure while updating establishment: ${userId}, error: ${error}`,
-      );
+      console.error(`An error occure while updating establishment: ${userId}, error: ${error}`);
       throw new ServerError(`An error occure while updating establishment`);
     }
   }

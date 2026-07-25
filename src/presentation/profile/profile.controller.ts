@@ -9,10 +9,7 @@ export class ProfileController {
   constructor(private readonly updateProfileUseCase: UpdateProfileUseCase) {}
 
   @Patch()
-  async updateProfile(
-    @CurrentUser() user: AuthUser,
-    @Body() body: UpdateProfileBodyDto,
-  ): Promise<void> {
+  async updateProfile(@CurrentUser() user: AuthUser, @Body() body: UpdateProfileBodyDto): Promise<void> {
     await this.updateProfileUseCase.execute(user, body);
   }
 }

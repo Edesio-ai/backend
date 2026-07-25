@@ -1,8 +1,6 @@
 import { CancelSubscriptionEmailParams } from 'src/domain/billing/types/billing.type';
 
-export function renderCancelSubscriptionEmailHtml(
-  data: CancelSubscriptionEmailParams,
-): string {
+export function renderCancelSubscriptionEmailHtml(data: CancelSubscriptionEmailParams): string {
   const { planName, endDate, firstname } = data;
   const APP_URL = process.env.FRONTEND_URL || 'http://localhost:5000';
   const LOGO_URL = `${APP_URL}/edesio-logo-square.png`;

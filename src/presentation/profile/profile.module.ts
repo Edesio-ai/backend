@@ -7,12 +7,7 @@ import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teac
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/student/student-persistence.module';
 
 @Module({
-  imports: [
-    AuthPersistenceModule,
-    TeacherPersistenceModule,
-    EstablishmentPersistenceModule,
-    StudentPersistenceModule,
-  ],
+  imports: [AuthPersistenceModule, TeacherPersistenceModule, EstablishmentPersistenceModule, StudentPersistenceModule],
   controllers: [ProfileController],
   providers: [UpdateProfileUseCase],
 })

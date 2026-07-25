@@ -1,10 +1,7 @@
 import { LoginUseCase } from './login.use-case';
 import type { IAuthRepository } from '../../domain/auth/contracts/i-auth.repository';
 import { createMockAuthRepository } from 'src/testing/mock-auth-repository';
-import {
-  AuthUserWithSession,
-  LoginBody,
-} from '../../domain/auth/types/auth.type';
+import { AuthUserWithSession, LoginBody } from '../../domain/auth/types/auth.type';
 
 describe('LoginUseCase', () => {
   let fixtures: Fixtures;
@@ -18,10 +15,7 @@ describe('LoginUseCase', () => {
 
     const result = await fixtures.whenExecuteWith(fixtures.loginBody);
 
-    fixtures.thenLoginUserCalledWith(
-      fixtures.loginBody.email,
-      fixtures.loginBody.password,
-    );
+    fixtures.thenLoginUserCalledWith(fixtures.loginBody.email, fixtures.loginBody.password);
     fixtures.thenReturnsExpectedAuthUserWithSession(result);
   });
 
@@ -31,10 +25,7 @@ describe('LoginUseCase', () => {
     const promise = fixtures.whenExecuteWith(fixtures.loginBody);
 
     await fixtures.thenThrowRepositoryError(promise);
-    fixtures.thenLoginUserCalledWith(
-      fixtures.loginBody.email,
-      fixtures.loginBody.password,
-    );
+    fixtures.thenLoginUserCalledWith(fixtures.loginBody.email, fixtures.loginBody.password);
   });
 });
 

@@ -72,10 +72,7 @@ class Fixtures {
   constructor() {
     this.teacherRepository = createMockTeacherRepository();
     this.sessionRepository = createMockSessionRepository();
-    this.useCase = new GetTeacherSessionsUseCase(
-      this.sessionRepository,
-      this.teacherRepository,
-    );
+    this.useCase = new GetTeacherSessionsUseCase(this.sessionRepository, this.teacherRepository);
   }
 
   whenExecute() {
@@ -87,19 +84,15 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null as any);
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
   }
 
   whenSessionsFound() {
-    this.sessionRepository.getSessionsByTeacherId.mockResolvedValue(
-      this.sessions,
-    );
+    this.sessionRepository.getSessionsByTeacherId.mockResolvedValue(this.sessions);
   }
 
   whenSessionsLookupFails() {
-    this.sessionRepository.getSessionsByTeacherId.mockRejectedValue(
-      this.sessionRepositoryError,
-    );
+    this.sessionRepository.getSessionsByTeacherId.mockRejectedValue(this.sessionRepositoryError);
   }
 
   async thenThrowTeacherNotFoundError(promise: Promise<unknown>) {
@@ -111,25 +104,17 @@ class Fixtures {
   }
 
   thenTeacherLookupCalledWithExpectedUserId() {
-    expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
-      this.userId,
-    );
+    expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(this.userId);
     expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledTimes(1);
   }
 
   thenSessionsLookupCalledWithTeacherId() {
-    expect(this.sessionRepository.getSessionsByTeacherId).toHaveBeenCalledWith(
-      this.teacher.id,
-    );
-    expect(this.sessionRepository.getSessionsByTeacherId).toHaveBeenCalledTimes(
-      1,
-    );
+    expect(this.sessionRepository.getSessionsByTeacherId).toHaveBeenCalledWith(this.teacher.id);
+    expect(this.sessionRepository.getSessionsByTeacherId).toHaveBeenCalledTimes(1);
   }
 
   thenSessionsLookupNotCalled() {
-    expect(
-      this.sessionRepository.getSessionsByTeacherId,
-    ).not.toHaveBeenCalled();
+    expect(this.sessionRepository.getSessionsByTeacherId).not.toHaveBeenCalled();
   }
 
   thenReturnExpectedSessions(result: unknown) {

@@ -15,9 +15,7 @@ export class StudentCourseStatsSupabaseRepository implements IStudentCourseStats
     private readonly supabase: SupabaseClient,
   ) {}
 
-  public async getStudentCourseStatsByCourseId(
-    courseId: string,
-  ): Promise<StudentCourseStatsWithStudent[]> {
+  public async getStudentCourseStatsByCourseId(courseId: string): Promise<StudentCourseStatsWithStudent[]> {
     const { data, error } = await this.supabase
       .from('student_course_stats')
       .select(
@@ -37,32 +35,17 @@ export class StudentCourseStatsSupabaseRepository implements IStudentCourseStats
       .eq('course_id', courseId);
 
     if (error) {
-      console.error(
-        'An error occurred while getting student stats by course id',
-        courseId,
-        error,
-      );
+      console.error('An error occurred while getting student stats by course id', courseId, error);
       throw new ServerError(error.message);
     }
-    return StudentCourseStatsMapper.listCourseStatsWithStudentFromQuery(
-      data ?? [],
-    );
+    return StudentCourseStatsMapper.listCourseStatsWithStudentFromQuery(data ?? []);
   }
 
-  public async deleteStudentCourseStatsByCourseId(
-    courseId: string,
-  ): Promise<void> {
-    const { error } = await this.supabase
-      .from('student_course_stats')
-      .delete()
-      .eq('course_id', courseId);
+  public async deleteStudentCourseStatsByCourseId(courseId: string): Promise<void> {
+    const { error } = await this.supabase.from('student_course_stats').delete().eq('course_id', courseId);
 
     if (error) {
-      console.error(
-        'Error deleting student course stats for course id: ',
-        courseId,
-        error,
-      );
+      console.error('Error deleting student course stats for course id: ', courseId, error);
       throw new ServerError(error.message);
     }
   }
@@ -88,9 +71,7 @@ export class StudentCourseStatsSupabaseRepository implements IStudentCourseStats
     return data ? StudentCourseStatsMapper.toDomain(data) : null;
   }
 
-  public async createStudentCourseStats(
-    statToInsert: Omit<StudentCourseStats, 'id'>,
-  ): Promise<void> {
+  public async createStudentCourseStats(statToInsert: Omit<StudentCourseStats, 'id'>): Promise<void> {
     const { error } = await this.supabase
       .from('student_course_stats')
       .insert(StudentCourseStatsMapper.toInsert(statToInsert));
@@ -101,10 +82,7 @@ export class StudentCourseStatsSupabaseRepository implements IStudentCourseStats
     }
   }
 
-  public async updateStudentCourseStats(
-    statId: string,
-    statToUpdate: Omit<StudentCourseStats, 'id'>,
-  ): Promise<void> {
+  public async updateStudentCourseStats(statId: string, statToUpdate: Omit<StudentCourseStats, 'id'>): Promise<void> {
     const { error } = await this.supabase
       .from('student_course_stats')
       .update(StudentCourseStatsMapper.toUpdate(statToUpdate))

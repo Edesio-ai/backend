@@ -1,5 +1,3 @@
-import { CourseFile } from '../../course-file/types/course-file.type';
-import { Question } from '../../question/types/question.type';
 import { Session, SupabaseSession } from '../../session/types/session.type';
 import { SupabaseTeacher, Teacher } from '../../teacher/types/teacher.type';
 

@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type ISelfLearnerCourseFileRepository,
   SELF_LEARNER_COURSE_FILE_REPOSITORY,
@@ -39,14 +36,12 @@ export class DeleteSelfLearnerCourseUseCase {
   ) {}
 
   async execute(userId: string, courseId: string): Promise<void> {
-    const selfLearner =
-      await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
     if (!selfLearner) {
       throw new NotFoundError('Self learner not found');
     }
 
-    const selfLearnerCourse =
-      await this.selfLearnerCourseRepository.getSelfLearnerCourseById(courseId);
+    const selfLearnerCourse = await this.selfLearnerCourseRepository.getSelfLearnerCourseById(courseId);
     if (!selfLearnerCourse) {
       throw new NotFoundError('Self learner course not found');
     }
@@ -55,22 +50,15 @@ export class DeleteSelfLearnerCourseUseCase {
       throw new ForbiddenError('You are not authorized to delete this course');
     }
 
-    const courseFilesUrls =
-      await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls(
-        courseId,
-      );
+    const courseFilesUrls = await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFilesUrls(courseId);
     if (courseFilesUrls.length > 0) {
       for (const fileUrl of courseFilesUrls) {
         await this.courseFileRepository.deleteFileFromStorage(fileUrl);
       }
     }
 
-    await this.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFilesByCourseId(
-      courseId,
-    );
-    await this.selfLearnerQuestionRepository.deleteSelfLearnerQuestionsByCourseId(
-      courseId,
-    );
+    await this.selfLearnerCourseFileRepository.deleteSelfLearnerCourseFilesByCourseId(courseId);
+    await this.selfLearnerQuestionRepository.deleteSelfLearnerQuestionsByCourseId(courseId);
     await this.selfLearnerCourseRepository.deleteSelfLearnerCourse(courseId);
   }
 }

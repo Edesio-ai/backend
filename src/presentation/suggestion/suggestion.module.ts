@@ -10,11 +10,6 @@ import { DeleteSuggestionUseCase } from 'src/application/suggestion/delete-sugge
 @Module({
   imports: [SuggestionPersistenceModule, SuggestionLikePersistenceModule],
   controllers: [SuggestionController],
-  providers: [
-    GetSuggestionsUseCase,
-    LikeSuggestionUseCase,
-    CreateSuggestionUseCase,
-    DeleteSuggestionUseCase,
-  ],
+  providers: [GetSuggestionsUseCase, LikeSuggestionUseCase, CreateSuggestionUseCase, DeleteSuggestionUseCase],
 })
 export class SuggestionModule {}

@@ -1,7 +1,4 @@
-import {
-  GetStudentBatchUseCase,
-  GetStudentBatchBody,
-} from './get-student-batch.use-case';
+import { GetStudentBatchUseCase, GetStudentBatchBody } from './get-student-batch.use-case';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { Student } from 'src/domain/teaching/student/type/student.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
@@ -18,9 +15,7 @@ describe('GetStudentBatchUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.studentRepository.getStudentsByIds).toHaveBeenCalledWith(
-      fixtures.body.studentIds,
-    );
+    expect(fixtures.studentRepository.getStudentsByIds).toHaveBeenCalledWith(fixtures.body.studentIds);
   });
 
   it('should return the students matching the provided ids', async () => {

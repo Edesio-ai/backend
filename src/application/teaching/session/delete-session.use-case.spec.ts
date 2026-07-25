@@ -1,5 +1,6 @@
 import { DeleteSessionUseCase } from './delete-session.use-case';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { SupabaseCourse } from 'src/domain/teaching/course/types/course.type';
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
@@ -49,7 +50,24 @@ class Fixtures {
   public readonly sessionId = 'session-1';
   public readonly userId = 'user-1';
   public readonly teacherId = 'teacher-1';
-  public readonly courses = [{ id: 'course-1' }, { id: 'course-2' }];
+  public readonly courses: SupabaseCourse[] = [
+    {
+      id: 'course-1',
+      session_id: this.sessionId,
+      title: 'C1',
+      description: null,
+      text_content: null,
+      created_at: '2026-01-01T00:00:00.000Z',
+    },
+    {
+      id: 'course-2',
+      session_id: this.sessionId,
+      title: 'C2',
+      description: null,
+      text_content: null,
+      created_at: '2026-01-01T00:00:00.000Z',
+    },
+  ];
   public readonly teacher = {
     id: this.teacherId,
     name: 'T',
@@ -91,9 +109,7 @@ class Fixtures {
   }
 
   whenSessionHasCourses() {
-    this.courseRepository.getCoursesBySessionId.mockResolvedValue(
-      this.courses as any,
-    );
+    this.courseRepository.getCoursesBySessionId.mockResolvedValue(this.courses);
     this.questionsRepository.deleteQuestionsByCourseIds.mockResolvedValue();
     this.courseFileRepository.deleteCoursesFilesByCourseIds.mockResolvedValue();
     this.courseRepository.deleteCoursesBySessionId.mockResolvedValue();
@@ -111,61 +127,31 @@ class Fixtures {
   }
 
   whenGetCoursesFails() {
-    this.courseRepository.getCoursesBySessionId.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.courseRepository.getCoursesBySessionId.mockRejectedValue(this.repositoryError);
   }
 
   thenCascadeDeleteCalledInOrder() {
-    expect(this.courseRepository.getCoursesBySessionId).toHaveBeenCalledWith(
-      this.sessionId,
-    );
-    expect(
-      this.questionsRepository.deleteQuestionsByCourseIds,
-    ).toHaveBeenCalledWith(['course-1', 'course-2']);
-    expect(
-      this.courseFileRepository.deleteCoursesFilesByCourseIds,
-    ).toHaveBeenCalledWith(['course-1', 'course-2']);
-    const questionsOrder =
-      this.questionsRepository.deleteQuestionsByCourseIds.mock
-        .invocationCallOrder[0];
-    const filesOrder =
-      this.courseFileRepository.deleteCoursesFilesByCourseIds.mock
-        .invocationCallOrder[0];
+    expect(this.courseRepository.getCoursesBySessionId).toHaveBeenCalledWith(this.sessionId);
+    expect(this.questionsRepository.deleteQuestionsByCourseIds).toHaveBeenCalledWith(['course-1', 'course-2']);
+    expect(this.courseFileRepository.deleteCoursesFilesByCourseIds).toHaveBeenCalledWith(['course-1', 'course-2']);
+    const questionsOrder = this.questionsRepository.deleteQuestionsByCourseIds.mock.invocationCallOrder[0];
+    const filesOrder = this.courseFileRepository.deleteCoursesFilesByCourseIds.mock.invocationCallOrder[0];
     expect(questionsOrder).toBeLessThan(filesOrder);
-    expect(this.courseRepository.deleteCoursesBySessionId).toHaveBeenCalledWith(
-      this.sessionId,
-    );
-    expect(
-      this.studentSessionRepository.deleteStudentSessionsBySessionId,
-    ).toHaveBeenCalledWith(this.sessionId);
-    expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(
-      this.userId,
-    );
-    expect(
-      this.sessionRepository.deleteSessionByTeacherId,
-    ).toHaveBeenCalledWith(this.sessionId, this.teacherId);
+    expect(this.courseRepository.deleteCoursesBySessionId).toHaveBeenCalledWith(this.sessionId);
+    expect(this.studentSessionRepository.deleteStudentSessionsBySessionId).toHaveBeenCalledWith(this.sessionId);
+    expect(this.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(this.userId);
+    expect(this.sessionRepository.deleteSessionByTeacherId).toHaveBeenCalledWith(this.sessionId, this.teacherId);
   }
 
   thenQuestionsAndFilesNotCalled() {
-    expect(
-      this.questionsRepository.deleteQuestionsByCourseIds,
-    ).not.toHaveBeenCalled();
-    expect(
-      this.courseFileRepository.deleteCoursesFilesByCourseIds,
-    ).not.toHaveBeenCalled();
+    expect(this.questionsRepository.deleteQuestionsByCourseIds).not.toHaveBeenCalled();
+    expect(this.courseFileRepository.deleteCoursesFilesByCourseIds).not.toHaveBeenCalled();
   }
 
   thenCoursesAndLinksAndSessionDeleted() {
-    expect(this.courseRepository.deleteCoursesBySessionId).toHaveBeenCalledWith(
-      this.sessionId,
-    );
-    expect(
-      this.studentSessionRepository.deleteStudentSessionsBySessionId,
-    ).toHaveBeenCalledWith(this.sessionId);
-    expect(
-      this.sessionRepository.deleteSessionByTeacherId,
-    ).toHaveBeenCalledWith(this.sessionId, this.teacherId);
+    expect(this.courseRepository.deleteCoursesBySessionId).toHaveBeenCalledWith(this.sessionId);
+    expect(this.studentSessionRepository.deleteStudentSessionsBySessionId).toHaveBeenCalledWith(this.sessionId);
+    expect(this.sessionRepository.deleteSessionByTeacherId).toHaveBeenCalledWith(this.sessionId, this.teacherId);
   }
 
   async thenThrowRepositoryError(promise: Promise<unknown>) {

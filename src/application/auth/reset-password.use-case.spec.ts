@@ -14,12 +14,8 @@ describe('ResetPasswordUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.authRepository.resetPasswordByEmail).toHaveBeenCalledWith(
-      fixtures.email,
-    );
-    expect(fixtures.authRepository.resetPasswordByEmail).toHaveBeenCalledTimes(
-      1,
-    );
+    expect(fixtures.authRepository.resetPasswordByEmail).toHaveBeenCalledWith(fixtures.email);
+    expect(fixtures.authRepository.resetPasswordByEmail).toHaveBeenCalledTimes(1);
   });
 
   it('should propagate repository errors', async () => {

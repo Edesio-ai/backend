@@ -21,10 +21,7 @@ export const selfLearnerQuestionMapper = {
       createdAt: data.created_at,
     };
   },
-  generatedToInserts: (
-    questions: GeneratedQuestion[],
-    courseId: string,
-  ): SelfLearnerQuestionInsertSupabase[] => {
+  generatedToInserts: (questions: GeneratedQuestion[], courseId: string): SelfLearnerQuestionInsertSupabase[] => {
     return questions.map((q) => ({
       course_id: courseId,
       type: q.type,
@@ -34,9 +31,7 @@ export const selfLearnerQuestionMapper = {
       explanation: q.explanation ?? null,
     }));
   },
-  toInsert: (
-    payload: SelfLearnerQuestionInsert,
-  ): SelfLearnerQuestionInsertSupabase => {
+  toInsert: (payload: SelfLearnerQuestionInsert): SelfLearnerQuestionInsertSupabase => {
     return {
       course_id: payload.courseId,
       type: payload.type,
@@ -46,9 +41,7 @@ export const selfLearnerQuestionMapper = {
       explanation: payload.explanation,
     };
   },
-  toUpdate: (
-    payload: UpdateSelfLearnerQuestionPayload,
-  ): SelfLearnerQuestionUpdateSupabase => {
+  toUpdate: (payload: UpdateSelfLearnerQuestionPayload): SelfLearnerQuestionUpdateSupabase => {
     return {
       question_text: payload.questionText,
       correct_answers: payload.correctAnswers,

@@ -1,9 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from 'src/domain/shared/errors/global.errors';
+import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type ISelfLearnerCourseRepository,
   SELF_LEARNER_COURSE_REPOSITORY,
@@ -18,10 +15,7 @@ import {
   SELF_LEARNER_REPOSITORY,
 } from 'src/domain/teaching/self-learner/contracts/i-self-learner.repository';
 
-type updateSelfLearnerBody = Pick<
-  SelfLearnerQuestion,
-  'questionText' | 'correctAnswers'
->;
+type updateSelfLearnerBody = Pick<SelfLearnerQuestion, 'questionText' | 'correctAnswers'>;
 
 export class UpdateSelfLearnerQuestionUseCase {
   constructor(
@@ -33,45 +27,32 @@ export class UpdateSelfLearnerQuestionUseCase {
     private readonly selfLearnerCourseRepository: ISelfLearnerCourseRepository,
   ) {}
 
-  async execute(
-    questionId: string,
-    body: updateSelfLearnerBody,
-    user: AuthUser,
-  ): Promise<SelfLearnerQuestion> {
-    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(
-      user.id,
-    );
+  async execute(questionId: string, body: updateSelfLearnerBody, user: AuthUser): Promise<SelfLearnerQuestion> {
+    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(user.id);
     if (!selfLearner) {
       throw new NotFoundError('Self learner not found');
     }
 
-    const selfLearnerQuestion =
-      await this.selfLearnerQuestionRepository.getSelfLearnerQuestionById(
-        questionId,
-      );
+    const selfLearnerQuestion = await this.selfLearnerQuestionRepository.getSelfLearnerQuestionById(questionId);
     if (!selfLearnerQuestion) {
       throw new NotFoundError('Self learner question not found');
     }
 
-    const selfLearnerCourse =
-      await this.selfLearnerCourseRepository.getSelfLearnerCourseById(
-        selfLearnerQuestion.courseId,
-      );
+    const selfLearnerCourse = await this.selfLearnerCourseRepository.getSelfLearnerCourseById(
+      selfLearnerQuestion.courseId,
+    );
     if (!selfLearnerCourse) {
       throw new NotFoundError('Self learner course not found');
     }
 
     if (selfLearnerCourse.selfLearnerId !== selfLearner.id) {
-      throw new ForbiddenError(
-        'You are not allowed to update this self learner question',
-      );
+      throw new ForbiddenError('You are not allowed to update this self learner question');
     }
 
-    const updatedSelfLearnerQuestion =
-      await this.selfLearnerQuestionRepository.updateSelfLearnerQuestion(
-        questionId,
-        body,
-      );
+    const updatedSelfLearnerQuestion = await this.selfLearnerQuestionRepository.updateSelfLearnerQuestion(
+      questionId,
+      body,
+    );
     return updatedSelfLearnerQuestion;
   }
 }

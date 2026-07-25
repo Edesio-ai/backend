@@ -14,11 +14,7 @@ describe('CreateCheckoutSessionsUseCase', () => {
   });
 
   it('should throw TokenUserNotFoundError when user is missing', async () => {
-    const promise = fixtures.whenExecuteWith(
-      fixtures.priceId,
-      fixtures.planType,
-      null as unknown as User,
-    );
+    const promise = fixtures.whenExecuteWith(fixtures.priceId, fixtures.planType, null as unknown as User);
 
     await fixtures.thenThrowTokenUserNotFound(promise);
     fixtures.thenRepositoriesNotCalled();
@@ -27,11 +23,7 @@ describe('CreateCheckoutSessionsUseCase', () => {
   it('should return existing checkout url when subscription already exists', async () => {
     fixtures.whenSubscriptionRepositoryReturnsExistingSubscription();
 
-    const result = await fixtures.whenExecuteWith(
-      fixtures.priceId,
-      fixtures.planType,
-      fixtures.user,
-    );
+    const result = await fixtures.whenExecuteWith(fixtures.priceId, fixtures.planType, fixtures.user);
 
     fixtures.thenSubscriptionLookupCalledWithUserId();
     fixtures.thenCreateCheckoutSessionNotCalled();
@@ -42,11 +34,7 @@ describe('CreateCheckoutSessionsUseCase', () => {
     fixtures.whenSubscriptionRepositoryReturnsNull();
     fixtures.whenPaymentClientReturnsCheckoutUrl();
 
-    const result = await fixtures.whenExecuteWith(
-      fixtures.priceId,
-      fixtures.planType,
-      fixtures.user,
-    );
+    const result = await fixtures.whenExecuteWith(fixtures.priceId, fixtures.planType, fixtures.user);
 
     fixtures.thenSubscriptionLookupCalledWithUserId();
     fixtures.thenCreateCheckoutSessionCalledWithExpectedArguments();
@@ -56,11 +44,7 @@ describe('CreateCheckoutSessionsUseCase', () => {
   it('should propagate repository error', async () => {
     fixtures.whenSubscriptionRepositoryThrowsError();
 
-    const promise = fixtures.whenExecuteWith(
-      fixtures.priceId,
-      fixtures.planType,
-      fixtures.user,
-    );
+    const promise = fixtures.whenExecuteWith(fixtures.priceId, fixtures.planType, fixtures.user);
 
     await fixtures.thenThrowRepositoryError(promise);
     fixtures.thenCreateCheckoutSessionNotCalled();
@@ -100,18 +84,12 @@ class Fixtures {
     this.repositoryError = new Error('database down');
   }
 
-  whenExecuteWith(
-    priceId: string,
-    planType: string,
-    user: User,
-  ): Promise<unknown> {
+  whenExecuteWith(priceId: string, planType: string, user: User): Promise<unknown> {
     return this.createCheckoutSessionsUseCase.execute(priceId, planType, user);
   }
 
   whenSubscriptionRepositoryReturnsExistingSubscription() {
-    this.subscriptionRepository.getUserSubscription.mockResolvedValue(
-      this.existingSubscription,
-    );
+    this.subscriptionRepository.getUserSubscription.mockResolvedValue(this.existingSubscription);
   }
 
   whenSubscriptionRepositoryReturnsNull() {
@@ -119,15 +97,11 @@ class Fixtures {
   }
 
   whenSubscriptionRepositoryThrowsError() {
-    this.subscriptionRepository.getUserSubscription.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.subscriptionRepository.getUserSubscription.mockRejectedValue(this.repositoryError);
   }
 
   whenPaymentClientReturnsCheckoutUrl() {
-    this.paymentClient.createCheckoutSession.mockResolvedValue(
-      this.newCheckoutSessionPayload,
-    );
+    this.paymentClient.createCheckoutSession.mockResolvedValue(this.newCheckoutSessionPayload);
   }
 
   async thenThrowTokenUserNotFound(promise: Promise<unknown>) {
@@ -139,19 +113,13 @@ class Fixtures {
   }
 
   thenRepositoriesNotCalled() {
-    expect(
-      this.subscriptionRepository.getUserSubscription,
-    ).not.toHaveBeenCalled();
+    expect(this.subscriptionRepository.getUserSubscription).not.toHaveBeenCalled();
     expect(this.paymentClient.createCheckoutSession).not.toHaveBeenCalled();
   }
 
   thenSubscriptionLookupCalledWithUserId() {
-    expect(
-      this.subscriptionRepository.getUserSubscription,
-    ).toHaveBeenCalledWith(this.user.id);
-    expect(
-      this.subscriptionRepository.getUserSubscription,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.subscriptionRepository.getUserSubscription).toHaveBeenCalledWith(this.user.id);
+    expect(this.subscriptionRepository.getUserSubscription).toHaveBeenCalledTimes(1);
   }
 
   thenCreateCheckoutSessionCalledWithExpectedArguments() {

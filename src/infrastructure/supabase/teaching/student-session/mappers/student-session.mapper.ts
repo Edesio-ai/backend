@@ -9,19 +9,14 @@ import type {
 } from 'src/domain/teaching/student-session/types/student-session.type';
 import { mapList } from 'src/infrastructure/supabase/common/mapper.util';
 
-function sessionsEmbedToList(
-  embed: SupabaseSession | SupabaseSession[] | null,
-): SupabaseSession[] {
+function sessionsEmbedToList(embed: SupabaseSession | SupabaseSession[] | null): SupabaseSession[] {
   if (embed == null) {
     return [];
   }
   return Array.isArray(embed) ? embed : [embed];
 }
 
-function joinedSessionFromParts(
-  joinedAt: string,
-  session: SupabaseSession,
-): StudentJoinedSession {
+function joinedSessionFromParts(joinedAt: string, session: SupabaseSession): StudentJoinedSession {
   return {
     id: session.id,
     teacherId: session.teacher_id,
@@ -33,9 +28,7 @@ function joinedSessionFromParts(
   };
 }
 
-function sessionStudentEmbedRowToDomain(
-  row: SupabaseSessionStudent,
-): SessionStudent {
+function sessionStudentEmbedRowToDomain(row: SupabaseSessionStudent): SessionStudent {
   return {
     id: row.students.id,
     name: row.students.name,
@@ -46,9 +39,7 @@ function sessionStudentEmbedRowToDomain(
 }
 
 export const StudentSessionMapper = {
-  mapEnrollmentRowsWithEmbeddedSessions(
-    rows: SupabaseStudentJoinedSession[],
-  ): StudentJoinedSession[] {
+  mapEnrollmentRowsWithEmbeddedSessions(rows: SupabaseStudentJoinedSession[]): StudentJoinedSession[] {
     const out: StudentJoinedSession[] = [];
     for (const row of rows) {
       for (const session of sessionsEmbedToList(row.sessions)) {
@@ -60,10 +51,7 @@ export const StudentSessionMapper = {
 
   mapEnrollmentRowsWithEmbeddedStudents(rawRows: unknown): SessionStudent[] {
     const rows = Array.isArray(rawRows) ? rawRows : [];
-    return mapList(
-      rows as SupabaseSessionStudent[],
-      sessionStudentEmbedRowToDomain,
-    );
+    return mapList(rows as SupabaseSessionStudent[], sessionStudentEmbedRowToDomain);
   },
 
   toDomain: (row: SupabaseStudentSession): StudentSession => ({

@@ -32,9 +32,7 @@ describe('StudentSupabaseRepository', () => {
     it('throws ServerError when query fails', async () => {
       fixtures.whenGetStudentByUserIdFails();
 
-      await expect(fixtures.whenGetStudentByUserId()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenGetStudentByUserId()).rejects.toBeInstanceOf(ServerError);
     });
   });
 
@@ -53,9 +51,7 @@ describe('StudentSupabaseRepository', () => {
 
       await fixtures.whenCreateStudent(fixtures.authUser);
 
-      expect(fixtures.insertMock).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'Alice Dupont' }),
-      );
+      expect(fixtures.insertMock).toHaveBeenCalledWith(expect.objectContaining({ name: 'Alice Dupont' }));
     });
 
     it('uses only firstname when lastname missing', async () => {
@@ -66,9 +62,7 @@ describe('StudentSupabaseRepository', () => {
         metadata: { firstname: 'Alice' },
       });
 
-      expect(fixtures.insertMock).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'Alice' }),
-      );
+      expect(fixtures.insertMock).toHaveBeenCalledWith(expect.objectContaining({ name: 'Alice' }));
     });
 
     it('defaults name to Élève when no firstname', async () => {
@@ -79,17 +73,13 @@ describe('StudentSupabaseRepository', () => {
         metadata: {},
       });
 
-      expect(fixtures.insertMock).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'Élève' }),
-      );
+      expect(fixtures.insertMock).toHaveBeenCalledWith(expect.objectContaining({ name: 'Élève' }));
     });
 
     it('throws ServerError when insert fails', async () => {
       fixtures.whenCreateStudentInsertFails();
 
-      await expect(
-        fixtures.whenCreateStudent(fixtures.authUser),
-      ).rejects.toBeInstanceOf(ServerError);
+      await expect(fixtures.whenCreateStudent(fixtures.authUser)).rejects.toBeInstanceOf(ServerError);
     });
   });
 
@@ -106,9 +96,7 @@ describe('StudentSupabaseRepository', () => {
     it('throws ServerError when query fails', async () => {
       fixtures.whenGetStudentsByIdsFails();
 
-      await expect(
-        fixtures.whenGetStudentsByIds(fixtures.studentIds),
-      ).rejects.toBeInstanceOf(ServerError);
+      await expect(fixtures.whenGetStudentsByIds(fixtures.studentIds)).rejects.toBeInstanceOf(ServerError);
     });
   });
 
@@ -119,19 +107,13 @@ describe('StudentSupabaseRepository', () => {
       const url = await fixtures.whenStoreStudentPhoto();
 
       expect(url).toBe(fixtures.publicUrl);
-      expect(fixtures.uploadMock).toHaveBeenCalledWith(
-        fixtures.storagePath,
-        fixtures.photoBuffer,
-        { upsert: true },
-      );
+      expect(fixtures.uploadMock).toHaveBeenCalledWith(fixtures.storagePath, fixtures.photoBuffer, { upsert: true });
     });
 
     it('throws ServerError when upload fails', async () => {
       fixtures.whenUploadFails();
 
-      await expect(fixtures.whenStoreStudentPhoto()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenStoreStudentPhoto()).rejects.toBeInstanceOf(ServerError);
     });
 
     it('returns empty string when publicUrl missing', async () => {
@@ -158,9 +140,7 @@ describe('StudentSupabaseRepository', () => {
     it('throws ServerError when update fails', async () => {
       fixtures.whenUpdatePhotoFails();
 
-      await expect(fixtures.whenUpdateStudentPhoto()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenUpdateStudentPhoto()).rejects.toBeInstanceOf(ServerError);
     });
   });
 
@@ -175,18 +155,13 @@ describe('StudentSupabaseRepository', () => {
         name: 'Ann Other',
         email: 'ann@school.com',
       });
-      expect(fixtures.updateStudentProfileEqMock).toHaveBeenCalledWith(
-        'supabase_user_id',
-        fixtures.userId,
-      );
+      expect(fixtures.updateStudentProfileEqMock).toHaveBeenCalledWith('supabase_user_id', fixtures.userId);
     });
 
     it('throws ServerError when update fails', async () => {
       fixtures.whenUpdateStudentProfileFails();
 
-      await expect(fixtures.whenUpdateStudentProfile()).rejects.toBeInstanceOf(
-        ServerError,
-      );
+      await expect(fixtures.whenUpdateStudentProfile()).rejects.toBeInstanceOf(ServerError);
     });
   });
 });
@@ -197,8 +172,7 @@ class Fixtures {
   public readonly studentId = 'stu-1';
   public readonly photoUrl = 'https://cdn.example/p.png';
   public readonly storagePath = 'students/stu-1.jpg';
-  public readonly publicUrl =
-    'https://storage.example/public/students/stu-1.jpg';
+  public readonly publicUrl = 'https://storage.example/public/students/stu-1.jpg';
   public readonly photoBuffer = Buffer.from([1, 2, 3]);
 
   public readonly supabaseRow = {
@@ -272,51 +246,39 @@ class Fixtures {
         from: jest.fn(),
       },
     };
-    this.repository = new StudentSupabaseRepository(
-      this.supabase as unknown as SupabaseClient,
-    );
+    this.repository = new StudentSupabaseRepository(this.supabase as unknown as SupabaseClient);
   }
 
   whenGetStudentByUserIdReturnsRow() {
-    const maybeSingle = jest
-      .fn()
-      .mockResolvedValue({ data: this.supabaseRow, error: null });
+    const maybeSingle = jest.fn().mockResolvedValue({ data: this.supabaseRow, error: null });
     const eq = jest.fn().mockReturnValue({ maybeSingle });
     const select = jest.fn().mockReturnValue({ eq });
     this.supabase.from.mockReturnValue({ select });
   }
 
   whenGetStudentByUserIdReturnsNull() {
-    const maybeSingle = jest
-      .fn()
-      .mockResolvedValue({ data: null, error: null });
+    const maybeSingle = jest.fn().mockResolvedValue({ data: null, error: null });
     const eq = jest.fn().mockReturnValue({ maybeSingle });
     const select = jest.fn().mockReturnValue({ eq });
     this.supabase.from.mockReturnValue({ select });
   }
 
   whenGetStudentByUserIdFails() {
-    const maybeSingle = jest
-      .fn()
-      .mockResolvedValue({ data: null, error: { message: 'db down' } });
+    const maybeSingle = jest.fn().mockResolvedValue({ data: null, error: { message: 'db down' } });
     const eq = jest.fn().mockReturnValue({ maybeSingle });
     const select = jest.fn().mockReturnValue({ eq });
     this.supabase.from.mockReturnValue({ select });
   }
 
   whenCreateStudentInsertSucceeds() {
-    const single = jest
-      .fn()
-      .mockResolvedValue({ data: this.supabaseRow, error: null });
+    const single = jest.fn().mockResolvedValue({ data: this.supabaseRow, error: null });
     const selectAfterInsert = jest.fn().mockReturnValue({ single });
     this.insertMock.mockReturnValue({ select: selectAfterInsert });
     this.supabase.from.mockReturnValue({ insert: this.insertMock });
   }
 
   whenCreateStudentInsertFails() {
-    const single = jest
-      .fn()
-      .mockResolvedValue({ data: null, error: { message: 'insert failed' } });
+    const single = jest.fn().mockResolvedValue({ data: null, error: { message: 'insert failed' } });
     const selectAfterInsert = jest.fn().mockReturnValue({ single });
     this.insertMock.mockReturnValue({ select: selectAfterInsert });
     this.supabase.from.mockReturnValue({ insert: this.insertMock });
@@ -393,10 +355,7 @@ class Fixtures {
   }
 
   whenStoreStudentPhoto() {
-    return this.repository.storeStudentPhoto(
-      this.photoBuffer,
-      this.storagePath,
-    );
+    return this.repository.storeStudentPhoto(this.photoBuffer, this.storagePath);
   }
 
   whenUpdateStudentPhoto() {

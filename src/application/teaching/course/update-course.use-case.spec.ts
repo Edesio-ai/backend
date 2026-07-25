@@ -1,13 +1,8 @@
-import {
-  UpdateCourseUseCase,
-  UpdateCourseBody,
-} from './update-course.use-case';
+import { UpdateCourseUseCase, UpdateCourseBody } from './update-course.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
-import {
-  NotFoundError,
-  UnauthorizedError,
-} from 'src/domain/shared/errors/global.errors';
+import { NotFoundError, UnauthorizedError } from 'src/domain/shared/errors/global.errors';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { Course } from 'src/domain/teaching/course/types/course.type';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
@@ -23,9 +18,7 @@ describe('UpdateCourseUseCase', () => {
     fixtures.whenCourseNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(
-      fixtures.teacherRepository.getTeacherByUserId,
-    ).not.toHaveBeenCalled();
+    expect(fixtures.teacherRepository.getTeacherByUserId).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundError when teacher is not found', async () => {
@@ -40,9 +33,7 @@ describe('UpdateCourseUseCase', () => {
     fixtures.whenCourseFoundWithOtherTeacher();
     fixtures.whenTeacherFound();
 
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(
-      UnauthorizedError,
-    );
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(UnauthorizedError);
     expect(fixtures.courseRepository.updateCourse).not.toHaveBeenCalled();
   });
 
@@ -53,10 +44,7 @@ describe('UpdateCourseUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(
-      fixtures.courseId,
-      fixtures.body,
-    );
+    expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(fixtures.courseId, fixtures.body);
     expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledTimes(1);
     expect(result).toEqual(fixtures.updatedCourse);
   });
@@ -68,10 +56,7 @@ describe('UpdateCourseUseCase', () => {
 
     await fixtures.whenExecute({ title: 'Seul le titre' });
 
-    expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(
-      fixtures.courseId,
-      { title: 'Seul le titre' },
-    );
+    expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(fixtures.courseId, { title: 'Seul le titre' });
   });
 
   it('should pass positionOrder to updateCourse', async () => {
@@ -81,10 +66,7 @@ describe('UpdateCourseUseCase', () => {
 
     await fixtures.whenExecute({ positionOrder: 2 });
 
-    expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(
-      fixtures.courseId,
-      { positionOrder: 2 },
-    );
+    expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(fixtures.courseId, { positionOrder: 2 });
   });
 
   it('should propagate errors thrown by updateCourse', async () => {
@@ -122,7 +104,7 @@ class Fixtures {
     contentText: null,
   };
 
-  public readonly updatedCourse = {
+  public readonly updatedCourse: Course = {
     id: this.courseId,
     sessionId: 'session-1',
     title: 'Titre mis à jour',
@@ -142,10 +124,7 @@ class Fixtures {
   constructor() {
     this.courseRepository = createMockCourseRepository();
     this.teacherRepository = createMockTeacherRepository();
-    this.useCase = new UpdateCourseUseCase(
-      this.courseRepository,
-      this.teacherRepository,
-    );
+    this.useCase = new UpdateCourseUseCase(this.courseRepository, this.teacherRepository);
   }
 
   whenExecute(body: UpdateCourseBody = this.body) {
@@ -156,20 +135,20 @@ class Fixtures {
     this.courseRepository.getCourseWithSessionById.mockResolvedValue({
       id: this.courseId,
       session: { teacherId: this.teacher.id },
-    } as any);
+      teachers: {},
+    });
   }
 
   whenCourseFoundWithOtherTeacher() {
     this.courseRepository.getCourseWithSessionById.mockResolvedValue({
       id: this.courseId,
       session: { teacherId: 'other-teacher' },
-    } as any);
+      teachers: {},
+    });
   }
 
   whenCourseNotFound() {
-    this.courseRepository.getCourseWithSessionById.mockResolvedValue(
-      null as any,
-    );
+    this.courseRepository.getCourseWithSessionById.mockResolvedValue(null);
   }
 
   whenTeacherFound() {
@@ -177,13 +156,11 @@ class Fixtures {
   }
 
   whenTeacherNotFound() {
-    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null as any);
+    this.teacherRepository.getTeacherByUserId.mockResolvedValue(null);
   }
 
   whenUpdateSucceeds() {
-    this.courseRepository.updateCourse.mockResolvedValue(
-      this.updatedCourse as any,
-    );
+    this.courseRepository.updateCourse.mockResolvedValue(this.updatedCourse);
   }
 
   whenUpdateFails() {

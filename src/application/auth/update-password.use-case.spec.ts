@@ -14,10 +14,9 @@ describe('UpdatePasswordUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalledWith(
-      fixtures.userId,
-      { password: fixtures.newPassword },
-    );
+    expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalledWith(fixtures.userId, {
+      password: fixtures.newPassword,
+    });
     expect(fixtures.authRepository.updateAuthUser).toHaveBeenCalledTimes(1);
   });
 

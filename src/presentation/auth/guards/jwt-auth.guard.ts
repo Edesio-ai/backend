@@ -1,17 +1,8 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { IS_PUBLIC_KEY } from '../decorator/public.decorator';
-import {
-  AUTH_REPOSITORY,
-  type IAuthRepository,
-} from 'src/domain/auth/contracts/i-auth.repository';
+import { AUTH_REPOSITORY, type IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
 import { Request } from 'express';
 
 @Injectable()

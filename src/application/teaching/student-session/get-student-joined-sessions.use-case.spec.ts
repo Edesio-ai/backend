@@ -15,9 +15,7 @@ describe('GetStudentJoinedSessionsUseCase', () => {
 
     await fixtures.whenExecute();
 
-    expect(
-      fixtures.studentSessionRepository.listSessionsEnrolledByStudent,
-    ).toHaveBeenCalledWith(fixtures.studentId);
+    expect(fixtures.studentSessionRepository.listSessionsEnrolledByStudent).toHaveBeenCalledWith(fixtures.studentId);
   });
 
   it('should return the joined sessions', async () => {
@@ -63,9 +61,7 @@ class Fixtures {
 
   constructor() {
     this.studentSessionRepository = createMockStudentSessionRepository();
-    this.useCase = new GetStudentJoinedSessionsUseCase(
-      this.studentSessionRepository,
-    );
+    this.useCase = new GetStudentJoinedSessionsUseCase(this.studentSessionRepository);
   }
 
   whenExecute() {
@@ -73,20 +69,14 @@ class Fixtures {
   }
 
   whenJoinedSessionsFound() {
-    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue(
-      this.joinedSessions,
-    );
+    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue(this.joinedSessions);
   }
 
   whenNoJoinedSessionsFound() {
-    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue(
-      [],
-    );
+    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue([]);
   }
 
   whenRepositoryThrows(error: Error) {
-    this.studentSessionRepository.listSessionsEnrolledByStudent.mockRejectedValue(
-      error,
-    );
+    this.studentSessionRepository.listSessionsEnrolledByStudent.mockRejectedValue(error);
   }
 }

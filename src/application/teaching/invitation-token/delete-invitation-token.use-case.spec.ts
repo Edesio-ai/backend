@@ -49,9 +49,7 @@ class Fixtures {
   }
 
   whenRepositoryThrowsError() {
-    this.tokenRepository.deleteInvitationToken.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.tokenRepository.deleteInvitationToken.mockRejectedValue(this.repositoryError);
   }
 
   async thenThrowRepositoryError(promise: Promise<unknown>) {
@@ -59,9 +57,7 @@ class Fixtures {
   }
 
   thenRepositoryCalledWithToken() {
-    expect(this.tokenRepository.deleteInvitationToken).toHaveBeenCalledWith(
-      this.token,
-    );
+    expect(this.tokenRepository.deleteInvitationToken).toHaveBeenCalledWith(this.token);
     expect(this.tokenRepository.deleteInvitationToken).toHaveBeenCalledTimes(1);
   }
 }

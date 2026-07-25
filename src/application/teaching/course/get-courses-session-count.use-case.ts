@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
-import {
-  COURSE_REPOSITORY,
-  type ICourseRepository,
-} from 'src/domain/teaching/course/contracts/i-course.repository';
+import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 
 export class GetCoursesSessionCountUseCase {
   constructor(

@@ -1,7 +1,4 @@
-import {
-  CreateInvitationTokenBody,
-  CreateInvitationTokenUseCase,
-} from './create-invitation-token.use-case';
+import { CreateInvitationTokenBody, CreateInvitationTokenUseCase } from './create-invitation-token.use-case';
 import type { IInvitationTokenRepository } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 
 describe('CreateInvitationTokenUseCase', () => {
@@ -47,9 +44,7 @@ class Fixtures {
       updateTokenUsedAt: jest.fn(),
     };
 
-    this.createInvitationTokenUseCase = new CreateInvitationTokenUseCase(
-      this.invitationTokenRepository,
-    );
+    this.createInvitationTokenUseCase = new CreateInvitationTokenUseCase(this.invitationTokenRepository);
 
     this.body = {
       establishmentId: 'est-1',
@@ -66,15 +61,11 @@ class Fixtures {
   }
 
   whenCreateInvitationTokenResolves() {
-    this.invitationTokenRepository.createInvitationToken.mockResolvedValue(
-      undefined,
-    );
+    this.invitationTokenRepository.createInvitationToken.mockResolvedValue(undefined);
   }
 
   whenCreateInvitationTokenThrowsError() {
-    this.invitationTokenRepository.createInvitationToken.mockRejectedValue(
-      this.repositoryError,
-    );
+    this.invitationTokenRepository.createInvitationToken.mockRejectedValue(this.repositoryError);
   }
 
   async thenThrowRepositoryError(promise: Promise<unknown>) {
@@ -82,11 +73,7 @@ class Fixtures {
   }
 
   thenCreateInvitationTokenCalledWithExpectedArguments() {
-    expect(
-      this.invitationTokenRepository.createInvitationToken,
-    ).toHaveBeenCalledWith(this.body);
-    expect(
-      this.invitationTokenRepository.createInvitationToken,
-    ).toHaveBeenCalledTimes(1);
+    expect(this.invitationTokenRepository.createInvitationToken).toHaveBeenCalledWith(this.body);
+    expect(this.invitationTokenRepository.createInvitationToken).toHaveBeenCalledTimes(1);
   }
 }
