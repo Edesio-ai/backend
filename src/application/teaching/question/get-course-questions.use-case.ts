@@ -80,15 +80,9 @@ export class GetCourseQuestionsUseCase {
       throw new NotFoundError(`Course with id ${courseId} not found`);
     }
 
-    const studentSession = await this.studentSessionRepository.getStudentSessionBySessionId(course.sessionId);
+    const studentSession = await this.studentSessionRepository.getStudentSession(course.sessionId, student.id);
     if (!studentSession) {
       throw new ForbiddenError(`Student session not found for course id ${courseId}`);
-    }
-
-    if (studentSession.studentId !== student.id) {
-      throw new ForbiddenError(
-        `Student id ${student.id} does not match the student session id ${studentSession.studentId}`,
-      );
     }
   }
 }

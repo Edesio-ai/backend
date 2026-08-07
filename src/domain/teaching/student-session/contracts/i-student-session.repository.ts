@@ -7,7 +7,7 @@ export interface IStudentSessionRepository {
   deleteStudentSessionsBySessionId(sessionId: string): Promise<void>;
   listSessionsEnrolledByStudent(studentId: string): Promise<StudentJoinedSession[]>;
   listStudentsEnrolledInSession(sessionId: string, select: string): Promise<SessionStudent[]>;
-  getStudentSessionBySessionId(sessionId: string): Promise<StudentSession | null>;
+  getStudentSession(sessionId: string, studentId: string): Promise<StudentSession | null>;
   createStudentSession(studentId: string, sessionId: string): Promise<void>;
   deleteStudentSession(sessionId: string, studentId: string): Promise<void>;
 }

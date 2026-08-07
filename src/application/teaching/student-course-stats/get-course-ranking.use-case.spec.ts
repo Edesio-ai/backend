@@ -73,13 +73,10 @@ describe('GetCourseRankingUseCase', () => {
     expect(fixtures.studentCourseStatsRepository.getStudentCourseStatsByCourseId).not.toHaveBeenCalled();
   });
 
-  it('should throw ForbiddenException when enrolled student session belongs to someone else', async () => {
+  it('should throw ForbiddenException when student is not enrolled in course session', async () => {
     fixtures.whenCourseFound();
     fixtures.whenStudentProfileFound();
-    fixtures.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue({
-      sessionId: fixtures.course.sessionId,
-      studentId: 'intruder-student',
-    });
+    fixtures.studentSessionRepository.getStudentSession.mockResolvedValue(null);
 
     const promise = fixtures.whenExecuteAsStudent();
 
@@ -97,8 +94,9 @@ describe('GetCourseRankingUseCase', () => {
 
     expect(result).toHaveLength(4);
     expect(result[0].studentId).toBe('s-perfect');
-    expect(fixtures.studentSessionRepository.getStudentSessionBySessionId).toHaveBeenCalledWith(
+    expect(fixtures.studentSessionRepository.getStudentSession).toHaveBeenCalledWith(
       fixtures.course.sessionId,
+      fixtures.enrolledStudent.id,
     );
   });
 
@@ -279,7 +277,7 @@ class Fixtures {
   }
 
   whenStudentSessionMatchesEnrollment() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue({
+    this.studentSessionRepository.getStudentSession.mockResolvedValue({
       sessionId: this.course.sessionId,
       studentId: this.enrolledStudent.id,
     });

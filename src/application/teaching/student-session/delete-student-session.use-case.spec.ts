@@ -1,7 +1,7 @@
 import { DeleteStudentSessionUseCase } from 'src/application/teaching/student-session/delete-student-session.use-case';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
-import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
+import { NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Student } from 'src/domain/teaching/student/type/student.type';
 import { StudentSession } from 'src/domain/teaching/student-session/types/student-session.type';
@@ -31,7 +31,7 @@ describe('DeleteStudentSessionUseCase', () => {
     fixtures.whenStudentNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(fixtures.studentSessionRepository.getStudentSessionBySessionId).not.toHaveBeenCalled();
+    expect(fixtures.studentSessionRepository.getStudentSession).not.toHaveBeenCalled();
     expect(fixtures.studentSessionRepository.deleteStudentSession).not.toHaveBeenCalled();
   });
 
@@ -40,14 +40,10 @@ describe('DeleteStudentSessionUseCase', () => {
     fixtures.whenStudentSessionNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundError);
-    expect(fixtures.studentSessionRepository.deleteStudentSession).not.toHaveBeenCalled();
-  });
-
-  it('should throw ForbiddenError when student does not own the session', async () => {
-    fixtures.whenStudentFound();
-    fixtures.whenStudentSessionOwnedByAnother();
-
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
+    expect(fixtures.studentSessionRepository.getStudentSession).toHaveBeenCalledWith(
+      fixtures.sessionId,
+      fixtures.student.id,
+    );
     expect(fixtures.studentSessionRepository.deleteStudentSession).not.toHaveBeenCalled();
   });
 
@@ -118,18 +114,11 @@ class Fixtures {
   }
 
   whenStudentSessionFound() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(this.studentSession);
+    this.studentSessionRepository.getStudentSession.mockResolvedValue(this.studentSession);
   }
 
   whenStudentSessionNotFound() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(null);
-  }
-
-  whenStudentSessionOwnedByAnother() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue({
-      sessionId: this.sessionId,
-      studentId: 'another-student-99',
-    });
+    this.studentSessionRepository.getStudentSession.mockResolvedValue(null);
   }
 
   whenDeleteFails() {

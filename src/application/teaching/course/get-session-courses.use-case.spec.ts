@@ -126,22 +126,18 @@ describe('GetSessionCoursesUseCase', () => {
     fixtures.whenStudentNotFound();
 
     await expect(fixtures.whenExecuteAsStudent()).rejects.toBeInstanceOf(NotFoundError);
-    expect(fixtures.studentSessionRepository.getStudentSessionBySessionId).not.toHaveBeenCalled();
-  });
-
-  it('should throw NotFoundError when student session is not found', async () => {
-    fixtures.whenStudentFound();
-    fixtures.whenStudentSessionNotFound();
-
-    await expect(fixtures.whenExecuteAsStudent()).rejects.toBeInstanceOf(NotFoundError);
-    expect(fixtures.courseRepository.getSessionCoursesBySessionId).not.toHaveBeenCalled();
+    expect(fixtures.studentSessionRepository.getStudentSession).not.toHaveBeenCalled();
   });
 
   it('should throw ForbiddenError when student is not enrolled in the session', async () => {
     fixtures.whenStudentFound();
-    fixtures.whenStudentEnrolledInOtherSession();
+    fixtures.whenStudentSessionNotFound();
 
     await expect(fixtures.whenExecuteAsStudent()).rejects.toBeInstanceOf(ForbiddenError);
+    expect(fixtures.studentSessionRepository.getStudentSession).toHaveBeenCalledWith(
+      fixtures.sessionId,
+      fixtures.student.id,
+    );
     expect(fixtures.courseRepository.getSessionCoursesBySessionId).not.toHaveBeenCalled();
   });
 
@@ -331,17 +327,10 @@ class Fixtures {
   }
 
   whenStudentEnrolledInSession() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(this.studentSession);
+    this.studentSessionRepository.getStudentSession.mockResolvedValue(this.studentSession);
   }
 
   whenStudentSessionNotFound() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(null);
-  }
-
-  whenStudentEnrolledInOtherSession() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue({
-      sessionId: this.sessionId,
-      studentId: 'other-student-99',
-    });
+    this.studentSessionRepository.getStudentSession.mockResolvedValue(null);
   }
 }

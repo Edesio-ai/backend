@@ -129,13 +129,8 @@ export class GetCourseRankingUseCase {
       throw new NotFoundError(`Student with id ${user.id} not found`);
     }
 
-    const studentSession = await this.studentSessionRepository.getStudentSessionBySessionId(course.sessionId);
-
-    if (studentSession && studentSession.studentId !== student.id) {
-      console.error('session student id does not match student id', {
-        studentSessionId: studentSession.sessionId,
-        studentId: student.id,
-      });
+    const studentSession = await this.studentSessionRepository.getStudentSession(course.sessionId, student.id);
+    if (!studentSession) {
       throw new ForbiddenException('You are not authorized to access this course');
     }
   }
