@@ -110,12 +110,8 @@ export class GetSessionCoursesUseCase {
       throw new NotFoundError('Student not found');
     }
 
-    const studentSession = await this.studentSessionRepository.getStudentSessionBySessionId(sessionId);
+    const studentSession = await this.studentSessionRepository.getStudentSession(sessionId, student.id);
     if (!studentSession) {
-      throw new NotFoundError(`Session not found for id ${sessionId}`);
-    }
-
-    if (studentSession.studentId !== student.id) {
       throw new ForbiddenError('You are not authorized to access this session');
     }
   }

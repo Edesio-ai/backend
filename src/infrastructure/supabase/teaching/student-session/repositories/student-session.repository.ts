@@ -64,15 +64,21 @@ export class StudentSessionRepository implements IStudentSessionRepository {
     return StudentSessionMapper.mapEnrollmentRowsWithEmbeddedStudents(data ?? []);
   }
 
-  public async getStudentSessionBySessionId(sessionId: string): Promise<StudentSession | null> {
+  public async getStudentSession(sessionId: string, studentId: string): Promise<StudentSession | null> {
     const { data, error } = await this.supabase
       .from('student_sessions')
       .select('*')
       .eq('session_id', sessionId)
+      .eq('student_id', studentId)
       .maybeSingle();
 
     if (error) {
-      console.error('An error occurred while getting student session by session id', sessionId, error);
+      console.error(
+        'An error occurred while getting student session by session id and student id',
+        sessionId,
+        studentId,
+        error,
+      );
       throw new ServerError(error.message);
     }
     return data ? StudentSessionMapper.toDomain(data) : null;

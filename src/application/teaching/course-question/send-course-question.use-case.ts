@@ -42,12 +42,8 @@ export class SendCourseQuestionUseCase {
       throw new NotFoundException('Course not found');
     }
 
-    const studentSession = await this.studentSessionRepository.getStudentSessionBySessionId(course.sessionId);
+    const studentSession = await this.studentSessionRepository.getStudentSession(course.sessionId, student.id);
     if (!studentSession) {
-      throw new NotFoundException('Student session not found');
-    }
-
-    if (studentSession.studentId !== student.id) {
       throw new ForbiddenException('You are not enrolled in this session');
     }
 

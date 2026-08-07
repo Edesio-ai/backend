@@ -32,7 +32,10 @@ describe('SendCourseQuestionUseCase', () => {
     expect(result).toEqual(fixtures.createdCourseQuestion);
     expect(fixtures.studentRepository.getStudentByUserId).toHaveBeenCalledWith(fixtures.studentUser.id);
     expect(fixtures.courseRepository.getCourseById).toHaveBeenCalledWith(fixtures.body.courseId);
-    expect(fixtures.studentSessionRepository.getStudentSessionBySessionId).toHaveBeenCalledWith(fixtures.sessionId);
+    expect(fixtures.studentSessionRepository.getStudentSession).toHaveBeenCalledWith(
+      fixtures.sessionId,
+      fixtures.enrolledStudent.id,
+    );
     expect(fixtures.courseQuestionRepository.createCourseQuestion).toHaveBeenCalledWith({
       courseId: fixtures.body.courseId,
       questionText: fixtures.body.questionText,
@@ -53,23 +56,14 @@ describe('SendCourseQuestionUseCase', () => {
     fixtures.whenCourseMissing();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundException);
-    expect(fixtures.studentSessionRepository.getStudentSessionBySessionId).not.toHaveBeenCalled();
+    expect(fixtures.studentSessionRepository.getStudentSession).not.toHaveBeenCalled();
     expect(fixtures.courseQuestionRepository.createCourseQuestion).not.toHaveBeenCalled();
   });
 
-  it('should throw NotFoundException when student session row is missing', async () => {
+  it('should throw ForbiddenException when student is not enrolled in session', async () => {
     fixtures.whenStudentFound();
     fixtures.whenCourseReturned();
     fixtures.whenStudentSessionNotFound();
-
-    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundException);
-    expect(fixtures.courseQuestionRepository.createCourseQuestion).not.toHaveBeenCalled();
-  });
-
-  it('should throw ForbiddenException when session belongs to another student', async () => {
-    fixtures.whenStudentFound();
-    fixtures.whenCourseReturned();
-    fixtures.whenStudentSessionOwnedBySomeoneElse();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenException);
     expect(fixtures.courseQuestionRepository.createCourseQuestion).not.toHaveBeenCalled();
@@ -171,21 +165,14 @@ class Fixtures {
   }
 
   whenStudentSessionMatchesEnrollment() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue({
+    this.studentSessionRepository.getStudentSession.mockResolvedValue({
       sessionId: this.sessionId,
       studentId: this.enrolledStudent.id,
     });
   }
 
   whenStudentSessionNotFound() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue(null);
-  }
-
-  whenStudentSessionOwnedBySomeoneElse() {
-    this.studentSessionRepository.getStudentSessionBySessionId.mockResolvedValue({
-      sessionId: this.sessionId,
-      studentId: 'other-student',
-    });
+    this.studentSessionRepository.getStudentSession.mockResolvedValue(null);
   }
 
   whenCreateSucceeds() {
