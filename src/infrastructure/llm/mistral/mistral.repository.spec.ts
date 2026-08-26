@@ -88,6 +88,26 @@ describe('MistralProvider', () => {
 
       await expect(fixtures.whenEvaluate()).rejects.toBeInstanceOf(ServerError);
     });
+
+    it('defaults output language to the question language in the prompts', async () => {
+      fixtures.whenApiReturnsContent(JSON.stringify(fixtures.apiEvaluation));
+
+      await fixtures.whenEvaluate();
+
+      const call = fixtures.chatCompleteMock.mock.calls[0][0];
+      expect(call.messages[0].content).toContain('langue du cours');
+      expect(call.messages[1].content).toContain('LANGUE DU COURS');
+    });
+
+    it('passes an explicit course language into the prompts', async () => {
+      fixtures.whenApiReturnsContent(JSON.stringify(fixtures.apiEvaluation));
+
+      await fixtures.whenEvaluateWithLanguage('anglais');
+
+      const call = fixtures.chatCompleteMock.mock.calls[0][0];
+      expect(call.messages[0].content).toContain('anglais');
+      expect(call.messages[1].content).toContain('anglais');
+    });
   });
 
   describe('generateCompletionFeedback', () => {
@@ -215,6 +235,13 @@ class EvaluateAnswerFixtures {
 
   whenEvaluate() {
     return this.provider.evaluateAnswer(this.body);
+  }
+
+  whenEvaluateWithLanguage(language: 'francais' | 'anglais' | 'espagnol' | 'allemand') {
+    return this.provider.evaluateAnswer({
+      ...this.body,
+      language,
+    });
   }
 
   whenApiReturnsContent(content: string | null) {

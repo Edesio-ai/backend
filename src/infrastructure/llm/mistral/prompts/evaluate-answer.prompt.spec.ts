@@ -61,6 +61,22 @@ describe('evaluate-answer.prompt', () => {
       const prompt = getEvaluateAnswerSystemPrompt();
       expect(prompt).toContain('JSON');
     });
+
+    it('should require output in the course language, not the student answer language', () => {
+      const prompt = getEvaluateAnswerSystemPrompt();
+      expect(prompt).toContain('langue du cours');
+      expect(prompt).toContain("réponse de l'élève");
+    });
+
+    it('should mention the course language when it is provided', () => {
+      const prompt = getEvaluateAnswerSystemPrompt('anglais');
+      expect(prompt).toContain('anglais');
+    });
+
+    it('should keep scoring a correct answer written in another language', () => {
+      const prompt = getEvaluateAnswerSystemPrompt('anglais');
+      expect(prompt).toContain('autre langue');
+    });
   });
 
   describe('getEvaluateAnswerUserPrompt', () => {
@@ -110,6 +126,18 @@ describe('evaluate-answer.prompt', () => {
     it('should label the question section', () => {
       const prompt = getEvaluateAnswerUserPrompt(body);
       expect(prompt).toContain('QUESTION');
+    });
+
+    it('should instruct to use the question language when course language is omitted', () => {
+      const prompt = getEvaluateAnswerUserPrompt(body);
+      expect(prompt).toContain('LANGUE DU COURS');
+      expect(prompt).toContain("réponse de l'élève");
+    });
+
+    it('should require the given course language even if the student answered in another language', () => {
+      const prompt = getEvaluateAnswerUserPrompt({ ...body, language: 'anglais' });
+      expect(prompt).toContain('anglais');
+      expect(prompt).toContain('UNIQUEMENT');
     });
   });
 });
