@@ -73,6 +73,18 @@ describe('EvaluateAnswerUseCase', () => {
       expect(result.score).toBe(0);
       expect(fixtures.openaiRepositoryMock.evaluateAnswer).not.toHaveBeenCalled();
     });
+
+    it('should return cheating feedback in the course language', async () => {
+      const result = await fixtures.whenExecute({
+        ...fixtures.body,
+        language: 'anglais',
+        answer: fixtures.body.correctAnswer,
+      });
+
+      expect(result.isCheating).toBe(true);
+      expect(result.feedback).toBe("Nice try! But cheating won't help you improve.");
+      expect(fixtures.openaiRepositoryMock.evaluateAnswer).not.toHaveBeenCalled();
+    });
   });
 
   describe('when answers differ', () => {
@@ -102,6 +114,20 @@ describe('EvaluateAnswerUseCase', () => {
 
       expect(fixtures.openaiRepositoryMock.evaluateAnswer).toHaveBeenCalledWith(
         expect.objectContaining({ explanation: 'Contexte du cours important' }),
+      );
+    });
+
+    it('should forward the course language to the repository', async () => {
+      fixtures.whenOpenAiReturnsEvaluation();
+
+      await fixtures.whenExecute({
+        ...fixtures.body,
+        answer: 'A different answer',
+        language: 'anglais',
+      });
+
+      expect(fixtures.openaiRepositoryMock.evaluateAnswer).toHaveBeenCalledWith(
+        expect.objectContaining({ language: 'anglais' }),
       );
     });
 

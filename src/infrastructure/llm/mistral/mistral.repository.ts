@@ -59,7 +59,7 @@ export class MistralProvider implements MistralRepositoryContract {
   }
 
   public async evaluateAnswer(body: EvaluateAnswerBody): Promise<EvaluateAnswerResponse> {
-    const systemPrompt = getEvaluateAnswerSystemPrompt();
+    const systemPrompt = getEvaluateAnswerSystemPrompt(body.language);
     const userPrompt = getEvaluateAnswerUserPrompt(body);
 
     const response = await this.mistral.chat.complete({

@@ -2,12 +2,21 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { ILlmProvider } from 'src/domain/llm/contracts/I-llm.provider';
 import { LLM_REPOSITORY } from 'src/domain/llm/contracts/I-llm.provider';
 import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
+import { type Language } from 'src/domain/teaching/session/types/session.type';
+
+const CHEATING_FEEDBACK: Record<Language, string> = {
+  francais: "Bien essayé ! Mais ce n'est pas en trichant que tu vas progresser.",
+  anglais: "Nice try! But cheating won't help you improve.",
+  espagnol: '¡Buen intento! Pero no progresarás haciendo trampa.',
+  allemand: 'Netter Versuch! Aber durch Schummeln wirst du nicht besser.',
+};
 
 export interface EvaluateAnswerBody {
   questionText: string;
   correctAnswer: string;
   answer: string;
   explanation: string;
+  language?: Language;
 }
 
 @Injectable()
@@ -22,9 +31,10 @@ export class EvaluateAnswerUseCase {
     const normalizedStudentAnswer = this.normalizeString(body.answer);
 
     if (normalizedCorrectAnswers === normalizedStudentAnswer) {
+      const language = body.language ?? 'francais';
       return {
         score: 0,
-        feedback: "Bien essayé ! Mais ce n'est pas en trichant que tu vas progresser.",
+        feedback: CHEATING_FEEDBACK[language],
         concepts: [],
         missingElements: [],
         suggestedAction: null,
