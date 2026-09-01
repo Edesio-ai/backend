@@ -128,4 +128,13 @@ export class TeacherSupabaseRepository implements ITeacherRepository {
       throw new ServerError(error.message);
     }
   }
+
+  public async deleteTeacher(id: string): Promise<void> {
+    const { error } = await this.supabase.from('teachers').delete().eq('id', id);
+
+    if (error) {
+      console.error(`Error deleting teacher ${id}: ${error.message}`);
+      throw new ServerError(error.message);
+    }
+  }
 }

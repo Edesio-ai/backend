@@ -143,6 +143,20 @@ describe('TeacherSupabaseRepository', () => {
     await expect(fixtures.whenCreateTeacherWithInvitationToken()).rejects.toBeInstanceOf(ServerError);
     expect(fixtures.deleteUserMock).toHaveBeenCalledWith(fixtures.authUser.id);
   });
+
+  it('should delete teacher by id', async () => {
+    fixtures.whenDeleteTeacherSucceeds();
+
+    await fixtures.whenDeleteTeacher();
+
+    fixtures.thenDeleteTeacherQueryBuilt();
+  });
+
+  it('should throw ServerError when deleteTeacher fails', async () => {
+    fixtures.whenDeleteTeacherFails();
+
+    await expect(fixtures.whenDeleteTeacher()).rejects.toBeInstanceOf(ServerError);
+  });
 });
 
 class Fixtures {
@@ -289,8 +303,14 @@ class Fixtures {
     eq: this.teacherProfileEqMock,
   }));
 
+  private readonly deleteTeacherEqMock = jest.fn();
+  private readonly deleteTeacherDeleteMock = jest.fn(() => ({
+    eq: this.deleteTeacherEqMock,
+  }));
+
   private readonly fromMock = jest.fn((table: string) => {
     if (table === 'teachers') {
+      if (this.deleteTeacherModeEnabled) return { delete: this.deleteTeacherDeleteMock };
       if (this.updateTeacherProfileModeEnabled) return { update: this.teacherProfileUpdateMock };
       if (this.linkModeEnabled) return this.linkFromMock();
       if (this.byUserModeEnabled) return this.byUserFromMock();
@@ -308,6 +328,7 @@ class Fixtures {
   private linkModeEnabled = false;
   private byConditionsModeEnabled = false;
   private updateTeacherProfileModeEnabled = false;
+  private deleteTeacherModeEnabled = false;
 
   private readonly conditionsMaybeSingleMock = jest.fn();
   private readonly conditionsEqMock = jest.fn();
@@ -368,6 +389,11 @@ class Fixtures {
   whenUpdateTeacherProfile() {
     this.updateTeacherProfileModeEnabled = true;
     return this.repository.updateTeacher(this.teacherSupabaseRow.supabase_user_id, this.teacherProfilePayload);
+  }
+
+  whenDeleteTeacher() {
+    this.deleteTeacherModeEnabled = true;
+    return this.repository.deleteTeacher(this.teacherSupabaseRow.id);
   }
 
   whenTeacherQueryReturnsData() {
@@ -441,6 +467,16 @@ class Fixtures {
     });
   }
 
+  whenDeleteTeacherSucceeds() {
+    this.deleteTeacherEqMock.mockResolvedValue({ error: null });
+  }
+
+  whenDeleteTeacherFails() {
+    this.deleteTeacherEqMock.mockResolvedValue({
+      error: { message: 'delete teacher failed' },
+    });
+  }
+
   async thenThrowTeacherServerError(promise: Promise<unknown>) {
     await expect(promise).rejects.toBeInstanceOf(ServerError);
   }
@@ -502,6 +538,12 @@ class Fixtures {
       'supabase_user_id',
       this.teacherSupabaseRow.supabase_user_id,
     );
+  }
+
+  thenDeleteTeacherQueryBuilt() {
+    expect(this.fromMock).toHaveBeenCalledWith('teachers');
+    expect(this.deleteTeacherDeleteMock).toHaveBeenCalledTimes(1);
+    expect(this.deleteTeacherEqMock).toHaveBeenCalledWith('id', this.teacherSupabaseRow.id);
   }
 
   thenReturnExpectedTeacher(result: unknown) {

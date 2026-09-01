@@ -14,4 +14,5 @@ export interface ITeacherRepository {
   ): Promise<Teacher | null>;
   createTeacherWithInvitationToken(adminData: User, invitationToken: InvitationToken): Promise<Teacher>;
   updateTeacher(userId: string, payload: UpdateTeacherPayload): Promise<void>;
+  deleteTeacher(id: string): Promise<void>;
 }
