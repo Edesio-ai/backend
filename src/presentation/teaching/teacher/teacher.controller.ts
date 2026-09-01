@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseFilters } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseFilters } from '@nestjs/common';
 
 import { GetTeacherByUserIdUseCase } from 'src/application/teaching/teacher/get-teacher-by-user-id.use-case';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
@@ -8,6 +8,7 @@ import { CreateTeacherUseCase } from 'src/application/teaching/teacher/create-te
 import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
 import { GlobalErrorFilter } from 'src/presentation/filters/global.filter';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
+import { DeleteTeacherUseCase } from 'src/application/teaching/teacher/delete-teacher.use-case';
 
 @Roles('teacher')
 @Controller('teacher')
@@ -15,6 +16,7 @@ export class TeacherController {
   constructor(
     private readonly getTeacherByUserIdUseCase: GetTeacherByUserIdUseCase,
     private readonly createTeacherUseCase: CreateTeacherUseCase,
+    private readonly deleteTeacherUseCase: DeleteTeacherUseCase,
   ) {}
 
   @Get()
@@ -30,5 +32,12 @@ export class TeacherController {
     const { id } = user;
 
     return this.createTeacherUseCase.execute(id, body);
+  }
+
+  @Roles('establishment')
+  @Delete(':id')
+  @UseFilters(GlobalErrorFilter)
+  async deleteTeacher(@Param('id') id: string): Promise<void> {
+    return this.deleteTeacherUseCase.execute(id);
   }
 }

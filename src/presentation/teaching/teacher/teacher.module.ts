@@ -4,10 +4,11 @@ import { GetTeacherByUserIdUseCase } from 'src/application/teaching/teacher/get-
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { CreateTeacherUseCase } from 'src/application/teaching/teacher/create-teacher.use-case';
 import { TeacherController } from 'src/presentation/teaching/teacher/teacher.controller';
+import { DeleteTeacherUseCase } from 'src/application/teaching/teacher/delete-teacher.use-case';
 
 @Module({
   imports: [AuthPersistenceModule, TeacherPersistenceModule],
   controllers: [TeacherController],
-  providers: [GetTeacherByUserIdUseCase, CreateTeacherUseCase],
+  providers: [GetTeacherByUserIdUseCase, CreateTeacherUseCase, DeleteTeacherUseCase],
 })
 export class TeacherModule {}
