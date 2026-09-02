@@ -1,3 +1,4 @@
+import { LOCALES, type Locale } from 'src/domain/shared/locale.type';
 import { IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateCheckoutSessionBodyDto {
@@ -9,9 +10,9 @@ export class CreateCheckoutSessionBodyDto {
   @IsNotEmpty()
   planType: string;
 
-  /** Stripe Checkout UI locale (`en` | `fr`). Defaults to browser/`auto` if omitted. */
+  /** Stripe Checkout UI locale. Defaults to browser/`auto` if omitted. */
   @IsOptional()
   @IsString()
-  @IsIn(['en', 'fr'])
-  locale?: 'en' | 'fr';
+  @IsIn([...LOCALES])
+  locale?: Locale;
 }

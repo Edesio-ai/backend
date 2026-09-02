@@ -10,30 +10,46 @@ describe('SendInvitationUseCase', () => {
     fixtures = new Fixtures();
   });
 
-  it('should send professeur invitation email when body is valid', async () => {
-    fixtures.whenSendProfesseurInvitationResolves();
+  it('should send teacher invitation email when body is valid', async () => {
+    fixtures.whenSendTeacherInvitationResolves();
 
     await fixtures.whenExecuteWith(fixtures.body);
 
-    fixtures.thenSendProfesseurInvitationCalledWith(
+    fixtures.thenSendTeacherInvitationCalledWith(
       fixtures.body.invitedEmail,
       fixtures.body.establishmentName,
       fixtures.body.invitationToken,
       fixtures.body.assignedChatbots,
+      'fr',
+    );
+  });
+
+  it('should forward English locale to the email provider', async () => {
+    fixtures.whenSendTeacherInvitationResolves();
+
+    await fixtures.whenExecuteWith({ ...fixtures.body, locale: 'en' });
+
+    fixtures.thenSendTeacherInvitationCalledWith(
+      fixtures.body.invitedEmail,
+      fixtures.body.establishmentName,
+      fixtures.body.invitationToken,
+      fixtures.body.assignedChatbots,
+      'en',
     );
   });
 
   it('should propagate email provider error', async () => {
-    fixtures.whenSendProfesseurInvitationThrowsError();
+    fixtures.whenSendTeacherInvitationThrowsError();
 
     const promise = fixtures.whenExecuteWith(fixtures.body);
 
     await fixtures.thenThrowEmailProviderError(promise);
-    fixtures.thenSendProfesseurInvitationCalledWith(
+    fixtures.thenSendTeacherInvitationCalledWith(
       fixtures.body.invitedEmail,
       fixtures.body.establishmentName,
       fixtures.body.invitationToken,
       fixtures.body.assignedChatbots,
+      'fr',
     );
   });
 });
@@ -64,30 +80,32 @@ class Fixtures {
     return this.sendInvitationUseCase.execute(body);
   }
 
-  whenSendProfesseurInvitationResolves() {
-    this.emailProvider.sendProfesseurInvitation.mockResolvedValue(undefined);
+  whenSendTeacherInvitationResolves() {
+    this.emailProvider.sendTeacherInvitation.mockResolvedValue(undefined);
   }
 
-  whenSendProfesseurInvitationThrowsError() {
-    this.emailProvider.sendProfesseurInvitation.mockRejectedValue(this.emailProviderError);
+  whenSendTeacherInvitationThrowsError() {
+    this.emailProvider.sendTeacherInvitation.mockRejectedValue(this.emailProviderError);
   }
 
   async thenThrowEmailProviderError(promise: Promise<unknown>) {
     await expect(promise).rejects.toBe(this.emailProviderError);
   }
 
-  thenSendProfesseurInvitationCalledWith(
+  thenSendTeacherInvitationCalledWith(
     email: string,
     name: string,
     invitationToken: string,
     availableChatbots: number,
+    locale: 'en' | 'fr',
   ) {
-    expect(this.emailProvider.sendProfesseurInvitation).toHaveBeenCalledWith(
+    expect(this.emailProvider.sendTeacherInvitation).toHaveBeenCalledWith(
       email,
       name,
       invitationToken,
       availableChatbots,
+      locale,
     );
-    expect(this.emailProvider.sendProfesseurInvitation).toHaveBeenCalledTimes(1);
+    expect(this.emailProvider.sendTeacherInvitation).toHaveBeenCalledTimes(1);
   }
 }

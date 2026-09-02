@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { ResendEmailProvider } from './resend-email.provider';
 import { ServerError } from '../../domain/shared/errors/global.errors';
+import { Locale } from 'src/domain/shared/locale.type';
 
 describe('ResendEmailProvider', () => {
   let fixtures: Fixtures;
@@ -38,18 +39,26 @@ describe('ResendEmailProvider', () => {
     await fixtures.thenThrowEmailSendingError(promise);
   });
 
-  it('should send professeur invitation email with rendered template', async () => {
+  it('should send teacher invitation email with rendered template', async () => {
     fixtures.whenResendSendResolvesWithoutError();
 
-    await fixtures.whenSendProfesseurInvitation();
+    await fixtures.whenSendTeacherInvitation();
 
     fixtures.thenResendCalledWithInvitationPayload();
+  });
+
+  it('should send teacher invitation email in English when locale is en', async () => {
+    fixtures.whenResendSendResolvesWithoutError();
+
+    await fixtures.whenSendTeacherInvitation('en');
+
+    fixtures.thenResendCalledWithEnglishInvitationPayload();
   });
 
   it('should throw ServerError when invitation send returns error', async () => {
     fixtures.whenResendSendResolvesWithError();
 
-    const promise = fixtures.whenSendProfesseurInvitation();
+    const promise = fixtures.whenSendTeacherInvitation();
 
     await fixtures.thenThrowEmailSendingError(promise);
   });
@@ -57,7 +66,7 @@ describe('ResendEmailProvider', () => {
   it('should throw ServerError when invitation send rejects', async () => {
     fixtures.whenResendSendThrows();
 
-    const promise = fixtures.whenSendProfesseurInvitation();
+    const promise = fixtures.whenSendTeacherInvitation();
 
     await fixtures.thenThrowEmailSendingError(promise);
   });
@@ -66,7 +75,7 @@ describe('ResendEmailProvider', () => {
     fixtures.whenResendSendResolvesWithoutError();
     fixtures.whenFrontendUrlIs('https://app.edesio.test');
 
-    await fixtures.whenSendProfesseurInvitation();
+    await fixtures.whenSendTeacherInvitation();
 
     fixtures.thenInvitationHtmlContainsFrontendUrl('https://app.edesio.test');
   });
@@ -104,8 +113,14 @@ class Fixtures {
     return this.provider.sendWelcomeEmail(this.email, this.name, role);
   }
 
-  whenSendProfesseurInvitation() {
-    return this.provider.sendProfesseurInvitation(this.email, this.name, this.invitationToken, this.availableChatbots);
+  whenSendTeacherInvitation(locale?: Locale) {
+    return this.provider.sendTeacherInvitation(
+      this.email,
+      this.name,
+      this.invitationToken,
+      this.availableChatbots,
+      locale,
+    );
   }
 
   whenResendSendResolvesWithoutError() {
@@ -158,7 +173,7 @@ class Fixtures {
 
     const payload = this.sendMock.mock.calls[0][0];
     expect(payload.html).toContain(`Bienvenue ${this.name} !`);
-    expect(payload.html).toContain('Acceder a mon espace');
+    expect(payload.html).toContain('Accéder à mon espace');
     expect(payload.html).toContain('/teacher');
   }
 
@@ -168,14 +183,30 @@ class Fixtures {
       expect.objectContaining({
         from: 'Edesio <noreply@edesio.ai>',
         to: [this.email],
-        subject: `${this.name} vous invite a rejoindre Edesio`,
+        subject: `${this.name} vous invite à rejoindre Edesio`,
       }),
     );
 
     const payload = this.sendMock.mock.calls[0][0];
-    expect(payload.html).toContain('Vous etes invite(e) !');
+    expect(payload.html).toContain('Vous êtes invité(e) !');
     expect(payload.html).toContain(this.invitationToken);
-    expect(payload.html).toContain('Creer mon compte professeur');
+    expect(payload.html).toContain('Créer mon compte professeur');
+  }
+
+  thenResendCalledWithEnglishInvitationPayload() {
+    expect(this.sendMock).toHaveBeenCalledTimes(1);
+    expect(this.sendMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        from: 'Edesio <noreply@edesio.ai>',
+        to: [this.email],
+        subject: `${this.name} invites you to join Edesio`,
+      }),
+    );
+
+    const payload = this.sendMock.mock.calls[0][0];
+    expect(payload.html).toContain("You're invited!");
+    expect(payload.html).toContain(this.invitationToken);
+    expect(payload.html).toContain('Create my teacher account');
   }
 
   async thenThrowEmailSendingError(promise: Promise<unknown>) {
@@ -191,6 +222,11 @@ class Fixtures {
   thenInvitationHtmlContainsFrontendUrl(url: string) {
     const payload = this.sendMock.mock.calls[0][0];
     expect(payload.html).toContain(`${url}/register/teacher-invitation/${this.invitationToken}`);
-    expect(payload.html).toContain(`${url}/icon-192.png`);
+    expect(payload.html).toContain('cid:edesio-logo');
+    expect(payload.attachments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ contentId: 'edesio-logo', filename: 'edesio-logo-square.png' }),
+      ]),
+    );
   }
 }

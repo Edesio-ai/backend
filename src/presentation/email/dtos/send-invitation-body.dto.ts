@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { LOCALES, type Locale } from 'src/domain/shared/locale.type';
+import { IsEmail, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class SendInvitationBodyDto {
   @IsEmail()
@@ -16,4 +17,9 @@ export class SendInvitationBodyDto {
   @IsNumber()
   @IsNotEmpty()
   assignedChatbots: number;
+
+  @IsOptional()
+  @IsString()
+  @IsIn([...LOCALES])
+  locale?: Locale;
 }

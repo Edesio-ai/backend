@@ -41,6 +41,20 @@ describe('CreateCheckoutSessionsUseCase', () => {
     fixtures.thenReturnNewCheckoutUrl(result);
   });
 
+  it('should forward locale to the payment client when provided', async () => {
+    fixtures.whenSubscriptionRepositoryReturnsNull();
+    fixtures.whenPaymentClientReturnsCheckoutUrl();
+
+    await fixtures.whenExecuteWith(fixtures.priceId, fixtures.planType, fixtures.user, 'en');
+
+    expect(fixtures.paymentClient.createCheckoutSession).toHaveBeenCalledWith(
+      fixtures.user,
+      fixtures.priceId,
+      fixtures.planType,
+      'en',
+    );
+  });
+
   it('should propagate repository error', async () => {
     fixtures.whenSubscriptionRepositoryThrowsError();
 
@@ -84,8 +98,8 @@ class Fixtures {
     this.repositoryError = new Error('database down');
   }
 
-  whenExecuteWith(priceId: string, planType: string, user: User): Promise<unknown> {
-    return this.createCheckoutSessionsUseCase.execute(priceId, planType, user);
+  whenExecuteWith(priceId: string, planType: string, user: User, locale?: 'en' | 'fr'): Promise<unknown> {
+    return this.createCheckoutSessionsUseCase.execute(priceId, planType, user, locale);
   }
 
   whenSubscriptionRepositoryReturnsExistingSubscription() {

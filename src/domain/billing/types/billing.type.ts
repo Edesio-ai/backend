@@ -1,3 +1,5 @@
+import { Locale } from 'src/domain/shared/locale.type';
+
 export type SubscriptionStatus = {
   hasActiveSubscription: boolean;
   role: string;
@@ -66,4 +68,5 @@ export type CancelSubscription = {
 export type CancelSubscriptionEmailParams = CancelSubscription & {
   email: string;
   firstname: string;
+  locale?: Locale;
 };

@@ -52,11 +52,17 @@ describe('RegisterBody', () => {
     expect(errors.some((e) => e.property === 'acceptTerms')).toBe(true);
   });
 
-  it('rejects invalid email', async () => {
-    const dto = Object.assign(valid(), { email: 'not-valid' });
+  it('accepts optional locale en', async () => {
+    const dto = Object.assign(valid(), { locale: 'en' as const });
+
+    expect(await validate(dto)).toHaveLength(0);
+  });
+
+  it('rejects unsupported locale values', async () => {
+    const dto = Object.assign(valid(), { locale: 'de' as never });
 
     const errors = await validate(dto);
 
-    expect(errors.some((e) => e.property === 'email')).toBe(true);
+    expect(errors.some((e) => e.property === 'locale')).toBe(true);
   });
 });

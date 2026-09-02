@@ -317,7 +317,7 @@ class Fixtures {
   }
 
   thenSendWelcomeEmailCalledWith(email: string, name: string, role: string) {
-    expect(this.emailProvider.sendWelcomeEmail).toHaveBeenCalledWith(email, name, role);
+    expect(this.emailProvider.sendWelcomeEmail).toHaveBeenCalledWith(email, name, role, 'fr');
     expect(this.emailProvider.sendWelcomeEmail).toHaveBeenCalledTimes(1);
   }
 

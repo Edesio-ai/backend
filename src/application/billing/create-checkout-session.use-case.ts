@@ -7,6 +7,7 @@ import {
 } from 'src/domain/subscription/contracts/i-subscription.repository';
 import { STRIPE_PROVIDER, type IStripeProvider } from '../../domain/billing/contracts/i-stripe-client.provider';
 import { CheckoutSessionCreateResult, CheckoutSessionExistingResult } from 'src/domain/billing/types/billing.type';
+import { Locale } from 'src/domain/shared/locale.type';
 
 export class CreateCheckoutSessionsUseCase {
   constructor(
@@ -20,7 +21,7 @@ export class CreateCheckoutSessionsUseCase {
     priceId: string,
     planType: string,
     user: User,
-    locale?: 'en' | 'fr',
+    locale?: Locale,
   ): Promise<CheckoutSessionCreateResult | CheckoutSessionExistingResult> {
     if (!user) {
       throw new TokenUserNotFoundError('User not found');

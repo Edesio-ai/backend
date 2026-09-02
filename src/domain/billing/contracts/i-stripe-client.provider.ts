@@ -7,6 +7,7 @@ import {
   StripeSubscriptionsLookup,
   CheckoutSessionCreateResult,
 } from 'src/domain/billing/types/billing.type';
+import { Locale } from 'src/domain/shared/locale.type';
 
 export const STRIPE_PROVIDER = Symbol('STRIPE_PROVIDER');
 
@@ -19,10 +20,10 @@ export interface IStripeProvider {
     user: User,
     priceId: string,
     planType: string,
-    locale?: 'en' | 'fr',
+    locale?: Locale,
   ): Promise<CheckoutSessionCreateResult>;
   getCheckoutSession(sessionId: string): Promise<StripeSession>;
-  cancelSubscription(user: User): Promise<CancelSubscription>;
+  cancelSubscription(user: User, locale?: Locale): Promise<CancelSubscription>;
   reactivateSubscription(email: string): Promise<void>;
   getCustomerPortalUrl(email: string): Promise<string | null>;
 }
