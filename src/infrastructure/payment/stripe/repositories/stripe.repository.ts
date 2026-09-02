@@ -12,6 +12,7 @@ import {
   CheckoutSessionCreateResult,
 } from 'src/domain/billing/types/billing.type';
 import { NotFoundError, ServerError } from 'src/domain/shared/errors/global.errors';
+import { DEFAULT_LOCALE, type Locale } from 'src/domain/shared/locale.type';
 
 export class StripeRepository implements IStripeProvider {
   constructor(
@@ -87,7 +88,7 @@ export class StripeRepository implements IStripeProvider {
     user: User,
     priceId: string,
     planType: string,
-    locale?: 'en' | 'fr',
+    locale?: Locale,
   ): Promise<CheckoutSessionCreateResult> {
     try {
       const { email } = user;
@@ -209,7 +210,7 @@ export class StripeRepository implements IStripeProvider {
     }
   }
 
-  public async cancelSubscription(user: User): Promise<CancelSubscription> {
+  public async cancelSubscription(user: User, locale: Locale = DEFAULT_LOCALE): Promise<CancelSubscription> {
     try {
       const customer = await this.getCustomerByEmail(user.email);
       if (customer.length === 0) {
@@ -246,7 +247,8 @@ export class StripeRepository implements IStripeProvider {
       }
 
       const endTimestamp = canceledSubscription.cancel_at ?? 0;
-      const endDate = new Date(endTimestamp * 1000).toLocaleDateString('fr-FR', {
+      const dateLocale = locale === 'en' ? 'en-US' : 'fr-FR';
+      const endDate = new Date(endTimestamp * 1000).toLocaleDateString(dateLocale, {
         day: 'numeric',
         month: 'long',
         year: 'numeric',

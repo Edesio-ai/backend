@@ -1,3 +1,5 @@
+import { Locale } from 'src/domain/shared/locale.type';
+
 export type SignUpTeacherBody = {
   token: string;
   email: string;
@@ -63,6 +65,7 @@ export type RegisterBody = {
   acceptTerms: boolean;
   establishment?: string;
   invitationToken?: string;
+  locale?: Locale;
 };
 
 export type LoginBody = {

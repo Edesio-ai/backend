@@ -3,5 +3,11 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
+    "assets": [
+      {
+        "include": "**/*.png",
+        "watchAssets": true
+      }
+    ]
   }
 }

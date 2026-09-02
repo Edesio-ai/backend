@@ -10,6 +10,7 @@ import {
 } from 'src/domain/invitation-token/contract/i-invtiation-token.repository';
 import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { BadRequestError } from 'src/domain/shared/errors/global.errors';
+import { normalizeLocale } from 'src/domain/shared/locale.type';
 
 @Injectable()
 export class RegisterUseCase {
@@ -45,7 +46,7 @@ export class RegisterUseCase {
 
     await this.authRepository.createAuthUser(email, password, metadata);
 
-    await this.emailProvider.sendWelcomeEmail(email, firstname, role);
+    await this.emailProvider.sendWelcomeEmail(email, firstname, role, normalizeLocale(body.locale));
   }
 
   private async registerByInvitationToken(body: RegisterBody, metadata: UserMetadata): Promise<void> {
@@ -67,7 +68,8 @@ export class RegisterUseCase {
       const teacher = await this.teacherRepository.createTeacherWithInvitationToken(authUser, token);
       await this.invitationTokenRepository.updateTokenUsedAt(token.id, teacher.id);
     }
-    await this.emailProvider.sendWelcomeEmail(email, firstname, role);
+
+    await this.emailProvider.sendWelcomeEmail(email, firstname, role, normalizeLocale(body.locale));
     return;
   }
 }

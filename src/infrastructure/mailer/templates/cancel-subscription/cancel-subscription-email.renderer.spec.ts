@@ -1,6 +1,6 @@
-import { renderCancelSubscriptionEmailHtml } from './cancel-subscription-email.renderer';
+import { renderCancelSubscriptionEmail } from './render';
 
-describe('renderCancelSubscriptionEmailHtml', () => {
+describe('renderCancelSubscriptionEmail', () => {
   const params = {
     email: 'user@test.com',
     firstname: 'Claire',
@@ -20,14 +20,23 @@ describe('renderCancelSubscriptionEmailHtml', () => {
     });
 
     it('should include greeting, plan, end date and profile links from env base URL', () => {
-      const html = renderCancelSubscriptionEmailHtml(params);
+      const { html, subject } = renderCancelSubscriptionEmail(params);
 
+      expect(subject).toContain('annulation');
       expect(html).toContain('Bonjour Claire');
       expect(html).toContain('Offre Pro');
       expect(html).toContain('15 février 2026');
-      expect(html).toContain('https://app.edesio.test/edesio-logo-square.png');
-      expect(html).toContain('https://app.edesio.test/profil');
+      expect(html).toContain('https://app.edesio.test/profile');
+      expect(html).toContain('cid:edesio-logo');
       expect(html).toContain('contact@edesio.ai');
+    });
+
+    it('should render the English template when locale is en', () => {
+      const { html, subject } = renderCancelSubscriptionEmail({ ...params, locale: 'en' });
+
+      expect(subject).toContain('cancellation');
+      expect(html).toContain('Hello Claire');
+      expect(html).toContain('Go to my profile');
     });
   });
 
@@ -43,10 +52,10 @@ describe('renderCancelSubscriptionEmailHtml', () => {
     });
 
     it('should fall back to localhost default for assets and CTA', () => {
-      const html = renderCancelSubscriptionEmailHtml(params);
+      const { html } = renderCancelSubscriptionEmail(params);
 
-      expect(html).toContain('http://localhost:5000/edesio-logo-square.png');
-      expect(html).toContain('http://localhost:5000/profil');
+      expect(html).toContain('http://localhost:5000/profile');
+      expect(html).toContain('cid:edesio-logo');
     });
   });
 });

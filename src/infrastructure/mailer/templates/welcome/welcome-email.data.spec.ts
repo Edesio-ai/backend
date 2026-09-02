@@ -1,4 +1,4 @@
-import { buildWelcomeEmailTemplateData } from './welcome-email.data';
+import { buildWelcomeEmailTemplateData } from './data';
 
 describe('buildWelcomeEmailTemplateData', () => {
   const baseParams = {
@@ -16,20 +16,10 @@ describe('buildWelcomeEmailTemplateData', () => {
     expect(data.name).toBe(baseParams.name);
     expect(data.appUrl).toBe(baseParams.appUrl);
     expect(data.logoUrl).toBe(baseParams.logoUrl);
-    expect(data.roleLabel).toBe('Self-learner');
+    expect(data.roleLabel).toBe('Autodidacte');
     expect(data.dashboardPath).toBe('/self-learner');
     expect(data.quickStartItems.length).toBeGreaterThan(0);
     expect(data.quickStartItems[0]).toContain('cours');
-  });
-
-  it('aliases lowercase selfLearner-style input to self-learner role', () => {
-    const data = buildWelcomeEmailTemplateData({
-      ...baseParams,
-      role: 'selfLearner',
-    });
-
-    expect(data.dashboardPath).toBe('/self-learner');
-    expect(data.roleLabel).toBe('Self-learner');
   });
 
   it('trims role and ignores case before mapping', () => {
@@ -39,7 +29,7 @@ describe('buildWelcomeEmailTemplateData', () => {
     });
 
     expect(data.dashboardPath).toBe('/teacher');
-    expect(data.roleLabel).toBe('Teacher');
+    expect(data.roleLabel).toBe('Professeur');
   });
 
   it('defaults unknown roles to student', () => {
@@ -49,6 +39,17 @@ describe('buildWelcomeEmailTemplateData', () => {
     });
 
     expect(data.dashboardPath).toBe('/student');
-    expect(data.roleLabel).toBe('Student');
+    expect(data.roleLabel).toBe('Élève');
+  });
+
+  it('uses English role labels when locale is en', () => {
+    const data = buildWelcomeEmailTemplateData({
+      ...baseParams,
+      role: 'self-learner',
+      locale: 'en',
+    });
+
+    expect(data.roleLabel).toBe('Self-learner');
+    expect(data.quickStartItems[0]).toContain('lessons');
   });
 });

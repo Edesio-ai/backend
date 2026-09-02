@@ -185,6 +185,15 @@ describe('StripeRepository', () => {
       expect(result).toEqual(fixtures.expectedCancelSubscription);
     });
 
+    it('should format end date in English when locale is en', async () => {
+      fixtures.whenCancelSubscriptionSucceeds();
+
+      const result = await fixtures.whenCancelSubscriptionWithLocale('en');
+
+      expect(result.endDate).toBe(fixtures.expectedCancelSubscriptionEn.endDate);
+      expect(result.planName).toBe(fixtures.expectedCancelSubscriptionEn.planName);
+    });
+
     it('should throw ServerError when customer is not found', async () => {
       fixtures.whenCustomersListEmpty();
 
@@ -326,6 +335,11 @@ class Fixtures {
     endDate: '',
   };
 
+  public expectedCancelSubscriptionEn: CancelSubscription = {
+    planName: '',
+    endDate: '',
+  };
+
   public readonly subscriptionRow = {
     id: 'sub_abc',
     status: 'active',
@@ -436,6 +450,10 @@ class Fixtures {
     return this.stripeRepository.cancelSubscription(this.cancelDomainUser);
   }
 
+  whenCancelSubscriptionWithLocale(locale: 'en' | 'fr') {
+    return this.stripeRepository.cancelSubscription(this.cancelDomainUser, locale);
+  }
+
   whenReactivateSubscription() {
     return this.stripeRepository.reactivateSubscription(this.email);
   }
@@ -487,6 +505,14 @@ class Fixtures {
     this.expectedCancelSubscription = {
       planName: 'Offre Campus',
       endDate: new Date(endTs * 1000).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+    };
+    this.expectedCancelSubscriptionEn = {
+      planName: 'Offre Campus',
+      endDate: new Date(endTs * 1000).toLocaleDateString('en-US', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',

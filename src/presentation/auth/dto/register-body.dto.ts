@@ -10,6 +10,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { LOCALES, type Locale } from 'src/domain/shared/locale.type';
 
 export class RegisterBody {
   @IsString()
@@ -49,4 +50,9 @@ export class RegisterBody {
   @IsString()
   @IsOptional()
   invitationToken?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn([...LOCALES])
+  locale?: Locale;
 }

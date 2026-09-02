@@ -24,6 +24,18 @@ describe('CancelSubscriptionUseCase', () => {
     fixtures.thenReturnsCanceledPayload(result);
   });
 
+  it('should forward English locale to stripe and email providers', async () => {
+    fixtures.whenStripeCancelSucceeds();
+    fixtures.whenSendCancelEmailResolves();
+
+    await fixtures.whenExecuteWithLocale('en');
+
+    expect(fixtures.stripeRepository.cancelSubscription).toHaveBeenCalledWith(fixtures.user, 'en');
+    expect(fixtures.emailProvider.sendCancelSubscriptionEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ locale: 'en' }),
+    );
+  });
+
   it('should propagate stripe error and not send email', async () => {
     fixtures.whenStripeCancelThrows();
 
@@ -83,6 +95,10 @@ class Fixtures {
     return this.cancelSubscriptionUseCase.execute(this.user);
   }
 
+  whenExecuteWithLocale(locale: 'en' | 'fr') {
+    return this.cancelSubscriptionUseCase.execute(this.user, locale);
+  }
+
   whenStripeCancelSucceeds() {
     this.stripeRepository.cancelSubscription.mockResolvedValue(this.canceledSubscription);
   }
@@ -100,7 +116,7 @@ class Fixtures {
   }
 
   thenCancelSubscriptionCalledWithUser() {
-    expect(this.stripeRepository.cancelSubscription).toHaveBeenCalledWith(this.user);
+    expect(this.stripeRepository.cancelSubscription).toHaveBeenCalledWith(this.user, 'fr');
     expect(this.stripeRepository.cancelSubscription).toHaveBeenCalledTimes(1);
   }
 
@@ -110,6 +126,7 @@ class Fixtures {
       firstname: this.user.metadata.firstname,
       planName: this.canceledSubscription.planName,
       endDate: this.canceledSubscription.endDate,
+      locale: 'fr',
     });
     expect(this.emailProvider.sendCancelSubscriptionEmail).toHaveBeenCalledTimes(1);
   }

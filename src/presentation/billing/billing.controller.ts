@@ -16,6 +16,7 @@ import {
 import { CancelSubscriptionUseCase } from 'src/application/billing/cancel-subscription.use-case';
 import { ReactivateSubscriptionUseCase } from 'src/application/billing/reactivate-subscription.use-case';
 import { GetCustomerPortalUrlUseCase } from 'src/application/billing/get-custome-portal-url.use-case';
+import { CancelSubscriptionBodyDto } from './dtos/cancel-subscription-body.dto';
 
 @Controller('billing')
 export class BillingController {
@@ -49,8 +50,11 @@ export class BillingController {
   }
 
   @Post('subscription/cancel')
-  async cancelSubscription(@CurrentUser() user: User): Promise<CancelSubscription> {
-    return this.cancelSubscriptionUseCase.execute(user);
+  async cancelSubscription(
+    @CurrentUser() user: User,
+    @Body() body: CancelSubscriptionBodyDto,
+  ): Promise<CancelSubscription> {
+    return this.cancelSubscriptionUseCase.execute(user, body.locale);
   }
 
   @Post('subscription/reactivate')
