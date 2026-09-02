@@ -70,6 +70,7 @@ export class CourseController {
     return { data: course };
   }
 
+  @Roles('teacher', 'student')
   @Get('session/:sessionId/count')
   async getCoursesSessionCount(@Param('sessionId') sessionId: string): Promise<{ count: number }> {
     const count = await this.getCoursesSessionCountUseCase.execute(sessionId);
