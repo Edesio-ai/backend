@@ -3,6 +3,7 @@ import { AuthSupabaseRepository } from './auth-supabase.repository';
 import { AuthMapper } from '../mappers/auth.mappers';
 import { BadRequestError, ServerError, UnauthorizedError } from '../../../../domain/shared/errors/global.errors';
 import { AuthUserWithSession, SupabaseAuthSession } from '../../../../domain/auth/types/auth.type';
+import { TokenUserNotFoundError } from '../../../../domain/auth/errors/auth.errors';
 
 describe('AuthSupabaseRepository', () => {
   describe('loginUser', () => {
@@ -182,6 +183,31 @@ describe('AuthSupabaseRepository', () => {
       await expect(promise).rejects.toBeInstanceOf(ServerError);
       await expect(promise).rejects.toThrow('rate limited');
       expect(fixtures.resetPasswordForEmailMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('refreshSession', () => {
+    let fixtures: RefreshSessionFixtures;
+
+    beforeEach(() => {
+      fixtures = new RefreshSessionFixtures();
+    });
+
+    it('should return auth user with session when refresh succeeds', async () => {
+      fixtures.whenRefreshSucceeds();
+
+      const result = await fixtures.whenRefreshSession();
+
+      expect(fixtures.refreshSessionMock).toHaveBeenCalledWith({
+        refresh_token: fixtures.refreshToken,
+      });
+      expect(result).toEqual(fixtures.expectedAuthUserWithSession);
+    });
+
+    it('should throw TokenUserNotFoundError when refresh fails', async () => {
+      fixtures.whenRefreshFails();
+
+      await expect(fixtures.whenRefreshSession()).rejects.toBeInstanceOf(TokenUserNotFoundError);
     });
   });
 });
@@ -504,5 +530,86 @@ class ResetPasswordByEmailFixtures {
       redirectTo: 'http://localhost:3000/reset-password',
     });
     expect(this.resetPasswordForEmailMock).toHaveBeenCalledTimes(1);
+  }
+}
+
+class RefreshSessionFixtures {
+  public readonly refreshToken = 'refresh-token';
+  public readonly refreshSessionMock = jest.fn();
+  public readonly sut: AuthSupabaseRepository;
+  public readonly expectedAuthUserWithSession: AuthUserWithSession;
+
+  constructor() {
+    const supabaseAuthMock = {
+      auth: {
+        refreshSession: this.refreshSessionMock,
+      },
+    };
+
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as unknown as SupabaseClient);
+
+    this.expectedAuthUserWithSession = {
+      authUser: {
+        id: 'u1',
+        email: 'user@school.com',
+        emailConfirmedAt: '2026-01-01T00:00:00.000Z',
+        metadata: {
+          role: 'teacher',
+          firstname: 'Ada',
+          lastname: 'Lovelace',
+          establishment: undefined,
+          invitationToken: undefined,
+        },
+      },
+      session: {
+        accessToken: 'new-at',
+        refreshToken: 'new-rt',
+        expiresIn: 3600,
+      },
+    };
+  }
+
+  whenRefreshSession() {
+    return this.sut.refreshSession(this.refreshToken);
+  }
+
+  whenRefreshSucceeds() {
+    const user = {
+      id: 'u1',
+      email: 'user@school.com',
+      email_confirmed_at: '2026-01-01T00:00:00.000Z',
+      user_metadata: {
+        role: 'teacher',
+        firstname: 'Ada',
+        lastname: 'Lovelace',
+      },
+      confirmed_at: '2026-01-01T00:00:00.000Z',
+      last_sign_in_at: '2026-01-01T00:00:00.000Z',
+      created_at: '2026-01-01T00:00:00.000Z',
+      updated_at: '2026-01-01T00:00:00.000Z',
+    };
+
+    this.refreshSessionMock.mockResolvedValue({
+      data: {
+        session: {
+          access_token: 'new-at',
+          refresh_token: 'new-rt',
+          expires_in: 3600,
+          expires_at: '2026-12-31T23:59:59.000Z',
+          token_type: 'bearer',
+          user,
+          weak_password: null,
+        },
+        user,
+      },
+      error: null,
+    });
+  }
+
+  whenRefreshFails() {
+    this.refreshSessionMock.mockResolvedValue({
+      data: { session: null, user: null },
+      error: { message: 'Invalid Refresh Token: Already Used' },
+    });
   }
 }

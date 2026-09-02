@@ -30,6 +30,26 @@ export class AuthSupabaseRepository implements IAuthRepository {
     return AuthMapper.SupabaseValidatedTokenUserToUser(data.user as unknown as SupabaseUser);
   }
 
+  public async refreshSession(refreshToken: string): Promise<AuthUserWithSession> {
+    const { data, error } = await this.supabaseAuth.auth.refreshSession({
+      refresh_token: refreshToken,
+    });
+
+    if (error || !data.session) {
+      throw new TokenUserNotFoundError(error?.message || 'Invalid or expired refresh token');
+    }
+
+    const session = {
+      user: data.session.user,
+      session: data.session,
+    } as unknown as SupabaseAuthSession;
+
+    return {
+      authUser: AuthMapper.toAuthUser(session),
+      session: AuthMapper.toAuthTokenData(session),
+    };
+  }
+
   public async logoutUser(accessToken: string): Promise<void> {
     const { error } = await this.supabaseAuth.auth.admin.signOut(accessToken, 'global');
 
