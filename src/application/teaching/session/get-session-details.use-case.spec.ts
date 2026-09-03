@@ -80,6 +80,19 @@ describe('GetSessionDetailsUseCase', () => {
     expect(result.students).toEqual([]);
     expect(result.files).toEqual([]);
   });
+
+  it('should return course details for admin without establishment ownership', async () => {
+    fixtures.whenEstablishmentNotFound();
+    fixtures.whenCourseFound();
+    fixtures.whenQuestionsFound();
+    fixtures.whenStudentsFound();
+    fixtures.whenFilesFound();
+
+    const result = await fixtures.whenExecuteAsAdmin();
+
+    fixtures.thenCourseDetailsReturned(result);
+    expect(fixtures.establishmentRepository.getEstablishmentByUserId).toHaveBeenCalledWith(fixtures.adminUser.id);
+  });
 });
 
 class Fixtures {
@@ -89,6 +102,13 @@ class Fixtures {
     email: 'owner@school.com',
     emailConfirmedAt: '2026-01-01T00:00:00.000Z',
     metadata: { role: 'establishment' },
+  };
+
+  public readonly adminUser: AuthUser = {
+    id: 'user-admin-1',
+    email: 'admin@school.com',
+    emailConfirmedAt: '2026-01-01T00:00:00.000Z',
+    metadata: { role: 'admin' },
   };
 
   public readonly establishment = {
@@ -189,6 +209,10 @@ class Fixtures {
 
   whenExecute() {
     return this.useCase.execute(this.courseId, this.user);
+  }
+
+  whenExecuteAsAdmin() {
+    return this.useCase.execute(this.courseId, this.adminUser);
   }
 
   whenEstablishmentNotFound() {

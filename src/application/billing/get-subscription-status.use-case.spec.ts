@@ -23,6 +23,16 @@ describe('GetSubscriptionStatusUseCase', () => {
     fixtures.thenPaymentClientNotCalled();
   });
 
+  it('should return active subscription for admin role without payment calls', async () => {
+    const result = await fixtures.whenExecuteWith(fixtures.adminUser);
+
+    expect(result).toEqual({
+      hasActiveSubscription: true,
+      role: 'admin',
+    });
+    fixtures.thenPaymentClientNotCalled();
+  });
+
   it('should return inactive subscription when email is missing', async () => {
     const result = await fixtures.whenExecuteWith(fixtures.userWithoutEmail);
 
@@ -79,6 +89,7 @@ class Fixtures {
   public readonly establishmentUser: User;
   public readonly studentUser: User;
   public readonly teacherUser: User;
+  public readonly adminUser: User;
   public readonly userWithoutEmail: User;
   public readonly customerId: string;
   public readonly paymentClientError: Error;
@@ -116,6 +127,7 @@ class Fixtures {
     this.establishmentUser = this.createUser('establishment', 'owner@school.com', 'user-1');
     this.studentUser = this.createUser('student', 'student@school.com', 'user-3');
     this.teacherUser = this.createUser('teacher', 'teacher@school.com', 'user-2');
+    this.adminUser = this.createUser('admin', 'admin@school.com', 'user-5');
     this.userWithoutEmail = this.createUser('establishment', '', 'user-4');
   }
 

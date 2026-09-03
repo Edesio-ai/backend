@@ -1,5 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { CourseQuestion } from 'src/domain/teaching/course-question/types/course-question.type';
+import { isAdmin } from 'src/domain/auth/role.utils';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
@@ -40,16 +41,18 @@ export class GetStudentCourseQuestionsUseCase {
   async execute(courseId: string, user: AuthUser): Promise<CourseQuestion[]> {
     const { role } = user.metadata;
 
-    switch (role) {
-      case 'student': {
-        await this.checkStudentAccess(courseId, user.id);
-        break;
-      }
-      case 'teacher': {
-        break;
-      }
-      default: {
-        throw new ForbiddenError('You are not authorized to access this course');
+    if (!isAdmin(role)) {
+      switch (role) {
+        case 'student': {
+          await this.checkStudentAccess(courseId, user.id);
+          break;
+        }
+        case 'teacher': {
+          break;
+        }
+        default: {
+          throw new ForbiddenError('You are not authorized to access this course');
+        }
       }
     }
     return this.courseQuestionRepository.getCourseQuestionsByCourseId(courseId);

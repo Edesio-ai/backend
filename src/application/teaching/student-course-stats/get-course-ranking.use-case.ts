@@ -1,4 +1,5 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import { isAdmin } from 'src/domain/auth/role.utils';
 import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
   CourseRanking,
@@ -51,17 +52,19 @@ export class GetCourseRankingUseCase {
       throw new NotFoundError(`Course with id ${courseId} not found`);
     }
 
-    switch (role) {
-      case 'teacher': {
-        await this.checkTeacherAccess(course, user);
-        break;
-      }
-      case 'student': {
-        await this.checkStudentAccess(course, user);
-        break;
-      }
-      default: {
-        throw new ForbiddenException('You are not authorized to access this course');
+    if (!isAdmin(role)) {
+      switch (role) {
+        case 'teacher': {
+          await this.checkTeacherAccess(course, user);
+          break;
+        }
+        case 'student': {
+          await this.checkStudentAccess(course, user);
+          break;
+        }
+        default: {
+          throw new ForbiddenException('You are not authorized to access this course');
+        }
       }
     }
 

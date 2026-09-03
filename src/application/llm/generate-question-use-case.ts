@@ -1,5 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
+import { isAdmin } from 'src/domain/auth/role.utils';
 import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { CourseFile } from 'src/domain/teaching/course-file/types/course-file.type';
 import { Question } from 'src/domain/teaching/question/types/question.type';
@@ -69,18 +70,18 @@ export class GenerateQuestionUseCase {
   async execute(body: GenerateQuestionBody, user: AuthUser): Promise<Question[] | SelfLearnerQuestion[]> {
     const { courseId } = body;
     const role = user.metadata.role;
+    const useTeacherPath = await this.shouldUseTeacherPath(role, courseId);
 
-    const { combinedText, config } =
-      role === 'teacher'
-        ? await this.getTeacherGenerationConfig(user.id, body)
-        : await this.getSelfLearnerGenerationConfig(user.id, body);
+    const { combinedText, config } = useTeacherPath
+      ? await this.getTeacherGenerationConfig(user.id, body)
+      : await this.getSelfLearnerGenerationConfig(user.id, body);
 
     const questions = await this.mistralRepository.generateQuestions(combinedText, config);
     if (!questions || questions.length === 0) {
       throw new BadRequestError('Failed to generate questions');
     }
 
-    if (role === 'teacher') {
+    if (useTeacherPath) {
       await this.questionRepository.deleteCourseQuizQuestions(courseId);
     } else {
       await this.selfLearnerQuestionRepository.deleteSelfLearnerQuestionsByCourseId(courseId);
@@ -97,12 +98,21 @@ export class GenerateQuestionUseCase {
       if (i < openQuestions.length) alternatedQuestions.push(openQuestions[i]);
     }
 
-    const insertedQuestions =
-      role === 'teacher'
-        ? await this.questionRepository.insertQuestions(alternatedQuestions, courseId)
-        : await this.selfLearnerQuestionRepository.insertSelfLearnerQuestions(alternatedQuestions, courseId);
+    const insertedQuestions = useTeacherPath
+      ? await this.questionRepository.insertQuestions(alternatedQuestions, courseId)
+      : await this.selfLearnerQuestionRepository.insertSelfLearnerQuestions(alternatedQuestions, courseId);
 
     return insertedQuestions;
+  }
+
+  private async shouldUseTeacherPath(role: string | undefined, courseId: string): Promise<boolean> {
+    if (role === 'teacher') return true;
+    if (role === 'self-learner') return false;
+    if (isAdmin(role)) {
+      const teacherCourse = await this.courseRepository.getCourseById(courseId);
+      return !!teacherCourse;
+    }
+    return false;
   }
 
   private async getTeacherGenerationConfig(

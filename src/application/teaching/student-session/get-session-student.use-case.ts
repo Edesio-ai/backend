@@ -10,6 +10,7 @@ import {
   SESSION_REPOSITORY,
   type ISessionRepository,
 } from 'src/domain/teaching/session/contracts/i-session.repository';
+import { isAdmin } from 'src/domain/auth/role.utils';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import {
   ESTABLISHMENT_REPOSITORY,
@@ -37,14 +38,16 @@ export class GetSessionStudentUseCase {
   async execute(sessionId: string, user: AuthUser): Promise<SessionStudent[]> {
     const { role } = user.metadata;
 
-    switch (role) {
-      case 'teacher': {
-        await this.verifyTeacherAccess(user.id, sessionId);
-        break;
-      }
-      case 'establishment': {
-        await this.verifyEstablishmentAccess(user.id, sessionId);
-        break;
+    if (!isAdmin(role)) {
+      switch (role) {
+        case 'teacher': {
+          await this.verifyTeacherAccess(user.id, sessionId);
+          break;
+        }
+        case 'establishment': {
+          await this.verifyEstablishmentAccess(user.id, sessionId);
+          break;
+        }
       }
     }
 

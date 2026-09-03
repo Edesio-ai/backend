@@ -140,6 +140,19 @@ describe('GetCourseQuestionsUseCase', () => {
       expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
     });
   });
+
+  describe('admin', () => {
+    it('should return course questions without ownership checks', async () => {
+      fixtures.whenQuestionsReturned();
+
+      const result = await fixtures.whenAdminExecute();
+
+      expect(result).toEqual(fixtures.questions);
+      expect(fixtures.teachersRepository.getTeacherByUserId).not.toHaveBeenCalled();
+      expect(fixtures.studentRepository.getStudentByUserId).not.toHaveBeenCalled();
+      expect(fixtures.questionsRepository.getCourseQuestions).toHaveBeenCalledWith(fixtures.courseId);
+    });
+  });
 });
 
 class Fixtures {
@@ -238,6 +251,15 @@ class Fixtures {
 
   whenStudentExecute() {
     return this.useCase.execute(this.courseId, this.studentUser);
+  }
+
+  whenAdminExecute() {
+    const adminUser: AuthUser = {
+      ...this.teacherUser,
+      id: 'user-admin-1',
+      metadata: { role: 'admin' },
+    };
+    return this.useCase.execute(this.courseId, adminUser);
   }
 
   whenTeacherFound() {

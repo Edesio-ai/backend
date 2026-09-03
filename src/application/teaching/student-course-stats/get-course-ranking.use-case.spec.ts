@@ -62,6 +62,18 @@ describe('GetCourseRankingUseCase', () => {
     expect(fixtures.studentCourseStatsRepository.getStudentCourseStatsByCourseId).not.toHaveBeenCalled();
   });
 
+  it('should return ranking for admin without ownership checks', async () => {
+    fixtures.whenCourseFound();
+    fixtures.whenStudentStatsReturnUnsorted();
+
+    const result = await fixtures.whenExecuteAsAdmin();
+
+    expect(result).toHaveLength(4);
+    expect(result[0].studentId).toBe('s-perfect');
+    expect(fixtures.teacherRepository.getTeacherByUserId).not.toHaveBeenCalled();
+    expect(fixtures.studentRepository.getStudentByUserId).not.toHaveBeenCalled();
+  });
+
   it('should throw NotFoundError when student is missing', async () => {
     fixtures.whenCourseFound();
 
@@ -270,6 +282,14 @@ class Fixtures {
       metadata: { role: 'auditor' },
     };
     return this.useCase.execute(this.course.id, auditor);
+  }
+
+  whenExecuteAsAdmin() {
+    const admin: AuthUser = {
+      ...this.user,
+      metadata: { role: 'admin' },
+    };
+    return this.useCase.execute(this.course.id, admin);
   }
 
   whenStudentProfileFound() {

@@ -128,6 +128,17 @@ describe('GetSessionStudentUseCase', () => {
 
     await expect(fixtures.whenExecuteAsEstablishment()).rejects.toBeInstanceOf(NotFoundError);
   });
+
+  it('should return session students for admin without ownership checks', async () => {
+    fixtures.whenStudentsSessionsFound();
+
+    const result = await fixtures.whenExecuteAsAdmin();
+
+    expect(result).toEqual(fixtures.sessionStudents);
+    expect(fixtures.teacherRepository.getTeacherByUserId).not.toHaveBeenCalled();
+    expect(fixtures.establishmentRepository.getEstablishmentByUserId).not.toHaveBeenCalled();
+    expect(fixtures.sessionRepository.getSessionById).not.toHaveBeenCalled();
+  });
 });
 
 class Fixtures {
@@ -221,6 +232,15 @@ class Fixtures {
 
   whenExecuteAsEstablishment() {
     return this.useCase.execute(this.sessionId, this.establishmentUser);
+  }
+
+  whenExecuteAsAdmin() {
+    const adminUser: AuthUser = {
+      ...this.teacherUser,
+      id: 'user-admin-1',
+      metadata: { role: 'admin' },
+    };
+    return this.useCase.execute(this.sessionId, adminUser);
   }
 
   whenTeacherFound() {

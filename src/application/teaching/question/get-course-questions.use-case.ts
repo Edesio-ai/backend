@@ -1,4 +1,5 @@
 import { Question } from 'src/domain/teaching/question/types/question.type';
+import { isAdmin } from 'src/domain/auth/role.utils';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { Inject } from '@nestjs/common';
 import {
@@ -34,13 +35,15 @@ export class GetCourseQuestionsUseCase {
   async execute(courseId: string, user: AuthUser): Promise<Question[]> {
     const { role } = user.metadata;
 
-    switch (role) {
-      case 'teacher':
-        await this.checkTeacherAccess(courseId, user.id);
-        break;
-      case 'student':
-        await this.checkStudentAccess(courseId, user.id);
-        break;
+    if (!isAdmin(role)) {
+      switch (role) {
+        case 'teacher':
+          await this.checkTeacherAccess(courseId, user.id);
+          break;
+        case 'student':
+          await this.checkStudentAccess(courseId, user.id);
+          break;
+      }
     }
 
     return (await this.questionsRepository.getCourseQuestions(courseId)) ?? [];

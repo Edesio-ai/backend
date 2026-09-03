@@ -147,6 +147,16 @@ describe('GetSessionCoursesUseCase', () => {
     await expect(fixtures.whenExecuteWithUnknownRole()).rejects.toBeInstanceOf(ForbiddenError);
     expect(fixtures.courseRepository.getSessionCoursesBySessionId).not.toHaveBeenCalled();
   });
+
+  it('should return session courses for admin without ownership checks', async () => {
+    fixtures.whenCoursesReturned();
+
+    const result = await fixtures.whenExecuteAsAdmin();
+
+    expect(result).toEqual(fixtures.courses);
+    expect(fixtures.teachersRepository.getTeacherByUserId).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.getSessionCoursesBySessionId).toHaveBeenCalledWith(fixtures.sessionId);
+  });
 });
 
 class Fixtures {
@@ -269,6 +279,14 @@ class Fixtures {
       metadata: { role: 'unknown' as never },
     };
     return this.useCase.execute(this.sessionId, unknownUser);
+  }
+
+  whenExecuteAsAdmin() {
+    const adminUser: AuthUser = {
+      ...this.teacherUser,
+      metadata: { role: 'admin' },
+    };
+    return this.useCase.execute(this.sessionId, adminUser);
   }
 
   whenTeacherFound() {

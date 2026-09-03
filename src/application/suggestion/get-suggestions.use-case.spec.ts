@@ -21,6 +21,16 @@ describe('GetSuggestionsUseCase', () => {
     fixtures.thenRepositoryNotCalled();
   });
 
+  it('should return suggestions when user is admin', async () => {
+    fixtures.whenRepositoryReturnsSuggestionsAndPartialLikes();
+
+    const result = await fixtures.whenExecuteWith('teacher', fixtures.adminUser);
+
+    fixtures.thenGetSuggestionsCalledWith('teacher');
+    fixtures.thenGetUserLikesCalledWith(fixtures.adminUser.id, ['s1', 's2']);
+    fixtures.thenReturnsSuggestionsWithLikeStatus(result);
+  });
+
   it('should return suggestions with like flags when role matches category', async () => {
     fixtures.whenRepositoryReturnsSuggestionsAndPartialLikes();
 
@@ -49,6 +59,7 @@ class Fixtures {
 
   public readonly teacherUser: User;
   public readonly studentUser: User;
+  public readonly adminUser: User;
   public readonly suggestions: Suggestion[];
 
   constructor() {
@@ -68,6 +79,13 @@ class Fixtures {
       email: 's@school.com',
       emailConfirmedAt: '2026-01-01T00:00:00.000Z',
       metadata: { role: 'student' },
+    };
+
+    this.adminUser = {
+      id: 'u-admin',
+      email: 'a@school.com',
+      emailConfirmedAt: '2026-01-01T00:00:00.000Z',
+      metadata: { role: 'admin' },
     };
 
     this.suggestions = [

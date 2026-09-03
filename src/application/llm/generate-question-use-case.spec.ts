@@ -144,6 +144,22 @@ describe('GenerateQuestionUseCase', () => {
     );
     expect(result).toEqual(fixtures.insertedSelfLearnerQuestions);
   });
+
+  it('uses the teacher path when admin generates questions for a teacher course', async () => {
+    fixtures.whenAdminActor();
+    fixtures.whenTeacherCourseExists();
+    fixtures.whenTeacherFound();
+    fixtures.whenCourseWithSessionMatchesTeacher();
+    fixtures.whenNoFiles();
+    fixtures.whenOpenAiReturnsQuestions();
+    fixtures.whenInsertSucceeds();
+
+    const result = await fixtures.whenExecute();
+
+    expect(fixtures.questionRepository.deleteCourseQuizQuestions).toHaveBeenCalledWith(fixtures.body.courseId);
+    expect(fixtures.questionRepository.insertQuestions).toHaveBeenCalledWith(expect.any(Array), fixtures.body.courseId);
+    expect(result).toEqual(fixtures.insertedQuestions);
+  });
 });
 
 class Fixtures {
@@ -351,6 +367,20 @@ class Fixtures {
 
   whenSelfLearnerActor() {
     (this.user.metadata as { role: string }).role = 'self-learner';
+  }
+
+  whenAdminActor() {
+    (this.user.metadata as { role: string }).role = 'admin';
+  }
+
+  whenTeacherCourseExists() {
+    this.courseRepository.getCourseById.mockResolvedValue({
+      id: this.body.courseId,
+      sessionId: 'session-1',
+      title: 'Cours',
+      description: null,
+      contentText: 'Contenu',
+    });
   }
 
   whenSelfLearnerCourseReady() {

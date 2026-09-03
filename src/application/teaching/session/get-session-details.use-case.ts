@@ -3,6 +3,7 @@ import {
   ESTABLISHMENT_REPOSITORY,
   type IEstablishmentRepository,
 } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
+import { isAdmin } from 'src/domain/auth/role.utils';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
@@ -43,7 +44,7 @@ export class GetSessionDetailsUseCase {
 
   async execute(courseId: string, user: AuthUser): Promise<SessionDetails> {
     const establishment = await this.establishmentRepository.getEstablishmentByUserId(user.id);
-    if (!establishment) {
+    if (!establishment && !isAdmin(user.metadata.role)) {
       throw new NotFoundError('Establishment not found');
     }
 
@@ -64,7 +65,11 @@ export class GetSessionDetailsUseCase {
       throw new NotFoundError('Course not found');
     }
 
-    if (courseWithSession.teachers.establishmentId !== establishment.id) {
+    if (
+      !isAdmin(user.metadata.role) &&
+      establishment &&
+      courseWithSession.teachers.establishmentId !== establishment.id
+    ) {
       throw new ForbiddenError('You are not authorized to access this course');
     }
 
