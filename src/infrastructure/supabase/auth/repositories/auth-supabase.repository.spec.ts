@@ -210,6 +210,66 @@ describe('AuthSupabaseRepository', () => {
       await expect(fixtures.whenRefreshSession()).rejects.toBeInstanceOf(TokenUserNotFoundError);
     });
   });
+
+  describe('existsUserByEmail', () => {
+    let fixtures: ExistsUserByEmailFixtures;
+    let originalSupabaseUrl: string | undefined;
+    let originalServiceRoleKey: string | undefined;
+
+    beforeEach(() => {
+      originalSupabaseUrl = process.env.SUPABASE_URL;
+      originalServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      process.env.SUPABASE_URL = 'https://proj.supabase.co';
+      process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
+      fixtures = new ExistsUserByEmailFixtures();
+    });
+
+    afterEach(() => {
+      fixtures.restoreFetch();
+      if (originalSupabaseUrl === undefined) {
+        delete process.env.SUPABASE_URL;
+      } else {
+        process.env.SUPABASE_URL = originalSupabaseUrl;
+      }
+      if (originalServiceRoleKey === undefined) {
+        delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+      } else {
+        process.env.SUPABASE_SERVICE_ROLE_KEY = originalServiceRoleKey;
+      }
+    });
+
+    it('should return true when auth admin users contain the exact email', async () => {
+      fixtures.whenFetchReturnsUsers();
+
+      const result = await fixtures.whenExistsUserByEmail();
+
+      fixtures.thenAdminUsersFilteredByNormalizedEmail();
+      expect(result).toBe(true);
+    });
+
+    it('should return false when no user has the exact email', async () => {
+      fixtures.whenFetchReturnsUnrelatedUsers();
+
+      const result = await fixtures.whenExistsUserByEmail();
+
+      fixtures.thenAdminUsersFilteredByNormalizedEmail();
+      expect(result).toBe(false);
+    });
+
+    it('should throw ServerError when admin users request fails', async () => {
+      fixtures.whenFetchFails();
+
+      await expect(fixtures.whenExistsUserByEmail()).rejects.toBeInstanceOf(ServerError);
+    });
+
+    it('should throw ServerError when supabase auth configuration is missing', async () => {
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+      await expect(fixtures.whenExistsUserByEmail()).rejects.toBeInstanceOf(ServerError);
+      await expect(fixtures.whenExistsUserByEmail()).rejects.toThrow('Supabase auth configuration is missing');
+    });
+  });
 });
 
 class LoginUserFixtures {
@@ -611,5 +671,63 @@ class RefreshSessionFixtures {
       data: { session: null, user: null },
       error: { message: 'Invalid Refresh Token: Already Used' },
     });
+  }
+}
+
+class ExistsUserByEmailFixtures {
+  public readonly emailInput = '  Student@School.com  ';
+  public readonly emailNormalized = 'student@school.com';
+  public readonly supabaseUrl = 'https://proj.supabase.co';
+  public readonly serviceRoleKey = 'service-role-key';
+  public readonly sut: AuthSupabaseRepository;
+  private readonly originalFetch = globalThis.fetch;
+
+  constructor() {
+    this.sut = new AuthSupabaseRepository({} as unknown as SupabaseClient);
+  }
+
+  restoreFetch() {
+    globalThis.fetch = this.originalFetch;
+  }
+
+  whenExistsUserByEmail() {
+    return this.sut.existsUserByEmail(this.emailInput);
+  }
+
+  whenFetchReturnsUsers() {
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        users: [{ email: 'other@school.com' }, { email: this.emailNormalized }],
+      }),
+    }) as typeof fetch;
+  }
+
+  whenFetchReturnsUnrelatedUsers() {
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        users: [{ email: 'other@school.com' }],
+      }),
+    }) as typeof fetch;
+  }
+
+  whenFetchFails() {
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      statusText: 'Forbidden',
+    }) as typeof fetch;
+  }
+
+  thenAdminUsersFilteredByNormalizedEmail() {
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `${this.supabaseUrl}/auth/v1/admin/users?filter=${encodeURIComponent(this.emailNormalized)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.serviceRoleKey}`,
+          apikey: this.serviceRoleKey,
+        },
+      },
+    );
   }
 }
