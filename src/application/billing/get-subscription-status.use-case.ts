@@ -29,7 +29,8 @@ export class GetSubscriptionStatusUseCase {
     const role = user.metadata.role ?? '';
 
     switch (role) {
-      case 'student': {
+      case 'student':
+      case 'admin': {
         return {
           hasActiveSubscription: true,
           role,

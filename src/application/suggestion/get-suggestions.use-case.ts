@@ -1,4 +1,5 @@
 import { ForbiddenException, Inject } from '@nestjs/common';
+import { isAdmin } from 'src/domain/auth/role.utils';
 import { User } from 'src/domain/auth/types/auth.type';
 import {
   SUGGESTION_REPOSITORY,
@@ -21,7 +22,7 @@ export class GetSuggestionsUseCase {
   async execute(category: string, user: User): Promise<Suggestion[]> {
     const { role } = user.metadata;
 
-    if (role !== category) {
+    if (!isAdmin(role) && role !== category) {
       throw new ForbiddenException('You are not authorized to access this resource');
     }
     const suggestions = await this.suggestionRepository.getSuggestions(category);

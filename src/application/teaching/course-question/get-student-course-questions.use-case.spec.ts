@@ -74,6 +74,17 @@ describe('GetStudentCourseQuestionsUseCase', () => {
 
     await expect(fixtures.whenExecute()).rejects.toBe(fixtures.courseQuestionsError);
   });
+
+  it('should return course questions for admin without enrollment checks', async () => {
+    fixtures.whenCourseQuestionsReturned();
+
+    const result = await fixtures.whenExecuteAsAdmin();
+
+    expect(result).toEqual(fixtures.courseQuestions);
+    expect(fixtures.studentRepository.getStudentByUserId).not.toHaveBeenCalled();
+    expect(fixtures.courseRepository.getCourseById).not.toHaveBeenCalled();
+    expect(fixtures.courseQuestionRepository.getCourseQuestionsByCourseId).toHaveBeenCalledWith(fixtures.courseId);
+  });
 });
 
 class Fixtures {
@@ -146,6 +157,15 @@ class Fixtures {
 
   whenExecute() {
     return this.useCase.execute(this.courseId, this.studentUser);
+  }
+
+  whenExecuteAsAdmin() {
+    const adminUser: AuthUser = {
+      ...this.studentUser,
+      id: 'user-admin-1',
+      metadata: { role: 'admin' },
+    };
+    return this.useCase.execute(this.courseId, adminUser);
   }
 
   whenStudentFound() {

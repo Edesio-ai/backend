@@ -1,4 +1,5 @@
 import { Inject } from '@nestjs/common';
+import { isAdmin } from 'src/domain/auth/role.utils';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
@@ -40,18 +41,20 @@ export class GetSessionCoursesUseCase {
   async execute(sessionId: string, user: AuthUser): Promise<Course[]> {
     const { role } = user.metadata;
 
-    switch (role) {
-      case 'teacher':
-        await this.checkTeacherOwnership(sessionId, user);
-        break;
-      case 'establishment':
-        await this.checkEstablishmentOwnership(sessionId, user);
-        break;
-      case 'student':
-        await this.checkStudentOwnership(sessionId, user);
-        break;
-      default:
-        throw new ForbiddenError('You are not authorized to access this session');
+    if (!isAdmin(role)) {
+      switch (role) {
+        case 'teacher':
+          await this.checkTeacherOwnership(sessionId, user);
+          break;
+        case 'establishment':
+          await this.checkEstablishmentOwnership(sessionId, user);
+          break;
+        case 'student':
+          await this.checkStudentOwnership(sessionId, user);
+          break;
+        default:
+          throw new ForbiddenError('You are not authorized to access this session');
+      }
     }
 
     return this.courseRepository.getSessionCoursesBySessionId(sessionId);
