@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseFilters } from '@nestjs/common';
 import { Roles } from '../auth/decorator/role.decorator';
 import { CurrentUser } from '../auth/decorator/current-user.decorator';
 import { GetInvitationTokenUseCase } from 'src/application/teaching/invitation-token/get-invitation-token.use-case';
@@ -12,8 +12,10 @@ import { CreateInvitationTokenBodyDto } from './dtos/create-invitation-token.dto
 import { DeleteInvitationTokenUseCase } from 'src/application/teaching/invitation-token/delete-invitation-token.use-case';
 import { CreateInvitationTokenUseCase } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
 import { Public } from '../auth/decorator/public.decorator';
+import { GlobalErrorFilter } from '../filters/global.filter';
 
 @Roles('establishment')
+@UseFilters(GlobalErrorFilter)
 @Controller('invitation-token')
 export class InvitationTokenController {
   constructor(

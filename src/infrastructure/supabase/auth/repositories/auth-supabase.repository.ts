@@ -115,4 +115,28 @@ export class AuthSupabaseRepository implements IAuthRepository {
       throw new ServerError(error.message);
     }
   }
+
+  public async existsUserByEmail(email: string): Promise<boolean> {
+    const normalizedEmail = email.toLowerCase().trim();
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new ServerError('Supabase auth configuration is missing');
+    }
+
+    const response = await fetch(`${supabaseUrl}/auth/v1/admin/users?filter=${encodeURIComponent(normalizedEmail)}`, {
+      headers: {
+        Authorization: `Bearer ${serviceRoleKey}`,
+        apikey: serviceRoleKey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new ServerError(`Failed to fetch user by email: ${response.statusText}`);
+    }
+
+    const body = (await response.json()) as { users?: Array<{ email?: string }> };
+    return (body.users ?? []).some((user) => user.email?.toLowerCase() === normalizedEmail);
+  }
 }

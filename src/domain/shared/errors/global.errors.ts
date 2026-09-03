@@ -27,6 +27,14 @@ export class BadRequestError extends GlobalError {
   }
 }
 
+export class InvitationEmailAlreadyRegisteredError extends GlobalError {
+  readonly code = 'INVITATION_EMAIL_ALREADY_REGISTERED';
+  readonly httpStatus = 400;
+  constructor(message?: string) {
+    super(message || 'User already exists');
+  }
+}
+
 export class NotFoundError extends GlobalError {
   readonly code = 'NOT_FOUND';
   readonly httpStatus = 404;

@@ -9,5 +9,6 @@ export function createMockAuthRepository(): jest.Mocked<IAuthRepository> {
     logoutUser: jest.fn(),
     updateAuthUser: jest.fn(),
     resetPasswordByEmail: jest.fn(),
+    existsUserByEmail: jest.fn(),
   };
 }
