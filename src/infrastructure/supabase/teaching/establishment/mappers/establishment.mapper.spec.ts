@@ -31,6 +31,11 @@ class Fixtures {
     supabase_user_id: 'user-1',
     name: 'Academy',
     email: 'contact@school.com',
+    type: 'high_school',
+    street: '12 rue de la République',
+    zip_code: '75001',
+    city: 'Paris',
+    country: 'FR',
     created_at: '2026-01-01T00:00:00.000Z',
   };
 
@@ -39,6 +44,13 @@ class Fixtures {
     supabaseUserId: 'user-1',
     name: 'Academy',
     email: 'contact@school.com',
+    type: 'high_school',
+    address: {
+      street: '12 rue de la République',
+      zipCode: '75001',
+      city: 'Paris',
+      country: 'FR',
+    },
     createdAt: '2026-01-01T00:00:00.000Z',
   };
 
@@ -46,12 +58,24 @@ class Fixtures {
     supabaseUserId: 'user-2',
     name: 'New',
     email: 'new@edesio.io',
+    type: 'high_school' as const,
+    address: {
+      street: '1 avenue Test',
+      zipCode: '69001',
+      city: 'Lyon',
+      country: 'FR' as const,
+    },
   };
 
   public readonly expectedInsert = {
     supabase_user_id: 'user-2',
     name: 'New',
     email: 'new@edesio.io',
+    type: 'high_school',
+    street: '1 avenue Test',
+    zip_code: '69001',
+    city: 'Lyon',
+    country: 'FR',
   };
 
   whenToDomain() {

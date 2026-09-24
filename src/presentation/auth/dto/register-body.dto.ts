@@ -15,8 +15,8 @@ import { LOCALES, type Locale } from 'src/domain/shared/locale.type';
 export class RegisterBody {
   @IsString()
   @IsNotEmpty()
-  @IsIn(['teacher', 'establishment', 'student', 'self-learner'])
-  role: 'teacher' | 'establishment' | 'student' | 'self-learner';
+  @IsIn(['teacher', 'student', 'self-learner'])
+  role: 'teacher' | 'student' | 'self-learner';
 
   @IsEmail()
   @IsNotEmpty()

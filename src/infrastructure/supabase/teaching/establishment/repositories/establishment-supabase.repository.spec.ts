@@ -97,6 +97,11 @@ class Fixtures {
     name: 'Edesio Academy',
     email: 'owner@edesio.io',
     supabase_user_id: this.userId,
+    type: 'high_school',
+    street: '12 rue de la République',
+    zip_code: '75001',
+    city: 'Paris',
+    country: 'FR',
     created_at: '2026-01-01T00:00:00.000Z',
   };
 
@@ -105,18 +110,37 @@ class Fixtures {
     name: 'Edesio Academy',
     email: 'owner@edesio.io',
     supabaseUserId: this.userId,
+    type: 'high_school',
+    address: {
+      street: '12 rue de la République',
+      zipCode: '75001',
+      city: 'Paris',
+      country: 'FR',
+    },
     createdAt: '2026-01-01T00:00:00.000Z',
   };
   public readonly createBody = {
     supabaseUserId: 'user-2',
     name: 'Edesio New',
     email: 'new@edesio.io',
+    type: 'university' as const,
+    address: {
+      street: '1 avenue Test',
+      zipCode: '69001',
+      city: 'Lyon',
+      country: 'FR',
+    },
   };
   public readonly createdEstablishmentSupabaseRow = {
     id: 'est-2',
     supabase_user_id: this.createBody.supabaseUserId,
     name: this.createBody.name,
     email: this.createBody.email,
+    type: this.createBody.type,
+    street: this.createBody.address.street,
+    zip_code: this.createBody.address.zipCode,
+    city: this.createBody.address.city,
+    country: this.createBody.address.country,
     created_at: '2026-01-02T00:00:00.000Z',
   };
 
@@ -125,6 +149,8 @@ class Fixtures {
     supabaseUserId: this.createBody.supabaseUserId,
     name: this.createBody.name,
     email: this.createBody.email,
+    type: this.createBody.type,
+    address: this.createBody.address,
     createdAt: '2026-01-02T00:00:00.000Z',
   };
 
@@ -183,11 +209,7 @@ class Fixtures {
   }
 
   whenCreateEstablishment() {
-    return this.repository.createEstablishment(
-      this.createBody.supabaseUserId,
-      this.createBody.name,
-      this.createBody.email,
-    );
+    return this.repository.createEstablishment(this.createBody);
   }
 
   whenUpdateEstablishment() {
@@ -280,6 +302,11 @@ class Fixtures {
       supabase_user_id: this.createBody.supabaseUserId,
       name: this.createBody.name,
       email: this.createBody.email,
+      type: this.createBody.type,
+      street: this.createBody.address.street,
+      zip_code: this.createBody.address.zipCode,
+      city: this.createBody.address.city,
+      country: this.createBody.address.country,
     });
     expect(this.createSelectMock).toHaveBeenCalled();
     expect(this.createSingleMock).toHaveBeenCalledTimes(1);

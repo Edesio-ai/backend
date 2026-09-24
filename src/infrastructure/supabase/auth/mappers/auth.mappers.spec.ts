@@ -128,6 +128,7 @@ describe('AuthMapper', () => {
         email: 'user@example.com',
         email_confirmed_at: '2026-01-01T00:00:00.000Z',
         user_metadata: {
+          role: 'teacher',
           firstname: 'Jean',
           lastname: 'Dupont',
         },
@@ -137,6 +138,7 @@ describe('AuthMapper', () => {
         id: 'uid-1',
         email: 'user@example.com',
         metadata: {
+          role: 'teacher',
           firstname: 'Jean',
           lastname: 'Dupont',
         },

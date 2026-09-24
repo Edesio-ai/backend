@@ -5,7 +5,6 @@ import { GetEstablishmentsStatsUseCase } from 'src/application/teaching/establis
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
-import { CreateEstablishmentUseCase } from 'src/application/teaching/establishment/create-establishment.use-case';
 import { StudentSessionPersistenceModule } from 'src/infrastructure/supabase/teaching/student-session/student-session-persistence.module';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/session/sessions-persistence.module';
 
@@ -18,6 +17,6 @@ import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/
     SessionsPersistenceModule,
   ],
   controllers: [EstablishmentController],
-  providers: [GetEstablishmentsStatsUseCase, CreateEstablishmentUseCase],
+  providers: [GetEstablishmentsStatsUseCase],
 })
 export class EstablishmentModule {}
