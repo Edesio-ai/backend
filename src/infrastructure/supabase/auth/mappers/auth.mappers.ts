@@ -29,6 +29,7 @@ export const AuthMapper = {
     id: user.id,
     email: user.email,
     metadata: {
+      role: user.user_metadata?.role,
       firstname: user.user_metadata.firstname,
       lastname: user.user_metadata.lastname,
     },

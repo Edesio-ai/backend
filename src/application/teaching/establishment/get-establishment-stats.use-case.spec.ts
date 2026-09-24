@@ -79,6 +79,13 @@ class Fixtures {
       supabaseUserId: this.userId,
       name: 'Edesio Academy',
       email: 'stats@edesio.io',
+      type: 'high_school',
+      address: {
+        street: '12 rue de la République',
+        zipCode: '75001',
+        city: 'Paris',
+        country: 'FR',
+      },
       createdAt: '2026-01-01T00:00:00.000Z',
     };
     this.teachers = [

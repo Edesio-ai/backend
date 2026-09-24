@@ -1,4 +1,8 @@
 import { Locale } from 'src/domain/shared/locale.type';
+import {
+  type EstablishmentCountry,
+  type EstablishmentType,
+} from 'src/domain/teaching/establishment/types/establishment.type';
 
 export type SignUpTeacherBody = {
   token: string;
@@ -57,7 +61,7 @@ export type UserMetadata = {
 };
 
 export type RegisterBody = {
-  role: Role;
+  role: Exclude<Role, 'establishment'>;
   email: string;
   password: string;
   firstname: string;
@@ -65,6 +69,28 @@ export type RegisterBody = {
   acceptTerms: boolean;
   establishment?: string;
   invitationToken?: string;
+  locale?: Locale;
+};
+
+export type establishmentContactBody = {
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+  acceptTerms: boolean;
+};
+
+export type RegisterEstablishmentBody = {
+  role: 'establishment';
+  type: EstablishmentType;
+  name: string;
+  address: {
+    street: string;
+    zipCode: string;
+    city: string;
+    country: EstablishmentCountry;
+  };
+  contact: establishmentContactBody;
   locale?: Locale;
 };
 

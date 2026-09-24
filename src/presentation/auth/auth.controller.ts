@@ -16,6 +16,9 @@ import { ResetPasswordUseCase } from 'src/application/auth/reset-password.use-ca
 import { UpdatePasswordBodyDto } from './dto/update-password-body.dto';
 import { UpdatePasswordUseCase } from 'src/application/auth/update-password.use-case';
 import { CurrentUser } from './decorator/current-user.decorator';
+import { RegisterEstablishmentBodyDto } from './dto/estabishment-register.dto';
+import { RegisterBodyValidationPipe } from './pipes/register-body-validation.pipe';
+import { EstablishmentWithContact } from 'src/domain/teaching/establishment/types/establishment.type';
 
 /** Keep refresh cookie longer than access JWT so /auth/session can renew. */
 const REFRESH_TOKEN_MAX_AGE_MS = 60 * 60 * 24 * 7 * 1000;
@@ -75,9 +78,10 @@ export class AuthController {
   @Public()
   @SkipCsrf()
   @Post('register')
-  async register(@Body() body: RegisterBody): Promise<void> {
-    await this.registerUseCase.execute(body);
-    return;
+  async register(
+    @Body(RegisterBodyValidationPipe) body: RegisterBody | RegisterEstablishmentBodyDto,
+  ): Promise<EstablishmentWithContact | void> {
+    return this.registerUseCase.execute(body);
   }
 
   @Public()

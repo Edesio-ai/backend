@@ -80,6 +80,7 @@ describe('AuthSupabaseRepository', () => {
         id: 'user-uuid-1',
         email: 'teacher@school.com',
         metadata: {
+          role: 'teacher',
           firstname: 'Jean',
           lastname: 'Dupont',
         },

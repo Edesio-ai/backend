@@ -19,9 +19,16 @@ import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/t
 import { InvitationTokenPersistenceModule } from 'src/infrastructure/supabase/invitation-token/invitation-token-persistence.module';
 import { ResetPasswordUseCase } from 'src/application/auth/reset-password.use-case';
 import { UpdatePasswordUseCase } from 'src/application/auth/update-password.use-case';
+import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 
 @Module({
-  imports: [AuthPersistenceModule, MailerModule, TeacherPersistenceModule, InvitationTokenPersistenceModule],
+  imports: [
+    AuthPersistenceModule,
+    MailerModule,
+    TeacherPersistenceModule,
+    InvitationTokenPersistenceModule,
+    EstablishmentPersistenceModule,
+  ],
   controllers: [AuthController],
   providers: [
     {

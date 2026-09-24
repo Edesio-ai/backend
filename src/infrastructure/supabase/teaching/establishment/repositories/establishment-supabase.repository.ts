@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 import { SUPABASE_ADMIN } from '../../../supabase.module';
-import { Establishment } from 'src/domain/teaching/establishment/types/establishment.type';
+import { CreateEstablishmentBody, Establishment } from 'src/domain/teaching/establishment/types/establishment.type';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import { EstablishmentMapper } from '../mappers/establishment.mapper';
@@ -38,15 +38,15 @@ export class EstablishmentSupabaseRepository implements IEstablishmentRepository
     return data ? EstablishmentMapper.toDomain(data) : null;
   }
 
-  async createEstablishment(supabaseUserId: string, name: string, email: string): Promise<Establishment> {
+  async createEstablishment(body: CreateEstablishmentBody): Promise<Establishment> {
     const { data, error } = await this.supabase
       .from('establishment')
-      .insert(EstablishmentMapper.toInsert({ supabaseUserId, name, email }))
+      .insert(EstablishmentMapper.toInsert(body))
       .select()
       .single();
 
     if (error || !data) {
-      console.error(`An error occure while creating establishment: ${error}`);
+      console.error(`An error occure while creating establishment`, error);
       throw new ServerError(`An error occure while creating establishment`);
     }
 

@@ -107,6 +107,13 @@ class Fixtures {
     supabaseUserId: 'owner-1',
     name: 'Edesio Academy',
     email: 'billing@academy.com',
+    type: 'high_school' as const,
+    address: {
+      street: '12 rue de la République',
+      zipCode: '75001',
+      city: 'Paris',
+      country: 'FR',
+    },
     createdAt: '2026-01-01T00:00:00.000Z',
   };
 

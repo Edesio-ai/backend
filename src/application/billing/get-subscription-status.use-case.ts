@@ -78,6 +78,14 @@ export class GetSubscriptionStatusUseCase {
     }
 
     const subscriptions = await this.stripeRepository.getSubscriptionsByCustomerId(customerId);
+
+    if (subscriptions.length === 0) {
+      return {
+        hasActiveSubscription: false,
+        role,
+      };
+    }
+
     const subscription = this.getSubscriptionStatus(subscriptions);
 
     const isActive = subscription.status === 'active' || subscription.status === 'trialing';
