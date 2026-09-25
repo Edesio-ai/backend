@@ -80,6 +80,7 @@ class Fixtures {
     explanation: 'arithmétique',
     created_at: '2026-01-01T00:00:00.000Z',
     position_order: 1,
+    cheating_detection_enabled: true,
   };
 
   public readonly expectedQuestion = {
@@ -92,6 +93,7 @@ class Fixtures {
     explanation: 'arithmétique',
     createdAt: '2026-01-01T00:00:00.000Z',
     positionOrder: 1,
+    cheatingDetectionEnabled: true,
   };
 
   whenToDomain() {
@@ -137,6 +139,7 @@ class Fixtures {
       correctAnswers: ['4'],
       explanation: 'Simple addition',
       positionOrder: 3,
+      cheatingDetectionEnabled: false,
     });
   }
 
@@ -168,6 +171,7 @@ class Fixtures {
       correct_answers: ['oui', 'non'],
       explanation: null,
       position_order: 2,
+      cheating_detection_enabled: true,
     });
   }
 
@@ -180,6 +184,7 @@ class Fixtures {
       correct_answers: null,
       explanation: null,
       position_order: null,
+      cheating_detection_enabled: true,
     });
   }
 
@@ -202,6 +207,7 @@ class Fixtures {
       correct_answers: ['4'],
       explanation: 'Simple addition',
       position_order: 3,
+      cheating_detection_enabled: false,
     });
   }
 

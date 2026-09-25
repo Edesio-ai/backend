@@ -85,6 +85,18 @@ describe('EvaluateAnswerUseCase', () => {
       expect(result.feedback).toBe("Nice try! But cheating won't help you improve.");
       expect(fixtures.openaiRepositoryMock.evaluateAnswer).not.toHaveBeenCalled();
     });
+    it('should skip cheating detection when cheatingDetectionEnabled is false', async () => {
+      fixtures.whenOpenAiReturnsEvaluation();
+
+      const result = await fixtures.whenExecute({
+        ...fixtures.body,
+        answer: fixtures.body.correctAnswer,
+        cheatingDetectionEnabled: false,
+      });
+
+      expect(result.isCheating).not.toBe(true);
+      expect(fixtures.openaiRepositoryMock.evaluateAnswer).toHaveBeenCalled();
+    });
   });
 
   describe('when answers differ', () => {

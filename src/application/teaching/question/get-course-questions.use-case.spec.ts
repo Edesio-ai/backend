@@ -217,6 +217,7 @@ class Fixtures {
       explanation: null,
       createdAt: '2026-01-01T00:00:00.000Z',
       positionOrder: 1,
+      cheatingDetectionEnabled: true,
     },
   ];
 

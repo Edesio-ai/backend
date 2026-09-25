@@ -10,6 +10,7 @@ export type SupabaseQuestion = {
   explanation: string | null;
   created_at: string;
   position_order: number | null;
+  cheating_detection_enabled: boolean;
 };
 
 export type Question = {
@@ -22,6 +23,7 @@ export type Question = {
   explanation: string | null;
   createdAt: string;
   positionOrder: number | null;
+  cheatingDetectionEnabled: boolean;
 };
 
 export type CreateQuestionBody = {
@@ -32,12 +34,31 @@ export type CreateQuestionBody = {
   correctAnswers?: string[] | null;
   explanation?: string | null;
   positionOrder?: number | null;
+  cheatingDetectionEnabled?: boolean;
 };
 
 export type QuestionUpdate = Partial<
-  Pick<Question, 'type' | 'questionText' | 'proposals' | 'correctAnswers' | 'explanation' | 'positionOrder'>
+  Pick<
+    Question,
+    | 'type'
+    | 'questionText'
+    | 'proposals'
+    | 'correctAnswers'
+    | 'explanation'
+    | 'positionOrder'
+    | 'cheatingDetectionEnabled'
+  >
 >;
 
 export type SupabaseQuestionUpdate = Partial<
-  Pick<SupabaseQuestion, 'type' | 'question_text' | 'proposals' | 'correct_answers' | 'explanation' | 'position_order'>
+  Pick<
+    SupabaseQuestion,
+    | 'type'
+    | 'question_text'
+    | 'proposals'
+    | 'correct_answers'
+    | 'explanation'
+    | 'position_order'
+    | 'cheating_detection_enabled'
+  >
 >;
