@@ -156,6 +156,19 @@ describe('UpdateQuestionByIdUseCase', () => {
     });
   });
 
+  it('should include cheatingDetectionEnabled in updates when provided', async () => {
+    fixtures.whenQuestionFound();
+    fixtures.whenTeacherFound();
+    fixtures.whenCourseSessionMatchesTeacher();
+    fixtures.whenUpdateSucceeds();
+
+    await fixtures.whenExecute({ cheatingDetectionEnabled: false });
+
+    expect(fixtures.questionsRepository.updateQuestionById).toHaveBeenCalledWith(fixtures.questionId, {
+      cheatingDetectionEnabled: false,
+    });
+  });
+
   it('should propagate errors thrown by updateQuestionById', async () => {
     fixtures.whenQuestionFound();
     fixtures.whenTeacherFound();
@@ -197,6 +210,7 @@ class Fixtures {
     explanation: null,
     createdAt: '2026-01-01T00:00:00.000Z',
     positionOrder: 1,
+    cheatingDetectionEnabled: true,
   };
 
   public readonly updatedQuestion: Question = {

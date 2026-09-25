@@ -167,6 +167,7 @@ class Fixtures {
     explanation: 'Parce que A',
     created_at: '2026-01-01T00:00:00.000Z',
     position_order: 1,
+    cheating_detection_enabled: true,
   };
 
   public readonly expectedQuestions: Question[] = [
@@ -180,6 +181,7 @@ class Fixtures {
       explanation: 'Parce que A',
       createdAt: '2026-01-01T00:00:00.000Z',
       positionOrder: 1,
+      cheatingDetectionEnabled: true,
     },
   ];
 

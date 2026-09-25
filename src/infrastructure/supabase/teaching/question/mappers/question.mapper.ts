@@ -15,6 +15,7 @@ type SupabaseQuestionInsert = {
   correct_answers?: string[] | null;
   explanation?: string | null;
   position_order?: number | null;
+  cheating_detection_enabled?: boolean;
 };
 
 export const QuestionMapper = {
@@ -28,6 +29,7 @@ export const QuestionMapper = {
     explanation: row.explanation,
     createdAt: row.created_at,
     positionOrder: row.position_order,
+    cheatingDetectionEnabled: row.cheating_detection_enabled ?? true,
   }),
 
   toInsert: (body: CreateQuestionBody): SupabaseQuestionInsert => ({
@@ -38,6 +40,7 @@ export const QuestionMapper = {
     correct_answers: body.correctAnswers ?? null,
     explanation: body.explanation ?? null,
     position_order: body.positionOrder ?? null,
+    cheating_detection_enabled: body.cheatingDetectionEnabled ?? true,
   }),
 
   generatedToInserts: (questions: GeneratedQuestion[], courseId: string): SupabaseQuestionInsert[] =>
@@ -48,6 +51,7 @@ export const QuestionMapper = {
       proposals: q.proposals ?? null,
       correct_answers: q.correctAnswers ?? null,
       explanation: q.explanation ?? null,
+      cheating_detection_enabled: true,
     })),
 
   toUpdate: (updates: QuestionUpdate): SupabaseQuestionUpdate => {
@@ -58,6 +62,9 @@ export const QuestionMapper = {
     if (updates.correctAnswers !== undefined) row.correct_answers = updates.correctAnswers;
     if (updates.explanation !== undefined) row.explanation = updates.explanation;
     if (updates.positionOrder !== undefined) row.position_order = updates.positionOrder;
+    if (updates.cheatingDetectionEnabled !== undefined) {
+      row.cheating_detection_enabled = updates.cheatingDetectionEnabled;
+    }
     return row;
   },
 };

@@ -17,6 +17,7 @@ export interface EvaluateAnswerBody {
   answer: string;
   explanation: string;
   language?: Language;
+  cheatingDetectionEnabled?: boolean;
 }
 
 @Injectable()
@@ -27,10 +28,11 @@ export class EvaluateAnswerUseCase {
   ) {}
 
   async execute(body: EvaluateAnswerBody): Promise<EvaluateAnswerResponse> {
+    const cheatingDetectionEnabled = body.cheatingDetectionEnabled !== false;
     const normalizedCorrectAnswers = this.normalizeString(body.correctAnswer);
     const normalizedStudentAnswer = this.normalizeString(body.answer);
 
-    if (normalizedCorrectAnswers === normalizedStudentAnswer) {
+    if (cheatingDetectionEnabled && normalizedCorrectAnswers === normalizedStudentAnswer) {
       const language = body.language ?? 'francais';
       return {
         score: 0,

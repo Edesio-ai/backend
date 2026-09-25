@@ -1,4 +1,4 @@
-import { IsArray, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import { type QuestionType } from 'src/domain/teaching/question/types/question.type';
 
 export class UpdateQuestionDto {
@@ -25,4 +25,8 @@ export class UpdateQuestionDto {
   @IsNumber()
   @IsOptional()
   positionOrder?: number | undefined;
+
+  @IsBoolean()
+  @IsOptional()
+  cheatingDetectionEnabled?: boolean | undefined;
 }
