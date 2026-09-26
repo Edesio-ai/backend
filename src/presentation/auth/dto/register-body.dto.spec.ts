@@ -58,6 +58,18 @@ describe('RegisterBody', () => {
     expect(await validate(dto)).toHaveLength(0);
   });
 
+  it('accepts an invitation registration without firstname, lastname and email', async () => {
+    const dto = Object.assign(valid(), {
+      role: 'teacher' as const,
+      invitationToken: 'tok-abc',
+      firstname: undefined,
+      lastname: undefined,
+      email: undefined,
+    });
+
+    expect(await validate(dto)).toHaveLength(0);
+  });
+
   it('rejects unsupported locale values', async () => {
     const dto = Object.assign(valid(), { locale: 'de' as never });
 

@@ -57,6 +57,9 @@ class Fixtures {
 
     this.preview = {
       isValid: true,
+      firstname: 'Jean',
+      lastname: 'Dupont',
+      invitedEmail: 'jean.dupont@mail.com',
       maskedEmail: 'j***@mail.com',
       establishmentName: 'Mon Etablissement',
       assignedChatbots: 2,

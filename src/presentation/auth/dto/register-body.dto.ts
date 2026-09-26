@@ -9,6 +9,7 @@ import {
   Matches,
   MaxLength,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 import { LOCALES, type Locale } from 'src/domain/shared/locale.type';
 
@@ -18,6 +19,7 @@ export class RegisterBody {
   @IsIn(['teacher', 'student', 'self-learner'])
   role: 'teacher' | 'student' | 'self-learner';
 
+  @ValidateIf((body: RegisterBody) => !body.invitationToken)
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -31,10 +33,12 @@ export class RegisterBody {
   })
   password: string;
 
+  @ValidateIf((body: RegisterBody) => !body.invitationToken)
   @IsString()
   @IsNotEmpty()
   firstname: string;
 
+  @ValidateIf((body: RegisterBody) => !body.invitationToken)
   @IsString()
   @IsNotEmpty()
   lastname: string;

@@ -36,6 +36,9 @@ export const invitationTokenMapper = {
 
   toPreview(
     data: {
+      firstname?: string | null;
+      lastname?: string | null;
+      invited_email?: string | null;
       assigned_chatbots: number;
       establishment?: { name: string } | { name: string }[] | null;
     },
@@ -46,6 +49,9 @@ export const invitationTokenMapper = {
 
     return {
       isValid: true,
+      firstname: data.firstname ?? '',
+      lastname: data.lastname ?? '',
+      invitedEmail: data.invited_email ?? '',
       maskedEmail,
       establishmentName: row?.name ?? '',
       assignedChatbots: data.assigned_chatbots,

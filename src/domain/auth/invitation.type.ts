@@ -2,6 +2,9 @@ import { SupabaseEstablishment } from '../teaching/establishment/types/establish
 
 export type InvitationTokenPreview = {
   isValid: true;
+  firstname: string;
+  lastname: string;
+  invitedEmail: string;
   maskedEmail: string;
   establishmentName: string;
   assignedChatbots: number;

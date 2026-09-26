@@ -44,14 +44,23 @@ describe('invitationTokenMapper', () => {
   });
 
   describe('toPreview', () => {
-    it('maps embedded establishment object', () => {
+    it('maps identity and embedded establishment object', () => {
       const result = invitationTokenMapper.toPreview(
-        { assigned_chatbots: 3, establishment: { name: 'Lycée X' } },
+        {
+          firstname: 'Jean',
+          lastname: 'Dupont',
+          invited_email: 'teacher@school.fr',
+          assigned_chatbots: 3,
+          establishment: { name: 'Lycée X' },
+        },
         't***r@school.fr',
       );
 
       const expected: InvitationTokenPreview = {
         isValid: true,
+        firstname: 'Jean',
+        lastname: 'Dupont',
+        invitedEmail: 'teacher@school.fr',
         maskedEmail: 't***r@school.fr',
         establishmentName: 'Lycée X',
         assignedChatbots: 3,

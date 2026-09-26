@@ -116,14 +116,23 @@ describe('RegisterUseCase', () => {
       expect(fixtures.authRepository.createAuthUser).not.toHaveBeenCalled();
     });
 
-    it('throws BadRequestError when invited email does not match', async () => {
-      fixtures.whenInvitationTokenResolves({
-        ...fixtures.invitationToken,
-        invitedEmail: 'other@school.com',
-      });
+    it('creates auth user from the invitation identity even without client firstname lastname or email', async () => {
+      fixtures.whenInvitationTokenResolves();
+      fixtures.whenCreateAuthUserResolves();
+      fixtures.whenCreateTeacherWithInvitationResolves();
+      fixtures.whenUpdateTokenUsedAtResolves();
+      fixtures.whenSendWelcomeEmailResolves();
 
-      await expect(fixtures.whenExecuteWith(fixtures.teacherBody)).rejects.toBeInstanceOf(BadRequestError);
-      expect(fixtures.authRepository.createAuthUser).not.toHaveBeenCalled();
+      await fixtures.whenExecuteWith(fixtures.teacherInvitationBodyWithoutIdentity);
+
+      fixtures.thenCreateAuthUserCalledWithInvitationTokenIdentity();
+      fixtures.thenCreateTeacherWithInvitationCalled();
+      fixtures.thenUpdateTokenUsedAtCalled();
+      fixtures.thenSendWelcomeEmailCalledWith(
+        fixtures.invitationToken.invitedEmail,
+        fixtures.invitationToken.firstname,
+        fixtures.teacherInvitationBodyWithoutIdentity.role,
+      );
     });
 
     it('creates auth user, teacher from invitation, marks token used, then sends welcome email', async () => {
@@ -139,8 +148,8 @@ describe('RegisterUseCase', () => {
       fixtures.thenCreateTeacherWithInvitationCalled();
       fixtures.thenUpdateTokenUsedAtCalled();
       fixtures.thenSendWelcomeEmailCalledWith(
-        fixtures.teacherBody.email,
-        fixtures.teacherBody.firstname,
+        fixtures.invitationToken.invitedEmail,
+        fixtures.invitationToken.firstname,
         fixtures.teacherBody.role,
       );
     });
@@ -183,6 +192,7 @@ class Fixtures {
 
   public readonly invitationToken: InvitationToken;
   public readonly teacherBody: RegisterBody;
+  public readonly teacherInvitationBodyWithoutIdentity: RegisterBody;
   public readonly teacherBodyWithoutToken: RegisterBody;
   public readonly studentBodyWithoutToken: RegisterBody;
   public readonly establishmentBody: RegisterEstablishmentBody;
@@ -268,6 +278,16 @@ class Fixtures {
       password: 'secret123',
       firstname: 'Jean',
       lastname: 'Dupont',
+      acceptTerms: true,
+      invitationToken: this.invitationToken.token,
+    };
+
+    this.teacherInvitationBodyWithoutIdentity = {
+      role: 'teacher',
+      email: '',
+      password: 'secret123',
+      firstname: '',
+      lastname: '',
       acceptTerms: true,
       invitationToken: this.invitationToken.token,
     };
@@ -408,13 +428,21 @@ class Fixtures {
   }
 
   thenCreateAuthUserCalledWithTeacherMetadata() {
-    expect(this.authRepository.createAuthUser).toHaveBeenCalledWith(this.teacherBody.email, this.teacherBody.password, {
-      role: 'teacher',
-      firstname: this.teacherBody.firstname,
-      lastname: this.teacherBody.lastname,
-      acceptTerms: this.teacherBody.acceptTerms,
-      invitationToken: this.teacherBody.invitationToken,
-    });
+    this.thenCreateAuthUserCalledWithInvitationTokenIdentity();
+  }
+
+  thenCreateAuthUserCalledWithInvitationTokenIdentity() {
+    expect(this.authRepository.createAuthUser).toHaveBeenCalledWith(
+      this.invitationToken.invitedEmail,
+      this.teacherBody.password,
+      {
+        role: 'teacher',
+        firstname: this.invitationToken.firstname,
+        lastname: this.invitationToken.lastname,
+        acceptTerms: this.teacherBody.acceptTerms,
+        invitationToken: this.invitationToken.token,
+      },
+    );
     expect(this.authRepository.createAuthUser).toHaveBeenCalledTimes(1);
   }
 

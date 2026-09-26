@@ -86,6 +86,8 @@ export class InvitationTokenSupabaseRepository implements IInvitationTokenReposi
       .from('invitation_tokens')
       .select(
         `
+          firstname,
+          lastname,
           invited_email,
           assigned_chatbots,
           expires_at,
