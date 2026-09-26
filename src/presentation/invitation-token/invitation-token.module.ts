@@ -8,9 +8,17 @@ import { ValidateTeacherInvitationUseCase } from 'src/application/teaching/invit
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
 import { GetInvitationPreviewUseCase } from 'src/application/teaching/invitation-token/get-invitation-preview.use-case';
 import { CreateInvitationTokenUseCase } from 'src/application/teaching/invitation-token/create-invitation-token.use-case';
+import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
+import { MailerModule } from 'src/infrastructure/mailer/mailer.module';
 
 @Module({
-  imports: [AuthPersistenceModule, InvitationTokenPersistenceModule, TeacherPersistenceModule],
+  imports: [
+    AuthPersistenceModule,
+    InvitationTokenPersistenceModule,
+    TeacherPersistenceModule,
+    EstablishmentPersistenceModule,
+    MailerModule,
+  ],
   controllers: [InvitationTokenController],
   providers: [
     GetInvitationTokenUseCase,

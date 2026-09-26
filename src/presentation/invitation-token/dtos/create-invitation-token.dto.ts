@@ -1,5 +1,6 @@
-import { IsDate, IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsDate, IsEmail, IsIn, IsInt, IsNotEmpty, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { LOCALES, type Locale } from 'src/domain/shared/locale.type';
 
 export class CreateInvitationTokenBodyDto {
   @IsString()
@@ -10,6 +11,14 @@ export class CreateInvitationTokenBodyDto {
   @IsNotEmpty()
   token: string;
 
+  @IsString()
+  @IsNotEmpty()
+  firstname: string;
+
+  @IsString()
+  @IsNotEmpty()
+  lastname: string;
+
   @IsEmail()
   @IsNotEmpty()
   invitedEmail: string;
@@ -19,7 +28,12 @@ export class CreateInvitationTokenBodyDto {
   @IsNotEmpty()
   expiresAt: Date;
 
-  @IsNumber()
-  @IsNotEmpty()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
   assignedChatbots: number;
+
+  @IsString()
+  @IsIn([...LOCALES])
+  locale: Locale;
 }

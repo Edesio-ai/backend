@@ -217,6 +217,8 @@ class Fixtures {
     id: 'inv-1',
     establishmentId: this.establishmentId,
     token: 'tok-abc',
+    firstname: 'Prof',
+    lastname: '1',
     invitedEmail: 'prof1@school.com',
     expiresAt: '2026-12-31T00:00:00.000Z',
     usedAt: null,

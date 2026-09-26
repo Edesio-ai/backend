@@ -11,6 +11,8 @@ export type InvitationToken = {
   id: string;
   establishmentId: string;
   token: string;
+  firstname: string;
+  lastname: string;
   invitedEmail: string;
   expiresAt: string;
   usedAt: string | null;
@@ -23,6 +25,8 @@ export type SupabaseInvitationTokenRow = {
   id: string;
   establishment_id: string;
   token: string;
+  firstname: string;
+  lastname: string;
   invited_email: string;
   expires_at: string;
   used_at: string | null;
