@@ -172,6 +172,12 @@ describe('AuthSupabaseRepository', () => {
       await expect(fixtures.whenDeleteAuthUser()).resolves.toBeUndefined();
     });
 
+    it('should ignore not found errors when status is a string', async () => {
+      fixtures.whenDeleteUserReturnsStringNotFound();
+
+      await expect(fixtures.whenDeleteAuthUser()).resolves.toBeUndefined();
+    });
+
     it('should throw ServerError on other deleteUser errors', async () => {
       fixtures.whenDeleteUserFails();
 
@@ -574,6 +580,13 @@ class DeleteAuthUserFixtures {
     this.deleteUserMock.mockResolvedValue({
       data: null,
       error: { message: 'User not found', status: 404 },
+    });
+  }
+
+  whenDeleteUserReturnsStringNotFound() {
+    this.deleteUserMock.mockResolvedValue({
+      data: null,
+      error: { message: 'User not found', status: '404' },
     });
   }
 

@@ -107,8 +107,9 @@ export class AuthSupabaseRepository implements IAuthRepository {
 
   public async deleteAuthUser(userId: string): Promise<void> {
     const { error } = await this.supabaseAuth.auth.admin.deleteUser(userId);
+    const status = Number(error?.status);
 
-    if (error && error.status !== 404) {
+    if (error && status !== 404) {
       console.error(`Error deleting auth user ${userId}: ${error.message}`);
       throw new ServerError(error.message);
     }
@@ -127,6 +128,20 @@ export class AuthSupabaseRepository implements IAuthRepository {
 
   public async existsUserByEmail(email: string): Promise<boolean> {
     const normalizedEmail = email.toLowerCase().trim();
+    const users = await this.findAuthUsersByEmail(normalizedEmail);
+    return users.some((user) => user.email?.toLowerCase() === normalizedEmail);
+  }
+
+  public async getAuthUserIdByEmail(email: string): Promise<string | null> {
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = (await this.findAuthUsersByEmail(normalizedEmail)).find(
+      (candidate) => candidate.email?.toLowerCase() === normalizedEmail,
+    );
+
+    return user?.id ?? null;
+  }
+
+  private async findAuthUsersByEmail(normalizedEmail: string): Promise<Array<{ id?: string; email?: string }>> {
     const supabaseUrl = process.env.SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -145,7 +160,7 @@ export class AuthSupabaseRepository implements IAuthRepository {
       throw new ServerError(`Failed to fetch user by email: ${response.statusText}`);
     }
 
-    const body = (await response.json()) as { users?: Array<{ email?: string }> };
-    return (body.users ?? []).some((user) => user.email?.toLowerCase() === normalizedEmail);
+    const body = (await response.json()) as { users?: Array<{ id?: string; email?: string }> };
+    return body.users ?? [];
   }
 }

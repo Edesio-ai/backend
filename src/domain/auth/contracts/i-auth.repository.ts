@@ -11,5 +11,6 @@ export interface IAuthRepository {
   updateAuthUser(userId: string, payload: UpdateAuthUserPayload): Promise<void>;
   resetPasswordByEmail(email: string): Promise<void>;
   existsUserByEmail(email: string): Promise<boolean>;
+  getAuthUserIdByEmail(email: string): Promise<string | null>;
   deleteAuthUser(userId: string): Promise<void>;
 }

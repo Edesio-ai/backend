@@ -18,10 +18,12 @@ export class DeleteTeacherUseCase {
       throw new NotFoundError('Teacher not found');
     }
 
-    await this.teacherRepository.deleteTeacher(id);
+    const authUserId = teacher.supabaseUserId ?? (await this.authRepository.getAuthUserIdByEmail(teacher.email));
 
-    if (teacher.supabaseUserId) {
-      await this.authRepository.deleteAuthUser(teacher.supabaseUserId);
+    if (authUserId) {
+      await this.authRepository.deleteAuthUser(authUserId);
     }
+
+    await this.teacherRepository.deleteTeacher(id);
   }
 }

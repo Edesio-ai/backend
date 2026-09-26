@@ -13,19 +13,30 @@ describe('DeleteTeacherUseCase', () => {
     fixtures = new Fixtures();
   });
 
-  it('should delete teacher and its auth user', async () => {
+  it('should delete the auth user then the teacher', async () => {
     fixtures.givenTeacherExists();
-    fixtures.whenDeleteTeacherSucceeds();
+    fixtures.whenDeleteSucceeds();
 
     await fixtures.whenExecute();
 
-    fixtures.thenDeleteTeacherCalledWithExpectedId();
-    fixtures.thenDeleteAuthUserCalledWithSupabaseUserId();
+    fixtures.thenAuthUserDeletedBeforeTeacher();
   });
 
-  it('should not delete any auth user when teacher has no supabase user', async () => {
+  it('should look up the auth user by email when the teacher has no supabase user id', async () => {
     fixtures.givenTeacherExistsWithoutSupabaseUser();
-    fixtures.whenDeleteTeacherSucceeds();
+    fixtures.whenAuthUserIdFoundByEmail();
+    fixtures.whenDeleteSucceeds();
+
+    await fixtures.whenExecute();
+
+    fixtures.thenAuthUserLookedUpByEmail();
+    fixtures.thenAuthUserDeletedBeforeTeacher();
+  });
+
+  it('should still delete the teacher when no auth user is found', async () => {
+    fixtures.givenTeacherExistsWithoutSupabaseUser();
+    fixtures.whenAuthUserIdNotFoundByEmail();
+    fixtures.whenDeleteSucceeds();
 
     await fixtures.whenExecute();
 
@@ -41,21 +52,13 @@ describe('DeleteTeacherUseCase', () => {
     fixtures.thenNothingDeleted();
   });
 
-  it('should propagate repository errors without deleting auth user', async () => {
+  it('should not delete the teacher when auth deletion fails', async () => {
     fixtures.givenTeacherExists();
-    fixtures.whenDeleteTeacherFails();
-
-    await expect(fixtures.whenExecute()).rejects.toBe(fixtures.repositoryError);
-
-    fixtures.thenDeleteAuthUserNotCalled();
-  });
-
-  it('should propagate auth repository errors', async () => {
-    fixtures.givenTeacherExists();
-    fixtures.whenDeleteTeacherSucceeds();
     fixtures.whenDeleteAuthUserFails();
 
     await expect(fixtures.whenExecute()).rejects.toBe(fixtures.authError);
+
+    fixtures.thenDeleteTeacherNotCalled();
   });
 });
 
@@ -101,13 +104,17 @@ class Fixtures {
     return this.useCase.execute(this.teacherId);
   }
 
-  whenDeleteTeacherSucceeds() {
+  whenDeleteSucceeds() {
     this.teacherRepository.deleteTeacher.mockResolvedValue(undefined);
     this.authRepository.deleteAuthUser.mockResolvedValue(undefined);
   }
 
-  whenDeleteTeacherFails() {
-    this.teacherRepository.deleteTeacher.mockRejectedValue(this.repositoryError);
+  whenAuthUserIdFoundByEmail() {
+    this.authRepository.getAuthUserIdByEmail.mockResolvedValue(this.supabaseUserId);
+  }
+
+  whenAuthUserIdNotFoundByEmail() {
+    this.authRepository.getAuthUserIdByEmail.mockResolvedValue(null);
   }
 
   whenDeleteAuthUserFails() {
@@ -120,17 +127,30 @@ class Fixtures {
     expect(this.teacherRepository.deleteTeacher).toHaveBeenCalledTimes(1);
   }
 
-  thenDeleteAuthUserCalledWithSupabaseUserId() {
+  thenAuthUserDeletedBeforeTeacher() {
     expect(this.authRepository.deleteAuthUser).toHaveBeenCalledWith(this.supabaseUserId);
     expect(this.authRepository.deleteAuthUser).toHaveBeenCalledTimes(1);
+    this.thenDeleteTeacherCalledWithExpectedId();
+    expect(this.authRepository.deleteAuthUser.mock.invocationCallOrder[0]).toBeLessThan(
+      this.teacherRepository.deleteTeacher.mock.invocationCallOrder[0],
+    );
+  }
+
+  thenAuthUserLookedUpByEmail() {
+    expect(this.authRepository.getAuthUserIdByEmail).toHaveBeenCalledWith(this.teacher.email);
   }
 
   thenDeleteAuthUserNotCalled() {
     expect(this.authRepository.deleteAuthUser).not.toHaveBeenCalled();
   }
 
-  thenNothingDeleted() {
+  thenDeleteTeacherNotCalled() {
     expect(this.teacherRepository.deleteTeacher).not.toHaveBeenCalled();
+  }
+
+  thenNothingDeleted() {
+    this.thenDeleteTeacherNotCalled();
     this.thenDeleteAuthUserNotCalled();
+    expect(this.authRepository.getAuthUserIdByEmail).not.toHaveBeenCalled();
   }
 }
