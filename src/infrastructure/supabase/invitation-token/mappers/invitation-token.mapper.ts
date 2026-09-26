@@ -12,6 +12,8 @@ export const invitationTokenMapper = {
     id: row.id,
     establishmentId: row.establishment_id,
     token: row.token,
+    firstname: row.firstname,
+    lastname: row.lastname,
     invitedEmail: row.invited_email,
     expiresAt: row.expires_at,
     usedAt: row.used_at,
@@ -24,6 +26,8 @@ export const invitationTokenMapper = {
     return {
       establishment_id: body.establishmentId,
       token: body.token,
+      firstname: body.firstname,
+      lastname: body.lastname,
       invited_email: body.invitedEmail,
       expires_at: body.expiresAt.toISOString(),
       assigned_chatbots: body.assignedChatbots,

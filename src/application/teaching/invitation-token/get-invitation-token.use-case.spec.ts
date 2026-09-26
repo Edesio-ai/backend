@@ -63,6 +63,8 @@ class Fixtures {
         id: 'token-id-1',
         establishmentId: this.establishmentId,
         token: 'token-abc',
+        firstname: 'Camille',
+        lastname: 'Bernard',
         invitedEmail: 'teacher@school.com',
         expiresAt: '2026-04-01T00:00:00.000Z',
         usedAt: null,

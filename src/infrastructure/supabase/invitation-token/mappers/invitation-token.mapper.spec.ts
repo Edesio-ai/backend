@@ -23,14 +23,19 @@ describe('invitationTokenMapper', () => {
       const body: CreateInvitationTokenBody = {
         establishmentId: 'est-1',
         token: 'tok',
+        firstname: 'Camille',
+        lastname: 'Bernard',
         invitedEmail: 'inv@school.com',
         expiresAt,
         assignedChatbots: 3,
+        locale: 'fr',
       };
 
       expect(invitationTokenMapper.toInsert(body)).toEqual({
         establishment_id: 'est-1',
         token: 'tok',
+        firstname: 'Camille',
+        lastname: 'Bernard',
         invited_email: 'inv@school.com',
         expires_at: expiresAt.toISOString(),
         assigned_chatbots: 3,
@@ -81,6 +86,8 @@ class Fixtures {
     id: 'token-1',
     establishment_id: 'est-1',
     token: 'abc',
+    firstname: 'Camille',
+    lastname: 'Bernard',
     invited_email: 'teacher@school.com',
     expires_at: '2026-04-01T00:00:00.000Z',
     used_at: null,
@@ -93,6 +100,8 @@ class Fixtures {
     id: 'token-1',
     establishmentId: 'est-1',
     token: 'abc',
+    firstname: 'Camille',
+    lastname: 'Bernard',
     invitedEmail: 'teacher@school.com',
     expiresAt: '2026-04-01T00:00:00.000Z',
     usedAt: null,

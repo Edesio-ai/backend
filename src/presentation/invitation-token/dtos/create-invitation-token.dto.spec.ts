@@ -7,9 +7,12 @@ describe('CreateInvitationTokenBodyDto', () => {
     Object.assign(new CreateInvitationTokenBodyDto(), {
       establishmentId: 'est-1',
       token: 'token-123',
+      firstname: 'Camille',
+      lastname: 'Bernard',
       invitedEmail: 'teacher@school.com',
       expiresAt: new Date('2026-12-31T12:00:00.000Z'),
       assignedChatbots: 3,
+      locale: 'fr',
     });
 
   it('accepts a valid body', async () => {
@@ -38,5 +41,29 @@ describe('CreateInvitationTokenBodyDto', () => {
     const errors = await validate(dto);
 
     expect(errors.some((e) => e.property === 'expiresAt')).toBe(true);
+  });
+
+  it('rejects empty firstname', async () => {
+    const dto = Object.assign(valid(), { firstname: '' });
+
+    const errors = await validate(dto);
+
+    expect(errors.some((e) => e.property === 'firstname')).toBe(true);
+  });
+
+  it('rejects negative assignedChatbots', async () => {
+    const dto = Object.assign(valid(), { assignedChatbots: -1 });
+
+    const errors = await validate(dto);
+
+    expect(errors.some((e) => e.property === 'assignedChatbots')).toBe(true);
+  });
+
+  it('rejects invalid locale', async () => {
+    const dto = Object.assign(valid(), { locale: 'es' });
+
+    const errors = await validate(dto);
+
+    expect(errors.some((e) => e.property === 'locale')).toBe(true);
   });
 });

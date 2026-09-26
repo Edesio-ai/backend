@@ -96,6 +96,8 @@ class Fixtures {
     id: 'invitation-id-1',
     establishmentId: 'establishment-1',
     token: this.token,
+    firstname: 'Camille',
+    lastname: 'Bernard',
     invitedEmail: this.teacher.email,
     expiresAt: '2099-01-01T00:00:00.000Z',
     usedAt: null,

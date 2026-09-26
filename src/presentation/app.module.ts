@@ -6,7 +6,6 @@ import { TeachingModule } from './teaching/teaching.module';
 import { ExportModule } from './export/export.module';
 import { LlmModule } from './llm/llm.module';
 import { InvitationTokenModule } from './invitation-token/invitation-token.module';
-import { EmailModule } from './email/email.module';
 import { ProfileModule } from './profile/profile.module';
 import { SuggestionModule } from './suggestion/suggestion.module';
 
@@ -21,8 +20,6 @@ import { SuggestionModule } from './suggestion/suggestion.module';
     TeachingModule,
     ExportModule,
     LlmModule,
-    InvitationTokenModule,
-    EmailModule,
     InvitationTokenModule,
     ProfileModule,
     SuggestionModule,

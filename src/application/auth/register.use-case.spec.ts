@@ -239,6 +239,8 @@ class Fixtures {
       id: 'inv-1',
       establishmentId: 'est-1',
       token: 'tok-abc',
+      firstname: 'Jean',
+      lastname: 'Dupont',
       invitedEmail: 'teacher@school.com',
       expiresAt: '2026-12-31T00:00:00.000Z',
       usedAt: null,
