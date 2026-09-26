@@ -150,6 +150,35 @@ describe('AuthSupabaseRepository', () => {
     });
   });
 
+  describe('deleteAuthUser', () => {
+    let fixtures: DeleteAuthUserFixtures;
+
+    beforeEach(() => {
+      fixtures = new DeleteAuthUserFixtures();
+    });
+
+    it('should call admin.deleteUser with the user id', async () => {
+      fixtures.whenDeleteUserSucceeds();
+
+      await fixtures.whenDeleteAuthUser();
+
+      expect(fixtures.deleteUserMock).toHaveBeenCalledWith(fixtures.userId);
+      expect(fixtures.deleteUserMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should ignore not found errors', async () => {
+      fixtures.whenDeleteUserReturnsNotFound();
+
+      await expect(fixtures.whenDeleteAuthUser()).resolves.toBeUndefined();
+    });
+
+    it('should throw ServerError on other deleteUser errors', async () => {
+      fixtures.whenDeleteUserFails();
+
+      await expect(fixtures.whenDeleteAuthUser()).rejects.toBeInstanceOf(ServerError);
+    });
+  });
+
   describe('resetPasswordByEmail', () => {
     let fixtures: ResetPasswordByEmailFixtures;
     let originalFrontendUrl: string | undefined;
@@ -509,6 +538,49 @@ class UpdateAuthUserFixtures {
     this.updateUserByIdMock.mockResolvedValue({
       data: null,
       error: { message: 'update user failed' },
+    });
+  }
+}
+
+class DeleteAuthUserFixtures {
+  public readonly userId = 'user-delete-1';
+  public readonly deleteUserMock = jest.fn();
+  public readonly sut: AuthSupabaseRepository;
+
+  constructor() {
+    const supabaseAuthMock = {
+      auth: {
+        admin: {
+          deleteUser: this.deleteUserMock,
+        },
+      },
+    };
+
+    this.sut = new AuthSupabaseRepository(supabaseAuthMock as unknown as SupabaseClient);
+  }
+
+  whenDeleteAuthUser() {
+    return this.sut.deleteAuthUser(this.userId);
+  }
+
+  whenDeleteUserSucceeds() {
+    this.deleteUserMock.mockResolvedValue({
+      data: { user: {} },
+      error: null,
+    });
+  }
+
+  whenDeleteUserReturnsNotFound() {
+    this.deleteUserMock.mockResolvedValue({
+      data: null,
+      error: { message: 'User not found', status: 404 },
+    });
+  }
+
+  whenDeleteUserFails() {
+    this.deleteUserMock.mockResolvedValue({
+      data: null,
+      error: { message: 'delete user failed', status: 500 },
     });
   }
 }

@@ -26,6 +26,20 @@ describe('EvaluateAnswerDto', () => {
     expect(await validate(dto)).toHaveLength(0);
   });
 
+  it('accepts optional cheatingDetectionEnabled false', async () => {
+    const dto = Object.assign(valid(), { cheatingDetectionEnabled: false });
+
+    expect(await validate(dto)).toHaveLength(0);
+  });
+
+  it('rejects non-boolean cheatingDetectionEnabled', async () => {
+    const dto = Object.assign(valid(), { cheatingDetectionEnabled: 'yes' as never });
+
+    const errors = await validate(dto);
+
+    expect(errors.some((e) => e.property === 'cheatingDetectionEnabled')).toBe(true);
+  });
+
   it('rejects unsupported language values', async () => {
     const dto = Object.assign(valid(), {
       language: 'latin' as unknown as 'fr',

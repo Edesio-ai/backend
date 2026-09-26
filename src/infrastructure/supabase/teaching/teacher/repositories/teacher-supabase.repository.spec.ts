@@ -134,14 +134,12 @@ describe('TeacherSupabaseRepository', () => {
 
     fixtures.thenCreateTeacherWithInvitationQueryBuilt();
     expect(result).toEqual(fixtures.expectedTeacherWithEstablishment);
-    expect(fixtures.deleteUserMock).not.toHaveBeenCalled();
   });
 
-  it('should delete auth user and throw ServerError when createTeacherWithInvitationToken fails', async () => {
+  it('should throw ServerError when createTeacherWithInvitationToken fails', async () => {
     fixtures.whenCreateTeacherWithInvitationReturnsError();
 
     await expect(fixtures.whenCreateTeacherWithInvitationToken()).rejects.toBeInstanceOf(ServerError);
-    expect(fixtures.deleteUserMock).toHaveBeenCalledWith(fixtures.authUser.id);
   });
 
   it('should delete teacher by id', async () => {
@@ -252,8 +250,6 @@ class Fixtures {
     email: 'prof@school.com',
   };
 
-  public readonly deleteUserMock = jest.fn();
-
   private readonly teacherEqMock = jest.fn();
   private readonly teacherSelectMock = jest.fn(() => ({
     eq: this.teacherEqMock,
@@ -345,18 +341,7 @@ class Fixtures {
     const supabaseMock = {
       from: this.fromMock,
     };
-    const supabaseAuthMock = {
-      from: this.fromMock,
-      auth: {
-        admin: {
-          deleteUser: this.deleteUserMock,
-        },
-      },
-    };
-    this.repository = new TeacherSupabaseRepository(
-      supabaseMock as unknown as SupabaseClient,
-      supabaseAuthMock as unknown as SupabaseClient,
-    );
+    this.repository = new TeacherSupabaseRepository(supabaseMock as unknown as SupabaseClient);
   }
 
   whenGetTeacherByEstablishmentId() {
@@ -605,7 +590,6 @@ class Fixtures {
       data: null,
       error: { message: 'create teacher with invitation failed' },
     });
-    this.deleteUserMock.mockResolvedValue(undefined);
   }
 
   thenCreateTeacherWithInvitationQueryBuilt() {

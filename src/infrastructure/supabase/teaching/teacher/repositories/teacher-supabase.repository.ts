@@ -7,15 +7,12 @@ import { SUPABASE_ADMIN } from 'src/infrastructure/supabase/supabase.module';
 import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
 import { InvitationToken } from 'src/domain/auth/invitation.type';
 import { User } from 'src/domain/auth/types/auth.type';
-import { SUPABASE_AUTH } from 'src/infrastructure/supabase/supabase-auth.module';
 import { UpdateTeacherPayload } from 'src/domain/teaching/teacher/types/teacher.type';
 
 export class TeacherSupabaseRepository implements ITeacherRepository {
   constructor(
     @Inject(SUPABASE_ADMIN)
     private readonly supabase: SupabaseClient,
-    @Inject(SUPABASE_AUTH)
-    private readonly supabaseAuth: SupabaseClient,
   ) {}
 
   public async getTeacherByEstablishmentId(establishmentId: string): Promise<Teacher[]> {
@@ -113,7 +110,6 @@ export class TeacherSupabaseRepository implements ITeacherRepository {
       .single();
 
     if (error) {
-      await this.supabaseAuth.auth.admin.deleteUser(adminData.id);
       throw new ServerError(error.message);
     }
 

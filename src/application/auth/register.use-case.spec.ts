@@ -145,6 +145,19 @@ describe('RegisterUseCase', () => {
       );
     });
 
+    it('deletes auth user and propagates error when teacher creation fails', async () => {
+      fixtures.whenInvitationTokenResolves();
+      fixtures.whenCreateAuthUserResolves();
+      fixtures.whenCreateTeacherWithInvitationThrowsError();
+
+      const promise = fixtures.whenExecuteWith(fixtures.teacherBody);
+
+      await fixtures.thenThrowRepositoryError(promise);
+      expect(fixtures.authRepository.deleteAuthUser).toHaveBeenCalledWith(fixtures.authUser.id);
+      expect(fixtures.invitationTokenRepository.updateTokenUsedAt).not.toHaveBeenCalled();
+      fixtures.thenSendWelcomeEmailNotCalled();
+    });
+
     it('propagates repository error and does not send email', async () => {
       fixtures.whenInvitationTokenResolves();
       fixtures.whenCreateAuthUserThrowsError();
@@ -334,6 +347,11 @@ class Fixtures {
 
   whenCreateTeacherWithInvitationResolves() {
     this.teacherRepository.createTeacherWithInvitationToken.mockResolvedValue(this.createdTeacher);
+  }
+
+  whenCreateTeacherWithInvitationThrowsError() {
+    this.teacherRepository.createTeacherWithInvitationToken.mockRejectedValue(this.repositoryError);
+    this.authRepository.deleteAuthUser.mockResolvedValue(undefined);
   }
 
   whenUpdateTokenUsedAtResolves() {

@@ -16,6 +16,7 @@ import {
   type IEstablishmentRepository,
 } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import { EstablishmentWithContact } from 'src/domain/teaching/establishment/types/establishment.type';
+import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
 
 @Injectable()
 export class RegisterUseCase {
@@ -110,10 +111,14 @@ export class RegisterUseCase {
 
     const authUser = await this.authRepository.createAuthUser(email, password, metadata);
 
-    if (token) {
-      const teacher = await this.teacherRepository.createTeacherWithInvitationToken(authUser, token);
-      await this.invitationTokenRepository.updateTokenUsedAt(token.id, teacher.id);
+    let teacher: Teacher;
+    try {
+      teacher = await this.teacherRepository.createTeacherWithInvitationToken(authUser, token);
+    } catch (error) {
+      await this.authRepository.deleteAuthUser(authUser.id);
+      throw error;
     }
+    await this.invitationTokenRepository.updateTokenUsedAt(token.id, teacher.id);
 
     await this.emailProvider.sendWelcomeEmail(email, firstname, role, normalizeLocale(body.locale));
     return;
