@@ -84,7 +84,7 @@ export class RegisterUseCase {
     };
 
     if (invitationToken) {
-      return this.registerByInvitationToken(body, metadata);
+      return this.registerByInvitationToken(body);
     }
 
     if (role === 'student') {
@@ -96,20 +96,24 @@ export class RegisterUseCase {
     await this.emailProvider.sendWelcomeEmail(email, firstname, role, normalizeLocale(body.locale));
   }
 
-  private async registerByInvitationToken(body: RegisterBody, metadata: UserMetadata): Promise<void> {
-    const { email, password, firstname, role, invitationToken } = body;
-
-    const token = invitationToken ? await this.invitationTokenRepository.getInvitationByToken(invitationToken) : null;
+  private async registerByInvitationToken(body: RegisterBody): Promise<void> {
+    const token = body.invitationToken
+      ? await this.invitationTokenRepository.getInvitationByToken(body.invitationToken)
+      : null;
 
     if (!token) {
       throw new BadRequestError('Invalid invitation token');
     }
 
-    if (token.invitedEmail !== email) {
-      throw new BadRequestError('Email mismatch');
-    }
+    const metadata: UserMetadata = {
+      role: body.role,
+      firstname: token.firstname,
+      lastname: token.lastname,
+      acceptTerms: body.acceptTerms,
+      invitationToken: body.invitationToken,
+    };
 
-    const authUser = await this.authRepository.createAuthUser(email, password, metadata);
+    const authUser = await this.authRepository.createAuthUser(token.invitedEmail, body.password, metadata);
 
     let teacher: Teacher;
     try {
@@ -120,7 +124,11 @@ export class RegisterUseCase {
     }
     await this.invitationTokenRepository.updateTokenUsedAt(token.id, teacher.id);
 
-    await this.emailProvider.sendWelcomeEmail(email, firstname, role, normalizeLocale(body.locale));
-    return;
+    await this.emailProvider.sendWelcomeEmail(
+      token.invitedEmail,
+      token.firstname,
+      body.role,
+      normalizeLocale(body.locale),
+    );
   }
 }
