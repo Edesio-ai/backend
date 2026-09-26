@@ -105,6 +105,15 @@ export class AuthSupabaseRepository implements IAuthRepository {
     }
   }
 
+  public async deleteAuthUser(userId: string): Promise<void> {
+    const { error } = await this.supabaseAuth.auth.admin.deleteUser(userId);
+
+    if (error && error.status !== 404) {
+      console.error(`Error deleting auth user ${userId}: ${error.message}`);
+      throw new ServerError(error.message);
+    }
+  }
+
   public async resetPasswordByEmail(email: string): Promise<void> {
     const { error } = await this.supabaseAuth.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.FRONTEND_URL}/reset-password`,
