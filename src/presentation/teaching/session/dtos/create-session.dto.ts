@@ -13,8 +13,4 @@ export class CreateSessionBodyDto {
   @IsString()
   @IsNotEmpty()
   language: Language;
-
-  @IsString()
-  @IsNotEmpty()
-  teacherId: string;
 }

@@ -31,10 +31,13 @@ export type Session = {
   pendingQuestionCount: number;
 };
 
-export type CreateSessionBody = {
+export type CreateSessionInput = {
   name: string;
   code: string;
   language: Language;
+};
+
+export type CreateSessionBody = CreateSessionInput & {
   teacherId: string;
 };
 

@@ -34,8 +34,8 @@ export class SessionController {
   }
 
   @Post()
-  async createSession(@Body() body: CreateSessionBodyDto): Promise<Session> {
-    return await this.createSessionUseCase.execute(body);
+  async createSession(@CurrentUser() user: AuthUser, @Body() body: CreateSessionBodyDto): Promise<Session> {
+    return await this.createSessionUseCase.execute(user.id, body);
   }
 
   @Get('teacher-sessions')
