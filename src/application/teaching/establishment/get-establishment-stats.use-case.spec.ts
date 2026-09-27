@@ -114,6 +114,8 @@ class Fixtures {
         language: 'francais',
         teacherId: 'teacher-1',
         createdAt: '2026-01-01T00:00:00.000Z',
+        studentCount: 0,
+        pendingQuestionCount: 0,
       },
       {
         id: 'session-2',
@@ -122,6 +124,8 @@ class Fixtures {
         language: 'francais',
         teacherId: 'teacher-1',
         createdAt: '2026-01-01T00:00:00.000Z',
+        studentCount: 0,
+        pendingQuestionCount: 0,
       },
       {
         id: 'session-3',
@@ -130,6 +134,8 @@ class Fixtures {
         language: 'francais',
         teacherId: 'teacher-2',
         createdAt: '2026-01-01T00:00:00.000Z',
+        studentCount: 0,
+        pendingQuestionCount: 0,
       },
     ];
     this.studentSessions = [
@@ -197,6 +203,8 @@ class Fixtures {
               language: 'francais',
               teacherId: 'teacher-1',
               createdAt: '2026-01-01T00:00:00.000Z',
+              studentCount: 0,
+              pendingQuestionCount: 0,
               studentsCount: 1,
             },
             {
@@ -206,6 +214,8 @@ class Fixtures {
               language: 'francais',
               teacherId: 'teacher-1',
               createdAt: '2026-01-01T00:00:00.000Z',
+              studentCount: 0,
+              pendingQuestionCount: 0,
               studentsCount: 2,
             },
           ],
@@ -227,6 +237,8 @@ class Fixtures {
               language: 'francais',
               teacherId: 'teacher-2',
               createdAt: '2026-01-01T00:00:00.000Z',
+              studentCount: 0,
+              pendingQuestionCount: 0,
               studentsCount: 0,
             },
           ],

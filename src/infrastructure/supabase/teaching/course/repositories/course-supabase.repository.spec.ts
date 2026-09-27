@@ -885,6 +885,8 @@ class Fixtures {
       code: '',
       language: 'francais',
       createdAt: '',
+      studentCount: 0,
+      pendingQuestionCount: 0,
     },
     teachers: {
       id: '',

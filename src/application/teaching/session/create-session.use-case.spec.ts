@@ -43,6 +43,8 @@ class Fixtures {
     code: this.body.code,
     language: this.body.language,
     createdAt: '2026-01-01T00:00:00.000Z',
+    studentCount: 0,
+    pendingQuestionCount: 0,
   };
 
   public readonly repositoryError = new Error('insert failed');

@@ -164,6 +164,8 @@ class Fixtures {
       code: 'ABCD',
       language: 'francais' as const,
       created_at: '2026-01-01T00:00:00.000Z',
+      sessions_student_count: [{ count: 4 }],
+      courses: [{ pending_course_questions: [{ count: 2 }] }, { pending_course_questions: [{ count: 1 }] }],
     },
   ];
   public readonly expectedSessions = [
@@ -174,6 +176,8 @@ class Fixtures {
       code: 'ABCD',
       language: 'francais' as const,
       createdAt: '2026-01-01T00:00:00.000Z',
+      studentCount: 4,
+      pendingQuestionCount: 3,
     },
   ];
   public readonly sessionByCodeSupabaseRow = {
@@ -191,6 +195,8 @@ class Fixtures {
     code: this.code,
     language: 'francais' as const,
     createdAt: '2026-01-01T00:00:00.000Z',
+    studentCount: 0,
+    pendingQuestionCount: 0,
   };
   public readonly createSessionBody = {
     teacherId: this.teacherId,
@@ -213,6 +219,8 @@ class Fixtures {
     code: this.createSessionBody.code,
     language: this.createSessionBody.language,
     createdAt: '2026-01-01T00:00:00.000Z',
+    studentCount: 0,
+    pendingQuestionCount: 0,
   };
   public readonly updateSessionBody = {
     name: 'Updated Session Name',
@@ -235,6 +243,8 @@ class Fixtures {
     code: 'NEW123',
     language: 'francais' as const,
     createdAt: '2026-01-01T00:00:00.000Z',
+    studentCount: 0,
+    pendingQuestionCount: 0,
   };
 
   public readonly sessionIdForGetById = 'session-by-id-1';
@@ -253,6 +263,8 @@ class Fixtures {
     code: 'CODE1',
     language: 'francais' as const,
     createdAt: '2026-01-01T00:00:00.000Z',
+    studentCount: 0,
+    pendingQuestionCount: 0,
   };
 
   public readonly teacherIdsForBulkQuery = ['teacher-1', 'teacher-2'];
@@ -283,6 +295,8 @@ class Fixtures {
       code: 'ABCD',
       language: 'francais' as const,
       createdAt: '2026-01-01T00:00:00.000Z',
+      studentCount: 0,
+      pendingQuestionCount: 0,
     },
     {
       id: 'session-2',
@@ -291,6 +305,8 @@ class Fixtures {
       code: 'CDE',
       language: 'anglais' as const,
       createdAt: '2026-01-05T00:00:00.000Z',
+      studentCount: 0,
+      pendingQuestionCount: 0,
     },
   ];
 
@@ -304,7 +320,8 @@ class Fixtures {
 
   private readonly orderMock = jest.fn();
   private readonly listEqMock = jest.fn(() => ({ order: this.orderMock }));
-  private readonly listSelectMock = jest.fn(() => ({ eq: this.listEqMock }));
+  private readonly listIsMock = jest.fn(() => ({ eq: this.listEqMock }));
+  private readonly listSelectMock = jest.fn(() => ({ is: this.listIsMock }));
 
   private readonly byCodeMaybeSingleMock = jest.fn();
   private readonly byCodeEqMock = jest.fn(() => ({
@@ -511,7 +528,14 @@ class Fixtures {
 
   thenQueryBuiltWithExpectedArguments() {
     expect(this.fromMock).toHaveBeenCalledWith('sessions');
-    expect(this.listSelectMock).toHaveBeenCalledWith('*');
+    expect(this.listSelectMock).toHaveBeenCalledWith(`
+        *,
+        sessions_student_count:student_sessions(count),
+        courses(
+          pending_course_questions:course_questions(count)
+        )
+      `);
+    expect(this.listIsMock).toHaveBeenCalledWith('courses.course_questions.answer', null);
     expect(this.listEqMock).toHaveBeenCalledWith('teacher_id', this.teacherId);
     expect(this.orderMock).toHaveBeenCalledWith('created_at', {
       ascending: false,
