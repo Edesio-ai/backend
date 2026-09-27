@@ -21,7 +21,16 @@ export class SupabaseSessionRepository implements ISessionRepository {
   async getSessionsByTeacherId(teacherId: string): Promise<Session[]> {
     const { data, error } = await this.supabase
       .from('sessions')
-      .select('*')
+      .select(
+        `
+        *,
+        sessions_student_count:student_sessions(count),
+        courses(
+          pending_course_questions:course_questions(count)
+        )
+      `,
+      )
+      .is('courses.course_questions.answer', null)
       .eq('teacher_id', teacherId)
       .order('created_at', { ascending: false });
 

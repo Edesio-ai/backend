@@ -172,6 +172,8 @@ class Fixtures {
     code: 'ABCD',
     language: 'francais',
     createdAt: '2026-01-01T00:00:00.000Z',
+    studentCount: 0,
+    pendingQuestionCount: 0,
   };
 
   /** Order volontairement mélangé : le use case trie par taux puis bonnes réponses. */

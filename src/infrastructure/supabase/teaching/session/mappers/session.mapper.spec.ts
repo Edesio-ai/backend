@@ -15,6 +15,38 @@ describe('SessionMapper', () => {
 
       fixtures.thenReturnsExpectedSession(result);
     });
+
+    it('defaults studentCount and pendingQuestionCount to 0 when embeds are missing', () => {
+      const result = SessionMapper.toDomain({
+        id: 's-2',
+        teacher_id: 't-1',
+        name: 'Cours',
+        code: 'ZZZZ',
+        language: 'francais',
+        created_at: '2026-01-01T00:00:00.000Z',
+      });
+
+      expect(result.studentCount).toBe(0);
+      expect(result.pendingQuestionCount).toBe(0);
+    });
+
+    it('sums pending course question counts across courses', () => {
+      const result = SessionMapper.toDomain({
+        id: 's-3',
+        teacher_id: 't-1',
+        name: 'Cours',
+        code: 'PEND',
+        language: 'francais',
+        created_at: '2026-01-01T00:00:00.000Z',
+        courses: [
+          { pending_course_questions: [{ count: 2 }] },
+          { pending_course_questions: [{ count: 3 }] },
+          { pending_course_questions: null },
+        ],
+      });
+
+      expect(result.pendingQuestionCount).toBe(5);
+    });
   });
 
   describe('toInsert', () => {
@@ -56,6 +88,8 @@ class Fixtures {
     code: 'ABCD',
     language: 'francais',
     created_at: '2026-01-01T00:00:00.000Z',
+    sessions_student_count: [{ count: 3 }],
+    courses: [{ pending_course_questions: [{ count: 1 }] }, { pending_course_questions: [{ count: 4 }] }],
   };
 
   public readonly expectedSession = {
@@ -65,6 +99,8 @@ class Fixtures {
     code: 'ABCD',
     language: 'francais',
     createdAt: '2026-01-01T00:00:00.000Z',
+    studentCount: 3,
+    pendingQuestionCount: 5,
   };
 
   public readonly courseWithSessionFullRow: SupabaseCourseWithSession = {
@@ -106,6 +142,8 @@ class Fixtures {
       code: 'ABCD',
       language: 'francais',
       createdAt: '2026-01-01T00:00:00.000Z',
+      studentCount: 0,
+      pendingQuestionCount: 0,
     },
     teachers: {
       id: 'teacher-1',
@@ -177,6 +215,8 @@ class Fixtures {
     expect(result.session.id).toBe('');
     expect(result.session.teacherId).toBe('');
     expect(result.session.language).toBe('francais');
+    expect(result.session.studentCount).toBe(0);
+    expect(result.session.pendingQuestionCount).toBe(0);
     expect(result.teachers.id).toBe('');
     expect(result.teachers.establishmentId).toBe('');
   }

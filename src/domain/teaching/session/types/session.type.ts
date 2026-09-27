@@ -5,6 +5,10 @@ import { CourseRanking } from '../../student-course-stats/types/student-course-s
 
 export type Language = 'francais' | 'anglais' | 'espagnol' | 'allemand';
 
+export type SupabaseSessionCoursePendingQuestions = {
+  pending_course_questions?: { count: number }[] | null;
+};
+
 export type SupabaseSession = {
   id: string;
   teacher_id: string;
@@ -12,6 +16,8 @@ export type SupabaseSession = {
   code: string;
   language: Language;
   created_at: string;
+  sessions_student_count?: { count: number }[] | null;
+  courses?: SupabaseSessionCoursePendingQuestions[] | null;
 };
 
 export type Session = {
@@ -21,6 +27,8 @@ export type Session = {
   code: string;
   language: Language;
   createdAt: string;
+  studentCount: number;
+  pendingQuestionCount: number;
 };
 
 export type CreateSessionBody = {

@@ -8,6 +8,7 @@ import type {
   SupabaseStudentSession,
 } from 'src/domain/teaching/student-session/types/student-session.type';
 import { mapList } from 'src/infrastructure/supabase/common/mapper.util';
+import { SessionMapper } from 'src/infrastructure/supabase/teaching/session/mappers/session.mapper';
 
 function sessionsEmbedToList(embed: SupabaseSession | SupabaseSession[] | null): SupabaseSession[] {
   if (embed == null) {
@@ -18,12 +19,7 @@ function sessionsEmbedToList(embed: SupabaseSession | SupabaseSession[] | null):
 
 function joinedSessionFromParts(joinedAt: string, session: SupabaseSession): StudentJoinedSession {
   return {
-    id: session.id,
-    teacherId: session.teacher_id,
-    name: session.name,
-    code: session.code,
-    language: session.language,
-    createdAt: session.created_at,
+    ...SessionMapper.toDomain(session),
     joinedAt,
   };
 }

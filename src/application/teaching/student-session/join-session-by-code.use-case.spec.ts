@@ -80,6 +80,8 @@ class Fixtures {
     code: this.code,
     language: 'francais',
     createdAt: '2026-01-01T00:00:00.000Z',
+    studentCount: 0,
+    pendingQuestionCount: 0,
   };
 
   public readonly student: Student = {
@@ -98,6 +100,8 @@ class Fixtures {
     code: this.session.code,
     language: this.session.language,
     createdAt: this.session.createdAt,
+    studentCount: 0,
+    pendingQuestionCount: 0,
     joinedAt: '2026-01-10T00:00:00.000Z',
   };
 

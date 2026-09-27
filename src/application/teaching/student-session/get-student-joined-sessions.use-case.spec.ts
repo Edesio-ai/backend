@@ -52,6 +52,8 @@ class Fixtures {
       code: 'ABC123',
       language: 'francais',
       createdAt: '2026-01-01T00:00:00.000Z',
+      studentCount: 0,
+      pendingQuestionCount: 0,
       joinedAt: '2026-01-15T10:00:00.000Z',
     },
   ];
