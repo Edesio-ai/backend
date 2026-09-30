@@ -45,11 +45,12 @@ export class SessionController {
 
   @Put(':sessionId')
   async updateSessionName(
+    @CurrentUser() user: AuthUser,
     @Param('sessionId') sessionId: string,
     @Body() body: UpdateSessionBodyDto,
-  ): Promise<{ session: Session }> {
-    const session = await this.updateSessionNameUseCase.execute(sessionId, body);
-    return { session };
+  ): Promise<Session> {
+    const session = await this.updateSessionNameUseCase.execute(sessionId, user.id, body);
+    return session;
   }
 
   @Get('code/:code')

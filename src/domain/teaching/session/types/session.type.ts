@@ -41,8 +41,11 @@ export type CreateSessionBody = CreateSessionInput & {
   teacherId: string;
 };
 
-export type UpdateSessionNameBody = {
+export type UpdateSessionNameInput = {
   name: string;
+};
+
+export type UpdateSessionNameBody = UpdateSessionNameInput & {
   teacherId: string;
 };
 

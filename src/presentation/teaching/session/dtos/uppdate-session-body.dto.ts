@@ -4,8 +4,4 @@ export class UpdateSessionBodyDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  teacherId: string;
 }
