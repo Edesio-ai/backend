@@ -50,14 +50,14 @@ export class CourseController {
   }
 
   @Patch(':courseId')
-  async deleteCourseFiles(
+  async updateCourse(
     @Param('courseId') courseId: string,
     @CurrentUser() user: AuthUser,
     @Body() body: UpdateCourseBodyDto,
-  ): Promise<{ data: Course }> {
+  ): Promise<Course> {
     const course = await this.updateCourseUseCase.execute(courseId, body, user);
 
-    return { data: course };
+    return course;
   }
 
   @Post(':courseId/validate-questions')
