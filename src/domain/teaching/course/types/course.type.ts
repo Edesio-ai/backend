@@ -1,3 +1,5 @@
+import { CourseFile } from '../../course-file/types/course-file.type';
+import { Question } from '../../question/types/question.type';
 import { Session, SupabaseSession } from '../../session/types/session.type';
 import { SupabaseTeacher, Teacher } from '../../teacher/types/teacher.type';
 
@@ -51,4 +53,31 @@ export type SupabaseCourseInsert = {
   title: string;
   description?: string | null;
   text_content?: string | null;
+};
+
+/** Question shape for course details — matches frontend `Question` (non-null proposals). */
+export type CourseDetailsQuestion = {
+  id: string;
+  courseId: string;
+  type: Question['type'];
+  questionText: string;
+  proposals: string[];
+  correctAnswers: string[] | null;
+  explanation: string | null;
+  createdAt: string;
+  positionOrder: number | null;
+  cheatingDetectionEnabled: boolean;
+};
+
+export type CourseDetails = {
+  course: Course & {
+    contentText: string | null;
+    createdAt: string;
+  };
+  studentsCount: number;
+  /** Session students who attempted at least one question on this course (chatbot usage). */
+  studentsWhoUsedChatbotCount: number;
+  averageSuccessRate: number;
+  files: CourseFile[];
+  questions: CourseDetailsQuestion[];
 };

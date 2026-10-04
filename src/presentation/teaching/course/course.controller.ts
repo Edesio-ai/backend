@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
-import { Course } from 'src/domain/teaching/course/types/course.type';
+import { Course, CourseDetails } from 'src/domain/teaching/course/types/course.type';
 import { Roles } from '../../auth/decorator/role.decorator';
 import { CurrentUser } from '../../auth/decorator/current-user.decorator';
 import { CreateCourseUseCase } from 'src/application/teaching/course/create-course.use-case';
@@ -12,6 +12,7 @@ import { UpdateCourseUseCase } from 'src/application/teaching/course/update-cour
 import { ValidateCourseQuestionsUseCase } from 'src/application/teaching/course/validate-course-questions.use-case';
 import { GetCoursesSessionCountUseCase } from 'src/application/teaching/course/get-courses-session-count.use-case';
 import { GetSessionCoursesUseCase } from 'src/application/teaching/course/get-session-courses.use-case';
+import { GetCourseDetailsUseCase } from 'src/application/teaching/course/get-course-details.use-case';
 
 @Roles('teacher')
 @Controller('course')
@@ -24,6 +25,7 @@ export class CourseController {
     private readonly validateCourseQuestionsUseCase: ValidateCourseQuestionsUseCase,
     private readonly getCoursesSessionCountUseCase: GetCoursesSessionCountUseCase,
     private readonly getSessionCoursesUseCase: GetSessionCoursesUseCase,
+    private readonly getCourseDetailsUseCase: GetCourseDetailsUseCase,
   ) {}
 
   @Post()
@@ -81,5 +83,10 @@ export class CourseController {
   @Get('session/:sessionId')
   async getCoursesBySessionId(@Param('sessionId') sessionId: string, @CurrentUser() user: AuthUser): Promise<Course[]> {
     return (await this.getSessionCoursesUseCase.execute(sessionId, user)) || [];
+  }
+
+  @Get(':courseId/details')
+  async getCourseDetails(@Param('courseId') courseId: string, @CurrentUser() user: AuthUser): Promise<CourseDetails> {
+    return await this.getCourseDetailsUseCase.execute(courseId, user);
   }
 }

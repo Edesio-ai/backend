@@ -413,8 +413,10 @@ class Fixtures {
   private readonly coursesCountEqMock = jest.fn();
 
   private readonly coursesByIdSingleMock = jest.fn();
+  private readonly coursesByIdMaybeSingleMock = jest.fn();
   private readonly coursesByIdEqMock = jest.fn(() => ({
     single: this.coursesByIdSingleMock,
+    maybeSingle: this.coursesByIdMaybeSingleMock,
   }));
 
   private readonly coursesSessionSecondOrderMock = jest.fn();
@@ -432,11 +434,18 @@ class Fixtures {
     if (first === 'id') {
       return { eq: this.coursesListEqMock };
     }
-    if (first === 'id, session_id' || first === 'validated_questions') {
+    if (first === 'validated_questions') {
       return { eq: this.coursesByIdEqMock };
     }
     if (first === '*') {
-      return { eq: this.coursesSessionCoursesEqMock };
+      return {
+        eq: (column: string, value: string) => {
+          if (column === 'id') {
+            return { maybeSingle: this.coursesByIdMaybeSingleMock };
+          }
+          return this.coursesSessionCoursesEqMock(column, value);
+        },
+      };
     }
     return { eq: this.courseWithSessionEqMock };
   });
@@ -581,14 +590,14 @@ class Fixtures {
   }
 
   whenGetCourseByIdSucceeds() {
-    this.coursesByIdSingleMock.mockResolvedValue({
+    this.coursesByIdMaybeSingleMock.mockResolvedValue({
       data: this.courseByIdSupabaseRow,
       error: null,
     });
   }
 
   whenGetCourseByIdFails() {
-    this.coursesByIdSingleMock.mockResolvedValue({
+    this.coursesByIdMaybeSingleMock.mockResolvedValue({
       data: null,
       error: { message: 'course by id failed' },
     });
@@ -831,8 +840,8 @@ class Fixtures {
 
   thenGetCourseByIdQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('courses');
-    expect(this.coursesSelectMock).toHaveBeenCalledWith('id, session_id');
-    expect(this.coursesByIdEqMock).toHaveBeenCalledWith('id', this.courseDetailId);
+    expect(this.coursesSelectMock).toHaveBeenCalledWith('*');
+    expect(this.coursesByIdMaybeSingleMock).toHaveBeenCalledTimes(1);
   }
 
   thenGetCourseValidatedQuestionsQueryBuilt() {

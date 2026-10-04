@@ -16,14 +16,14 @@ export class CourseSupabaseRepository implements ICourseRepository {
   constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient) {}
 
   public async getCourseById(courseId: string): Promise<Course | null> {
-    const { data, error } = await this.supabase.from('courses').select('id, session_id').eq('id', courseId).single();
+    const { data, error } = await this.supabase.from('courses').select('*').eq('id', courseId).maybeSingle();
 
     if (error) {
       console.error('An error occurred while getting the course by id: ', courseId, error);
       throw new ServerError(error.message);
     }
 
-    return CourseMapper.toDomain(data as unknown as SupabaseCourse);
+    return data ? CourseMapper.toDomain(data as unknown as SupabaseCourse) : null;
   }
 
   public async getCoursesBySessionId(sessionId: string): Promise<SupabaseCourse[]> {
