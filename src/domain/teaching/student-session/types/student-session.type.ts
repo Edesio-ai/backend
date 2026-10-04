@@ -28,3 +28,10 @@ export type SupabaseSessionStudent = {
 export type SessionStudent = Omit<Student, 'supabaseUserId' | 'createdAt'> & {
   joinedAt: string;
 };
+
+export type SessionStudentWithStats = SessionStudent & {
+  attemptedQuestions: number;
+  correctAnswers: number;
+  successRate: number;
+  lastAttemptAt: string | null;
+};

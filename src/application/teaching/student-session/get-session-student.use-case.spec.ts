@@ -4,13 +4,19 @@ import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teache
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import { IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import { ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
-import { SessionStudent } from 'src/domain/teaching/student-session/types/student-session.type';
+import {
+  SessionStudent,
+  SessionStudentWithStats,
+} from 'src/domain/teaching/student-session/types/student-session.type';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
+import { createMockStudentCourseStatsRepository } from 'src/testing/mock-student-course-stats-repository';
+import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
+import { StudentCourseStats } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 
 describe('GetSessionStudentUseCase', () => {
   let fixtures: Fixtures;
@@ -28,7 +34,7 @@ describe('GetSessionStudentUseCase', () => {
 
     const result = await fixtures.whenExecuteAsTeacher();
 
-    expect(result).toEqual(fixtures.sessionStudents);
+    expect(result).toEqual(fixtures.sessionStudentsWithEmptyStats);
   });
 
   it('should call listStudentsEnrolledInSession with the correct sessionId and select fields', async () => {
@@ -85,6 +91,7 @@ describe('GetSessionStudentUseCase', () => {
     const result = await fixtures.whenExecuteAsTeacher();
 
     expect(result).toEqual([]);
+    expect(fixtures.studentCourseStatsRepository.getStudentCourseStatsBySessionId).not.toHaveBeenCalled();
   });
 
   it('should propagate repository errors thrown by the student repository', async () => {
@@ -105,7 +112,7 @@ describe('GetSessionStudentUseCase', () => {
 
     const result = await fixtures.whenExecuteAsEstablishment();
 
-    expect(result).toEqual(fixtures.sessionStudents);
+    expect(result).toEqual(fixtures.sessionStudentsWithEmptyStats);
   });
 
   it('should throw NotFoundError when establishment is not found', async () => {
@@ -134,10 +141,30 @@ describe('GetSessionStudentUseCase', () => {
 
     const result = await fixtures.whenExecuteAsAdmin();
 
-    expect(result).toEqual(fixtures.sessionStudents);
+    expect(result).toEqual(fixtures.sessionStudentsWithEmptyStats);
     expect(fixtures.teacherRepository.getTeacherByUserId).not.toHaveBeenCalled();
     expect(fixtures.establishmentRepository.getEstablishmentByUserId).not.toHaveBeenCalled();
     expect(fixtures.sessionRepository.getSessionById).not.toHaveBeenCalled();
+  });
+
+  it('should attach aggregated session stats when a student participated in several courses', async () => {
+    fixtures.whenTeacherFound();
+    fixtures.whenSessionFound();
+    fixtures.whenStudentsSessionsFound();
+    fixtures.whenCourseStatsReturned(fixtures.aliceCourseStats);
+
+    const result = await fixtures.whenExecuteAsTeacher();
+
+    expect(result).toEqual([
+      {
+        ...fixtures.sessionStudents[0],
+        attemptedQuestions: 5,
+        correctAnswers: 2.83,
+        successRate: 57,
+        lastAttemptAt: '2026-02-02T10:00:00.000Z',
+      },
+      fixtures.sessionStudentsWithEmptyStats[1],
+    ]);
   });
 });
 
@@ -206,11 +233,39 @@ class Fixtures {
     },
   ];
 
+  public readonly sessionStudentsWithEmptyStats: SessionStudentWithStats[] = this.sessionStudents.map((student) => ({
+    ...student,
+    attemptedQuestions: 0,
+    correctAnswers: 0,
+    successRate: 0,
+    lastAttemptAt: null,
+  }));
+
+  public readonly aliceCourseStats: StudentCourseStats[] = [
+    {
+      id: 'stat-course-1',
+      studentId: 'student-1',
+      courseId: 'course-1',
+      attemptedQuestions: 3,
+      correctAnswers: 1,
+      lastAttemptAt: '2026-02-01T10:00:00.000Z',
+    },
+    {
+      id: 'stat-course-2',
+      studentId: 'student-1',
+      courseId: 'course-2',
+      attemptedQuestions: 2,
+      correctAnswers: 1.83,
+      lastAttemptAt: '2026-02-02T10:00:00.000Z',
+    },
+  ];
+
   public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly studentSessionRepository: ReturnType<typeof createMockStudentSessionRepository>;
+  public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly useCase: GetSessionStudentUseCase;
 
   constructor() {
@@ -219,12 +274,15 @@ class Fixtures {
     this.teacherRepository = createMockTeacherRepository();
     this.sessionRepository = createMockSessionRepository();
     this.establishmentRepository = createMockEstablishmentRepository();
+    this.studentCourseStatsRepository = createMockStudentCourseStatsRepository();
+    this.studentCourseStatsRepository.getStudentCourseStatsBySessionId.mockResolvedValue([]);
     this.useCase = new GetSessionStudentUseCase(
       this.studentRepository,
       this.teacherRepository,
       this.sessionRepository,
       this.establishmentRepository,
       this.studentSessionRepository,
+      this.studentCourseStatsRepository,
     );
   }
 
@@ -296,5 +354,9 @@ class Fixtures {
 
   whenStudentRepositoryThrows(error: Error) {
     this.studentSessionRepository.listStudentsEnrolledInSession.mockRejectedValue(error);
+  }
+
+  whenCourseStatsReturned(stats: StudentCourseStats[]) {
+    this.studentCourseStatsRepository.getStudentCourseStatsBySessionId.mockResolvedValue(stats);
   }
 }

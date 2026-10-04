@@ -26,6 +26,23 @@ describe('StudentCourseStatsSupabaseRepository', () => {
     });
   });
 
+  describe('getStudentCourseStatsBySessionId', () => {
+    it('returns mapped stats for courses of the session', async () => {
+      fixtures.whenSessionStatsQuerySucceeds();
+
+      const result = await fixtures.whenGetStudentCourseStatsBySessionId();
+
+      expect(result).toEqual([fixtures.expectedStatDomain]);
+      fixtures.thenSessionStatsSelectBuilt();
+    });
+
+    it('throws ServerError when query fails', async () => {
+      fixtures.whenSessionStatsQueryFails();
+
+      await expect(fixtures.whenGetStudentCourseStatsBySessionId()).rejects.toThrow(ServerError);
+    });
+  });
+
   describe('deleteStudentCourseStatsByCourseId', () => {
     it('deletes rows for course id', async () => {
       fixtures.whenDeleteByCourseSucceeds();
@@ -119,6 +136,7 @@ describe('StudentCourseStatsSupabaseRepository', () => {
 
 class Fixtures {
   public readonly courseId = 'course-1';
+  public readonly sessionId = 'session-1';
   public readonly studentId = 'stu-1';
   public readonly statId = 'stat-row-1';
   public readonly lastAttemptAt = '2026-05-01T10:00:00.000Z';
@@ -207,6 +225,24 @@ class Fixtures {
     this.supabase.from.mockReturnValue({ select });
   }
 
+  whenSessionStatsQuerySucceeds() {
+    const eq = jest.fn().mockResolvedValue({
+      data: [this.supabaseStatRow],
+      error: null,
+    });
+    const select = jest.fn().mockReturnValue({ eq });
+    this.supabase.from.mockReturnValue({ select });
+  }
+
+  whenSessionStatsQueryFails() {
+    const eq = jest.fn().mockResolvedValue({
+      data: null,
+      error: { message: 'session stats failed' },
+    });
+    const select = jest.fn().mockReturnValue({ eq });
+    this.supabase.from.mockReturnValue({ select });
+  }
+
   whenRankingQueryFails() {
     const eq = jest.fn().mockResolvedValue({
       data: null,
@@ -278,6 +314,10 @@ class Fixtures {
     this.supabase.from.mockReturnValue({ update: this.updateMock });
   }
 
+  whenGetStudentCourseStatsBySessionId() {
+    return this.repository.getStudentCourseStatsBySessionId(this.sessionId);
+  }
+
   whengetStudentCourseStatsByCourseId() {
     return this.repository.getStudentCourseStatsByCourseId(this.courseId);
   }
@@ -296,6 +336,14 @@ class Fixtures {
 
   whenUpdateStudentCourseStats() {
     return this.repository.updateStudentCourseStats(this.statId, this.updatePayload);
+  }
+
+  thenSessionStatsSelectBuilt() {
+    expect(this.supabase.from).toHaveBeenCalledWith('student_course_stats');
+    const select = this.supabase.from.mock.results.at(-1)?.value.select;
+    expect(select).toHaveBeenCalledWith(expect.stringContaining('courses!inner'));
+    const eq = select.mock.results[0].value.eq;
+    expect(eq).toHaveBeenCalledWith('courses.session_id', this.sessionId);
   }
 
   thenRankingSelectBuilt() {
