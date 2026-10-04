@@ -5,7 +5,7 @@ import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { JoinSessionByCodeUseCase } from 'src/application/teaching/student-session/join-session-by-code.use-case';
-import { SessionStudent } from 'src/domain/teaching/student-session/types/student-session.type';
+import { SessionStudentWithStats } from 'src/domain/teaching/student-session/types/student-session.type';
 import { GetSessionStudentUseCase } from 'src/application/teaching/student-session/get-session-student.use-case';
 import { DeleteStudentSessionUseCase } from 'src/application/teaching/student-session/delete-student-session.use-case';
 
@@ -35,7 +35,7 @@ export class StudentSessionController {
   async getStudentSessions(
     @Param('sessionId') sessionId: string,
     @CurrentUser() user: AuthUser,
-  ): Promise<SessionStudent[]> {
+  ): Promise<SessionStudentWithStats[]> {
     const students = await this.getSessionStudentUseCase.execute(sessionId, user);
     return students ?? [];
   }

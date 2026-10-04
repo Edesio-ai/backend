@@ -10,6 +10,7 @@ import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/
 import { EstablishmentPersistenceModule } from 'src/infrastructure/supabase/teaching/establishment/establishment-persistence.module';
 import { TeacherPersistenceModule } from 'src/infrastructure/supabase/teaching/teacher/teacher-persistence.module';
 import { StudentSessionPersistenceModule } from 'src/infrastructure/supabase/teaching/student-session/student-session-persistence.module';
+import { StudentCourseStatsPersistenceModule } from 'src/infrastructure/supabase/teaching/student-course-stats/student-course-states-persistence.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { StudentSessionPersistenceModule } from 'src/infrastructure/supabase/tea
     EstablishmentPersistenceModule,
     TeacherPersistenceModule,
     StudentSessionPersistenceModule,
+    StudentCourseStatsPersistenceModule,
   ],
   controllers: [StudentSessionController],
   providers: [

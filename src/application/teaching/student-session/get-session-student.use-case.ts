@@ -1,4 +1,7 @@
-import { SessionStudent } from 'src/domain/teaching/student-session/types/student-session.type';
+import {
+  SessionStudent,
+  SessionStudentWithStats,
+} from 'src/domain/teaching/student-session/types/student-session.type';
 import { Inject } from '@nestjs/common';
 import {
   STUDENT_REPOSITORY,
@@ -20,6 +23,11 @@ import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
 } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
+import {
+  type IStudentCourseStatsRepository,
+  STUDENT_COURSE_STATS_REPOSITORY,
+} from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
+import { StudentCourseStats } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 
 export class GetSessionStudentUseCase {
   constructor(
@@ -33,9 +41,11 @@ export class GetSessionStudentUseCase {
     private readonly establishmentRepository: IEstablishmentRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
     private readonly studentSessionRepository: IStudentSessionRepository,
+    @Inject(STUDENT_COURSE_STATS_REPOSITORY)
+    private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}
 
-  async execute(sessionId: string, user: AuthUser): Promise<SessionStudent[]> {
+  async execute(sessionId: string, user: AuthUser): Promise<SessionStudentWithStats[]> {
     const { role } = user.metadata;
 
     if (!isAdmin(role)) {
@@ -56,7 +66,52 @@ export class GetSessionStudentUseCase {
             students (id, name, email, photo_url)
         `;
     const studentsSessions = await this.studentSessionRepository.listStudentsEnrolledInSession(sessionId, select);
-    return studentsSessions;
+    if (studentsSessions.length === 0) {
+      return [];
+    }
+
+    const courseStats = await this.studentCourseStatsRepository.getStudentCourseStatsBySessionId(sessionId);
+    return this.withSessionStats(studentsSessions, courseStats);
+  }
+
+  private withSessionStats(students: SessionStudent[], courseStats: StudentCourseStats[]): SessionStudentWithStats[] {
+    const statsByStudentId = this.aggregateStatsByStudent(courseStats);
+
+    return students.map((student) => {
+      const stats = statsByStudentId.get(student.id);
+      const attemptedQuestions = stats?.attemptedQuestions ?? 0;
+      const correctAnswers = stats?.correctAnswers ?? 0;
+
+      return {
+        ...student,
+        attemptedQuestions,
+        correctAnswers,
+        successRate: attemptedQuestions > 0 ? Math.round((correctAnswers / attemptedQuestions) * 100) : 0,
+        lastAttemptAt: stats?.lastAttemptAt ?? null,
+      };
+    });
+  }
+
+  private aggregateStatsByStudent(courseStats: StudentCourseStats[]): Map<string, AggregatedStudentStats> {
+    const statsByStudentId = new Map<string, AggregatedStudentStats>();
+
+    for (const stat of courseStats) {
+      const current = statsByStudentId.get(stat.studentId) ?? {
+        attemptedQuestions: 0,
+        correctAnswers: 0,
+        lastAttemptAt: null,
+      };
+
+      current.attemptedQuestions += stat.attemptedQuestions;
+      current.correctAnswers += stat.correctAnswers;
+      if (!current.lastAttemptAt || stat.lastAttemptAt > current.lastAttemptAt) {
+        current.lastAttemptAt = stat.lastAttemptAt;
+      }
+
+      statsByStudentId.set(stat.studentId, current);
+    }
+
+    return statsByStudentId;
   }
 
   private async verifyTeacherAccess(userId: string, sessionId: string): Promise<void> {
@@ -103,3 +158,9 @@ export class GetSessionStudentUseCase {
     }
   }
 }
+
+type AggregatedStudentStats = {
+  attemptedQuestions: number;
+  correctAnswers: number;
+  lastAttemptAt: string | null;
+};

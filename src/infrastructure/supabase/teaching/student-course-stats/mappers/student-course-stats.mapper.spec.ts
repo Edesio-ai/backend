@@ -19,6 +19,29 @@ describe('StudentCourseStatsMapper', () => {
 
       fixtures.thenReturnsExpectedCourseStat(result);
     });
+
+    it('coerces numeric strings from supabase to numbers', () => {
+      const result = StudentCourseStatsMapper.toDomain({
+        ...fixtures.supabaseFullRow,
+        attempted_questions: '3' as unknown as number,
+        correct_answers: '1.83' as unknown as number,
+      });
+
+      expect(result.attemptedQuestions).toBe(3);
+      expect(result.correctAnswers).toBe(1.83);
+    });
+  });
+
+  describe('listFromQuery', () => {
+    it('returns empty array when rawRows is not an array', () => {
+      expect(StudentCourseStatsMapper.listFromQuery(null)).toEqual([]);
+    });
+
+    it('maps stats rows without student embed', () => {
+      const result = StudentCourseStatsMapper.listFromQuery([fixtures.supabaseFullRow]);
+
+      expect(result).toEqual([fixtures.expectedCourseStat]);
+    });
   });
 
   describe('courseStatWithStudentToDomain', () => {

@@ -4,6 +4,7 @@ export const STUDENT_COURSE_STATS_REPOSITORY = Symbol('STUDENT_COURSE_STATS_REPO
 
 export interface IStudentCourseStatsRepository {
   getStudentCourseStatsByCourseId(courseId: string): Promise<StudentCourseStatsWithStudent[]>;
+  getStudentCourseStatsBySessionId(sessionId: string): Promise<StudentCourseStats[]>;
   deleteStudentCourseStatsByCourseId(courseId: string): Promise<void>;
   getStudentCourseStatsByStudentIdAndCourseId(studentId: string, courseId: string): Promise<StudentCourseStats | null>;
   createStudentCourseStats(statToInsert: Omit<StudentCourseStats, 'id'>): Promise<void>;

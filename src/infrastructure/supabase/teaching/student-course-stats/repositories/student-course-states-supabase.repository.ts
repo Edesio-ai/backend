@@ -41,6 +41,31 @@ export class StudentCourseStatsSupabaseRepository implements IStudentCourseStats
     return StudentCourseStatsMapper.listCourseStatsWithStudentFromQuery(data ?? []);
   }
 
+  public async getStudentCourseStatsBySessionId(sessionId: string): Promise<StudentCourseStats[]> {
+    const { data, error } = await this.supabase
+      .from('student_course_stats')
+      .select(
+        `
+          id,
+          student_id,
+          course_id,
+          attempted_questions,
+          correct_answers,
+          last_attempt_at,
+          courses!inner (
+            session_id
+          )
+        `,
+      )
+      .eq('courses.session_id', sessionId);
+
+    if (error) {
+      console.error('An error occurred while getting student course stats by session id', sessionId, error);
+      throw new ServerError(error.message);
+    }
+    return StudentCourseStatsMapper.listFromQuery(data ?? []);
+  }
+
   public async deleteStudentCourseStatsByCourseId(courseId: string): Promise<void> {
     const { error } = await this.supabase.from('student_course_stats').delete().eq('course_id', courseId);
 
