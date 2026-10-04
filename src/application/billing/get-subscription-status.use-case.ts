@@ -39,7 +39,7 @@ export class GetSubscriptionStatusUseCase {
       case 'teacher': {
         const teacher = await this.teacherRepository.getTeacherByUserId(id);
         if (!teacher) {
-          throw new NotFoundError(`Teacher with id ${id} not found`);
+          return await this.handleSubscriptionFormat(email, id, role);
         }
         const establishmentId = teacher.establishmentId;
         if (establishmentId === null) {

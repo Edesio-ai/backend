@@ -296,13 +296,18 @@ describe('GetSubscriptionStatusUseCase - teacher flow', () => {
     fixtures = new Fixtures();
   });
 
-  it('should throw NotFoundError when teacher does not exist', async () => {
+  it('should look up Stripe with the user email when teacher does not exist yet', async () => {
     fixtures.whenTeacherNotFound();
+    fixtures.whenCustomerFound();
+    fixtures.whenSubscriptionsReturnActive();
 
-    const promise = fixtures.whenExecuteWith(fixtures.teacherUser);
+    const result = await fixtures.whenExecuteWith(fixtures.teacherUser);
 
-    await expect(promise).rejects.toBeInstanceOf(NotFoundError);
     expect(fixtures.teacherRepository.getTeacherByUserId).toHaveBeenCalledWith(fixtures.teacherUser.id);
+    fixtures.thenEstablishmentRepositoryNotCalled();
+    expect(fixtures.paymentClient.getCustomerByEmail).toHaveBeenCalledWith(fixtures.teacherUser.email);
+    expect(result.hasActiveSubscription).toBe(true);
+    expect(result.role).toBe('teacher');
   });
 
   it('should use teacher email when teacher has no establishment', async () => {
