@@ -114,6 +114,27 @@ describe('GetCourseQuestionsUseCase', () => {
       expect(fixtures.questionsRepository.getCourseQuestions).toHaveBeenCalledWith(fixtures.courseId);
     });
 
+    it('should throw ForbiddenError when course questions are not published', async () => {
+      fixtures.whenStudentFound();
+      fixtures.whenUnpublishedCourseReturnedForStudent();
+      fixtures.whenStudentSessionMatchesEnrollment();
+
+      await expect(fixtures.whenStudentExecute()).rejects.toBeInstanceOf(ForbiddenError);
+      expect(fixtures.questionsRepository.getCourseQuestions).not.toHaveBeenCalled();
+    });
+
+    it('should return questions for a legacy course without validatedQuestions', async () => {
+      fixtures.whenStudentFound();
+      fixtures.whenLegacyCourseReturnedForStudent();
+      fixtures.whenStudentSessionMatchesEnrollment();
+      fixtures.whenQuestionsReturned();
+
+      const result = await fixtures.whenStudentExecute();
+
+      expect(result).toEqual(fixtures.questions);
+      expect(fixtures.questionsRepository.getCourseQuestions).toHaveBeenCalledWith(fixtures.courseId);
+    });
+
     it('should throw NotFoundError when student is missing', async () => {
       fixtures.whenStudentNotFound();
 
@@ -198,6 +219,7 @@ class Fixtures {
     title: 'Cours',
     description: null,
     createdAt: '2026-01-01T00:00:00.000Z',
+    validatedQuestions: true,
   };
 
   public readonly courseWithSession: CourseWithSession = {
@@ -297,6 +319,20 @@ class Fixtures {
 
   whenCourseReturnedForStudent() {
     this.coursesRepository.getCourseById.mockResolvedValue(this.courseForStudent);
+  }
+
+  whenUnpublishedCourseReturnedForStudent() {
+    this.coursesRepository.getCourseById.mockResolvedValue({
+      ...this.courseForStudent,
+      validatedQuestions: false,
+    });
+  }
+
+  whenLegacyCourseReturnedForStudent() {
+    this.coursesRepository.getCourseById.mockResolvedValue({
+      ...this.courseForStudent,
+      validatedQuestions: undefined,
+    });
   }
 
   whenCourseByIdMissing() {

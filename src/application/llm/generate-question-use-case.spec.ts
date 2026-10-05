@@ -74,6 +74,9 @@ describe('GenerateQuestionUseCase', () => {
 
     expect(fixtures.questionRepository.deleteCourseQuizQuestions).toHaveBeenCalledWith(fixtures.body.courseId);
     expect(fixtures.questionRepository.insertQuestions).toHaveBeenCalledWith(expect.any(Array), fixtures.body.courseId);
+    expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(fixtures.body.courseId, {
+      validatedQuestions: false,
+    });
     expect(result).toEqual(fixtures.insertedQuestions);
   });
 
@@ -142,6 +145,7 @@ describe('GenerateQuestionUseCase', () => {
       expect.any(Array),
       fixtures.body.courseId,
     );
+    expect(fixtures.courseRepository.updateCourse).not.toHaveBeenCalled();
     expect(result).toEqual(fixtures.insertedSelfLearnerQuestions);
   });
 
@@ -158,6 +162,9 @@ describe('GenerateQuestionUseCase', () => {
 
     expect(fixtures.questionRepository.deleteCourseQuizQuestions).toHaveBeenCalledWith(fixtures.body.courseId);
     expect(fixtures.questionRepository.insertQuestions).toHaveBeenCalledWith(expect.any(Array), fixtures.body.courseId);
+    expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(fixtures.body.courseId, {
+      validatedQuestions: false,
+    });
     expect(result).toEqual(fixtures.insertedQuestions);
   });
 });
@@ -364,6 +371,14 @@ class Fixtures {
   whenInsertSucceeds() {
     this.questionRepository.deleteCourseQuizQuestions.mockResolvedValue(undefined);
     this.questionRepository.insertQuestions.mockResolvedValue(this.insertedQuestions);
+    this.courseRepository.updateCourse.mockResolvedValue({
+      id: this.body.courseId,
+      sessionId: 'session-1',
+      title: 'Cours',
+      description: null,
+      contentText: 'Contenu',
+      validatedQuestions: false,
+    });
   }
 
   whenSelfLearnerActor() {

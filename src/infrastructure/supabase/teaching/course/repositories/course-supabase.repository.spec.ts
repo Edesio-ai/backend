@@ -321,6 +321,7 @@ class Fixtures {
     validatedQuestions: undefined,
     positionOrder: undefined,
     createdAt: '2026-01-01T00:00:00.000Z',
+    questionCount: 0,
   };
 
   public readonly courseId = 'course-1';
@@ -366,6 +367,7 @@ class Fixtures {
     validatedQuestions: undefined,
     positionOrder: undefined,
     createdAt: '2026-01-01T00:00:00.000Z',
+    questionCount: 0,
   };
 
   public readonly sessionCoursesSupabaseRows = [
@@ -376,6 +378,7 @@ class Fixtures {
       description: null,
       text_content: null,
       created_at: '2026-01-02T00:00:00.000Z',
+      questions: [{ count: 4 }],
     },
     {
       id: 'c-b',
@@ -384,6 +387,7 @@ class Fixtures {
       description: null,
       text_content: null,
       created_at: '2026-01-01T00:00:00.000Z',
+      questions: [{ count: 0 }],
     },
   ];
   public readonly expectedSessionCourses = [
@@ -396,6 +400,7 @@ class Fixtures {
       validatedQuestions: undefined,
       positionOrder: undefined,
       createdAt: '2026-01-02T00:00:00.000Z',
+      questionCount: 4,
     },
     {
       id: 'c-b',
@@ -406,6 +411,7 @@ class Fixtures {
       validatedQuestions: undefined,
       positionOrder: undefined,
       createdAt: '2026-01-01T00:00:00.000Z',
+      questionCount: 0,
     },
   ];
 
@@ -436,6 +442,9 @@ class Fixtures {
     }
     if (first === 'validated_questions') {
       return { eq: this.coursesByIdEqMock };
+    }
+    if (first === '*, questions(count)') {
+      return { eq: this.coursesSessionCoursesEqMock };
     }
     if (first === '*') {
       return {
@@ -805,6 +814,7 @@ class Fixtures {
       title: this.createBody.title,
       description: this.createBody.description,
       text_content: this.createBody.contentText,
+      validated_questions: false,
     });
     expect(this.coursesInsertSelectMock).toHaveBeenCalledTimes(1);
     expect(this.coursesInsertSingleMock).toHaveBeenCalledTimes(1);
@@ -852,7 +862,7 @@ class Fixtures {
 
   thenGetSessionCoursesBySessionIdQueryBuilt() {
     expect(this.fromMock).toHaveBeenCalledWith('courses');
-    expect(this.coursesSelectMock).toHaveBeenCalledWith('*');
+    expect(this.coursesSelectMock).toHaveBeenCalledWith('*, questions(count)');
     expect(this.coursesSessionCoursesEqMock).toHaveBeenCalledWith('session_id', this.sessionId);
     expect(this.coursesSessionFirstOrderMock).toHaveBeenCalledWith('position_order', { ascending: true });
     expect(this.coursesSessionSecondOrderMock).toHaveBeenCalledWith('created_at', { ascending: false });
@@ -985,6 +995,7 @@ class Fixtures {
     validatedQuestions: false,
     positionOrder: 1,
     createdAt: '2026-01-01T00:00:00.000Z',
+    questionCount: 0,
   };
 
   whenUpdateCourse() {

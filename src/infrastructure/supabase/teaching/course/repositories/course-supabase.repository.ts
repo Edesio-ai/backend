@@ -102,7 +102,7 @@ export class CourseSupabaseRepository implements ICourseRepository {
   public async getSessionCoursesBySessionId(sessionId: string): Promise<Course[]> {
     const { data, error } = await this.supabase
       .from('courses')
-      .select('*')
+      .select('*, questions(count)')
       .eq('session_id', sessionId)
       .order('position_order', { ascending: true })
       .order('created_at', { ascending: false });
