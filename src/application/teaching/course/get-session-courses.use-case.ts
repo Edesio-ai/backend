@@ -20,6 +20,7 @@ import {
   type IStudentRepository,
 } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import { isCourseVisibleToStudents } from 'src/domain/teaching/course/course.utils';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 
 export class GetSessionCoursesUseCase {
@@ -57,7 +58,13 @@ export class GetSessionCoursesUseCase {
       }
     }
 
-    return this.courseRepository.getSessionCoursesBySessionId(sessionId);
+    const courses = await this.courseRepository.getSessionCoursesBySessionId(sessionId);
+
+    if (role === 'student') {
+      return courses.filter(isCourseVisibleToStudents);
+    }
+
+    return courses;
   }
 
   private async checkTeacherOwnership(sessionId: string, user: AuthUser): Promise<void> {

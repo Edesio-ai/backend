@@ -12,6 +12,7 @@ export type SupabaseCourse = {
   validated_questions?: boolean;
   position_order?: number;
   created_at: string;
+  questions?: { count: number }[] | null;
 };
 
 export type CreateCourseBody = {
@@ -30,6 +31,7 @@ export type Course = {
   validatedQuestions?: boolean;
   positionOrder?: number;
   createdAt?: string;
+  questionCount?: number;
 };
 
 export type SupabaseCourseWithSession = {
@@ -53,6 +55,7 @@ export type SupabaseCourseInsert = {
   title: string;
   description?: string | null;
   text_content?: string | null;
+  validated_questions?: boolean;
 };
 
 /** Question shape for course details — matches frontend `Question` (non-null proposals). */

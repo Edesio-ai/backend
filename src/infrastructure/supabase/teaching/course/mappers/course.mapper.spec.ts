@@ -122,6 +122,7 @@ class Fixtures {
     validatedQuestions: true,
     positionOrder: 2,
     createdAt: '2026-01-01T00:00:00.000Z',
+    questionCount: 0,
   };
 
   whenToInsertFull() {
@@ -207,6 +208,7 @@ class Fixtures {
       title: 'Titre',
       description: 'D',
       text_content: 'Contenu',
+      validated_questions: false,
     });
   }
 
@@ -216,6 +218,7 @@ class Fixtures {
       title: 'T',
       description: undefined,
       text_content: undefined,
+      validated_questions: false,
     });
   }
 

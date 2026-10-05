@@ -102,6 +102,10 @@ export class GenerateQuestionUseCase {
       ? await this.questionRepository.insertQuestions(alternatedQuestions, courseId)
       : await this.selfLearnerQuestionRepository.insertSelfLearnerQuestions(alternatedQuestions, courseId);
 
+    if (useTeacherPath) {
+      await this.courseRepository.updateCourse(courseId, { validatedQuestions: false });
+    }
+
     return insertedQuestions;
   }
 

@@ -15,6 +15,7 @@ export const CourseMapper = {
     validatedQuestions: row.validated_questions,
     positionOrder: row.position_order,
     createdAt: row.created_at,
+    questionCount: Array.isArray(row.questions) ? (row.questions[0]?.count ?? 0) : 0,
   }),
 
   toInsert: (body: CreateCourseBody): SupabaseCourseInsert => ({
@@ -22,6 +23,7 @@ export const CourseMapper = {
     title: body.title,
     description: body.description,
     text_content: body.contentText,
+    validated_questions: false,
   }),
 
   toUpdate: (updates: Record<string, unknown>): Record<string, unknown> => {

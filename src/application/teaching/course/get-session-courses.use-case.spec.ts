@@ -122,6 +122,17 @@ describe('GetSessionCoursesUseCase', () => {
     expect(fixtures.courseRepository.getSessionCoursesBySessionId).toHaveBeenCalledWith(fixtures.sessionId);
   });
 
+  it('should return only published courses for a student', async () => {
+    fixtures.whenStudentFound();
+    fixtures.whenStudentEnrolledInSession();
+    fixtures.whenMixedPublicationCoursesReturned();
+
+    const result = await fixtures.whenExecuteAsStudent();
+
+    expect(result).toEqual([fixtures.publishedCourse, fixtures.legacyCourse]);
+    expect(fixtures.courseRepository.getSessionCoursesBySessionId).toHaveBeenCalledWith(fixtures.sessionId);
+  });
+
   it('should throw NotFoundError when student is not found', async () => {
     fixtures.whenStudentNotFound();
 
@@ -226,15 +237,33 @@ class Fixtures {
     pendingQuestionCount: 0,
   };
 
-  public readonly courses: Course[] = [
-    {
-      id: 'c-1',
-      sessionId: this.sessionId,
-      title: 'Cours 1',
-      description: null,
-      contentText: null,
-    },
-  ];
+  public readonly publishedCourse: Course = {
+    id: 'c-1',
+    sessionId: this.sessionId,
+    title: 'Cours 1',
+    description: null,
+    contentText: null,
+    validatedQuestions: true,
+  };
+
+  public readonly draftCourse: Course = {
+    id: 'c-draft',
+    sessionId: this.sessionId,
+    title: 'Cours brouillon',
+    description: null,
+    contentText: null,
+    validatedQuestions: false,
+  };
+
+  public readonly legacyCourse: Course = {
+    id: 'c-legacy',
+    sessionId: this.sessionId,
+    title: 'Cours legacy',
+    description: null,
+    contentText: null,
+  };
+
+  public readonly courses: Course[] = [this.publishedCourse];
 
   public readonly coursesError = new Error('courses failed');
 
@@ -332,6 +361,14 @@ class Fixtures {
 
   whenCoursesReturned() {
     this.courseRepository.getSessionCoursesBySessionId.mockResolvedValue(this.courses);
+  }
+
+  whenMixedPublicationCoursesReturned() {
+    this.courseRepository.getSessionCoursesBySessionId.mockResolvedValue([
+      this.publishedCourse,
+      this.draftCourse,
+      this.legacyCourse,
+    ]);
   }
 
   whenCoursesFail() {
