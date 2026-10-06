@@ -16,6 +16,7 @@ export interface CreateQuestionBody {
   correctAnswers: string[];
   proposals?: string[];
   explanation?: string | undefined | null;
+  cheatingDetectionEnabled?: boolean;
 }
 export class CreateQuestionUseCase {
   constructor(

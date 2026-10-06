@@ -1,4 +1,4 @@
-import { IsArray, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { type QuestionType } from 'src/domain/teaching/question/types/question.type';
 
 export class CreateQuestionDto {
@@ -25,4 +25,8 @@ export class CreateQuestionDto {
   @IsOptional()
   @IsString()
   explanation?: string | null;
+
+  @IsOptional()
+  @IsBoolean()
+  cheatingDetectionEnabled?: boolean;
 }
