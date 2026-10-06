@@ -17,10 +17,20 @@ function sessionsEmbedToList(embed: SupabaseSession | SupabaseSession[] | null):
   return Array.isArray(embed) ? embed : [embed];
 }
 
+function teacherNameFromSession(session: SupabaseSession): string {
+  const teachers = session.teachers;
+  if (!teachers) {
+    return '';
+  }
+  const teacher = Array.isArray(teachers) ? teachers[0] : teachers;
+  return teacher?.name ?? '';
+}
+
 function joinedSessionFromParts(joinedAt: string, session: SupabaseSession): StudentJoinedSession {
   return {
     ...SessionMapper.toDomain(session),
     joinedAt,
+    teacherName: teacherNameFromSession(session),
   };
 }
 

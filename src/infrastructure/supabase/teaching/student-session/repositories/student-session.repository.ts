@@ -43,7 +43,16 @@ export class StudentSessionRepository implements IStudentSessionRepository {
   public async listSessionsEnrolledByStudent(studentId: string): Promise<StudentJoinedSession[]> {
     const { data, error } = await this.supabase
       .from('student_sessions')
-      .select('joined_at, sessions (*)')
+      .select(
+        `
+        joined_at,
+        sessions (
+          *,
+          teachers (name),
+          sessions_student_count:student_sessions(count)
+        )
+      `,
+      )
       .eq('student_id', studentId)
       .order('joined_at', { ascending: false });
 

@@ -18,6 +18,7 @@ export type SupabaseStudentJoinedSession = {
 
 export type StudentJoinedSession = Session & {
   joinedAt: string;
+  teacherName: string;
 };
 
 export type SupabaseSessionStudent = {

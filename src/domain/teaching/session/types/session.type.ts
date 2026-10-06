@@ -18,6 +18,7 @@ export type SupabaseSession = {
   created_at: string;
   sessions_student_count?: { count: number }[] | null;
   courses?: SupabaseSessionCoursePendingQuestions[] | null;
+  teachers?: { name: string } | { name: string }[] | null;
 };
 
 export type Session = {

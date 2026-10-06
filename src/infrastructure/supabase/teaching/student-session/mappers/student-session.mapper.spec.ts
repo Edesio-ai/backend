@@ -39,8 +39,31 @@ describe('StudentSessionMapper', () => {
           studentCount: 0,
           pendingQuestionCount: 0,
           joinedAt: '2026-01-15T10:00:00.000Z',
+          teacherName: '',
         },
       ]);
+    });
+
+    it('maps teacherName from the embedded teacher', () => {
+      const rows: SupabaseStudentJoinedSession[] = [
+        {
+          joined_at: '2026-01-15T10:00:00.000Z',
+          sessions: { ...sessionA, teachers: { name: 'Camille Bernard' } },
+        },
+      ];
+
+      expect(StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(rows)[0].teacherName).toBe('Camille Bernard');
+    });
+
+    it('maps teacherName from an embedded teacher array', () => {
+      const rows: SupabaseStudentJoinedSession[] = [
+        {
+          joined_at: '2026-01-15T10:00:00.000Z',
+          sessions: { ...sessionA, teachers: [{ name: 'Marc Lefèvre' }] },
+        },
+      ];
+
+      expect(StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(rows)[0].teacherName).toBe('Marc Lefèvre');
     });
 
     it('returns an empty array for empty input', () => {
@@ -94,6 +117,7 @@ describe('StudentSessionMapper', () => {
           studentCount: 0,
           pendingQuestionCount: 0,
           joinedAt: '2026-02-01T00:00:00.000Z',
+          teacherName: '',
         },
       ]);
     });

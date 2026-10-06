@@ -103,6 +103,7 @@ class Fixtures {
     studentCount: 0,
     pendingQuestionCount: 0,
     joinedAt: '2026-01-10T00:00:00.000Z',
+    teacherName: '',
   };
 
   public readonly studentRepository: jest.Mocked<IStudentRepository>;
