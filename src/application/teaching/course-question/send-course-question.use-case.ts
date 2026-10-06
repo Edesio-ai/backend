@@ -6,6 +6,7 @@ import {
 } from 'src/domain/teaching/course-question/contracts/i-course-question.repository';
 import { CourseQuestion, CourseQuestionToInsert } from 'src/domain/teaching/course-question/types/course-question.type';
 import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { isCourseVisibleToStudents } from 'src/domain/teaching/course/course.utils';
 import {
   STUDENT_SESSION_REPOSITORY,
   type IStudentSessionRepository,
@@ -40,6 +41,10 @@ export class SendCourseQuestionUseCase {
     const course = await this.courseRepository.getCourseById(body.courseId);
     if (!course) {
       throw new NotFoundException('Course not found');
+    }
+
+    if (!isCourseVisibleToStudents(course)) {
+      throw new ForbiddenException('You are not authorized to access this course');
     }
 
     const studentSession = await this.studentSessionRepository.getStudentSession(course.sessionId, student.id);

@@ -1,6 +1,7 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { isCourseVisibleToStudents } from 'src/domain/teaching/course/course.utils';
 import {
   type IStudentCourseStatsRepository,
   STUDENT_COURSE_STATS_REPOSITORY,
@@ -32,6 +33,9 @@ export class UpdateOrCreateStudentCourseStatsUseCase {
     const course = await this.courseRepository.getCourseById(courseId);
     if (!course) {
       throw new NotFoundException('Course not found');
+    }
+    if (!isCourseVisibleToStudents(course)) {
+      throw new ForbiddenException('You are not authorized to access this course');
     }
     const existingStats = await this.studentCourseStatsRepository.getStudentCourseStatsByStudentIdAndCourseId(
       student.id,

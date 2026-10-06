@@ -8,6 +8,7 @@ import {
   type IStudentRepository,
 } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
+import { isCourseVisibleToStudents } from 'src/domain/teaching/course/course.utils';
 import {
   COURSE_QUESTION_REPOSITORY,
   type ICourseQuestionRepository,
@@ -66,6 +67,10 @@ export class GetStudentCourseQuestionsUseCase {
     const course = await this.courseRepository.getCourseById(courseId);
     if (!course) {
       throw new NotFoundError(`Course with id ${courseId} not found`);
+    }
+
+    if (!isCourseVisibleToStudents(course)) {
+      throw new ForbiddenError(`Course questions are not published for course id ${courseId}`);
     }
 
     const studentSession = await this.studentSessionRepository.getStudentSession(course.sessionId, student.id);

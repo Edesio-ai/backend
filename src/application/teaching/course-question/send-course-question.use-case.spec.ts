@@ -60,6 +60,15 @@ describe('SendCourseQuestionUseCase', () => {
     expect(fixtures.courseQuestionRepository.createCourseQuestion).not.toHaveBeenCalled();
   });
 
+  it('should throw ForbiddenException when course is not published', async () => {
+    fixtures.whenStudentFound();
+    fixtures.whenUnpublishedCourseReturned();
+
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenException);
+    expect(fixtures.studentSessionRepository.getStudentSession).not.toHaveBeenCalled();
+    expect(fixtures.courseQuestionRepository.createCourseQuestion).not.toHaveBeenCalled();
+  });
+
   it('should throw ForbiddenException when student is not enrolled in session', async () => {
     fixtures.whenStudentFound();
     fixtures.whenCourseReturned();
@@ -158,6 +167,13 @@ class Fixtures {
 
   whenCourseReturned() {
     this.courseRepository.getCourseById.mockResolvedValue(this.course);
+  }
+
+  whenUnpublishedCourseReturned() {
+    this.courseRepository.getCourseById.mockResolvedValue({
+      ...this.course,
+      validatedQuestions: false,
+    });
   }
 
   whenCourseMissing() {

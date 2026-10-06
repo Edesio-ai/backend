@@ -17,6 +17,7 @@ import {
   type IStudentCourseStatsRepository,
   STUDENT_COURSE_STATS_REPOSITORY,
 } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
+import { isCourseVisibleToStudents } from 'src/domain/teaching/course/course.utils';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 import {
   type IStudentRepository,
@@ -127,6 +128,10 @@ export class GetCourseRankingUseCase {
   }
 
   private async checkStudentAccess(course: Course, user: AuthUser): Promise<void> {
+    if (!isCourseVisibleToStudents(course)) {
+      throw new ForbiddenException('You are not authorized to access this course');
+    }
+
     const student = await this.studentRepository.getStudentByUserId(user.id);
     if (!student) {
       throw new NotFoundError(`Student with id ${user.id} not found`);

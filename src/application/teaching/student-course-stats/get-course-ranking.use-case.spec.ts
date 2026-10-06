@@ -85,6 +85,30 @@ describe('GetCourseRankingUseCase', () => {
     expect(fixtures.studentCourseStatsRepository.getStudentCourseStatsByCourseId).not.toHaveBeenCalled();
   });
 
+  it('should throw ForbiddenException when course is not published for student', async () => {
+    fixtures.whenUnpublishedCourseFound();
+
+    const promise = fixtures.whenExecuteAsStudent();
+
+    await expect(promise).rejects.toBeInstanceOf(ForbiddenException);
+    expect(fixtures.studentRepository.getStudentByUserId).not.toHaveBeenCalled();
+    expect(fixtures.studentCourseStatsRepository.getStudentCourseStatsByCourseId).not.toHaveBeenCalled();
+  });
+
+  it('should return ranking for teacher when course is unpublished', async () => {
+    fixtures.whenUnpublishedCourseFound();
+    fixtures.whenTeacherFound();
+    fixtures.whenSessionMatchesTeacher();
+    fixtures.whenStudentStatsReturnUnsorted();
+
+    const result = await fixtures.whenExecute();
+
+    expect(result).toHaveLength(4);
+    expect(fixtures.studentCourseStatsRepository.getStudentCourseStatsByCourseId).toHaveBeenCalledWith(
+      fixtures.course.id,
+    );
+  });
+
   it('should throw ForbiddenException when student is not enrolled in course session', async () => {
     fixtures.whenCourseFound();
     fixtures.whenStudentProfileFound();
@@ -311,6 +335,13 @@ class Fixtures {
 
   whenCourseFound() {
     this.courseRepository.getCourseById.mockResolvedValue(this.course);
+  }
+
+  whenUnpublishedCourseFound() {
+    this.courseRepository.getCourseById.mockResolvedValue({
+      ...this.course,
+      validatedQuestions: false,
+    });
   }
 
   whenTeacherNotFound() {

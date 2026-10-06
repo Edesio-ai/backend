@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { UpdateOrCreateStudentCourseStatsUseCase } from 'src/application/teaching/student-course-stats/update-or-create-student-course-stats.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
 import type { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
@@ -30,6 +30,14 @@ describe('UpdateOrCreateStudentCourseStatsUseCase', () => {
     fixtures.whenCourseNotFound();
 
     await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(NotFoundException);
+    expect(fixtures.studentCourseStatsRepository.getStudentCourseStatsByStudentIdAndCourseId).not.toHaveBeenCalled();
+  });
+
+  it('should throw ForbiddenException when course is not published', async () => {
+    fixtures.whenStudentFound();
+    fixtures.whenUnpublishedCourseFound();
+
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenException);
     expect(fixtures.studentCourseStatsRepository.getStudentCourseStatsByStudentIdAndCourseId).not.toHaveBeenCalled();
   });
 
@@ -133,6 +141,13 @@ class Fixtures {
 
   whenCourseFound() {
     this.courseRepository.getCourseById.mockResolvedValue(this.course);
+  }
+
+  whenUnpublishedCourseFound() {
+    this.courseRepository.getCourseById.mockResolvedValue({
+      ...this.course,
+      validatedQuestions: false,
+    });
   }
 
   whenExistingStatsReturned() {
