@@ -84,6 +84,28 @@ describe('FileSupabaseRepository', () => {
 
     await fixtures.thenThrowServerError(promise);
   });
+
+  it('should return a signed URL from the courses-pdf bucket', async () => {
+    fixtures.whenCreateSignedUrlSucceeds('https://signed.example/doc.pdf');
+
+    const result = await fixtures.whenGetCourseFileSignedUrl();
+
+    expect(fixtures.storageFromMock).toHaveBeenCalledWith('courses-pdf');
+    expect(fixtures.createSignedUrlMock).toHaveBeenCalledWith(fixtures.fileUrl, 3600);
+    expect(result).toBe('https://signed.example/doc.pdf');
+  });
+
+  it('should return null when Supabase omits signedUrl', async () => {
+    fixtures.whenCreateSignedUrlSucceeds(undefined);
+
+    await expect(fixtures.whenGetCourseFileSignedUrl()).resolves.toBeNull();
+  });
+
+  it('should throw ServerError when createSignedUrl fails', async () => {
+    fixtures.whenCreateSignedUrlFails();
+
+    await fixtures.thenThrowServerError(fixtures.whenGetCourseFileSignedUrl());
+  });
 });
 
 class Fixtures {
@@ -132,8 +154,10 @@ class Fixtures {
   }));
 
   public readonly removeMock = jest.fn();
-  private readonly storageFromMock = jest.fn(() => ({
+  public readonly createSignedUrlMock = jest.fn();
+  public readonly storageFromMock = jest.fn(() => ({
     remove: this.removeMock,
+    createSignedUrl: this.createSignedUrlMock,
   }));
 
   public readonly repository: CourseFileRepository;
@@ -156,6 +180,24 @@ class Fixtures {
 
   whenGetCourseFilesByCourseId() {
     return this.repository.getCourseFilesByCourseId(this.courseId);
+  }
+
+  whenGetCourseFileSignedUrl() {
+    return this.repository.getCourseFileSignedUrl(this.fileUrl);
+  }
+
+  whenCreateSignedUrlSucceeds(signedUrl?: string) {
+    this.createSignedUrlMock.mockResolvedValue({
+      data: signedUrl === undefined ? {} : { signedUrl },
+      error: null,
+    });
+  }
+
+  whenCreateSignedUrlFails() {
+    this.createSignedUrlMock.mockResolvedValue({
+      data: null,
+      error: { message: 'signed url failed' },
+    });
   }
 
   whenGetCourseFileByIdSucceeds() {

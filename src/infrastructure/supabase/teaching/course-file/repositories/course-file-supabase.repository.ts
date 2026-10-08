@@ -55,6 +55,17 @@ export class CourseFileRepository implements ICourseFileRepository {
     return Buffer.from(await fileData.arrayBuffer());
   }
 
+  public async getCourseFileSignedUrl(fileUrl: string): Promise<string | null> {
+    const { data, error } = await this.supabase.storage.from('courses-pdf').createSignedUrl(fileUrl, 3600);
+
+    if (error) {
+      console.error(`Error getting course file signed url: ${fileUrl}: ${error.message}`);
+      throw new ServerError(error.message);
+    }
+
+    return data.signedUrl ?? null;
+  }
+
   public async getCourseFilesByCourseId(courseId: string): Promise<CourseFile[]> {
     const { data, error } = await this.supabase.from('course_files').select('*').eq('course_id', courseId);
 

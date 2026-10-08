@@ -10,5 +10,6 @@ export function createMockCourseFileRepository(): jest.Mocked<ICourseFileReposit
     getFileBufferFromStorage: jest.fn(),
     insertCourseFile: jest.fn(),
     storeCourseFile: jest.fn(),
+    getCourseFileSignedUrl: jest.fn(),
   };
 }

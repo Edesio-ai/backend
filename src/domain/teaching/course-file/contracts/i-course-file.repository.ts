@@ -11,4 +11,5 @@ export interface ICourseFileRepository {
   storeCourseFile(file: CourseFileUpload, storagePath: string): Promise<void>;
   deleteFileById(fileId: string): Promise<void>;
   getCourseFileById(fileId: string, select?: string): Promise<CourseFile | null>;
+  getCourseFileSignedUrl(fileUrl: string): Promise<string | null>;
 }
