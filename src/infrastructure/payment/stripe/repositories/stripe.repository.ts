@@ -161,23 +161,7 @@ export class StripeRepository implements IStripeProvider {
         interval = subscription.items.data[0].price.recurring.interval;
       }
 
-      let last4: string | null = null;
-      let cardBrand: string | null = null;
-
-      if (subscription.default_payment_method) {
-        try {
-          const paymentMethod = await this.stripeClient.paymentMethods.retrieve(
-            subscription.default_payment_method as string,
-          );
-          if (paymentMethod.card) {
-            last4 = paymentMethod.card.last4;
-            cardBrand = paymentMethod.card.brand;
-          }
-        } catch (e) {
-          console.error('Error fetching payment method:', e);
-        }
-      }
-
+      const { last4, cardBrand } = await this.resolveCardDetails(customerId, subscription);
       const preview = await this.getPreview(customerId, subscription.id);
 
       return {
@@ -196,6 +180,72 @@ export class StripeRepository implements IStripeProvider {
       const message = error instanceof Error ? error.message : 'Unknown error';
       throw new ServerError(`Error searching subscriptions: ${message}`);
     }
+  }
+
+  private async resolveCardDetails(
+    customerId: string,
+    subscription: Stripe.Subscription,
+  ): Promise<{ last4: string | null; cardBrand: string | null }> {
+    const fromSubscription = await this.getCardByPaymentMethodId(
+      this.paymentMethodId(subscription.default_payment_method),
+    );
+    if (fromSubscription.last4) {
+      return fromSubscription;
+    }
+
+    const customer = await this.stripeClient.customers.retrieve(customerId);
+    if (!customer.deleted) {
+      const fromCustomer = await this.getCardByPaymentMethodId(
+        this.paymentMethodId(customer.invoice_settings?.default_payment_method),
+      );
+      if (fromCustomer.last4) {
+        return fromCustomer;
+      }
+    }
+
+    const listed = await this.stripeClient.paymentMethods.list({
+      customer: customerId,
+      type: 'card',
+      limit: 1,
+    });
+    return this.cardFromPaymentMethod(listed.data[0]);
+  }
+
+  private paymentMethodId(value: string | Stripe.PaymentMethod | null | undefined): string | null {
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+    if (value && typeof value === 'object' && typeof value.id === 'string') {
+      return value.id;
+    }
+    return null;
+  }
+
+  private async getCardByPaymentMethodId(
+    paymentMethodId: string | null,
+  ): Promise<{ last4: string | null; cardBrand: string | null }> {
+    if (!paymentMethodId) {
+      return { last4: null, cardBrand: null };
+    }
+
+    try {
+      const paymentMethod = await this.stripeClient.paymentMethods.retrieve(paymentMethodId);
+      return this.cardFromPaymentMethod(paymentMethod);
+    } catch (error) {
+      console.error('Error fetching payment method:', error);
+      return { last4: null, cardBrand: null };
+    }
+  }
+
+  private cardFromPaymentMethod(paymentMethod: Stripe.PaymentMethod | undefined): {
+    last4: string | null;
+    cardBrand: string | null;
+  } {
+    const card = paymentMethod?.card;
+    if (!card?.last4) {
+      return { last4: null, cardBrand: null };
+    }
+    return { last4: card.last4, cardBrand: card.brand ?? null };
   }
 
   private async getPreview(customerId: string, subscriptionId: string): Promise<Stripe.Invoice | null> {

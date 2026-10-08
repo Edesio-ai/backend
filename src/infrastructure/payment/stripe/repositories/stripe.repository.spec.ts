@@ -142,9 +142,10 @@ describe('StripeRepository', () => {
       expect(fixtures.invoicesCreatePreviewMock).not.toHaveBeenCalled();
     });
 
-    it('should omit card details when subscription has no default payment method', async () => {
+    it('should omit card details when no payment method is attached', async () => {
       fixtures.whenCustomersListReturnsOneCustomer();
       fixtures.whenSubscriptionWithoutPaymentMethod();
+      fixtures.whenCustomerHasNoCard();
       fixtures.whenProductsRetrieveSucceeds();
       fixtures.whenCreatePreviewSucceeds();
 
@@ -156,6 +157,39 @@ describe('StripeRepository', () => {
         last4: null,
         cardBrand: null,
       });
+    });
+
+    it('should use the customer default payment method when the subscription has none', async () => {
+      fixtures.whenCustomersListReturnsOneCustomer();
+      fixtures.whenSubscriptionWithoutPaymentMethod();
+      fixtures.whenCustomerHasDefaultPaymentMethod();
+      fixtures.whenProductsRetrieveSucceeds();
+      fixtures.whenCreatePreviewSucceeds();
+
+      const result = await fixtures.whenGetUserSubscription();
+
+      expect(fixtures.paymentMethodsRetrieveMock).toHaveBeenCalledWith('pm_customer');
+      expect(fixtures.paymentMethodsListMock).not.toHaveBeenCalled();
+      expect(result).toEqual(fixtures.expectedStripeSubscription);
+    });
+
+    it('should use the first listed card when no default payment method exists', async () => {
+      fixtures.whenCustomersListReturnsOneCustomer();
+      fixtures.whenSubscriptionWithoutPaymentMethod();
+      fixtures.whenCustomerHasNoDefaultPaymentMethod();
+      fixtures.whenListedCardSucceeds();
+      fixtures.whenProductsRetrieveSucceeds();
+      fixtures.whenCreatePreviewSucceeds();
+
+      const result = await fixtures.whenGetUserSubscription();
+
+      expect(fixtures.paymentMethodsRetrieveMock).not.toHaveBeenCalled();
+      expect(fixtures.paymentMethodsListMock).toHaveBeenCalledWith({
+        customer: fixtures.customerId,
+        type: 'card',
+        limit: 1,
+      });
+      expect(result).toEqual(fixtures.expectedStripeSubscription);
     });
 
     it('should fall back when createPreview fails', async () => {
@@ -312,12 +346,14 @@ describe('StripeRepository', () => {
 
 class Fixtures {
   public readonly customersListMock = jest.fn();
+  public readonly customersRetrieveMock = jest.fn();
   public readonly checkoutSessionsListMock = jest.fn();
   public readonly checkoutSessionsRetrieveMock = jest.fn();
   public readonly checkoutSessionsCreateMock = jest.fn();
   public readonly subscriptionsListMock = jest.fn();
   public readonly productsRetrieveMock = jest.fn();
   public readonly paymentMethodsRetrieveMock = jest.fn();
+  public readonly paymentMethodsListMock = jest.fn();
   public readonly invoicesCreatePreviewMock = jest.fn();
   public readonly subscriptionsUpdateMock = jest.fn();
   public readonly billingPortalSessionsCreateMock = jest.fn();
@@ -391,6 +427,7 @@ class Fixtures {
     const stripeClientMock = {
       customers: {
         list: this.customersListMock,
+        retrieve: this.customersRetrieveMock,
       },
       checkout: {
         sessions: {
@@ -408,6 +445,7 @@ class Fixtures {
       },
       paymentMethods: {
         retrieve: this.paymentMethodsRetrieveMock,
+        list: this.paymentMethodsListMock,
       },
       invoices: {
         createPreview: this.invoicesCreatePreviewMock,
@@ -603,6 +641,32 @@ class Fixtures {
           default_payment_method: null,
         },
       ],
+    });
+  }
+
+  whenCustomerHasNoDefaultPaymentMethod() {
+    this.customersRetrieveMock.mockResolvedValue({
+      invoice_settings: { default_payment_method: null },
+    });
+  }
+
+  whenCustomerHasNoCard() {
+    this.whenCustomerHasNoDefaultPaymentMethod();
+    this.paymentMethodsListMock.mockResolvedValue({ data: [] });
+  }
+
+  whenCustomerHasDefaultPaymentMethod() {
+    this.customersRetrieveMock.mockResolvedValue({
+      invoice_settings: { default_payment_method: 'pm_customer' },
+    });
+    this.paymentMethodsRetrieveMock.mockResolvedValue({
+      card: { last4: '4242', brand: 'visa' },
+    });
+  }
+
+  whenListedCardSucceeds() {
+    this.paymentMethodsListMock.mockResolvedValue({
+      data: [{ card: { last4: '4242', brand: 'visa' } }],
     });
   }
 
