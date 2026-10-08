@@ -129,6 +129,7 @@ class Fixtures {
       name: 'Alice',
       email: 'alice@school.com',
       photo_url: 'https://x/p.png',
+      supabase_user_id: 'auth-stu-1',
     },
   };
 
@@ -142,6 +143,7 @@ class Fixtures {
       name: 'Alice',
       email: 'alice@school.com',
       photoUrl: 'https://x/p.png',
+      supabaseUserId: 'auth-stu-1',
     },
   };
 

@@ -23,11 +23,12 @@ export type StudentJoinedSession = Session & {
 
 export type SupabaseSessionStudent = {
   joined_at: string;
-  students: Omit<SupabaseStudent, 'supabase_user_id' | 'created_at'>;
+  students: Omit<SupabaseStudent, 'created_at'>;
 };
 
 export type SessionStudent = Omit<Student, 'supabaseUserId' | 'createdAt'> & {
   joinedAt: string;
+  supabaseUserId?: string;
 };
 
 export type SessionStudentWithStats = SessionStudent & {

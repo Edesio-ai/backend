@@ -4,10 +4,12 @@ import { IEstablishmentRepository } from 'src/domain/teaching/establishment/cont
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import type { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
+import type { IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
+import { createMockAuthRepository } from 'src/testing/mock-auth-repository';
 import { Establishment } from 'src/domain/teaching/establishment/types/establishment.type';
 import { Teacher } from 'src/domain/teaching/teacher/types/teacher.type';
 import { Session } from 'src/domain/teaching/session/types/session.type';
@@ -48,6 +50,7 @@ describe('GetEstablishmentsStatsUseCase', () => {
 
 class Fixtures {
   public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
+  public readonly authRepository: jest.Mocked<IAuthRepository>;
   public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
   public readonly sessionRepository: jest.Mocked<ISessionRepository>;
@@ -62,12 +65,14 @@ class Fixtures {
 
   constructor() {
     this.establishmentRepository = createMockEstablishmentRepository();
+    this.authRepository = createMockAuthRepository();
     this.teacherRepository = createMockTeacherRepository();
     this.studentSessionRepository = createMockStudentSessionRepository();
     this.sessionRepository = createMockSessionRepository();
 
     this.getEstablishmentsStatsUseCase = new GetEstablishmentsStatsUseCase(
       this.establishmentRepository,
+      this.authRepository,
       this.teacherRepository,
       this.studentSessionRepository,
       this.sessionRepository,
@@ -96,6 +101,7 @@ class Fixtures {
         createdAt: '2026-01-01T00:00:00.000Z',
         establishmentId: 'est-1',
         availableChatbots: 0,
+        supabaseUserId: 'auth-teacher-1',
       },
       {
         id: 'teacher-2',
@@ -104,6 +110,7 @@ class Fixtures {
         createdAt: '2026-01-01T00:00:00.000Z',
         establishmentId: 'est-1',
         availableChatbots: 0,
+        supabaseUserId: 'auth-teacher-2',
       },
     ];
     this.sessions = [
@@ -153,6 +160,9 @@ class Fixtures {
   whenRepositoriesReturnData() {
     this.establishmentRepository.getEstablishmentByUserId.mockResolvedValue(this.establishment);
     this.teacherRepository.getTeacherByEstablishmentId.mockResolvedValue(this.teachers);
+    this.authRepository.getAvatarUrlsByUserIds.mockResolvedValue({
+      'auth-teacher-1': 'https://cdn.example.com/prof-1.jpg',
+    });
     this.sessionRepository.getTeachersSessionsByIds.mockResolvedValue(this.sessions);
     this.studentSessionRepository.getStudentsSessionsByIds.mockResolvedValue(this.studentSessions);
   }
@@ -168,6 +178,7 @@ class Fixtures {
   thenRepositoriesCalledInExpectedOrder() {
     expect(this.establishmentRepository.getEstablishmentByUserId).toHaveBeenCalledWith(this.userId);
     expect(this.teacherRepository.getTeacherByEstablishmentId).toHaveBeenCalledWith(this.establishment.id);
+    expect(this.authRepository.getAvatarUrlsByUserIds).toHaveBeenCalledWith(['auth-teacher-1', 'auth-teacher-2']);
     expect(this.sessionRepository.getTeachersSessionsByIds).toHaveBeenCalledWith(['teacher-1', 'teacher-2']);
     expect(this.studentSessionRepository.getStudentsSessionsByIds).toHaveBeenCalledWith([
       'session-1',
@@ -178,6 +189,7 @@ class Fixtures {
 
   thenDownstreamRepositoriesNotCalled() {
     expect(this.teacherRepository.getTeacherByEstablishmentId).not.toHaveBeenCalled();
+    expect(this.authRepository.getAvatarUrlsByUserIds).not.toHaveBeenCalled();
     expect(this.sessionRepository.getTeachersSessionsByIds).not.toHaveBeenCalled();
     expect(this.studentSessionRepository.getStudentsSessionsByIds).not.toHaveBeenCalled();
   }
@@ -193,6 +205,8 @@ class Fixtures {
           createdAt: '2026-01-01T00:00:00.000Z',
           establishmentId: 'est-1',
           availableChatbots: 0,
+          supabaseUserId: 'auth-teacher-1',
+          photoUrl: 'https://cdn.example.com/prof-1.jpg',
           sessionsCount: 2,
           studentsCount: 3,
           sessions: [
@@ -227,6 +241,8 @@ class Fixtures {
           createdAt: '2026-01-01T00:00:00.000Z',
           establishmentId: 'est-1',
           availableChatbots: 0,
+          supabaseUserId: 'auth-teacher-2',
+          photoUrl: null,
           sessionsCount: 1,
           studentsCount: 0,
           sessions: [

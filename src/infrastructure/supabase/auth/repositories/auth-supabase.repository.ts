@@ -132,6 +132,27 @@ export class AuthSupabaseRepository implements IAuthRepository {
     return users.some((user) => user.email?.toLowerCase() === normalizedEmail);
   }
 
+  public async getAvatarUrlsByUserIds(userIds: string[]): Promise<Record<string, string>> {
+    const uniqueIds = [...new Set(userIds.filter((userId) => userId.length > 0))];
+    const entries = await Promise.all(
+      uniqueIds.map(async (userId) => {
+        const { data, error } = await this.supabaseAuth.auth.admin.getUserById(userId);
+        if (error || !data.user) {
+          return null;
+        }
+
+        const avatarUrl = data.user.user_metadata?.avatarUrl;
+        if (typeof avatarUrl !== 'string' || avatarUrl.length === 0) {
+          return null;
+        }
+
+        return [userId, avatarUrl] as const;
+      }),
+    );
+
+    return Object.fromEntries(entries.filter((entry): entry is readonly [string, string] => entry !== null));
+  }
+
   public async getAuthUserIdByEmail(email: string): Promise<string | null> {
     const normalizedEmail = email.toLowerCase().trim();
     const user = (await this.findAuthUsersByEmail(normalizedEmail)).find(

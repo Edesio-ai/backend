@@ -40,6 +40,7 @@ function sessionStudentEmbedRowToDomain(row: SupabaseSessionStudent): SessionStu
     name: row.students.name,
     email: row.students.email,
     photoUrl: row.students.photo_url,
+    supabaseUserId: row.students.supabase_user_id,
     joinedAt: row.joined_at,
   };
 }

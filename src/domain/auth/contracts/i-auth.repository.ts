@@ -12,5 +12,6 @@ export interface IAuthRepository {
   resetPasswordByEmail(email: string): Promise<void>;
   existsUserByEmail(email: string): Promise<boolean>;
   getAuthUserIdByEmail(email: string): Promise<string | null>;
+  getAvatarUrlsByUserIds(userIds: string[]): Promise<Record<string, string>>;
   deleteAuthUser(userId: string): Promise<void>;
 }

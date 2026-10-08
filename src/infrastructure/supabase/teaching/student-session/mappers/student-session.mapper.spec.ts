@@ -133,6 +133,7 @@ describe('StudentSessionMapper', () => {
             name: 'Alice',
             email: 'alice@school.com',
             photo_url: 'https://x/a.png',
+            supabase_user_id: 'auth-student-1',
           },
         },
       ];
@@ -143,6 +144,7 @@ describe('StudentSessionMapper', () => {
           name: 'Alice',
           email: 'alice@school.com',
           photoUrl: 'https://x/a.png',
+          supabaseUserId: 'auth-student-1',
           joinedAt: '2026-01-15T10:00:00.000Z',
         },
       ]);

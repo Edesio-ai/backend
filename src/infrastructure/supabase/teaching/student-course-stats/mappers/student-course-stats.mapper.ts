@@ -32,6 +32,7 @@ function courseStatWithStudentRowToDomain(row: SupabaseStudentCourseStatsWithStu
       name: row.students.name,
       email: row.students.email,
       photoUrl: row.students.photo_url,
+      supabaseUserId: row.students.supabase_user_id,
     },
   };
 }

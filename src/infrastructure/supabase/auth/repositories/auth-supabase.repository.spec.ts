@@ -150,6 +150,27 @@ describe('AuthSupabaseRepository', () => {
     });
   });
 
+  describe('getAvatarUrlsByUserIds', () => {
+    it('returns avatarUrl from user_metadata and skips users without one', async () => {
+      const getUserByIdMock = jest.fn();
+      const sut = new AuthSupabaseRepository({
+        auth: { admin: { getUserById: getUserByIdMock } },
+      } as unknown as SupabaseClient);
+
+      getUserByIdMock.mockImplementation(async (userId: string) => {
+        if (userId === 'user-1') {
+          return { data: { user: { user_metadata: { avatarUrl: 'https://cdn.example.com/a.jpg' } } }, error: null };
+        }
+        return { data: { user: { user_metadata: {} } }, error: null };
+      });
+
+      await expect(sut.getAvatarUrlsByUserIds(['user-1', 'user-2', 'user-1'])).resolves.toEqual({
+        'user-1': 'https://cdn.example.com/a.jpg',
+      });
+      expect(getUserByIdMock).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe('deleteAuthUser', () => {
     let fixtures: DeleteAuthUserFixtures;
 

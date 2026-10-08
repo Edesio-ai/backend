@@ -28,7 +28,8 @@ export class StudentCourseStatsSupabaseRepository implements IStudentCourseStats
             id,
             name,
             email,
-            photo_url
+            photo_url,
+            supabase_user_id
           )
         `,
       )

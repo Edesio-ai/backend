@@ -1,4 +1,5 @@
 import { Inject } from '@nestjs/common';
+import { AUTH_REPOSITORY, type IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
 import { ESTABLISHMENT_REPOSITORY } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 import { type IEstablishmentRepository } from 'src/domain/teaching/establishment/contracts/i-establishment.repository';
 
@@ -21,6 +22,8 @@ export class GetEstablishmentsStatsUseCase {
   constructor(
     @Inject(ESTABLISHMENT_REPOSITORY)
     private readonly establishmentRepository: IEstablishmentRepository,
+    @Inject(AUTH_REPOSITORY)
+    private readonly authRepository: IAuthRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: ITeacherRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
@@ -42,6 +45,9 @@ export class GetEstablishmentsStatsUseCase {
 
     const teachersSessions = await this.sessionRepository.getTeachersSessionsByIds(teachersIds);
     const teacherSessionIds = (teachersSessions || []).map((s) => s.id);
+    const avatarUrls = await this.authRepository.getAvatarUrlsByUserIds(
+      (teachers || []).flatMap((teacher) => (teacher.supabaseUserId ? [teacher.supabaseUserId] : [])),
+    );
 
     const studentsSessions: StudentSession[] =
       await this.studentSessionRepository.getStudentsSessionsByIds(teacherSessionIds);
@@ -54,7 +60,12 @@ export class GetEstablishmentsStatsUseCase {
       uniqueStudents.add(ss.studentId);
     });
 
-    const TeachersWithStats = this.buildTeachersWithStats(teachers, teachersSessions, studentCountPerSession);
+    const TeachersWithStats = this.buildTeachersWithStats(
+      teachers,
+      teachersSessions,
+      studentCountPerSession,
+      avatarUrls,
+    );
 
     return this.buildEstablishmentStats(establishment, teachers, teachersSessions, TeachersWithStats, uniqueStudents);
   }
@@ -63,6 +74,7 @@ export class GetEstablishmentsStatsUseCase {
     teachers: Teacher[],
     teachersSessions: Session[],
     studentCountPerSession: Record<string, number>,
+    avatarUrls: Record<string, string>,
   ): TeacherWithStats[] {
     return (teachers || []).map((teacher) => {
       const teacherSessions = (teachersSessions || []).filter((s) => s.teacherId === teacher.id);
@@ -70,6 +82,7 @@ export class GetEstablishmentsStatsUseCase {
 
       return {
         ...teacher,
+        photoUrl: teacher.supabaseUserId ? (avatarUrls[teacher.supabaseUserId] ?? null) : null,
         sessionsCount: teacherSessions.length,
         studentsCount: teacherStudentsCount,
         sessions: teacherSessions.map((s) => ({

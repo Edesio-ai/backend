@@ -5,11 +5,10 @@ import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-per
 import { GetStudentByUserIdUseCase } from 'src/application/teaching/student/get-student-by-user-id.use-case';
 import { CreateStudentUseCase } from 'src/application/teaching/student/create-student.use-case';
 import { GetStudentBatchUseCase } from 'src/application/teaching/student/get-student-batch.use-case';
-import { UploadStudentPhotoUseCase } from 'src/application/teaching/student/upload-student-photo.use-case';
 
 @Module({
   imports: [AuthPersistenceModule, StudentPersistenceModule],
   controllers: [StudentController],
-  providers: [GetStudentByUserIdUseCase, CreateStudentUseCase, GetStudentBatchUseCase, UploadStudentPhotoUseCase],
+  providers: [GetStudentByUserIdUseCase, CreateStudentUseCase, GetStudentBatchUseCase],
 })
 export class StudentModule {}

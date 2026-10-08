@@ -144,6 +144,22 @@ describe('AuthMapper', () => {
         },
       });
     });
+
+    it('maps avatarUrl when present in user_metadata', () => {
+      const user: SupabaseUser = {
+        id: 'uid-1',
+        email: 'user@example.com',
+        email_confirmed_at: '2026-01-01T00:00:00.000Z',
+        user_metadata: {
+          role: 'teacher',
+          firstname: 'Jean',
+          lastname: 'Dupont',
+          avatarUrl: 'https://cdn.example.com/a.jpg',
+        },
+      };
+
+      expect(AuthMapper.AuthUserToUser(user).metadata.avatarUrl).toBe('https://cdn.example.com/a.jpg');
+    });
   });
 
   describe('toUpdateAuthUser', () => {

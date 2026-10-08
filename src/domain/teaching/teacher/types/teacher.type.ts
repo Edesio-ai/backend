@@ -34,4 +34,5 @@ export type TeacherWithStats = Teacher & {
   sessionsCount: number;
   studentsCount: number;
   sessions: Session[];
+  photoUrl: string | null;
 };

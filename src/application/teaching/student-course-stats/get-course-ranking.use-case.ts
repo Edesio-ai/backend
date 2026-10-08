@@ -1,4 +1,6 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import { AUTH_REPOSITORY, type IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
+import { resolveProfilePhotoUrl } from 'src/domain/auth/photo-url.utils';
 import { isAdmin } from 'src/domain/auth/role.utils';
 import { COURSE_REPOSITORY, type ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import {
@@ -33,6 +35,8 @@ export class GetCourseRankingUseCase {
   constructor(
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: ICourseRepository,
+    @Inject(AUTH_REPOSITORY)
+    private readonly authRepository: IAuthRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: ITeacherRepository,
     @Inject(SESSION_REPOSITORY)
@@ -70,7 +74,10 @@ export class GetCourseRankingUseCase {
     }
 
     const studentCourseStats = await this.studentCourseStatsRepository.getStudentCourseStatsByCourseId(courseId);
-    const rankingWithRate = this.getRankingWithRate(studentCourseStats);
+    const avatarUrls = await this.authRepository.getAvatarUrlsByUserIds(
+      studentCourseStats.flatMap((row) => (row.student.supabaseUserId ? [row.student.supabaseUserId] : [])),
+    );
+    const rankingWithRate = this.getRankingWithRate(studentCourseStats, avatarUrls);
     const statsSortedByRate = this.getStatsSortedByRate(rankingWithRate);
 
     return this.getRankingWithRank(statsSortedByRate);
@@ -92,7 +99,10 @@ export class GetCourseRankingUseCase {
     }));
   }
 
-  private getRankingWithRate(studentStats: StudentCourseStatsWithStudent[]): CourseRankingWithRate[] {
+  private getRankingWithRate(
+    studentStats: StudentCourseStatsWithStudent[],
+    avatarUrls: Record<string, string>,
+  ): CourseRankingWithRate[] {
     return studentStats.map((row): CourseRankingWithRate => {
       const student = row.student;
       const successRate =
@@ -101,7 +111,10 @@ export class GetCourseRankingUseCase {
       return {
         studentId: row.studentId,
         name: student.name,
-        photoUrl: student.photoUrl,
+        photoUrl: resolveProfilePhotoUrl(
+          student.supabaseUserId ? avatarUrls[student.supabaseUserId] : undefined,
+          student.photoUrl,
+        ),
         attemptedQuestions: row.attemptedQuestions,
         correctAnswers: row.correctAnswers,
         successRate: successRate,

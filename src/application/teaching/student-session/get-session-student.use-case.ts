@@ -3,6 +3,8 @@ import {
   SessionStudentWithStats,
 } from 'src/domain/teaching/student-session/types/student-session.type';
 import { Inject } from '@nestjs/common';
+import { AUTH_REPOSITORY, type IAuthRepository } from 'src/domain/auth/contracts/i-auth.repository';
+import { resolveProfilePhotoUrl } from 'src/domain/auth/photo-url.utils';
 import {
   STUDENT_REPOSITORY,
   type IStudentRepository,
@@ -33,6 +35,8 @@ export class GetSessionStudentUseCase {
   constructor(
     @Inject(STUDENT_REPOSITORY)
     private readonly studentRepository: IStudentRepository,
+    @Inject(AUTH_REPOSITORY)
+    private readonly authRepository: IAuthRepository,
     @Inject(TEACHER_REPOSITORY)
     private readonly teacherRepository: ITeacherRepository,
     @Inject(SESSION_REPOSITORY)
@@ -63,18 +67,25 @@ export class GetSessionStudentUseCase {
 
     const select = `
             joined_at,
-            students (id, name, email, photo_url)
+            students (id, name, email, photo_url, supabase_user_id)
         `;
     const studentsSessions = await this.studentSessionRepository.listStudentsEnrolledInSession(sessionId, select);
     if (studentsSessions.length === 0) {
       return [];
     }
 
+    const avatarUrls = await this.authRepository.getAvatarUrlsByUserIds(
+      studentsSessions.flatMap((student) => (student.supabaseUserId ? [student.supabaseUserId] : [])),
+    );
     const courseStats = await this.studentCourseStatsRepository.getStudentCourseStatsBySessionId(sessionId);
-    return this.withSessionStats(studentsSessions, courseStats);
+    return this.withSessionStats(studentsSessions, courseStats, avatarUrls);
   }
 
-  private withSessionStats(students: SessionStudent[], courseStats: StudentCourseStats[]): SessionStudentWithStats[] {
+  private withSessionStats(
+    students: SessionStudent[],
+    courseStats: StudentCourseStats[],
+    avatarUrls: Record<string, string>,
+  ): SessionStudentWithStats[] {
     const statsByStudentId = this.aggregateStatsByStudent(courseStats);
 
     return students.map((student) => {
@@ -84,6 +95,11 @@ export class GetSessionStudentUseCase {
 
       return {
         ...student,
+        photoUrl:
+          resolveProfilePhotoUrl(
+            student.supabaseUserId ? avatarUrls[student.supabaseUserId] : undefined,
+            student.photoUrl,
+          ) ?? '',
         attemptedQuestions,
         correctAnswers,
         successRate: attemptedQuestions > 0 ? Math.round((correctAnswers / attemptedQuestions) * 100) : 0,

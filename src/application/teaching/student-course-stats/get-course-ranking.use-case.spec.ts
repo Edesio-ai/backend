@@ -1,6 +1,7 @@
 import { ForbiddenException } from '@nestjs/common';
 import { GetCourseRankingUseCase } from 'src/application/teaching/student-course-stats/get-course-ranking.use-case';
 import { AuthUser } from 'src/domain/auth/types/auth.type';
+import { createMockAuthRepository } from 'src/testing/mock-auth-repository';
 import { ICourseRepository } from 'src/domain/teaching/course/contracts/i-course.repository';
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
 import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
@@ -161,6 +162,45 @@ describe('GetCourseRankingUseCase', () => {
       fixtures.course.id,
     );
   });
+
+  it('should prefer auth avatarUrl over empty student photoUrl', async () => {
+    fixtures.whenCourseFound();
+    fixtures.whenTeacherFound();
+    fixtures.whenSessionMatchesTeacher();
+    fixtures.whenStudentStatsReturnUnsorted();
+    fixtures.whenAvatarsFound();
+
+    const result = await fixtures.whenExecute();
+
+    expect(result.find((row) => row.studentId === 's-perfect')?.photoUrl).toBe('https://cdn/perfect.png');
+    expect(result.find((row) => row.studentId === 's-low')?.photoUrl).toBeNull();
+    expect(fixtures.authRepository.getAvatarUrlsByUserIds).toHaveBeenCalledWith([
+      'auth-s-low',
+      'auth-s-perfect',
+      'auth-s-tie-a',
+      'auth-s-tie-b',
+    ]);
+  });
+
+  it('should keep student photoUrl when auth has no avatar', async () => {
+    fixtures.whenCourseFound();
+    fixtures.whenTeacherFound();
+    fixtures.whenSessionMatchesTeacher();
+    fixtures.studentCourseStatsRepository.getStudentCourseStatsByCourseId.mockResolvedValue([
+      {
+        ...fixtures.studentStatsUnsorted[1],
+        student: {
+          ...fixtures.studentStatsUnsorted[1].student,
+          photoUrl: 'https://legacy/photo.png',
+        },
+      },
+    ]);
+
+    const result = await fixtures.whenExecute();
+
+    expect(result).toHaveLength(1);
+    expect(result[0].photoUrl).toBe('https://legacy/photo.png');
+  });
 });
 
 class Fixtures {
@@ -212,6 +252,7 @@ class Fixtures {
         email: 'low@school.com',
         name: 'Low',
         photoUrl: '',
+        supabaseUserId: 'auth-s-low',
       },
     },
     {
@@ -224,6 +265,7 @@ class Fixtures {
         email: 'perfect@school.com',
         name: 'Perfect',
         photoUrl: '',
+        supabaseUserId: 'auth-s-perfect',
       },
     },
     {
@@ -236,6 +278,7 @@ class Fixtures {
         email: 'tiea@school.com',
         name: 'TieA',
         photoUrl: '',
+        supabaseUserId: 'auth-s-tie-a',
       },
     },
     {
@@ -248,6 +291,7 @@ class Fixtures {
         email: 'tieb@school.com',
         name: 'TieB',
         photoUrl: '',
+        supabaseUserId: 'auth-s-tie-b',
       },
     },
   ];
@@ -258,6 +302,7 @@ class Fixtures {
   public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
+  public readonly authRepository: ReturnType<typeof createMockAuthRepository>;
   public readonly useCase: GetCourseRankingUseCase;
 
   public readonly studentUser: AuthUser = {
@@ -283,9 +328,12 @@ class Fixtures {
     this.studentCourseStatsRepository = createMockStudentCourseStatsRepository();
     this.studentRepository = createMockStudentRepository();
     this.studentSessionRepository = createMockStudentSessionRepository();
+    this.authRepository = createMockAuthRepository();
+    this.authRepository.getAvatarUrlsByUserIds.mockResolvedValue({});
 
     this.useCase = new GetCourseRankingUseCase(
       this.courseRepository,
+      this.authRepository,
       this.teacherRepository,
       this.sessionRepository,
       this.studentCourseStatsRepository,
@@ -365,5 +413,11 @@ class Fixtures {
 
   whenStudentStatsReturnUnsorted() {
     this.studentCourseStatsRepository.getStudentCourseStatsByCourseId.mockResolvedValue(this.studentStatsUnsorted);
+  }
+
+  whenAvatarsFound() {
+    this.authRepository.getAvatarUrlsByUserIds.mockResolvedValue({
+      'auth-s-perfect': 'https://cdn/perfect.png',
+    });
   }
 }

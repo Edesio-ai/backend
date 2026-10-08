@@ -22,7 +22,7 @@ export type SupabaseStudentCourseStats = {
   last_attempt_at: string;
 };
 export type SupabaseStudentCourseStatsWithStudent = Omit<SupabaseStudentCourseStats, 'id' | 'course_id'> & {
-  students: Omit<SupabaseStudent, 'supabase_user_id' | 'created_at'>;
+  students: Omit<SupabaseStudent, 'created_at'>;
 };
 
 export type StudentCourseStats = {
@@ -35,7 +35,7 @@ export type StudentCourseStats = {
 };
 
 export type StudentCourseStatsWithStudent = Omit<StudentCourseStats, 'id' | 'courseId'> & {
-  student: Omit<Student, 'supabaseUserId' | 'createdAt'>;
+  student: Omit<Student, 'supabaseUserId' | 'createdAt'> & { supabaseUserId?: string };
 };
 
 export type insertStudentCourseStats = Omit<StudentCourseStats, 'id'>;

@@ -14,6 +14,7 @@ import { createMockStudentSessionRepository } from 'src/testing/mock-student-ses
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
+import { createMockAuthRepository } from 'src/testing/mock-auth-repository';
 import { createMockStudentCourseStatsRepository } from 'src/testing/mock-student-course-stats-repository';
 import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
 import { StudentCourseStats } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
@@ -37,6 +38,21 @@ describe('GetSessionStudentUseCase', () => {
     expect(result).toEqual(fixtures.sessionStudentsWithEmptyStats);
   });
 
+  it('should prefer auth avatarUrl over empty student photoUrl', async () => {
+    fixtures.whenTeacherFound();
+    fixtures.whenSessionFound();
+    fixtures.whenStudentsSessionsFound();
+    fixtures.authRepository.getAvatarUrlsByUserIds.mockResolvedValue({
+      'auth-student-2': 'https://cdn/bob.png',
+    });
+
+    const result = await fixtures.whenExecuteAsTeacher();
+
+    expect(result.find((student) => student.id === 'student-2')?.photoUrl).toBe('https://cdn/bob.png');
+    expect(result.find((student) => student.id === 'student-1')?.photoUrl).toBe('https://x/a.png');
+    expect(fixtures.authRepository.getAvatarUrlsByUserIds).toHaveBeenCalledWith(['auth-student-1', 'auth-student-2']);
+  });
+
   it('should call listStudentsEnrolledInSession with the correct sessionId and select fields', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenSessionFound();
@@ -51,6 +67,10 @@ describe('GetSessionStudentUseCase', () => {
     expect(fixtures.studentSessionRepository.listStudentsEnrolledInSession).toHaveBeenCalledWith(
       fixtures.sessionId,
       expect.stringContaining('students'),
+    );
+    expect(fixtures.studentSessionRepository.listStudentsEnrolledInSession).toHaveBeenCalledWith(
+      fixtures.sessionId,
+      expect.stringContaining('supabase_user_id'),
     );
   });
 
@@ -222,6 +242,7 @@ class Fixtures {
       name: 'Alice',
       email: 'alice@school.com',
       photoUrl: 'https://x/a.png',
+      supabaseUserId: 'auth-student-1',
       joinedAt: '2026-01-15T10:00:00.000Z',
     },
     {
@@ -229,6 +250,7 @@ class Fixtures {
       name: 'Bob',
       email: 'bob@school.com',
       photoUrl: '',
+      supabaseUserId: 'auth-student-2',
       joinedAt: '2026-01-16T08:00:00.000Z',
     },
   ];
@@ -266,6 +288,7 @@ class Fixtures {
   public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly studentSessionRepository: ReturnType<typeof createMockStudentSessionRepository>;
   public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
+  public readonly authRepository: ReturnType<typeof createMockAuthRepository>;
   public readonly useCase: GetSessionStudentUseCase;
 
   constructor() {
@@ -276,8 +299,11 @@ class Fixtures {
     this.establishmentRepository = createMockEstablishmentRepository();
     this.studentCourseStatsRepository = createMockStudentCourseStatsRepository();
     this.studentCourseStatsRepository.getStudentCourseStatsBySessionId.mockResolvedValue([]);
+    this.authRepository = createMockAuthRepository();
+    this.authRepository.getAvatarUrlsByUserIds.mockResolvedValue({});
     this.useCase = new GetSessionStudentUseCase(
       this.studentRepository,
+      this.authRepository,
       this.teacherRepository,
       this.sessionRepository,
       this.establishmentRepository,
