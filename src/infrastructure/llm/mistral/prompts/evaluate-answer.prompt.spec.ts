@@ -51,6 +51,12 @@ describe('evaluate-answer.prompt', () => {
       expect(prompt).toContain('"B"');
     });
 
+    it('should forbid inviting the student to retry or reformulate', () => {
+      const prompt = getEvaluateAnswerSystemPrompt();
+      expect(prompt).toContain("PAS d'autre tentative");
+      expect(prompt).toContain('actionPrompt : toujours null');
+    });
+
     it('should describe the score range from 0 to 1', () => {
       const prompt = getEvaluateAnswerSystemPrompt();
       expect(prompt).toContain('0');

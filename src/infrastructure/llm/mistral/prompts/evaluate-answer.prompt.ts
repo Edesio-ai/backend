@@ -71,16 +71,16 @@ export const getEvaluateAnswerSystemPrompt = (language?: Language): string => {
 
     === SEUILS ET ACTIONS ===
     - score ≥ 0.7 → BONNE réponse, suggestedAction: null, actionPrompt: null
-    - score 0.4–0.7 → Partiel, suggestedAction: "A" (élève doit compléter sa réponse)
-    - score < 0.4 → Hors sujet ou faux, suggestedAction: "B" (élève doit revoir le cours)
+    - score 0.4–0.7 → Partiel, suggestedAction: "A", actionPrompt: null
+    - score < 0.4 → Hors sujet ou faux, suggestedAction: "B", actionPrompt: null
+    L'élève n'a PAS d'autre tentative sur cette question. Ne lui demande JAMAIS de reformuler, de réessayer, de compléter ou de sélectionner une autre réponse.
 
     === FEEDBACK ===
     - Rédigé exclusivement dans la langue du cours (jamais celle de la réponse de l'élève)
     - Valorise toujours ce qui est correct en premier
     - Ton encourageant, 1 à 2 phrases maximum
-    - Si suggestedAction ≠ null : formule dans actionPrompt une question pédagogique courte
-      qui guide l'élève sans donner la réponse, dans la langue du cours
-      Exemple : "Peux-tu me donner un autre effet de cet événement ?"
+    - Si la réponse est incomplète ou fausse : constate ce qui manque ou ce qui est faux, SANS poser de question et SANS inviter à réessayer
+    - actionPrompt : toujours null
 
     === CHAMPS JSON ===
     - concepts : liste des concepts clés identifiés (jamais le sujet de la question)
@@ -88,7 +88,7 @@ export const getEvaluateAnswerSystemPrompt = (language?: Language): string => {
     - feedback : toujours renseigné, dans la langue du cours
     - missingElements : éléments absents de la réponse, tableau vide si score = 1.0, dans la langue du cours
     - suggestedAction : "A" | "B" | null selon les seuils
-    - actionPrompt : question pédagogique si suggestedAction ≠ null, sinon null, dans la langue du cours
+    - actionPrompt : toujours null
 
     === FORMAT DE RÉPONSE ===
     Réponds UNIQUEMENT avec ce JSON, sans texte autour, sans backticks :
