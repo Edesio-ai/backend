@@ -7,19 +7,19 @@ describe('buildWelcomeEmailTemplateData', () => {
     logoUrl: 'https://cdn.test/logo.png',
   };
 
-  it('maps self-learner role when slug uses a hyphen', () => {
+  it('maps student role', () => {
     const data = buildWelcomeEmailTemplateData({
       ...baseParams,
-      role: 'self-learner',
+      role: 'student',
     });
 
     expect(data.name).toBe(baseParams.name);
     expect(data.appUrl).toBe(baseParams.appUrl);
     expect(data.logoUrl).toBe(baseParams.logoUrl);
-    expect(data.roleLabel).toBe('Autodidacte');
-    expect(data.dashboardPath).toBe('/self-learner');
+    expect(data.roleLabel).toBe('Élève');
+    expect(data.dashboardPath).toBe('/student');
     expect(data.quickStartItems.length).toBeGreaterThan(0);
-    expect(data.quickStartItems[0]).toContain('cours');
+    expect(data.quickStartItems[0]).toContain('session');
   });
 
   it('trims role and ignores case before mapping', () => {
@@ -28,7 +28,7 @@ describe('buildWelcomeEmailTemplateData', () => {
       role: '  TEACHER ',
     });
 
-    expect(data.dashboardPath).toBe('/teacher');
+    expect(data.dashboardPath).toBe('/teacher/sessions');
     expect(data.roleLabel).toBe('Professeur');
   });
 
@@ -45,11 +45,21 @@ describe('buildWelcomeEmailTemplateData', () => {
   it('uses English role labels when locale is en', () => {
     const data = buildWelcomeEmailTemplateData({
       ...baseParams,
-      role: 'self-learner',
+      role: 'teacher',
       locale: 'en',
     });
 
-    expect(data.roleLabel).toBe('Self-learner');
-    expect(data.quickStartItems[0]).toContain('lessons');
+    expect(data.roleLabel).toBe('Teacher');
+    expect(data.quickStartItems[0]).toContain('session');
+  });
+
+  it('maps establishment dashboard path', () => {
+    const data = buildWelcomeEmailTemplateData({
+      ...baseParams,
+      role: 'establishment',
+    });
+
+    expect(data.dashboardPath).toBe('/establishment/overview');
+    expect(data.roleLabel).toBe('Établissement');
   });
 });

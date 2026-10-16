@@ -4,7 +4,6 @@ export const roleLabels: Record<WelcomeEmailRole, string> = {
   teacher: 'Professeur',
   student: 'Élève',
   establishment: 'Établissement',
-  'self-learner': 'Autodidacte',
 };
 
 export const quickStartItems: Record<WelcomeEmailRole, string[]> = {
@@ -19,12 +18,6 @@ export const quickStartItems: Record<WelcomeEmailRole, string[]> = {
     "Suivez l'activité de vos professeurs et sessions",
     'Consultez les statistiques globales de votre établissement',
     "Gérez les codes d'invitation pour les nouveaux professeurs",
-  ],
-  'self-learner': [
-    'Créez vos propres cours et ajoutez du contenu',
-    'Uploadez vos documents PDF',
-    "Générez des questions avec l'IA",
-    'Entraînez-vous avec le chatbot intelligent',
   ],
   student: [
     'Rejoignez une session avec le code de votre professeur',

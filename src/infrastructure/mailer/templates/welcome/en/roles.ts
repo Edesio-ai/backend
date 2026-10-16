@@ -4,7 +4,6 @@ export const roleLabels: Record<WelcomeEmailRole, string> = {
   teacher: 'Teacher',
   student: 'Student',
   establishment: 'Institution',
-  'self-learner': 'Self-learner',
 };
 
 export const quickStartItems: Record<WelcomeEmailRole, string[]> = {
@@ -19,12 +18,6 @@ export const quickStartItems: Record<WelcomeEmailRole, string[]> = {
     'Track your teachers and sessions activity',
     "View your institution's overall statistics",
     'Manage invitation codes for new teachers',
-  ],
-  'self-learner': [
-    'Create your own lessons and add content',
-    'Upload your PDF documents',
-    'Generate questions with AI',
-    'Practice with the intelligent chatbot',
   ],
   student: [
     "Join a session with your teacher's code",

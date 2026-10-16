@@ -9,10 +9,6 @@ import { StudentCourseStatsModule } from './student-course-stats/student-course-
 import { StudentModule } from './student/student.module';
 import { StudentSessionModule } from './student-session/student-session.module';
 import { TeacherModule } from './teacher/teacher.module';
-import { SelfLearnerModule } from './self-learner/self-learner.module';
-import { SelfLearnerCourseModule } from './self-learner-course/self-learner-course.module';
-import { SelfLearnerCourseFileModule } from './self-learner-course-file/self-learner-course-file.module';
-import { SelfLearnerQuestionModule } from './self-learner-question/self-learner-question.module';
 
 @Module({
   imports: [
@@ -26,10 +22,6 @@ import { SelfLearnerQuestionModule } from './self-learner-question/self-learner-
     CourseQuestionModule,
     StudentCourseStatsModule,
     StudentSessionModule,
-    SelfLearnerModule,
-    SelfLearnerCourseModule,
-    SelfLearnerCourseFileModule,
-    SelfLearnerQuestionModule,
   ],
 })
 export class TeachingModule {}

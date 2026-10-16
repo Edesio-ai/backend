@@ -15,8 +15,8 @@ describe('CreateSuggestionBodyDto', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('accepts self-learner category', async () => {
-    const dto = Object.assign(valid(), { category: 'self-learner' });
+  it('accepts student category', async () => {
+    const dto = Object.assign(valid(), { category: 'student' });
 
     const errors = await validate(dto);
 

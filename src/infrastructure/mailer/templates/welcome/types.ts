@@ -1,6 +1,6 @@
 import { Locale } from 'src/domain/shared/locale.type';
 
-export type WelcomeEmailRole = 'teacher' | 'student' | 'establishment' | 'self-learner';
+export type WelcomeEmailRole = 'teacher' | 'student' | 'establishment';
 
 export type WelcomeEmailTemplateData = {
   locale: Locale;

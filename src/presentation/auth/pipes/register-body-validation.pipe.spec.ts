@@ -92,7 +92,7 @@ describe('RegisterBodyValidationPipe', () => {
 
   it('validates non-establishment bodies against RegisterBody', async () => {
     const body = {
-      role: 'self-learner',
+      role: 'student',
       email: 'user@school.com',
       password: validPassword,
       firstname: 'Alex',

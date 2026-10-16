@@ -104,7 +104,7 @@ export type GetUserSessionResponse = {
   role: Role | null;
 };
 
-export type Role = 'teacher' | 'establishment' | 'student' | 'self-learner' | 'admin';
+export type Role = 'teacher' | 'establishment' | 'student' | 'admin';
 
 export type AuthUser = {
   id: string;

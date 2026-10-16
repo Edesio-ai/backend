@@ -11,17 +11,8 @@ import type { CourseWithSession } from 'src/domain/teaching/course/types/course.
 import { IQuestionsRepository } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import { Question } from 'src/domain/teaching/question/types/question.type';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
-import type { ISelfLearnerCourseFileRepository } from 'src/domain/teaching/self-learner-course-file/contracts/i-self-learner-course-file.repository';
-import type { ISelfLearnerCourseRepository } from 'src/domain/teaching/self-learner-course/contracts/i-self-learner-course.repository';
-import type { ISelfLearnerQuestionRepository } from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
-import type { SelfLearnerQuestion } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
-import type { ISelfLearnerRepository } from 'src/domain/teaching/self-learner/contracts/i-self-learner.repository';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
-import { createMockSelfLearnerCourseFileRepository } from 'src/testing/mock-self-learner-course-file-repository';
-import { createMockSelfLearnerCourseRepository } from 'src/testing/mock-self-learner-course-repository';
-import { createMockSelfLearnerQuestionRepository } from 'src/testing/mock-self-learner-question-repository';
-import { createMockSelfLearnerRepository } from 'src/testing/mock-self-learner-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 
 describe('GenerateQuestionUseCase', () => {
@@ -125,30 +116,6 @@ describe('GenerateQuestionUseCase', () => {
     expect(insertCall[3].type).toBe('open');
   });
 
-  it('deletes then inserts via self learner question persistence when actor is self-learner', async () => {
-    fixtures.whenSelfLearnerActor();
-    fixtures.whenSelfLearnerCourseReady();
-    fixtures.whenOpenAiReturnsQuestions();
-    fixtures.selfLearnerQuestionRepository.deleteSelfLearnerQuestionsByCourseId.mockResolvedValue(undefined);
-    fixtures.selfLearnerQuestionRepository.insertSelfLearnerQuestions.mockResolvedValue(
-      fixtures.insertedSelfLearnerQuestions,
-    );
-
-    const result = await fixtures.whenExecute();
-
-    expect(fixtures.questionRepository.deleteCourseQuizQuestions).not.toHaveBeenCalled();
-    expect(fixtures.questionRepository.insertQuestions).not.toHaveBeenCalled();
-    expect(fixtures.selfLearnerQuestionRepository.deleteSelfLearnerQuestionsByCourseId).toHaveBeenCalledWith(
-      fixtures.body.courseId,
-    );
-    expect(fixtures.selfLearnerQuestionRepository.insertSelfLearnerQuestions).toHaveBeenCalledWith(
-      expect.any(Array),
-      fixtures.body.courseId,
-    );
-    expect(fixtures.courseRepository.updateCourse).not.toHaveBeenCalled();
-    expect(result).toEqual(fixtures.insertedSelfLearnerQuestions);
-  });
-
   it('uses the teacher path when admin generates questions for a teacher course', async () => {
     fixtures.whenAdminActor();
     fixtures.whenTeacherCourseExists();
@@ -209,19 +176,6 @@ class Fixtures {
     },
   ];
 
-  public readonly insertedSelfLearnerQuestions: SelfLearnerQuestion[] = [
-    {
-      id: 'slq-1',
-      courseId: this.body.courseId,
-      type: 'single',
-      questionText: 'Q1 ?',
-      proposals: ['A', 'B'],
-      correctAnswers: ['A'],
-      explanation: '',
-      createdAt: new Date('2026-01-05T12:00:00.000Z'),
-    },
-  ];
-
   private readonly generatedSingle: GeneratedQuestion = {
     type: 'single',
     questionText: 'QCM ?',
@@ -254,10 +208,6 @@ class Fixtures {
   public readonly questionRepository: jest.Mocked<IQuestionsRepository>;
   public readonly teacherRepository: jest.Mocked<ITeacherRepository>;
   public readonly courseFileRepository: jest.Mocked<ICourseFileRepository>;
-  public readonly selfLearnerRepository: jest.Mocked<ISelfLearnerRepository>;
-  public readonly selfLearnerCourseRepository: jest.Mocked<ISelfLearnerCourseRepository>;
-  public readonly selfLearnerCourseFileRepository: jest.Mocked<ISelfLearnerCourseFileRepository>;
-  public readonly selfLearnerQuestionRepository: jest.Mocked<ISelfLearnerQuestionRepository>;
   public readonly useCase: GenerateQuestionUseCase;
 
   constructor() {
@@ -284,10 +234,6 @@ class Fixtures {
     this.teacherRepository = createMockTeacherRepository();
 
     this.courseFileRepository = createMockCourseFileRepository();
-    this.selfLearnerRepository = createMockSelfLearnerRepository();
-    this.selfLearnerCourseRepository = createMockSelfLearnerCourseRepository();
-    this.selfLearnerCourseFileRepository = createMockSelfLearnerCourseFileRepository();
-    this.selfLearnerQuestionRepository = createMockSelfLearnerQuestionRepository();
 
     this.useCase = new GenerateQuestionUseCase(
       this.courseRepository,
@@ -296,10 +242,6 @@ class Fixtures {
       this.questionRepository,
       this.teacherRepository,
       this.courseFileRepository,
-      this.selfLearnerRepository,
-      this.selfLearnerCourseRepository,
-      this.selfLearnerCourseFileRepository,
-      this.selfLearnerQuestionRepository,
     );
   }
 
@@ -381,10 +323,6 @@ class Fixtures {
     });
   }
 
-  whenSelfLearnerActor() {
-    (this.user.metadata as { role: string }).role = 'self-learner';
-  }
-
   whenAdminActor() {
     (this.user.metadata as { role: string }).role = 'admin';
   }
@@ -397,25 +335,5 @@ class Fixtures {
       description: null,
       contentText: 'Contenu',
     });
-  }
-
-  whenSelfLearnerCourseReady() {
-    this.selfLearnerRepository.getSelfLearnerByUserId.mockResolvedValue({
-      id: 'sl-77',
-      supabaseUserId: this.user.id,
-      name: 'Apprenant',
-      email: 'sl@test.com',
-      createdAt: '2026-01-04T10:00:00.000Z',
-    });
-    this.selfLearnerCourseRepository.getSelfLearnerCourseById.mockResolvedValue({
-      id: this.body.courseId,
-      selfLearnerId: 'sl-77',
-      title: 'Cours perso',
-      description: null,
-      textContent: 'Contenu du cours perso',
-      language: 'francais',
-      createdAt: '2026-01-04T12:00:00.000Z',
-    });
-    this.selfLearnerCourseFileRepository.getSelfLearnerCourseFiles.mockResolvedValue([]);
   }
 }

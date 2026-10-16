@@ -16,8 +16,8 @@ import { LOCALES, type Locale } from 'src/domain/shared/locale.type';
 export class RegisterBody {
   @IsString()
   @IsNotEmpty()
-  @IsIn(['teacher', 'student', 'self-learner'])
-  role: 'teacher' | 'student' | 'self-learner';
+  @IsIn(['teacher', 'student'])
+  role: 'teacher' | 'student';
 
   @ValidateIf((body: RegisterBody) => !body.invitationToken)
   @IsEmail()

@@ -18,23 +18,6 @@ import {
   type IQuestionsRepository,
 } from 'src/domain/teaching/question/contracts/i-questions.repository';
 import { GeneratedQuestion, QuestionGenerationConfig } from 'src/domain/llm/types/openai.type';
-import {
-  SELF_LEARNER_REPOSITORY,
-  type ISelfLearnerRepository,
-} from 'src/domain/teaching/self-learner/contracts/i-self-learner.repository';
-import {
-  type ISelfLearnerCourseRepository,
-  SELF_LEARNER_COURSE_REPOSITORY,
-} from 'src/domain/teaching/self-learner-course/contracts/i-self-learner-course.repository';
-import {
-  type ISelfLearnerCourseFileRepository,
-  SELF_LEARNER_COURSE_FILE_REPOSITORY,
-} from 'src/domain/teaching/self-learner-course-file/contracts/i-self-learner-course-file.repository';
-import {
-  type ISelfLearnerQuestionRepository,
-  SELF_LEARNER_QUESTION_REPOSITORY,
-} from 'src/domain/teaching/self-learner-question/contracts/i-self-learner-question.repository';
-import { SelfLearnerQuestion } from 'src/domain/teaching/self-learner-question/types/self-learner-question.type';
 
 export type GenerateQuestionBody = {
   courseId: string;
@@ -57,35 +40,20 @@ export class GenerateQuestionUseCase {
     private readonly teacherRepository: ITeacherRepository,
     @Inject(COURSE_FILE_REPOSITORY)
     private readonly courseFileRepository: ICourseFileRepository,
-    @Inject(SELF_LEARNER_REPOSITORY)
-    private readonly selfLearnerRepository: ISelfLearnerRepository,
-    @Inject(SELF_LEARNER_COURSE_REPOSITORY)
-    private readonly selfLearnerCourseRepository: ISelfLearnerCourseRepository,
-    @Inject(SELF_LEARNER_COURSE_FILE_REPOSITORY)
-    private readonly selfLearnerCourseFileRepository: ISelfLearnerCourseFileRepository,
-    @Inject(SELF_LEARNER_QUESTION_REPOSITORY)
-    private readonly selfLearnerQuestionRepository: ISelfLearnerQuestionRepository,
   ) {}
 
-  async execute(body: GenerateQuestionBody, user: AuthUser): Promise<Question[] | SelfLearnerQuestion[]> {
+  async execute(body: GenerateQuestionBody, user: AuthUser): Promise<Question[]> {
     const { courseId } = body;
-    const role = user.metadata.role;
-    const useTeacherPath = await this.shouldUseTeacherPath(role, courseId);
+    await this.ensureAuthorized(user, courseId);
 
-    const { combinedText, config } = useTeacherPath
-      ? await this.getTeacherGenerationConfig(user.id, body)
-      : await this.getSelfLearnerGenerationConfig(user.id, body);
+    const { combinedText, config } = await this.getTeacherGenerationConfig(user.id, body);
 
     const questions = await this.mistralRepository.generateQuestions(combinedText, config);
     if (!questions || questions.length === 0) {
       throw new BadRequestError('Failed to generate questions');
     }
 
-    if (useTeacherPath) {
-      await this.questionRepository.deleteCourseQuizQuestions(courseId);
-    } else {
-      await this.selfLearnerQuestionRepository.deleteSelfLearnerQuestionsByCourseId(courseId);
-    }
+    await this.questionRepository.deleteCourseQuizQuestions(courseId);
 
     const multipleQuestions = questions.filter((q) => q.type === 'single');
     const openQuestions = questions.filter((q) => q.type === 'open');
@@ -98,25 +66,24 @@ export class GenerateQuestionUseCase {
       if (i < openQuestions.length) alternatedQuestions.push(openQuestions[i]);
     }
 
-    const insertedQuestions = useTeacherPath
-      ? await this.questionRepository.insertQuestions(alternatedQuestions, courseId)
-      : await this.selfLearnerQuestionRepository.insertSelfLearnerQuestions(alternatedQuestions, courseId);
+    const insertedQuestions = await this.questionRepository.insertQuestions(alternatedQuestions, courseId);
 
-    if (useTeacherPath) {
-      await this.courseRepository.updateCourse(courseId, { validatedQuestions: false });
-    }
+    await this.courseRepository.updateCourse(courseId, { validatedQuestions: false });
 
     return insertedQuestions;
   }
 
-  private async shouldUseTeacherPath(role: string | undefined, courseId: string): Promise<boolean> {
-    if (role === 'teacher') return true;
-    if (role === 'self-learner') return false;
+  private async ensureAuthorized(user: AuthUser, courseId: string): Promise<void> {
+    const role = user.metadata.role;
+    if (role === 'teacher') return;
     if (isAdmin(role)) {
       const teacherCourse = await this.courseRepository.getCourseById(courseId);
-      return !!teacherCourse;
+      if (!teacherCourse) {
+        throw new NotFoundError(`Course with id ${courseId} not found`);
+      }
+      return;
     }
-    return false;
+    throw new ForbiddenError('You are not authorized to generate questions');
   }
 
   private async getTeacherGenerationConfig(
@@ -146,41 +113,6 @@ export class GenerateQuestionUseCase {
 
     const contentText = courseWithSession.contentText || '';
     const combinedText = await this.getCombinedText(contentText, courseFiles);
-    return {
-      combinedText,
-      config: {
-        totalQuestions,
-        singleCount,
-        openedCount,
-        language,
-      },
-    };
-  }
-  private async getSelfLearnerGenerationConfig(
-    userId: string,
-    body: GenerateQuestionBody,
-  ): Promise<{ combinedText: string; config: QuestionGenerationConfig }> {
-    const { courseId, totalQuestions, singleCount, openedCount } = body;
-
-    const selfLearner = await this.selfLearnerRepository.getSelfLearnerByUserId(userId);
-    if (!selfLearner) {
-      throw new NotFoundError(`Self learner with id ${userId} not found`);
-    }
-
-    const selfLearnerCourse = await this.selfLearnerCourseRepository.getSelfLearnerCourseById(courseId);
-    if (!selfLearnerCourse) {
-      throw new NotFoundError(`Self learner course with id ${courseId} not found`);
-    }
-
-    if (selfLearnerCourse.selfLearnerId !== selfLearner.id) {
-      throw new ForbiddenError('You are not authorized to modify this course');
-    }
-
-    const language = selfLearnerCourse.language || 'francais';
-    const courseFiles = await this.selfLearnerCourseFileRepository.getSelfLearnerCourseFiles(courseId);
-    const contentText = selfLearnerCourse.textContent || '';
-    const combinedText = await this.getCombinedText(contentText, courseFiles);
-
     return {
       combinedText,
       config: {

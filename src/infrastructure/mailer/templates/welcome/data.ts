@@ -4,17 +4,15 @@ import * as frRoles from './fr/roles';
 import { WelcomeEmailRole, WelcomeEmailTemplateData } from './types';
 
 const DASHBOARD_PATHS: Record<WelcomeEmailRole, string> = {
-  teacher: '/teacher',
+  teacher: '/teacher/sessions',
   student: '/student',
-  establishment: '/establishment',
-  'self-learner': '/self-learner',
+  establishment: '/establishment/overview',
 };
 
 const ROLE_ALIASES: Record<string, WelcomeEmailRole> = {
   teacher: 'teacher',
   student: 'student',
   establishment: 'establishment',
-  'self-learner': 'self-learner',
 };
 
 const ROLES = {

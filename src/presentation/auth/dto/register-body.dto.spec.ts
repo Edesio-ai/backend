@@ -6,7 +6,7 @@ describe('RegisterBody', () => {
 
   const valid = () =>
     Object.assign(new RegisterBody(), {
-      role: 'self-learner' as const,
+      role: 'student' as const,
       email: 'user@school.com',
       password: validPassword,
       firstname: 'Alex',
@@ -14,7 +14,7 @@ describe('RegisterBody', () => {
       acceptTerms: true,
     });
 
-  it('accepts a valid self-learner registration body', async () => {
+  it('accepts a valid student registration body', async () => {
     const errors = await validate(valid());
 
     expect(errors).toHaveLength(0);
@@ -29,7 +29,7 @@ describe('RegisterBody', () => {
   });
 
   it('rejects unsupported role values', async () => {
-    const dto = Object.assign(valid(), { role: 'admin' as never });
+    const dto = Object.assign(valid(), { role: 'self-learner' as never });
 
     const errors = await validate(dto);
 
