@@ -117,15 +117,49 @@ describe('MistralProvider', () => {
       fixtures = new CompletionFeedbackFixtures();
     });
 
-    it('returns feedback text from the API response', async () => {
-      fixtures.whenApiReturnsFeedback('Excellent travail !');
+    it('returns feedback and notionsToReview from a JSON API response', async () => {
+      fixtures.whenApiReturnsFeedback(
+        JSON.stringify({
+          feedback: 'Excellent travail !',
+          notionsToReview: ['les causes de la Révolution'],
+        }),
+      );
 
       const result = await fixtures.whenGenerate();
 
-      expect(result).toBe('Excellent travail !');
+      expect(result).toEqual({
+        feedback: 'Excellent travail !',
+        notionsToReview: ['les causes de la Révolution'],
+      });
       expect(fixtures.chatCompleteMock).toHaveBeenCalledWith(
-        expect.objectContaining({ model: 'mistral-small-latest' }),
+        expect.objectContaining({
+          model: 'mistral-small-latest',
+          responseFormat: { type: 'json_object' },
+        }),
       );
+    });
+
+    it('includes course content and answers in the user prompt', async () => {
+      fixtures.whenApiReturnsFeedback(JSON.stringify({ feedback: 'ok', notionsToReview: [] }));
+
+      await fixtures.whenGenerate();
+
+      const call = fixtures.chatCompleteMock.mock.calls[0][0];
+      expect(call.messages[1].content).toContain('Chapitre Révolution');
+      expect(call.messages[1].content).toContain('Quelles sont les causes ?');
+    });
+
+    it('accepts alternate notions keys from the model', async () => {
+      fixtures.whenApiReturnsFeedback(
+        JSON.stringify({
+          feedback: 'Continue !',
+          notionsAReviser: ['les causes'],
+        }),
+      );
+
+      const result = await fixtures.whenGenerate();
+
+      expect(result.notionsToReview).toEqual(['les causes']);
     });
 
     it('falls back to default message when API returns no content', async () => {
@@ -133,7 +167,10 @@ describe('MistralProvider', () => {
 
       const result = await fixtures.whenGenerate();
 
-      expect(result).toBe('Bravo pour avoir terminé ce quiz !');
+      expect(result).toEqual({
+        feedback: 'Bravo pour avoir terminé ce quiz !',
+        notionsToReview: [],
+      });
     });
 
     it('throws ServerError when API throws', async () => {
@@ -143,7 +180,7 @@ describe('MistralProvider', () => {
     });
 
     it('defaults language to francais in the prompts', async () => {
-      fixtures.whenApiReturnsFeedback('ok');
+      fixtures.whenApiReturnsFeedback(JSON.stringify({ feedback: 'ok', notionsToReview: [] }));
 
       await fixtures.whenGenerate();
 
@@ -153,7 +190,7 @@ describe('MistralProvider', () => {
     });
 
     it('passes an explicit course language into the prompts', async () => {
-      fixtures.whenApiReturnsFeedback('ok');
+      fixtures.whenApiReturnsFeedback(JSON.stringify({ feedback: 'ok', notionsToReview: [] }));
 
       await fixtures.whenGenerateWithLanguage('anglais');
 
@@ -256,7 +293,16 @@ class CompletionFeedbackFixtures {
     total: 10,
     score: 8,
     courseTitle: 'Histoire',
+    courseContent: 'Chapitre Révolution : causes et conséquences.',
     studentName: 'Alex',
+    language: 'francais' as const,
+    answers: [
+      {
+        questionText: 'Quelles sont les causes ?',
+        score: 0.4,
+        missingElements: ['crise financière'],
+      },
+    ],
   };
 
   public readonly chatCompleteMock = jest.fn();

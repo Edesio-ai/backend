@@ -12,6 +12,18 @@ export type EvaluateAnswerResponse = {
   isCheating?: boolean;
 };
 
+export type CompletionFeedbackResponse = {
+  feedback: string;
+  score: number;
+  total: number;
+  notionsToReview: string[];
+};
+
+export type LlmCompletionFeedbackResult = {
+  feedback: string;
+  notionsToReview: string[];
+};
+
 export type QuestionGenerationConfig = {
   totalQuestions?: number;
   singleCount?: number;

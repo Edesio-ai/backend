@@ -8,7 +8,7 @@ import { GenerateQuestionDto } from 'src/presentation/llm/dtos/generate-question
 import { Question } from 'src/domain/teaching/question/types/question.type';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { GenerateQuestionUseCase } from 'src/application/llm/generate-question-use-case';
-import { EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
+import { CompletionFeedbackResponse, EvaluateAnswerResponse } from 'src/domain/llm/types/openai.type';
 import { EvaluateAnswerDto } from './dtos/evaluate-answer.dto';
 import { EvaluateAnswerUseCase } from 'src/application/llm/evaluate-answer.use-case';
 
@@ -23,9 +23,10 @@ export class LlmController {
 
   @Roles('student', 'teacher')
   @Post('completion-feedback')
-  async generateCompletionFeedback(@Body() body: GenerateCompletionFeedbackBodyDto): Promise<{ feedback: string }> {
-    const feedback = await this.generateCompletionFeedbackUseCase.execute(body);
-    return { feedback };
+  async generateCompletionFeedback(
+    @Body() body: GenerateCompletionFeedbackBodyDto,
+  ): Promise<CompletionFeedbackResponse> {
+    return await this.generateCompletionFeedbackUseCase.execute(body);
   }
 
   @Post('generate-questions')
