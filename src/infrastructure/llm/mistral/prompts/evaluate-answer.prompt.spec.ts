@@ -25,16 +25,6 @@ describe('evaluate-answer.prompt', () => {
       expect(prompt).toContain('feedback');
     });
 
-    it('should include suggestedAction field definition', () => {
-      const prompt = getEvaluateAnswerSystemPrompt();
-      expect(prompt).toContain('suggestedAction');
-    });
-
-    it('should include actionPrompt field definition', () => {
-      const prompt = getEvaluateAnswerSystemPrompt();
-      expect(prompt).toContain('actionPrompt');
-    });
-
     it('should include missingElements field definition', () => {
       const prompt = getEvaluateAnswerSystemPrompt();
       expect(prompt).toContain('missingElements');
@@ -45,16 +35,16 @@ describe('evaluate-answer.prompt', () => {
       expect(prompt).toContain('concepts');
     });
 
-    it('should define action thresholds A and B', () => {
+    it('should not include obsolete suggestedAction or actionPrompt fields', () => {
       const prompt = getEvaluateAnswerSystemPrompt();
-      expect(prompt).toContain('"A"');
-      expect(prompt).toContain('"B"');
+      expect(prompt).not.toContain('suggestedAction');
+      expect(prompt).not.toContain('actionPrompt');
     });
 
     it('should forbid inviting the student to retry or reformulate', () => {
       const prompt = getEvaluateAnswerSystemPrompt();
       expect(prompt).toContain("PAS d'autre tentative");
-      expect(prompt).toContain('actionPrompt : toujours null');
+      expect(prompt).toContain('SANS inviter à réessayer');
     });
 
     it('should describe the score range from 0 to 1', () => {

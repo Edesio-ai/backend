@@ -39,8 +39,6 @@ export class EvaluateAnswerUseCase {
         feedback: CHEATING_FEEDBACK[language],
         concepts: [],
         missingElements: [],
-        suggestedAction: null,
-        actionPrompt: null,
         isCheating: true,
       };
     }

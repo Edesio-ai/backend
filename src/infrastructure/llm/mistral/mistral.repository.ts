@@ -92,8 +92,6 @@ export class MistralProvider implements MistralRepositoryContract {
         score: Number(concept.score ?? 0),
       })),
       missingElements: evaluation.missingElements || [],
-      suggestedAction: evaluation.suggestedAction || null,
-      actionPrompt: evaluation.actionPrompt || null,
       correctAnswer: body.correctAnswer,
     };
   }

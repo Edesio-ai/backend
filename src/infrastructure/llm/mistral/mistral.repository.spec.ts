@@ -66,8 +66,6 @@ describe('MistralProvider', () => {
         feedback: fixtures.apiEvaluation.feedback,
         concepts: fixtures.apiEvaluation.concepts,
         missingElements: fixtures.apiEvaluation.missingElements,
-        suggestedAction: fixtures.apiEvaluation.suggestedAction,
-        actionPrompt: fixtures.apiEvaluation.actionPrompt,
         correctAnswer: fixtures.body.correctAnswer,
       });
       expect(fixtures.chatCompleteMock).toHaveBeenCalledWith(
@@ -259,8 +257,6 @@ class EvaluateAnswerFixtures {
     feedback: 'Bonne tentative.',
     concepts: [{ name: 'inégalités', score: 1 }],
     missingElements: ['crise financière'],
-    suggestedAction: 'A',
-    actionPrompt: 'Peux-tu compléter ?',
   };
 
   public readonly chatCompleteMock = jest.fn();

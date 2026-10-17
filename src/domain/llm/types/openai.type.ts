@@ -6,8 +6,6 @@ export type EvaluateAnswerResponse = {
   feedback: string;
   concepts: { name: string; score: number }[];
   missingElements: string[];
-  suggestedAction: string | null;
-  actionPrompt: string | null;
   correctAnswer?: string;
   isCheating?: boolean;
 };

@@ -21,8 +21,6 @@ describe('EvaluateAnswerUseCase', () => {
       expect(result.feedback).toBe("Bien essayé ! Mais ce n'est pas en trichant que tu vas progresser.");
       expect(result.concepts).toEqual([]);
       expect(result.missingElements).toEqual([]);
-      expect(result.suggestedAction).toBeNull();
-      expect(result.actionPrompt).toBeNull();
       expect(fixtures.openaiRepositoryMock.evaluateAnswer).not.toHaveBeenCalled();
     });
 
@@ -166,8 +164,6 @@ class Fixtures {
     feedback: 'Bonne tentative, il manque quelques éléments.',
     concepts: [{ name: 'crise financière', score: 1 }],
     missingElements: ['inégalités sociales', 'influence des Lumières'],
-    suggestedAction: 'A',
-    actionPrompt: 'Peux-tu me donner un autre élément ?',
   };
 
   public readonly openaiRepositoryMock = {
