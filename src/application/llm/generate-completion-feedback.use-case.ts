@@ -30,13 +30,11 @@ export type GenerateCompletionFeedbackBody = {
   language?: Language;
 };
 
-/** Payload sent to the LLM provider (includes resolved course content). */
 export type GenerateCompletionFeedbackLlmInput = Omit<GenerateCompletionFeedbackBody, 'courseId'> & {
   courseContent: string;
   language: Language;
 };
 
-/** Anything strictly below 1 is imperfect — notions are required unless the quiz is 100%. */
 const PERFECT_ANSWER_SCORE = 1;
 const MAX_NOTIONS = 5;
 
