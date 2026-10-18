@@ -9,10 +9,9 @@ import { EvaluateAnswerResponse, LlmCompletionFeedbackResult } from 'src/domain/
 import { GenerateCompletionFeedbackLlmInput } from 'src/application/llm/generate-completion-feedback.use-case';
 import { getGenerateCompletionFeedbackSystemPrompt } from './prompts/generate-completion-feedback.prompt';
 import { getGenerateCompletionFeedbackUserPrompt } from './prompts/generate-completion-feedback.prompt';
+import { truncateCourseContent } from 'src/domain/llm/course-content.limits';
 import { MISTRAL_CLIENT } from './mistral.constants';
 import { Mistral } from '@mistralai/mistralai';
-
-const COURSE_CONTENT_MAX_CHARS = 15000;
 
 @Injectable()
 export class MistralProvider implements MistralRepositoryContract {
@@ -26,11 +25,7 @@ export class MistralProvider implements MistralRepositoryContract {
     config: QuestionGenerationConfig,
     existingQuestions?: string[],
   ): Promise<GeneratedQuestion[]> {
-    const maxChars = 15000;
-    const truncatedContent =
-      courseContent.length > maxChars
-        ? courseContent.substring(0, maxChars) + '\n\n[Contenu tronqué pour respecter la limite]'
-        : courseContent;
+    const truncatedContent = truncateCourseContent(courseContent).text;
 
     const existingQuestionsContext =
       existingQuestions && existingQuestions.length > 0
@@ -114,10 +109,7 @@ export class MistralProvider implements MistralRepositoryContract {
               : "L'élève a eu des difficultés. Motive-le positivement et indique clairement les notions du cours à réviser.";
 
       const language = body.language ?? 'francais';
-      const truncatedCourseContent =
-        body.courseContent.length > COURSE_CONTENT_MAX_CHARS
-          ? body.courseContent.substring(0, COURSE_CONTENT_MAX_CHARS) + '\n\n[Contenu tronqué pour respecter la limite]'
-          : body.courseContent;
+      const truncatedCourseContent = truncateCourseContent(body.courseContent).text;
 
       const systemPrompt = getGenerateCompletionFeedbackSystemPrompt(language);
       const userPrompt = getGenerateCompletionFeedbackUserPrompt(

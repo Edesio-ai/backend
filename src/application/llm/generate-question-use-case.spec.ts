@@ -68,7 +68,10 @@ describe('GenerateQuestionUseCase', () => {
     expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(fixtures.body.courseId, {
       validatedQuestions: false,
     });
-    expect(result).toEqual(fixtures.insertedQuestions);
+    expect(result).toEqual({
+      questions: fixtures.insertedQuestions,
+      contentTruncated: false,
+    });
   });
 
   it('should extract text from PDF files and append to content', async () => {
@@ -132,7 +135,10 @@ describe('GenerateQuestionUseCase', () => {
     expect(fixtures.courseRepository.updateCourse).toHaveBeenCalledWith(fixtures.body.courseId, {
       validatedQuestions: false,
     });
-    expect(result).toEqual(fixtures.insertedQuestions);
+    expect(result).toEqual({
+      questions: fixtures.insertedQuestions,
+      contentTruncated: false,
+    });
   });
 });
 

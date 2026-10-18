@@ -17,6 +17,7 @@ import {
   QUESTIONS_REPOSITORY,
   type IQuestionsRepository,
 } from 'src/domain/teaching/question/contracts/i-questions.repository';
+import { truncateCourseContent } from 'src/domain/llm/course-content.limits';
 import { GeneratedQuestion, QuestionGenerationConfig } from 'src/domain/llm/types/openai.type';
 
 export type GenerateQuestionBody = {
@@ -24,6 +25,11 @@ export type GenerateQuestionBody = {
   totalQuestions?: number;
   singleCount?: number;
   openedCount?: number;
+};
+
+export type GenerateQuestionResult = {
+  questions: Question[];
+  contentTruncated: boolean;
 };
 
 export class GenerateQuestionUseCase {
@@ -42,11 +48,11 @@ export class GenerateQuestionUseCase {
     private readonly courseFileRepository: ICourseFileRepository,
   ) {}
 
-  async execute(body: GenerateQuestionBody, user: AuthUser): Promise<Question[]> {
+  async execute(body: GenerateQuestionBody, user: AuthUser): Promise<GenerateQuestionResult> {
     const { courseId } = body;
     await this.ensureAuthorized(user, courseId);
 
-    const { combinedText, config } = await this.getTeacherGenerationConfig(user.id, body);
+    const { combinedText, contentTruncated, config } = await this.getTeacherGenerationConfig(user.id, body);
 
     const questions = await this.mistralRepository.generateQuestions(combinedText, config);
     if (!questions || questions.length === 0) {
@@ -70,7 +76,10 @@ export class GenerateQuestionUseCase {
 
     await this.courseRepository.updateCourse(courseId, { validatedQuestions: false });
 
-    return insertedQuestions;
+    return {
+      questions: insertedQuestions,
+      contentTruncated,
+    };
   }
 
   private async ensureAuthorized(user: AuthUser, courseId: string): Promise<void> {
@@ -89,7 +98,7 @@ export class GenerateQuestionUseCase {
   private async getTeacherGenerationConfig(
     userId: string,
     body: GenerateQuestionBody,
-  ): Promise<{ combinedText: string; config: QuestionGenerationConfig }> {
+  ): Promise<{ combinedText: string; contentTruncated: boolean; config: QuestionGenerationConfig }> {
     const { courseId, totalQuestions, singleCount, openedCount } = body;
     const teacher = await this.teacherRepository.getTeacherByUserId(userId);
     if (!teacher) {
@@ -112,9 +121,10 @@ export class GenerateQuestionUseCase {
     const courseFiles = await this.courseFileRepository.getCourseFilesByCourseId(courseId);
 
     const contentText = courseWithSession.contentText || '';
-    const combinedText = await this.getCombinedText(contentText, courseFiles);
+    const { combinedText, contentTruncated } = await this.getCombinedText(contentText, courseFiles);
     return {
       combinedText,
+      contentTruncated,
       config: {
         totalQuestions,
         singleCount,
@@ -124,7 +134,10 @@ export class GenerateQuestionUseCase {
     };
   }
 
-  private async getCombinedText(contentText: string, files: CourseFile[]): Promise<string> {
+  private async getCombinedText(
+    contentText: string,
+    files: CourseFile[],
+  ): Promise<{ combinedText: string; contentTruncated: boolean }> {
     let combinedText = contentText;
     if (files && files.length > 0) {
       for (const file of files) {
@@ -148,6 +161,11 @@ export class GenerateQuestionUseCase {
       console.error('No content available for this course. Add text or a PDF file:', files);
       throw new BadRequestError('No content available for this course. Add text or a PDF file.');
     }
-    return combinedText;
+
+    const truncated = truncateCourseContent(combinedText);
+    return {
+      combinedText: truncated.text,
+      contentTruncated: truncated.truncated,
+    };
   }
 }
