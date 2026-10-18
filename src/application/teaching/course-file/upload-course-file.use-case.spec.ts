@@ -1,6 +1,8 @@
 import { UploadCourseFileUseCase } from 'src/application/teaching/course-file/upload-course-file.use-case';
 import type { ICourseFileRepository } from 'src/domain/teaching/course-file/contracts/i-course-file.repository';
+import { MAX_COURSE_FILE_BYTES, MAX_COURSE_FILES } from 'src/domain/teaching/course-file/course-file.limits';
 import { CourseFile, CourseFileUpload } from 'src/domain/teaching/course-file/types/course-file.type';
+import { BadRequestError } from 'src/domain/shared/errors/global.errors';
 import { createMockCourseFileRepository } from 'src/testing/mock-course-file-repository';
 
 describe('UploadCourseFileUseCase', () => {
@@ -35,6 +37,22 @@ describe('UploadCourseFileUseCase', () => {
       fixtures.file,
       `${fixtures.courseId}/1700000000000.pdf`,
     );
+  });
+
+  it('should throw BadRequestError when file exceeds max size', async () => {
+    fixtures.file.byteLength = MAX_COURSE_FILE_BYTES + 1;
+
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(BadRequestError);
+    expect(fixtures.courseFileRepository.getCourseFilesByCourseId).not.toHaveBeenCalled();
+    expect(fixtures.courseFileRepository.storeCourseFile).not.toHaveBeenCalled();
+  });
+
+  it('should throw BadRequestError when course already has max files', async () => {
+    fixtures.whenCourseAlreadyHasMaxFiles();
+
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(BadRequestError);
+    expect(fixtures.courseFileRepository.storeCourseFile).not.toHaveBeenCalled();
+    expect(fixtures.courseFileRepository.insertCourseFile).not.toHaveBeenCalled();
   });
 
   it('should propagate error when storeCourseFile fails', async () => {
@@ -79,6 +97,7 @@ class Fixtures {
 
   constructor() {
     this.courseFileRepository = createMockCourseFileRepository();
+    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue([]);
     this.useCase = new UploadCourseFileUseCase(this.courseFileRepository);
   }
 
@@ -89,6 +108,18 @@ class Fixtures {
   whenUploadAndInsertSucceed() {
     this.courseFileRepository.storeCourseFile.mockResolvedValue();
     this.courseFileRepository.insertCourseFile.mockResolvedValue(this.insertedFile);
+  }
+
+  whenCourseAlreadyHasMaxFiles() {
+    this.courseFileRepository.getCourseFilesByCourseId.mockResolvedValue(
+      Array.from({ length: MAX_COURSE_FILES }, (_, index) => ({
+        id: `file-${index}`,
+        courseId: this.courseId,
+        fileUrl: `${this.courseId}/${index}.pdf`,
+        fileName: `notes-${index}.pdf`,
+        createdAt: '2026-01-01T00:00:00.000Z',
+      })),
+    );
   }
 
   whenStoreFails() {
