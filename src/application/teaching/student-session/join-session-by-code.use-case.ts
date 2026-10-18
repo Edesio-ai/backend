@@ -7,7 +7,7 @@ import {
   STUDENT_REPOSITORY,
   type IStudentRepository,
 } from 'src/domain/teaching/student/contracts/I-student.repository';
-import { BadRequestError, NotFoundError } from 'src/domain/shared/errors/global.errors';
+import { BadRequestError, ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import {
   type IStudentSessionRepository,
   STUDENT_SESSION_REPOSITORY,
@@ -34,10 +34,11 @@ export class JoinSessionByCodeUseCase {
       throw new NotFoundError();
     }
 
-    const studentSessions = await this.studentSessionRepository.listSessionsEnrolledByStudent(student.id);
-
-    const existingSession = studentSessions.find((studentSession) => studentSession.id === session.id);
-    if (existingSession) {
+    const membership = await this.studentSessionRepository.getStudentSessionMembership(session.id, student.id);
+    if (membership?.status === 'banned') {
+      throw new ForbiddenError('studentBannedFromSession');
+    }
+    if (membership?.status === 'active') {
       throw new BadRequestError('Student already joined this session');
     }
 

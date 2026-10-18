@@ -4,6 +4,8 @@ import { StudentSessionController } from './student-session.controller';
 import { GetSessionStudentUseCase } from 'src/application/teaching/student-session/get-session-student.use-case';
 import { GetStudentJoinedSessionsUseCase } from 'src/application/teaching/student-session/get-student-joined-sessions.use-case';
 import { JoinSessionByCodeUseCase } from 'src/application/teaching/student-session/join-session-by-code.use-case';
+import { BanStudentFromSessionUseCase } from 'src/application/teaching/student-session/ban-student-from-session.use-case';
+import { UnbanStudentFromSessionUseCase } from 'src/application/teaching/student-session/unban-student-from-session.use-case';
 import { AuthPersistenceModule } from 'src/infrastructure/supabase/auth/auth-persistence.module';
 import { StudentPersistenceModule } from 'src/infrastructure/supabase/teaching/student/student-persistence.module';
 import { SessionsPersistenceModule } from 'src/infrastructure/supabase/teaching/session/sessions-persistence.module';
@@ -28,6 +30,8 @@ import { StudentCourseStatsPersistenceModule } from 'src/infrastructure/supabase
     JoinSessionByCodeUseCase,
     GetSessionStudentUseCase,
     DeleteStudentSessionUseCase,
+    BanStudentFromSessionUseCase,
+    UnbanStudentFromSessionUseCase,
   ],
 })
 export class StudentSessionModule {}

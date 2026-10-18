@@ -1,5 +1,7 @@
 import {
+  BannedSessionStudent,
   SessionStudent,
+  SessionStudentsPayload,
   SessionStudentWithStats,
 } from 'src/domain/teaching/student-session/types/student-session.type';
 import { Inject } from '@nestjs/common';
@@ -31,6 +33,12 @@ import {
 } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
 import { StudentCourseStats } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 
+const SESSION_STUDENT_SELECT = `
+  joined_at,
+  banned_at,
+  students (id, name, email, photo_url, supabase_user_id)
+`;
+
 export class GetSessionStudentUseCase {
   constructor(
     @Inject(STUDENT_REPOSITORY)
@@ -49,7 +57,7 @@ export class GetSessionStudentUseCase {
     private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}
 
-  async execute(sessionId: string, user: AuthUser): Promise<SessionStudentWithStats[]> {
+  async execute(sessionId: string, user: AuthUser): Promise<SessionStudentsPayload> {
     const { role } = user.metadata;
 
     if (!isAdmin(role)) {
@@ -65,20 +73,26 @@ export class GetSessionStudentUseCase {
       }
     }
 
-    const select = `
-            joined_at,
-            students (id, name, email, photo_url, supabase_user_id)
-        `;
-    const studentsSessions = await this.studentSessionRepository.listStudentsEnrolledInSession(sessionId, select);
-    if (studentsSessions.length === 0) {
-      return [];
+    const [activeStudents, bannedStudents] = await Promise.all([
+      this.studentSessionRepository.listStudentsEnrolledInSession(sessionId, SESSION_STUDENT_SELECT, 'active'),
+      this.studentSessionRepository.listStudentsEnrolledInSession(sessionId, SESSION_STUDENT_SELECT, 'banned'),
+    ]);
+
+    if (activeStudents.length === 0 && bannedStudents.length === 0) {
+      return { students: [], bannedStudents: [] };
     }
 
     const avatarUrls = await this.authRepository.getAvatarUrlsByUserIds(
-      studentsSessions.flatMap((student) => (student.supabaseUserId ? [student.supabaseUserId] : [])),
+      [...activeStudents, ...bannedStudents].flatMap((student) =>
+        student.supabaseUserId ? [student.supabaseUserId] : [],
+      ),
     );
     const courseStats = await this.studentCourseStatsRepository.getStudentCourseStatsBySessionId(sessionId);
-    return this.withSessionStats(studentsSessions, courseStats, avatarUrls);
+
+    return {
+      students: this.withSessionStats(activeStudents, courseStats, avatarUrls),
+      bannedStudents: this.withBannedStats(bannedStudents, courseStats, avatarUrls),
+    };
   }
 
   private withSessionStats(
@@ -106,6 +120,17 @@ export class GetSessionStudentUseCase {
         lastAttemptAt: stats?.lastAttemptAt ?? null,
       };
     });
+  }
+
+  private withBannedStats(
+    students: SessionStudent[],
+    courseStats: StudentCourseStats[],
+    avatarUrls: Record<string, string>,
+  ): BannedSessionStudent[] {
+    return this.withSessionStats(students, courseStats, avatarUrls).map((student) => ({
+      ...student,
+      bannedAt: student.bannedAt ?? '',
+    }));
   }
 
   private aggregateStatsByStudent(courseStats: StudentCourseStats[]): Map<string, AggregatedStudentStats> {

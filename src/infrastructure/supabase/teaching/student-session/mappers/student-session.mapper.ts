@@ -42,6 +42,7 @@ function sessionStudentEmbedRowToDomain(row: SupabaseSessionStudent): SessionStu
     photoUrl: row.students.photo_url,
     supabaseUserId: row.students.supabase_user_id,
     joinedAt: row.joined_at,
+    bannedAt: row.banned_at ?? null,
   };
 }
 
@@ -64,5 +65,7 @@ export const StudentSessionMapper = {
   toDomain: (row: SupabaseStudentSession): StudentSession => ({
     sessionId: row.session_id,
     studentId: row.student_id,
+    status: row.status ?? 'active',
+    bannedAt: row.banned_at ?? null,
   }),
 };

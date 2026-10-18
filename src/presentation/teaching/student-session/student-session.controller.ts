@@ -1,13 +1,17 @@
 import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { StudentJoinedSession } from 'src/domain/teaching/student-session/types/student-session.type';
+import {
+  SessionStudentsPayload,
+  StudentJoinedSession,
+} from 'src/domain/teaching/student-session/types/student-session.type';
 import { GetStudentJoinedSessionsUseCase } from 'src/application/teaching/student-session/get-student-joined-sessions.use-case';
 import { Roles } from 'src/presentation/auth/decorator/role.decorator';
 import { CurrentUser } from 'src/presentation/auth/decorator/current-user.decorator';
 import type { AuthUser } from 'src/domain/auth/types/auth.type';
 import { JoinSessionByCodeUseCase } from 'src/application/teaching/student-session/join-session-by-code.use-case';
-import { SessionStudentWithStats } from 'src/domain/teaching/student-session/types/student-session.type';
 import { GetSessionStudentUseCase } from 'src/application/teaching/student-session/get-session-student.use-case';
 import { DeleteStudentSessionUseCase } from 'src/application/teaching/student-session/delete-student-session.use-case';
+import { BanStudentFromSessionUseCase } from 'src/application/teaching/student-session/ban-student-from-session.use-case';
+import { UnbanStudentFromSessionUseCase } from 'src/application/teaching/student-session/unban-student-from-session.use-case';
 
 @Roles('student')
 @Controller('student-session')
@@ -17,6 +21,8 @@ export class StudentSessionController {
     private readonly joinSessionByCodeUseCase: JoinSessionByCodeUseCase,
     private readonly getSessionStudentUseCase: GetSessionStudentUseCase,
     private readonly deleteStudentSessionUseCase: DeleteStudentSessionUseCase,
+    private readonly banStudentFromSessionUseCase: BanStudentFromSessionUseCase,
+    private readonly unbanStudentFromSessionUseCase: UnbanStudentFromSessionUseCase,
   ) {}
 
   @Get('student/:studentId/joined-sessions')
@@ -35,9 +41,28 @@ export class StudentSessionController {
   async getStudentSessions(
     @Param('sessionId') sessionId: string,
     @CurrentUser() user: AuthUser,
-  ): Promise<SessionStudentWithStats[]> {
-    const students = await this.getSessionStudentUseCase.execute(sessionId, user);
-    return students ?? [];
+  ): Promise<SessionStudentsPayload> {
+    return this.getSessionStudentUseCase.execute(sessionId, user);
+  }
+
+  @Roles('teacher')
+  @Post('/session/:sessionId/students/:studentId/ban')
+  async banStudentFromSession(
+    @Param('sessionId') sessionId: string,
+    @Param('studentId') studentId: string,
+    @CurrentUser() user: AuthUser,
+  ): Promise<void> {
+    await this.banStudentFromSessionUseCase.execute(sessionId, studentId, user);
+  }
+
+  @Roles('teacher')
+  @Post('/session/:sessionId/students/:studentId/unban')
+  async unbanStudentFromSession(
+    @Param('sessionId') sessionId: string,
+    @Param('studentId') studentId: string,
+    @CurrentUser() user: AuthUser,
+  ): Promise<void> {
+    await this.unbanStudentFromSessionUseCase.execute(sessionId, studentId, user);
   }
 
   @Delete('session/:sessionId')

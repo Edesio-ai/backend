@@ -7,6 +7,7 @@ import type {
   SessionStudent,
   StudentJoinedSession,
   StudentSession,
+  StudentSessionStatus,
 } from 'src/domain/teaching/student-session/types/student-session.type';
 import { SUPABASE_ADMIN } from '../../../supabase.module';
 import { StudentSessionMapper } from '../mappers/student-session.mapper';
@@ -21,7 +22,8 @@ export class StudentSessionRepository implements IStudentSessionRepository {
   public async getStudentsSessionsByIds(sessionIds: string[]) {
     const { data, error } = await this.supabase
       .from('student_sessions')
-      .select('session_id, student_id')
+      .select('session_id, student_id, status, banned_at')
+      .eq('status', 'active')
       .in('session_id', sessionIds.length > 0 ? sessionIds : ['00000000-0000-0000-0000-000000000000']);
 
     if (error) {
@@ -54,6 +56,7 @@ export class StudentSessionRepository implements IStudentSessionRepository {
       `,
       )
       .eq('student_id', studentId)
+      .eq('status', 'active')
       .order('joined_at', { ascending: false });
 
     if (error) {
@@ -63,8 +66,16 @@ export class StudentSessionRepository implements IStudentSessionRepository {
     return StudentSessionMapper.mapEnrollmentRowsWithEmbeddedSessions(data ?? []);
   }
 
-  public async listStudentsEnrolledInSession(sessionId: string, select: string = '*'): Promise<SessionStudent[]> {
-    const { data, error } = await this.supabase.from('student_sessions').select(select).eq('session_id', sessionId);
+  public async listStudentsEnrolledInSession(
+    sessionId: string,
+    select: string = '*',
+    status: StudentSessionStatus = 'active',
+  ): Promise<SessionStudent[]> {
+    const { data, error } = await this.supabase
+      .from('student_sessions')
+      .select(select)
+      .eq('session_id', sessionId)
+      .eq('status', status);
 
     if (error) {
       console.error('An error occurred while listing students enrolled in session', sessionId, error);
@@ -74,9 +85,17 @@ export class StudentSessionRepository implements IStudentSessionRepository {
   }
 
   public async getStudentSession(sessionId: string, studentId: string): Promise<StudentSession | null> {
+    const membership = await this.getStudentSessionMembership(sessionId, studentId);
+    if (!membership || membership.status !== 'active') {
+      return null;
+    }
+    return membership;
+  }
+
+  public async getStudentSessionMembership(sessionId: string, studentId: string): Promise<StudentSession | null> {
     const { data, error } = await this.supabase
       .from('student_sessions')
-      .select('*')
+      .select('session_id, student_id, status, banned_at')
       .eq('session_id', sessionId)
       .eq('student_id', studentId)
       .maybeSingle();
@@ -94,9 +113,11 @@ export class StudentSessionRepository implements IStudentSessionRepository {
   }
 
   public async createStudentSession(studentId: string, sessionId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('student_sessions')
-      .insert({ student_id: studentId, session_id: sessionId });
+    const { error } = await this.supabase.from('student_sessions').insert({
+      student_id: studentId,
+      session_id: sessionId,
+      status: 'active',
+    });
 
     if (error) {
       console.error('An error occurred while creating student session', studentId, sessionId);
@@ -113,6 +134,34 @@ export class StudentSessionRepository implements IStudentSessionRepository {
 
     if (error) {
       console.error(`Error deleting student session for session id: ${sessionId} and student id: ${studentId}`, error);
+      throw new ServerError(error.message);
+    }
+  }
+
+  public async banStudentFromSession(sessionId: string, studentId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('student_sessions')
+      .update({ status: 'banned', banned_at: new Date().toISOString() })
+      .eq('session_id', sessionId)
+      .eq('student_id', studentId)
+      .eq('status', 'active');
+
+    if (error) {
+      console.error('An error occurred while banning student from session', sessionId, studentId, error);
+      throw new ServerError(error.message);
+    }
+  }
+
+  public async unbanStudentFromSession(sessionId: string, studentId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('student_sessions')
+      .update({ status: 'active', banned_at: null })
+      .eq('session_id', sessionId)
+      .eq('student_id', studentId)
+      .eq('status', 'banned');
+
+    if (error) {
+      console.error('An error occurred while unbanning student from session', sessionId, studentId, error);
       throw new ServerError(error.message);
     }
   }

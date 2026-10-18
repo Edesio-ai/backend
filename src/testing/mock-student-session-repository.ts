@@ -7,7 +7,10 @@ export function createMockStudentSessionRepository(): jest.Mocked<IStudentSessio
     listSessionsEnrolledByStudent: jest.fn(),
     listStudentsEnrolledInSession: jest.fn(),
     getStudentSession: jest.fn(),
+    getStudentSessionMembership: jest.fn(),
     createStudentSession: jest.fn(),
     deleteStudentSession: jest.fn(),
+    banStudentFromSession: jest.fn(),
+    unbanStudentFromSession: jest.fn(),
   };
 }

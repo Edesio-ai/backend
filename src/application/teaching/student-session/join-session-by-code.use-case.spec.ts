@@ -1,10 +1,9 @@
 import { JoinSessionByCodeUseCase } from './join-session-by-code.use-case';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-session.repository';
-import { BadRequestError, NotFoundError } from 'src/domain/shared/errors/global.errors';
+import { BadRequestError, ForbiddenError, NotFoundError } from 'src/domain/shared/errors/global.errors';
 import { Session } from 'src/domain/teaching/session/types/session.type';
 import { Student } from 'src/domain/teaching/student/type/student.type';
-import { StudentJoinedSession } from 'src/domain/teaching/student-session/types/student-session.type';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
@@ -43,6 +42,14 @@ describe('JoinSessionByCodeUseCase', () => {
     fixtures.whenStudentAlreadyJoinedSession();
 
     await expect(fixtures.whenExecute()).rejects.toThrow('Student already joined this session');
+  });
+
+  it('should throw ForbiddenError when the student is banned from the session', async () => {
+    fixtures.whenSessionFound();
+    fixtures.whenStudentFound();
+    fixtures.whenStudentBannedFromSession();
+
+    await expect(fixtures.whenExecute()).rejects.toBeInstanceOf(ForbiddenError);
   });
 
   it('should call createStudentSession with the correct student id and session id', async () => {
@@ -93,19 +100,6 @@ class Fixtures {
     photoUrl: 'https://x/a.png',
   };
 
-  public readonly alreadyJoinedSession: StudentJoinedSession = {
-    id: this.session.id,
-    teacherId: this.session.teacherId,
-    name: this.session.name,
-    code: this.session.code,
-    language: this.session.language,
-    createdAt: this.session.createdAt,
-    studentCount: 0,
-    pendingQuestionCount: 0,
-    joinedAt: '2026-01-10T00:00:00.000Z',
-    teacherName: '',
-  };
-
   public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly sessionRepository: jest.Mocked<ISessionRepository>;
   public readonly studentSessionRepository: ReturnType<typeof createMockStudentSessionRepository>;
@@ -143,11 +137,25 @@ class Fixtures {
   }
 
   whenStudentAlreadyJoinedSession() {
-    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue([this.alreadyJoinedSession]);
+    this.studentSessionRepository.getStudentSessionMembership.mockResolvedValue({
+      sessionId: this.session.id,
+      studentId: this.student.id,
+      status: 'active',
+      bannedAt: null,
+    });
+  }
+
+  whenStudentBannedFromSession() {
+    this.studentSessionRepository.getStudentSessionMembership.mockResolvedValue({
+      sessionId: this.session.id,
+      studentId: this.student.id,
+      status: 'banned',
+      bannedAt: '2026-02-01T00:00:00.000Z',
+    });
   }
 
   whenStudentHasNoJoinedSessions() {
-    this.studentSessionRepository.listSessionsEnrolledByStudent.mockResolvedValue([]);
+    this.studentSessionRepository.getStudentSessionMembership.mockResolvedValue(null);
   }
 
   whenCreateStudentSessionSucceeds() {
