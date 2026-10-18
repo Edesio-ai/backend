@@ -35,7 +35,10 @@ describe('GetSessionStudentUseCase', () => {
 
     const result = await fixtures.whenExecuteAsTeacher();
 
-    expect(result).toEqual(fixtures.sessionStudentsWithEmptyStats);
+    expect(result).toEqual({
+      students: fixtures.sessionStudentsWithEmptyStats,
+      bannedStudents: [],
+    });
   });
 
   it('should prefer auth avatarUrl over empty student photoUrl', async () => {
@@ -48,12 +51,12 @@ describe('GetSessionStudentUseCase', () => {
 
     const result = await fixtures.whenExecuteAsTeacher();
 
-    expect(result.find((student) => student.id === 'student-2')?.photoUrl).toBe('https://cdn/bob.png');
-    expect(result.find((student) => student.id === 'student-1')?.photoUrl).toBe('https://x/a.png');
+    expect(result.students.find((student) => student.id === 'student-2')?.photoUrl).toBe('https://cdn/bob.png');
+    expect(result.students.find((student) => student.id === 'student-1')?.photoUrl).toBe('https://x/a.png');
     expect(fixtures.authRepository.getAvatarUrlsByUserIds).toHaveBeenCalledWith(['auth-student-1', 'auth-student-2']);
   });
 
-  it('should call listStudentsEnrolledInSession with the correct sessionId and select fields', async () => {
+  it('should call listStudentsEnrolledInSession for active and banned students', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenSessionFound();
     fixtures.whenStudentsSessionsFound();
@@ -63,14 +66,12 @@ describe('GetSessionStudentUseCase', () => {
     expect(fixtures.studentSessionRepository.listStudentsEnrolledInSession).toHaveBeenCalledWith(
       fixtures.sessionId,
       expect.stringContaining('joined_at'),
+      'active',
     );
     expect(fixtures.studentSessionRepository.listStudentsEnrolledInSession).toHaveBeenCalledWith(
       fixtures.sessionId,
-      expect.stringContaining('students'),
-    );
-    expect(fixtures.studentSessionRepository.listStudentsEnrolledInSession).toHaveBeenCalledWith(
-      fixtures.sessionId,
-      expect.stringContaining('supabase_user_id'),
+      expect.stringContaining('banned_at'),
+      'banned',
     );
   });
 
@@ -103,14 +104,14 @@ describe('GetSessionStudentUseCase', () => {
     await expect(fixtures.whenExecuteAsTeacher()).rejects.toBeInstanceOf(ForbiddenError);
   });
 
-  it('should return an empty array when the session has no students', async () => {
+  it('should return empty lists when the session has no students', async () => {
     fixtures.whenTeacherFound();
     fixtures.whenSessionFound();
     fixtures.whenNoStudentsInSession();
 
     const result = await fixtures.whenExecuteAsTeacher();
 
-    expect(result).toEqual([]);
+    expect(result).toEqual({ students: [], bannedStudents: [] });
     expect(fixtures.studentCourseStatsRepository.getStudentCourseStatsBySessionId).not.toHaveBeenCalled();
   });
 
@@ -132,7 +133,10 @@ describe('GetSessionStudentUseCase', () => {
 
     const result = await fixtures.whenExecuteAsEstablishment();
 
-    expect(result).toEqual(fixtures.sessionStudentsWithEmptyStats);
+    expect(result).toEqual({
+      students: fixtures.sessionStudentsWithEmptyStats,
+      bannedStudents: [],
+    });
   });
 
   it('should throw NotFoundError when establishment is not found', async () => {
@@ -161,7 +165,10 @@ describe('GetSessionStudentUseCase', () => {
 
     const result = await fixtures.whenExecuteAsAdmin();
 
-    expect(result).toEqual(fixtures.sessionStudentsWithEmptyStats);
+    expect(result).toEqual({
+      students: fixtures.sessionStudentsWithEmptyStats,
+      bannedStudents: [],
+    });
     expect(fixtures.teacherRepository.getTeacherByUserId).not.toHaveBeenCalled();
     expect(fixtures.establishmentRepository.getEstablishmentByUserId).not.toHaveBeenCalled();
     expect(fixtures.sessionRepository.getSessionById).not.toHaveBeenCalled();
@@ -175,16 +182,19 @@ describe('GetSessionStudentUseCase', () => {
 
     const result = await fixtures.whenExecuteAsTeacher();
 
-    expect(result).toEqual([
-      {
-        ...fixtures.sessionStudents[0],
-        attemptedQuestions: 5,
-        correctAnswers: 2.83,
-        successRate: 57,
-        lastAttemptAt: '2026-02-02T10:00:00.000Z',
-      },
-      fixtures.sessionStudentsWithEmptyStats[1],
-    ]);
+    expect(result).toEqual({
+      students: [
+        {
+          ...fixtures.sessionStudents[0],
+          attemptedQuestions: 5,
+          correctAnswers: 2.83,
+          successRate: 57,
+          lastAttemptAt: '2026-02-02T10:00:00.000Z',
+        },
+        fixtures.sessionStudentsWithEmptyStats[1],
+      ],
+      bannedStudents: [],
+    });
   });
 });
 
@@ -371,7 +381,12 @@ class Fixtures {
   }
 
   whenStudentsSessionsFound() {
-    this.studentSessionRepository.listStudentsEnrolledInSession.mockResolvedValue(this.sessionStudents);
+    this.studentSessionRepository.listStudentsEnrolledInSession.mockImplementation(
+      async (_sessionId, _select, status = 'active') => {
+        if (status === 'banned') return [];
+        return this.sessionStudents;
+      },
+    );
   }
 
   whenNoStudentsInSession() {
