@@ -1,6 +1,7 @@
 import { Inject, NotFoundException } from '@nestjs/common';
 import type { ILlmProvider } from 'src/domain/llm/contracts/I-llm.provider';
 import { LLM_REPOSITORY } from 'src/domain/llm/contracts/I-llm.provider';
+import { truncateCourseContent } from 'src/domain/llm/course-content.limits';
 import type { CompletionFeedbackResponse } from 'src/domain/llm/types/openai.type';
 import { PDF_EXTRACTOR, type IPdfExtractorProvider } from 'src/domain/pdf/contracts/i-pdf-extractor.provider';
 import { BadRequestError } from 'src/domain/shared/errors/global.errors';
@@ -116,7 +117,7 @@ export class GenerateCompletionFeedbackUseCase {
       throw new BadRequestError('No course file content available for this course.');
     }
 
-    return combinedText.trim();
+    return truncateCourseContent(combinedText.trim()).text;
   }
 
   private deriveNotionsFromImperfectAnswers(answers: CompletionFeedbackAnswer[]): string[] {

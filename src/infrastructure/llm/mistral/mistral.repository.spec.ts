@@ -3,6 +3,7 @@ jest.mock('@mistralai/mistralai', () => ({
   Mistral: jest.fn(),
 }));
 
+import { COURSE_CONTENT_MAX_CHARS } from 'src/domain/llm/course-content.limits';
 import { ServerError } from 'src/domain/shared/errors/global.errors';
 import type { QuestionGenerationConfig } from 'src/domain/llm/types/openai.type';
 import { MistralProvider } from './mistral.repository';
@@ -30,8 +31,8 @@ describe('MistralProvider', () => {
       );
     });
 
-    it('truncates content longer than 15000 characters', async () => {
-      const longContent = 'a'.repeat(16000);
+    it('truncates content longer than COURSE_CONTENT_MAX_CHARS', async () => {
+      const longContent = 'a'.repeat(COURSE_CONTENT_MAX_CHARS + 1000);
       fixtures.whenApiReturnsContent(JSON.stringify({ questions: fixtures.generatedQuestions }));
 
       await fixtures.provider.generateQuestions(longContent, fixtures.config);

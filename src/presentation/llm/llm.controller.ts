@@ -36,11 +36,13 @@ export class LlmController {
   ): Promise<{
     questions: Question[];
     questionCount: number;
+    contentTruncated: boolean;
   }> {
-    const questions = await this.generateQuestionUseCase.execute(body, user);
+    const result = await this.generateQuestionUseCase.execute(body, user);
     return {
-      questions,
-      questionCount: questions.length,
+      questions: result.questions,
+      questionCount: result.questions.length,
+      contentTruncated: result.contentTruncated,
     };
   }
 
