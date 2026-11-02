@@ -22,6 +22,11 @@ import {
 import { TEACHER_REPOSITORY, type ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
 import { isCourseVisibleToStudents } from 'src/domain/teaching/course/course.utils';
 import { Course } from 'src/domain/teaching/course/types/course.type';
+import {
+  STUDENT_COURSE_STATS_REPOSITORY,
+  type IStudentCourseStatsRepository,
+} from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
+import type { StudentCourseStats } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 
 export class GetSessionCoursesUseCase {
   constructor(
@@ -37,6 +42,8 @@ export class GetSessionCoursesUseCase {
     private readonly studentRepository: IStudentRepository,
     @Inject(STUDENT_SESSION_REPOSITORY)
     private readonly studentSessionRepository: IStudentSessionRepository,
+    @Inject(STUDENT_COURSE_STATS_REPOSITORY)
+    private readonly studentCourseStatsRepository: IStudentCourseStatsRepository,
   ) {}
 
   async execute(sessionId: string, user: AuthUser): Promise<Course[]> {
@@ -58,13 +65,48 @@ export class GetSessionCoursesUseCase {
       }
     }
 
-    const courses = await this.courseRepository.getSessionCoursesBySessionId(sessionId);
+    const [courses, stats, enrollments] = await Promise.all([
+      this.courseRepository.getSessionCoursesBySessionId(sessionId),
+      this.studentCourseStatsRepository.getStudentCourseStatsBySessionId(sessionId),
+      this.studentSessionRepository.getStudentsSessionsByIds([sessionId]),
+    ]);
+    const enrolledStudentIds = new Set(enrollments.map((enrollment) => enrollment.studentId));
+    const enrolledStats = stats.filter((stat) => enrolledStudentIds.has(stat.studentId));
+    const averageByCourseId = this.computeAverageSuccessRateByCourseId(enrolledStats);
+
+    const coursesWithAverage = courses.map((course) => ({
+      ...course,
+      averageSuccessRate: averageByCourseId.get(course.id) ?? null,
+    }));
 
     if (role === 'student') {
-      return courses.filter(isCourseVisibleToStudents);
+      return coursesWithAverage.filter(isCourseVisibleToStudents);
     }
 
-    return courses;
+    return coursesWithAverage;
+  }
+
+  private computeAverageSuccessRateByCourseId(stats: StudentCourseStats[]): Map<string, number> {
+    const byCourse = new Map<string, StudentCourseStats[]>();
+
+    for (const stat of stats) {
+      if (Number(stat.attemptedQuestions) <= 0) {
+        continue;
+      }
+      const existing = byCourse.get(stat.courseId) ?? [];
+      existing.push(stat);
+      byCourse.set(stat.courseId, existing);
+    }
+
+    const averages = new Map<string, number>();
+    for (const [courseId, courseStats] of byCourse) {
+      const totalRate = courseStats.reduce((sum, stat) => {
+        return sum + (Number(stat.correctAnswers) / Number(stat.attemptedQuestions)) * 100;
+      }, 0);
+      averages.set(courseId, Math.round(totalRate / courseStats.length));
+    }
+
+    return averages;
   }
 
   private async checkTeacherOwnership(sessionId: string, user: AuthUser): Promise<void> {

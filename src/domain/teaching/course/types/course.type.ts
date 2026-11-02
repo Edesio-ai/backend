@@ -32,6 +32,8 @@ export type Course = {
   positionOrder?: number;
   createdAt?: string;
   questionCount?: number;
+  /** Class average 0–100, or null when nobody has attempted the course yet. */
+  averageSuccessRate?: number | null;
 };
 
 export type SupabaseCourseWithSession = {
@@ -80,7 +82,8 @@ export type CourseDetails = {
   studentsCount: number;
   /** Session students who attempted at least one question on this course (chatbot usage). */
   studentsWhoUsedChatbotCount: number;
-  averageSuccessRate: number;
+  /** Null when no enrolled student has attempted the course. */
+  averageSuccessRate: number | null;
   files: CourseFile[];
   questions: CourseDetailsQuestion[];
 };

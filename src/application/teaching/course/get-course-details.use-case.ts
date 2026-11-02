@@ -69,6 +69,9 @@ export class GetCourseDetailsUseCase {
     ]);
 
     const enrolledStudentIds = new Set(enrollments.map((enrollment) => enrollment.studentId));
+    const enrolledStatsWithAttempts = courseStats.filter(
+      (stat) => enrolledStudentIds.has(stat.studentId) && Number(stat.attemptedQuestions) > 0,
+    );
 
     return {
       course: {
@@ -78,15 +81,11 @@ export class GetCourseDetailsUseCase {
         createdAt: course.createdAt ?? '',
       },
       studentsCount: enrollments.length,
-      studentsWhoUsedChatbotCount: this.countStudentsWhoUsedChatbot(courseStats, enrolledStudentIds),
-      averageSuccessRate: this.computeAverageSuccessRate(courseStats),
+      studentsWhoUsedChatbotCount: enrolledStatsWithAttempts.length,
+      averageSuccessRate: this.computeAverageSuccessRate(enrolledStatsWithAttempts),
       files: files ?? [],
       questions: this.toDetailsQuestions(questions ?? []),
     };
-  }
-
-  private countStudentsWhoUsedChatbot(stats: StudentCourseStatsWithStudent[], enrolledStudentIds: Set<string>): number {
-    return stats.filter((stat) => enrolledStudentIds.has(stat.studentId) && Number(stat.attemptedQuestions) > 0).length;
   }
 
   private toDetailsQuestions(questions: Question[]): CourseDetailsQuestion[] {
@@ -104,16 +103,15 @@ export class GetCourseDetailsUseCase {
     }));
   }
 
-  private computeAverageSuccessRate(stats: StudentCourseStatsWithStudent[]): number {
-    const withAttempts = stats.filter((stat) => Number(stat.attemptedQuestions) > 0);
-    if (withAttempts.length === 0) {
-      return 0;
+  private computeAverageSuccessRate(statsWithAttempts: StudentCourseStatsWithStudent[]): number | null {
+    if (statsWithAttempts.length === 0) {
+      return null;
     }
 
-    const totalRate = withAttempts.reduce((sum, stat) => {
+    const totalRate = statsWithAttempts.reduce((sum, stat) => {
       return sum + (Number(stat.correctAnswers) / Number(stat.attemptedQuestions)) * 100;
     }, 0);
 
-    return Math.round(totalRate / withAttempts.length);
+    return Math.round(totalRate / statsWithAttempts.length);
   }
 }

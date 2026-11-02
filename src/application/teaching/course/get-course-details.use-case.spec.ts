@@ -71,7 +71,7 @@ describe('GetCourseDetailsUseCase', () => {
     fixtures.thenReturnsExpectedDetails(result);
   });
 
-  it('should return averageSuccessRate 0 when no student has attempts', async () => {
+  it('should return averageSuccessRate null when no enrolled student has attempts', async () => {
     fixtures.whenCourseFound();
     fixtures.whenTeacherFound();
     fixtures.whenSessionFound();
@@ -79,12 +79,12 @@ describe('GetCourseDetailsUseCase', () => {
 
     const result = await fixtures.whenExecute();
 
-    expect(result.averageSuccessRate).toBe(0);
+    expect(result.averageSuccessRate).toBeNull();
     expect(result.studentsCount).toBe(2);
     expect(result.studentsWhoUsedChatbotCount).toBe(0);
   });
 
-  it('should count enrolled students who attempted at least one question as chatbot users', async () => {
+  it('should ignore non-enrolled stats for chatbot count and averageSuccessRate', async () => {
     fixtures.whenCourseFound();
     fixtures.whenTeacherFound();
     fixtures.whenSessionFound();
@@ -117,6 +117,30 @@ describe('GetCourseDetailsUseCase', () => {
     const result = await fixtures.whenExecute();
 
     expect(result.studentsWhoUsedChatbotCount).toBe(1);
+    // Only enrolled student-1 (33%) — outsider 100% must not inflate the average.
+    expect(result.averageSuccessRate).toBe(33);
+  });
+
+  it('should return null average when only non-enrolled students have attempts', async () => {
+    fixtures.whenCourseFound();
+    fixtures.whenTeacherFound();
+    fixtures.whenSessionFound();
+    fixtures.whenDetailsDataReturned({
+      courseStats: [
+        {
+          studentId: 'outsider',
+          attemptedQuestions: 5,
+          correctAnswers: 5,
+          lastAttemptAt: '2026-01-03T00:00:00.000Z',
+          student: { id: 'outsider', name: 'Zoe', email: 'z@school.com', photoUrl: '' },
+        },
+      ],
+    });
+
+    const result = await fixtures.whenExecute();
+
+    expect(result.studentsWhoUsedChatbotCount).toBe(0);
+    expect(result.averageSuccessRate).toBeNull();
   });
 
   it('should map null question proposals to empty arrays and keep full question fields', async () => {

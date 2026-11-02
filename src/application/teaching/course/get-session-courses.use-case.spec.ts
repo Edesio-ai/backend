@@ -8,11 +8,14 @@ import { ISessionRepository } from 'src/domain/teaching/session/contracts/i-sess
 import type { IStudentSessionRepository } from 'src/domain/teaching/student-session/contracts/i-student-session.repository';
 import { IStudentRepository } from 'src/domain/teaching/student/contracts/I-student.repository';
 import { ITeacherRepository } from 'src/domain/teaching/teacher/contracts/teacher.repository';
+import type { IStudentCourseStatsRepository } from 'src/domain/teaching/student-course-stats/contracts/i-student-course-stats.repository';
+import type { StudentCourseStats } from 'src/domain/teaching/student-course-stats/types/student-course-stats.type';
 import { createMockCourseRepository } from 'src/testing/mock-course-repository';
 import { createMockEstablishmentRepository } from 'src/testing/mock-establishment-repository';
 import { createMockSessionRepository } from 'src/testing/mock-session-repository';
 import { createMockStudentRepository } from 'src/testing/mock-student-repository';
 import { createMockStudentSessionRepository } from 'src/testing/mock-student-session-repository';
+import { createMockStudentCourseStatsRepository } from 'src/testing/mock-student-course-stats-repository';
 import { createMockTeacherRepository } from 'src/testing/mock-teacher-repository';
 import { Course } from 'src/domain/teaching/course/types/course.type';
 
@@ -32,8 +35,87 @@ describe('GetSessionCoursesUseCase', () => {
 
     const result = await fixtures.whenExecuteAsTeacher();
 
-    expect(result).toEqual(fixtures.courses);
+    expect(result).toEqual(fixtures.coursesWithAverage());
     expect(fixtures.courseRepository.getSessionCoursesBySessionId).toHaveBeenCalledWith(fixtures.sessionId);
+    expect(fixtures.studentCourseStatsRepository.getStudentCourseStatsBySessionId).toHaveBeenCalledWith(
+      fixtures.sessionId,
+    );
+  });
+
+  it('should set averageSuccessRate to null when nobody has participated', async () => {
+    fixtures.whenTeacherFound();
+    fixtures.whenSessionFoundForTeacher();
+    fixtures.whenCoursesReturned();
+    fixtures.whenSessionStatsReturned([]);
+
+    const result = await fixtures.whenExecuteAsTeacher();
+
+    expect(result[0].averageSuccessRate).toBeNull();
+  });
+
+  it('should compute averageSuccessRate per course from enrolled session stats only', async () => {
+    fixtures.whenTeacherFound();
+    fixtures.whenSessionFoundForTeacher();
+    fixtures.whenMixedPublicationCoursesReturned();
+    fixtures.whenEnrollmentsReturned(['student-1', 'student-2']);
+    fixtures.whenSessionStatsReturned([
+      fixtures.stat({
+        courseId: 'c-1',
+        studentId: 'student-1',
+        attemptedQuestions: 10,
+        correctAnswers: 8,
+      }),
+      fixtures.stat({
+        courseId: 'c-1',
+        studentId: 'student-2',
+        attemptedQuestions: 4,
+        correctAnswers: 2,
+      }),
+      fixtures.stat({
+        courseId: 'c-1',
+        studentId: 'outsider',
+        attemptedQuestions: 1,
+        correctAnswers: 1,
+      }),
+      fixtures.stat({
+        courseId: 'c-draft',
+        studentId: 'student-1',
+        attemptedQuestions: 2,
+        correctAnswers: 2,
+      }),
+      fixtures.stat({
+        courseId: 'c-legacy',
+        studentId: 'student-1',
+        attemptedQuestions: 0,
+        correctAnswers: 0,
+      }),
+    ]);
+
+    const result = await fixtures.whenExecuteAsTeacher();
+
+    // (80 + 50) / 2 = 65 — outsider 100% ignored
+    expect(result.find((course) => course.id === 'c-1')?.averageSuccessRate).toBe(65);
+    expect(result.find((course) => course.id === 'c-draft')?.averageSuccessRate).toBe(100);
+    expect(result.find((course) => course.id === 'c-legacy')?.averageSuccessRate).toBeNull();
+  });
+
+  it('should return null average when only non-enrolled students have attempts', async () => {
+    fixtures.whenTeacherFound();
+    fixtures.whenSessionFoundForTeacher();
+    fixtures.whenCoursesReturned();
+    fixtures.whenEnrollmentsReturned(['student-1']);
+    fixtures.whenSessionStatsReturned([
+      fixtures.stat({
+        courseId: 'c-1',
+        studentId: 'outsider',
+        attemptedQuestions: 2,
+        correctAnswers: 2,
+      }),
+    ]);
+
+    const result = await fixtures.whenExecuteAsTeacher();
+
+    expect(result[0].averageSuccessRate).toBeNull();
   });
 
   it('should throw NotFoundError when teacher is missing', async () => {
@@ -81,7 +163,7 @@ describe('GetSessionCoursesUseCase', () => {
       establishmentId: fixtures.establishment.id,
       id: fixtures.session.teacherId,
     });
-    expect(result).toEqual(fixtures.courses);
+    expect(result).toEqual(fixtures.coursesWithAverage());
     expect(fixtures.courseRepository.getSessionCoursesBySessionId).toHaveBeenCalledWith(fixtures.sessionId);
   });
 
@@ -118,7 +200,7 @@ describe('GetSessionCoursesUseCase', () => {
 
     const result = await fixtures.whenExecuteAsStudent();
 
-    expect(result).toEqual(fixtures.courses);
+    expect(result).toEqual(fixtures.coursesWithAverage());
     expect(fixtures.courseRepository.getSessionCoursesBySessionId).toHaveBeenCalledWith(fixtures.sessionId);
   });
 
@@ -129,7 +211,10 @@ describe('GetSessionCoursesUseCase', () => {
 
     const result = await fixtures.whenExecuteAsStudent();
 
-    expect(result).toEqual([fixtures.publishedCourse, fixtures.legacyCourse]);
+    expect(result).toEqual([
+      { ...fixtures.publishedCourse, averageSuccessRate: null },
+      { ...fixtures.legacyCourse, averageSuccessRate: null },
+    ]);
     expect(fixtures.courseRepository.getSessionCoursesBySessionId).toHaveBeenCalledWith(fixtures.sessionId);
   });
 
@@ -164,7 +249,7 @@ describe('GetSessionCoursesUseCase', () => {
 
     const result = await fixtures.whenExecuteAsAdmin();
 
-    expect(result).toEqual(fixtures.courses);
+    expect(result).toEqual(fixtures.coursesWithAverage());
     expect(fixtures.teachersRepository.getTeacherByUserId).not.toHaveBeenCalled();
     expect(fixtures.courseRepository.getSessionCoursesBySessionId).toHaveBeenCalledWith(fixtures.sessionId);
   });
@@ -273,6 +358,7 @@ class Fixtures {
   public readonly establishmentRepository: jest.Mocked<IEstablishmentRepository>;
   public readonly studentRepository: jest.Mocked<IStudentRepository>;
   public readonly studentSessionRepository: jest.Mocked<IStudentSessionRepository>;
+  public readonly studentCourseStatsRepository: jest.Mocked<IStudentCourseStatsRepository>;
   public readonly useCase: GetSessionCoursesUseCase;
 
   constructor() {
@@ -282,6 +368,9 @@ class Fixtures {
     this.establishmentRepository = createMockEstablishmentRepository();
     this.studentRepository = createMockStudentRepository();
     this.studentSessionRepository = createMockStudentSessionRepository();
+    this.studentCourseStatsRepository = createMockStudentCourseStatsRepository();
+    this.studentCourseStatsRepository.getStudentCourseStatsBySessionId.mockResolvedValue([]);
+    this.studentSessionRepository.getStudentsSessionsByIds.mockResolvedValue([]);
     this.useCase = new GetSessionCoursesUseCase(
       this.courseRepository,
       this.teachersRepository,
@@ -289,7 +378,25 @@ class Fixtures {
       this.establishmentRepository,
       this.studentRepository,
       this.studentSessionRepository,
+      this.studentCourseStatsRepository,
     );
+  }
+
+  coursesWithAverage(rate: number | null = null): Course[] {
+    return this.courses.map((course) => ({ ...course, averageSuccessRate: rate }));
+  }
+
+  stat(
+    partial: Pick<StudentCourseStats, 'courseId' | 'attemptedQuestions' | 'correctAnswers'> & {
+      studentId?: string;
+    },
+  ): StudentCourseStats {
+    return {
+      id: `stat-${partial.courseId}-${partial.studentId ?? 'student-1'}-${partial.attemptedQuestions}`,
+      studentId: 'student-1',
+      lastAttemptAt: '2026-01-01T00:00:00.000Z',
+      ...partial,
+    };
   }
 
   whenExecuteAsTeacher() {
@@ -369,6 +476,16 @@ class Fixtures {
       this.draftCourse,
       this.legacyCourse,
     ]);
+  }
+
+  whenSessionStatsReturned(stats: StudentCourseStats[]) {
+    this.studentCourseStatsRepository.getStudentCourseStatsBySessionId.mockResolvedValue(stats);
+  }
+
+  whenEnrollmentsReturned(studentIds: string[]) {
+    this.studentSessionRepository.getStudentsSessionsByIds.mockResolvedValue(
+      studentIds.map((studentId) => ({ sessionId: this.sessionId, studentId })),
+    );
   }
 
   whenCoursesFail() {
