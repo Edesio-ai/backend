@@ -71,7 +71,7 @@ jobs:
           fi
 
       - name: Apply preprod DB migrations
-        run: supabase db push --yes --db-url "${{ secrets.PREPROD_SUPABASE_DB_URL }}"
+        run: supabase db push --yes --remote="${{ secrets.PREPROD_SUPABASE_DB_URL }}"
 
       - name: Trigger Render preprod deploy
         run: |
