@@ -824,6 +824,7 @@ class Fixtures {
       customer_email: this.email,
       allow_promotion_codes: true,
       locale: 'auto',
+      payment_method_collection: 'if_required',
       line_items: [
         {
           price: this.priceId,
@@ -834,6 +835,12 @@ class Fixtures {
         plan: this.planType,
       },
       subscription_data: {
+        trial_period_days: 60,
+        trial_settings: {
+          end_behavior: {
+            missing_payment_method: 'cancel',
+          },
+        },
         metadata: {
           plan: this.planType,
           priceId: this.priceId,

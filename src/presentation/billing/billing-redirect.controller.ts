@@ -4,6 +4,11 @@ import { PaymentSuccessUseCase } from '../../application/billing/payment-success
 import { Public } from '../auth/decorator/public.decorator';
 import { SkipCsrf } from '../auth/decorator/skip-csrf.decorator';
 
+const POST_PAYMENT_PATH: Record<string, string> = {
+  teacher: '/teacher/sessions',
+  establishment: '/establishment/overview',
+};
+
 @Public()
 @SkipCsrf()
 @Controller('billing/redirect')
@@ -18,7 +23,8 @@ export class BillingRedirectController {
     }
     const { metadata } = session;
     const { plan } = metadata;
-    return res.redirect(`${process.env.FRONTEND_URL}/${plan}`);
+    const path = POST_PAYMENT_PATH[plan] ?? `/${plan}`;
+    return res.redirect(302, `${process.env.FRONTEND_URL}${path}`);
   }
 
   @Get('cancel')

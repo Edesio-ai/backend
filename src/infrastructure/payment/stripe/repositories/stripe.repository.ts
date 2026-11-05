@@ -98,6 +98,7 @@ export class StripeRepository implements IStripeProvider {
         customer_email: email,
         allow_promotion_codes: true,
         locale: locale ?? 'auto',
+        payment_method_collection: 'if_required',
         line_items: [
           {
             price: priceId,
@@ -108,6 +109,12 @@ export class StripeRepository implements IStripeProvider {
           plan: planType,
         },
         subscription_data: {
+          trial_period_days: 60,
+          trial_settings: {
+            end_behavior: {
+              missing_payment_method: 'cancel',
+            },
+          },
           metadata: {
             plan: planType,
             priceId: priceId,
